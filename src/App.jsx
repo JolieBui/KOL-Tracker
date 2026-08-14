@@ -775,6 +775,570 @@ const KanbanView = ({ rows, onOpen }) => (
 );
 
 /* ================================================================
+   INSIGHTS & SUMMARY VIEW
+================================================================ */
+const parseFollowers = (str) => {
+  if (!str) return 0;
+  const s = str.toString().trim().toLowerCase();
+  if (s.endsWith("m")) return parseFloat(s) * 1000000;
+  if (s.endsWith("k")) return parseFloat(s) * 1000;
+  const n = parseFloat(s);
+  return isNaN(n) ? 0 : n;
+};
+
+const fmtFollowers = (num) => {
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
+  if (num >= 1000) return (num / 1000).toFixed(0) + "K";
+  return num.toString();
+};
+
+const StatCard = ({ title, value, subtext, color = "var(--ink)" }) => (
+  <div style={{
+    background: "var(--card)",
+    border: "1px solid var(--line)",
+    borderRadius: 12,
+    padding: "16px 20px",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.02)"
+  }}>
+    <span style={{ fontSize: 11, fontWeight: 600, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em" }}>{title}</span>
+    <span style={{ fontSize: 20, fontWeight: 700, color: color, margin: "6px 0", wordBreak: "break-all" }}>{value}</span>
+    <span style={{ fontSize: 11, color: "var(--ink-soft)", lineHeight: 1.3 }}>{subtext}</span>
+  </div>
+);
+
+const InsightsView = ({ rows }) => {
+  const [subView, setSubView] = useState("account");
+
+  const metrics = useMemo(() => {
+    if (rows.length === 0) return null;
+
+    const totalKOL = rows.length;
+    const totalCost = rows.reduce((sum, r) => sum + (Number(r.cost) || 0), 0);
+    const avgCost = totalCost / totalKOL;
+    const airedKOLs = rows.filter(r => r.statusKey === "aired");
+    const airedCount = airedKOLs.length;
+    const airedRate = Math.round((airedCount / totalKOL) * 100);
+    const zeroCostCount = rows.filter(r => (Number(r.cost) || 0) === 0).length;
+
+    // 1. Account: Campaign Analysis
+    const campaignMap = {};
+    rows.forEach(r => {
+      const c = r.campaign || "Unknown";
+      if (!campaignMap[c]) {
+        campaignMap[c] = { campaign: c, count: 0, cost: 0, airedCount: 0 };
+      }
+      campaignMap[c].count += 1;
+      campaignMap[c].cost += (Number(r.cost) || 0);
+      if (r.statusKey === "aired") campaignMap[c].airedCount += 1;
+    });
+    const campaignList = Object.values(campaignMap).sort((a, b) => b.cost - a.cost);
+
+    // Account: Bottlenecks (stages where statusKey !== 'aired')
+    const statusMap = {};
+    rows.forEach(r => {
+      if (r.statusKey !== "aired") {
+        const s = r.statusKey || "waiting_food";
+        statusMap[s] = (statusMap[s] || 0) + 1;
+      }
+    });
+    const bottlenecks = Object.entries(statusMap)
+      .map(([key, count]) => {
+        const stage = STATUS_MAP[key] || { label: key, color: "#666" };
+        return { key, count, label: stage.label, color: stage.color };
+      })
+      .sort((a, b) => b.count - a.count);
+
+    // 2. Marketing: Tiers
+    const tierMap = {};
+    rows.forEach(r => {
+      const t = r.type || "Chưa phân loại";
+      if (!tierMap[t]) {
+        tierMap[t] = { name: t, count: 0, cost: 0, followers: 0 };
+      }
+      tierMap[t].count += 1;
+      tierMap[t].cost += (Number(r.cost) || 0);
+      tierMap[t].followers += parseFollowers(r.follower);
+    });
+    const tierList = Object.values(tierMap).sort((a, b) => b.count - a.count);
+
+    // Marketing: Locations
+    const locMap = {};
+    rows.forEach(r => {
+      const l = r.location || "Chưa xác định";
+      if (!locMap[l]) {
+        locMap[l] = { name: l, count: 0, cost: 0 };
+      }
+      locMap[l].count += 1;
+      locMap[l].cost += (Number(r.cost) || 0);
+    });
+    const locList = Object.values(locMap).sort((a, b) => b.count - a.count);
+
+    // Marketing: Audience Groups
+    const groupMap = {};
+    rows.forEach(r => {
+      const g = r.group || "Chưa xác định";
+      if (!groupMap[g]) {
+        groupMap[g] = { name: g, count: 0 };
+      }
+      groupMap[g].count += 1;
+    });
+    const groupList = Object.values(groupMap).sort((a, b) => b.count - a.count);
+
+    // Total followers
+    const totalFollowers = rows.reduce((sum, r) => sum + parseFollowers(r.follower), 0);
+
+    // 3. Ecom: Cost efficiency
+    const ecomList = rows
+      .map(r => {
+        const fl = parseFollowers(r.follower);
+        const cost = Number(r.cost) || 0;
+        return {
+          ...r,
+          followersNum: fl,
+          cpf: fl > 0 ? cost / fl : null,
+        };
+      })
+      .filter(r => r.followersNum > 0);
+    const sortedEcom = [...ecomList]
+      .filter(r => r.cpf !== null)
+      .sort((a, b) => a.cpf - b.cpf);
+
+    // Ecom: Aired link status
+    const airedKOLsCount = rows.filter(r => r.statusKey === "aired").length;
+    const airedWithLink = rows.filter(r => r.statusKey === "aired" && r.airedLink && r.airedLink.trim().startsWith("http")).length;
+    const linkAiredRate = airedKOLsCount ? Math.round((airedWithLink / airedKOLsCount) * 100) : 0;
+    const airedMissingLink = rows.filter(r => r.statusKey === "aired" && (!r.airedLink || !r.airedLink.trim().startsWith("http")));
+
+    // Ecom: Dish analysis
+    const dishMap = {};
+    rows.forEach(r => {
+      if (r.monAn) {
+        const firstLine = r.monAn.split("\n")[0].trim();
+        if (firstLine) {
+          dishMap[firstLine] = (dishMap[firstLine] || 0) + 1;
+        }
+      }
+    });
+    const dishList = Object.entries(dishMap)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+
+    // CPM Est
+    const totalFollowersOfEcom = ecomList.reduce((sum, r) => sum + r.followersNum, 0);
+    const totalCostOfEcom = ecomList.reduce((sum, r) => sum + (Number(r.cost) || 0), 0);
+    const cpmEst = totalFollowersOfEcom > 0 ? (totalCostOfEcom / totalFollowersOfEcom) * 1000 : 0;
+
+    return {
+      totalKOL, totalCost, avgCost, airedCount, airedRate, zeroCostCount,
+      campaignList, bottlenecks,
+      tierList, locList, groupList, totalFollowers,
+      sortedEcom, linkAiredRate, airedMissingLink, dishList, cpmEst
+    };
+  }, [rows]);
+
+  if (!metrics) return null;
+
+  // Helper colors for charts
+  const COLOR_PALETTE = ["#FF6B6B", "#4ECDC4", "#45B7D1", "#FFA07A", "#98D8C8", "#F7DC6F", "#BB8FCE"];
+
+  // Smart Insights Texts
+  const accountInsights = [];
+  const topCampaign = metrics.campaignList[0];
+  if (topCampaign) {
+    const pct = Math.round((topCampaign.cost / metrics.totalCost) * 100);
+    accountInsights.push(`💼 Chiến dịch <strong>${topCampaign.campaign}</strong> đang dẫn đầu về ngân sách đầu tư với <strong>${fmtVND(topCampaign.cost)}</strong> (chiếm <strong>${pct}%</strong> tổng ngân sách).`);
+  }
+  const topBottleneck = metrics.bottlenecks[0];
+  if (topBottleneck && topBottleneck.count > 0) {
+    accountInsights.push(`⚠️ Trạng thái <strong>"${topBottleneck.label}"</strong> hiện là nút thắt cổ chai lớn nhất với <strong>${topBottleneck.count} KOL</strong> đang chờ xử lý/phê duyệt.`);
+  }
+  if (metrics.zeroCostCount > 0) {
+    accountInsights.push(`🎁 Có <strong>${metrics.zeroCostCount} KOL</strong> chạy hình thức đổi quà/miễn phí booking trực tiếp, giúp tiết kiệm chi phí.`);
+  }
+  if (metrics.airedRate > 70) {
+    accountInsights.push(`📈 Tỷ lệ hoàn thành lên sóng đạt mức cao (<strong>${metrics.airedRate}%</strong>), dự án đang nghiệm thu tốt.`);
+  } else if (metrics.airedRate < 35) {
+    accountInsights.push(`⏳ Tỷ lệ lên sóng hiện tại khá thấp (<strong>${metrics.airedRate}%</strong>), team Account cần đôn đốc duyệt kịch bản & demo.`);
+  }
+
+  const marketingInsights = [];
+  const topTier = metrics.tierList[0];
+  if (topTier) {
+    const pct = Math.round((topTier.count / metrics.totalKOL) * 100);
+    marketingInsights.push(`🎯 Phân khúc <strong>${topTier.name}</strong> chiếm đa số với <strong>${topTier.count} KOLs</strong> (tỷ lệ <strong>${pct}%</strong>).`);
+  }
+  const topLoc = metrics.locList[0];
+  if (topLoc) {
+    marketingInsights.push(`📍 Điểm nóng địa lý tập trung cao nhất tại <strong>${topLoc.name}</strong> với <strong>${topLoc.count} KOLs</strong>.`);
+  }
+  const topGroup = metrics.groupList[0];
+  if (topGroup) {
+    marketingInsights.push(`👥 Nhóm đối tượng độc giả <strong>"${topGroup.name}"</strong> đang được phủ sóng nhiều nhất.`);
+  }
+  if (metrics.totalFollowers > 0) {
+    marketingInsights.push(`📢 Tổng độ phủ truyền thông (followers) tích lũy của tệp KOL đạt khoảng <strong>${fmtFollowers(metrics.totalFollowers)}</strong>.`);
+  }
+
+  const ecomInsights = [];
+  const bestKOL = metrics.sortedEcom[0];
+  if (bestKOL) {
+    ecomInsights.push(`🛒 KOL <strong>${bestKOL.kol}</strong> (${bestKOL.follower}) đạt hiệu số tiếp cận tối ưu nhất với chi phí chỉ <strong>${Math.round(bestKOL.cpf).toLocaleString()}đ</strong> / follower.`);
+  }
+  if (metrics.linkAiredRate < 100 && metrics.airedCount > 0) {
+    const missingCount = metrics.airedMissingLink.length;
+    ecomInsights.push(`🔗 Còn <strong>${missingCount} KOL</strong> đã lên sóng nhưng chưa cập nhật Link Video. Cần bổ sung để chạy ads / đo lường giỏ hàng.`);
+  }
+  const topDish = metrics.dishList[0];
+  if (topDish) {
+    ecomInsights.push(`🍽 Sản phẩm/Món ăn được quảng bá chủ đạo là <strong>"${topDish.name}"</strong> (${topDish.count} bài kịch bản).`);
+  }
+  if (metrics.cpmEst > 0) {
+    ecomInsights.push(`💸 Chỉ số CPM trung bình dự kiến của chiến dịch là <strong>${fmtVND(metrics.cpmEst)}</strong> / 1,000 followers tiếp cận.`);
+  }
+
+  return (
+    <div style={{ padding: 20 }}>
+      {/* ── Role perspective selector tabs ── */}
+      <div style={{
+        display: "flex",
+        gap: 8,
+        borderBottom: "1px solid var(--line)",
+        paddingBottom: 12,
+        marginBottom: 20,
+        flexWrap: "wrap"
+      }}>
+        <button
+          className={`kt-btn ${subView === "account" ? "kt-btn-primary" : "kt-btn-ghost"}`}
+          onClick={() => setSubView("account")}
+          style={{ fontSize: 12, padding: "6px 14px", borderRadius: 8 }}
+        >
+          💼 Account (Tài chính & Tiến độ)
+        </button>
+        <button
+          className={`kt-btn ${subView === "marketing" ? "kt-btn-primary" : "kt-btn-ghost"}`}
+          onClick={() => setSubView("marketing")}
+          style={{ fontSize: 12, padding: "6px 14px", borderRadius: 8 }}
+        >
+          🎯 Marketing (Đối tượng & Độ phủ)
+        </button>
+        <button
+          className={`kt-btn ${subView === "ecom" ? "kt-btn-primary" : "kt-btn-ghost"}`}
+          onClick={() => setSubView("ecom")}
+          style={{ fontSize: 12, padding: "6px 14px", borderRadius: 8 }}
+        >
+          🛒 E-commerce (Hiệu quả & Link)
+        </button>
+      </div>
+
+      {/* ── Subviews Rendering ── */}
+      {subView === "account" && (
+        <div className="kt-anim">
+          {/* Stats grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, marginBottom: 20 }}>
+            <StatCard title="Tổng ngân sách" value={fmtVND(metrics.totalCost)} subtext="Tổng chi phí chiến dịch" color="var(--red)" />
+            <StatCard title="Chi phí trung bình" value={fmtVND(metrics.avgCost)} subtext="Chi phí trên mỗi KOL" />
+            <StatCard title="Tỷ lệ lên sóng" value={`${metrics.airedRate}%`} subtext={`${metrics.airedCount} / ${metrics.totalKOL} KOL đã hoàn thành`} color="var(--green)" />
+            <StatCard title="KOL đổi quà (0đ)" value={`${metrics.zeroCostCount} KOL`} subtext="Không tính phí booking" color="var(--amber)" />
+          </div>
+
+          {/* Campaign breakdown table */}
+          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>Phân bổ ngân sách theo Chiến dịch</h3>
+            <div style={{ overflowX: "auto" }} className="kt-scrollbar">
+              <table className="kt-table" style={{ margin: 0, minWidth: 500 }}>
+                <thead>
+                  <tr>
+                    <th>Chiến dịch</th>
+                    <th>Số lượng KOL</th>
+                    <th>Tổng ngân sách</th>
+                    <th>Chi phí trung bình</th>
+                    <th>Tiến độ đã Aired</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {metrics.campaignList.map(c => {
+                    const progress = c.count ? Math.round((c.airedCount / c.count) * 100) : 0;
+                    return (
+                      <tr key={c.campaign}>
+                        <td><strong>{c.campaign}</strong></td>
+                        <td>{c.count}</td>
+                        <td>{fmtVND(c.cost)}</td>
+                        <td>{fmtVND(c.cost / c.count)}</td>
+                        <td>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <div style={{ flex: 1, height: 6, borderRadius: 3, background: "var(--line)", overflow: "hidden", minWidth: 80 }}>
+                              <div style={{ width: `${progress}%`, background: "var(--green)", height: "100%" }} />
+                            </div>
+                            <span style={{ fontSize: 11, fontWeight: 600, minWidth: 30 }}>{progress}%</span>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Bottlenecks */}
+          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)", display: "flex", alignItems: "center", gap: 6 }}>
+              ⚠️ Cảnh báo điểm nghẽn duyệt kịch bản / demo
+            </h3>
+            {metrics.bottlenecks.length > 0 ? (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
+                {metrics.bottlenecks.map(b => (
+                  <div key={b.key} style={{ padding: 12, borderRadius: 8, background: "var(--amber-soft)", border: "1px solid var(--line)" }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>{b.label}</div>
+                    <div style={{ fontSize: 18, fontWeight: 700, color: b.color, marginTop: 4 }}>{b.count} KOL đang kẹt</div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ padding: 12, borderRadius: 8, background: "var(--green-soft)", color: "var(--green)", fontSize: 12, fontWeight: 600 }}>
+                🎉 Tuyệt vời! Không có KOL nào đang bị nghẽn ở các bước duyệt trung gian.
+              </div>
+            )}
+          </div>
+
+          {/* Insights statements */}
+          <div style={{ background: "var(--red-soft)", borderRadius: 12, padding: 16, border: "1px solid var(--line)" }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 10px 0", color: "var(--red)" }}>💡 Đúc kết Insight cho Account</h3>
+            <ul style={{ margin: 0, paddingLeft: 20, display: "flex", flexDirection: "column", gap: 8, fontSize: 12, color: "var(--ink)" }}>
+              {accountInsights.map((ins, i) => (
+                <li key={i} dangerouslySetInnerHTML={{ __html: ins }} />
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+
+      {subView === "marketing" && (
+        <div className="kt-anim">
+          {/* Stats grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, marginBottom: 20 }}>
+            <StatCard title="Tổng số người theo dõi" value={fmtFollowers(metrics.totalFollowers)} subtext="Tích lũy tệp truyền thông" color="var(--red)" />
+            <StatCard title="Phân khúc chủ đạo" value={metrics.tierList[0]?.name || "N/A"} subtext="Loại KOL chiếm số đông" />
+            <StatCard title="Điểm nóng địa lý" value={metrics.locList[0]?.name || "N/A"} subtext="Khu vực tập trung nhiều nhất" color="var(--green)" />
+            <StatCard title="Nhóm target lớn nhất" value={metrics.groupList[0]?.name || "N/A"} subtext="Nhóm khán giả của KOL" color="var(--amber)" />
+          </div>
+
+          {/* Tiers Segmented Bar Chart */}
+          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>Phân bố loại KOL (Tiers) & Độ phủ</h3>
+            
+            {/* Visual Bar Chart */}
+            <div style={{ display: "flex", height: 16, borderRadius: 8, overflow: "hidden", background: "var(--line)", marginBottom: 16 }}>
+              {metrics.tierList.map((t, idx) => {
+                const pct = Math.round((t.count / metrics.totalKOL) * 100);
+                if (pct === 0) return null;
+                const color = COLOR_PALETTE[idx % COLOR_PALETTE.length];
+                return (
+                  <div
+                    key={t.name}
+                    style={{ width: `${pct}%`, background: color, height: "100%" }}
+                    title={`${t.name}: ${t.count} KOL (${pct}%)`}
+                  />
+                );
+              })}
+            </div>
+
+            {/* Breakdown details */}
+            <div style={{ overflowX: "auto" }} className="kt-scrollbar">
+              <table className="kt-table" style={{ margin: 0, minWidth: 400 }}>
+                <thead>
+                  <tr>
+                    <th>Loại KOL</th>
+                    <th>Số lượng</th>
+                    <th>Tỷ lệ</th>
+                    <th>Tổng ngân sách</th>
+                    <th>Tổng Followers</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {metrics.tierList.map((t, idx) => {
+                    const pct = Math.round((t.count / metrics.totalKOL) * 100);
+                    return (
+                      <tr key={t.name}>
+                        <td>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: COLOR_PALETTE[idx % COLOR_PALETTE.length] }} />
+                            <strong>{t.name}</strong>
+                          </div>
+                        </td>
+                        <td>{t.count}</td>
+                        <td>{pct}%</td>
+                        <td>{fmtVND(t.cost)}</td>
+                        <td>{fmtFollowers(t.followers)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Locations & Groups grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16, marginBottom: 20 }}>
+            {/* Locations */}
+            <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16 }}>
+              <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>📍 Địa bàn của KOL</h3>
+              <table className="kt-table" style={{ margin: 0 }}>
+                <thead>
+                  <tr>
+                    <th>Khu vực</th>
+                    <th>Số KOL</th>
+                    <th>Chi phí</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {metrics.locList.slice(0, 5).map(l => (
+                    <tr key={l.name}>
+                      <td><strong>{l.name}</strong></td>
+                      <td>{l.count}</td>
+                      <td>{fmtVND(l.cost)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Audience Groups */}
+            <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16 }}>
+              <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>👥 Nhóm target của KOL</h3>
+              <table className="kt-table" style={{ margin: 0 }}>
+                <thead>
+                  <tr>
+                    <th>Nhóm khán giả</th>
+                    <th>Số KOL</th>
+                    <th>Tỷ lệ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {metrics.groupList.slice(0, 5).map(g => (
+                    <tr key={g.name}>
+                      <td><strong>{g.name}</strong></td>
+                      <td>{g.count}</td>
+                      <td>{Math.round((g.count / metrics.totalKOL) * 100)}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Insights statements */}
+          <div style={{ background: "var(--red-soft)", borderRadius: 12, padding: 16, border: "1px solid var(--line)" }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 10px 0", color: "var(--red)" }}>💡 Đúc kết Insight cho Marketing</h3>
+            <ul style={{ margin: 0, paddingLeft: 20, display: "flex", flexDirection: "column", gap: 8, fontSize: 12, color: "var(--ink)" }}>
+              {marketingInsights.map((ins, i) => (
+                <li key={i} dangerouslySetInnerHTML={{ __html: ins }} />
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+
+      {subView === "ecom" && (
+        <div className="kt-anim">
+          {/* Stats grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, marginBottom: 20 }}>
+            <StatCard title="Chi phí/1000 Follower" value={metrics.cpmEst ? `${fmtVND(metrics.cpmEst)}` : "N/A"} subtext="CPM trung bình toàn chiến dịch" color="var(--red)" />
+            <StatCard title="Tỷ lệ cập nhật Video Link" value={`${metrics.linkAiredRate}%`} subtext={`${metrics.airedCount - metrics.airedMissingLink.length} / ${metrics.airedCount} bài aired đã có link`} />
+            <StatCard title="Món ăn hot nhất" value={metrics.dishList[0]?.name || "N/A"} subtext={`${metrics.dishList[0]?.count || 0} bài lên kịch bản`} color="var(--green)" />
+            <StatCard title="KOL tối ưu nhất" value={metrics.sortedEcom[0]?.kol || "N/A"} subtext={metrics.sortedEcom[0] ? `Hiệu số tiếp cận: ${fmtVND(metrics.sortedEcom[0].cpf)} / follower` : ""} color="var(--amber)" />
+          </div>
+
+          {/* Top 5 cost-effective KOLs */}
+          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>🛒 Top 5 KOL có hiệu suất chi phí tiếp cận tối ưu nhất (CPF)</h3>
+            {metrics.sortedEcom.length > 0 ? (
+              <div style={{ overflowX: "auto" }} className="kt-scrollbar">
+                <table className="kt-table" style={{ margin: 0, minWidth: 400 }}>
+                  <thead>
+                    <tr>
+                      <th>KOL</th>
+                      <th>Chiến dịch</th>
+                      <th>Followers</th>
+                      <th>Chi phí</th>
+                      <th>Chi phí / 1 Follower</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {metrics.sortedEcom.slice(0, 5).map(r => (
+                      <tr key={r.id}>
+                        <td><strong>{r.kol}</strong></td>
+                        <td>{r.campaign}</td>
+                        <td>{r.follower}</td>
+                        <td>{fmtVND(r.cost)}</td>
+                        <td style={{ color: "var(--green)", fontWeight: 600 }}>{fmtVND(r.cpf)} / follow</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div style={{ padding: 12, borderRadius: 8, background: "var(--amber-soft)", color: "var(--amber)", fontSize: 12, fontWeight: 600 }}>
+                Không tìm thấy KOL nào có ghi nhận thông tin Followers để tính chỉ số hiệu suất.
+              </div>
+            )}
+          </div>
+
+          {/* Ecom actions: Aired missing link checklist */}
+          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>🔗 Checklist việc cần làm: Thu thập Video Link các bài đã lên sóng (Aired)</h3>
+            {metrics.airedMissingLink.length > 0 ? (
+              <div>
+                <p style={{ fontSize: 11, color: "var(--ink-soft)", margin: "0 0 8px 0" }}>Phát hiện <strong>{metrics.airedMissingLink.length} bài</strong> đã lên sóng nhưng chưa có đường dẫn video để đối soát:</p>
+                <div style={{ maxHeight: 200, overflowY: "auto", border: "1px solid var(--line)", borderRadius: 8 }} className="kt-scrollbar">
+                  <table className="kt-table" style={{ margin: 0 }}>
+                    <thead>
+                      <tr>
+                        <th>Tên KOL</th>
+                        <th>Chiến dịch</th>
+                        <th>Món ăn</th>
+                        <th>Ngày lên sóng</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {metrics.airedMissingLink.map(r => (
+                        <tr key={r.id}>
+                          <td><strong>{r.kol}</strong></td>
+                          <td>{r.campaign}</td>
+                          <td>{r.monAn || "—"}</td>
+                          <td>{r.ngayAir || "—"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ) : (
+              <div style={{ padding: 12, borderRadius: 8, background: "var(--green-soft)", color: "var(--green)", fontSize: 12, fontWeight: 600 }}>
+                ✅ Rất tốt! Toàn bộ KOL đã lên sóng (Aired) đều đã được gắn link video đầy đủ.
+              </div>
+            )}
+          </div>
+
+          {/* Insights statements */}
+          <div style={{ background: "var(--red-soft)", borderRadius: 12, padding: 16, border: "1px solid var(--line)" }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 10px 0", color: "var(--red)" }}>💡 Đúc kết Insight cho E-commerce</h3>
+            <ul style={{ margin: 0, paddingLeft: 20, display: "flex", flexDirection: "column", gap: 8, fontSize: 12, color: "var(--ink)" }}>
+              {ecomInsights.map((ins, i) => (
+                <li key={i} dangerouslySetInnerHTML={{ __html: ins }} />
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ================================================================
    MAIN APP
 ================================================================ */
 const LS_KEY = "kol_tracker_v1";
@@ -951,6 +1515,8 @@ export default function App() {
                 onClick={() => setView("table")}>☰ Bảng</button>
               <button className={`kt-btn kt-btn-ghost${view === "kanban" ? " active" : ""}`}
                 onClick={() => setView("kanban")}>⬛ Kanban</button>
+              <button className={`kt-btn kt-btn-ghost${view === "insights" ? " active" : ""}`}
+                onClick={() => setView("insights")}>📊 Insights</button>
             </div>
 
             {/* Excel / JSON Actions */}
@@ -1007,10 +1573,9 @@ export default function App() {
       {/* ── BODY ── */}
       <div style={{ padding: "20px" }}>
         <div style={{ background: "var(--card)", borderRadius: 12, border: "1px solid var(--line)", overflow: "clip" }}>
-          {view === "table"
-            ? <TableView rows={filtered} onOpen={r => setSelected(r)} />
-            : <KanbanView rows={filtered} onOpen={r => setSelected(r)} />
-          }
+          {view === "table" && <TableView rows={filtered} onOpen={r => setSelected(r)} />}
+          {view === "kanban" && <KanbanView rows={filtered} onOpen={r => setSelected(r)} />}
+          {view === "insights" && <InsightsView rows={filtered} />}
         </div>
       </div>
 
