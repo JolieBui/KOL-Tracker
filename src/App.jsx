@@ -151,6 +151,8 @@ const GlobalStyle = () => (
       text-transform: uppercase;
       letter-spacing: 0.04em;
       white-space: nowrap;
+    }
+    .kt-table-sticky th {
       position: sticky;
       top: 184px;
       z-index: 10;
@@ -644,7 +646,7 @@ const StatsBar = ({ rows }) => {
 ================================================================ */
 const TableView = ({ rows, onOpen }) => (
   <div style={{ overflow: "visible" }}>
-    <table className="kt-table">
+    <table className="kt-table kt-table-sticky">
       <thead>
         <tr>
           <th>ID</th>
@@ -809,9 +811,14 @@ const StatCard = ({ title, value, subtext, color = "var(--ink)" }) => (
   </div>
 );
 
-const InsightsView = ({ rows }) => {
+const InsightsView = ({ rows, insightsNotes, onSaveNote }) => {
   const [subView, setSubView] = useState("account");
   const [selectedCampaign, setSelectedCampaign] = useState("all");
+  const [noteText, setNoteText] = useState("");
+
+  useEffect(() => {
+    setNoteText(insightsNotes[selectedCampaign] || "");
+  }, [selectedCampaign, insightsNotes]);
 
   const campaigns = useMemo(() => {
     const list = Array.from(new Set(rows.map(r => r.campaign).filter(Boolean)));
@@ -1379,6 +1386,32 @@ const InsightsView = ({ rows }) => {
           </div>
         </div>
       )}
+
+      {/* ── Custom Notes Card ── */}
+      <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginTop: 20 }}>
+        <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 8px 0", color: "var(--ink)", display: "flex", alignItems: "center", gap: 6 }}>
+          📝 Nhận xét & Đánh giá của tôi
+        </h3>
+        <p style={{ fontSize: 11, color: "var(--ink-soft)", margin: "0 0 12px 0" }}>
+          Ghi chú này sẽ được lưu riêng cho chiến dịch <strong>{selectedCampaign === "all" ? "Tổng cộng (Tất cả)" : selectedCampaign}</strong>.
+        </p>
+        <textarea
+          className="kt-textarea"
+          value={noteText}
+          onChange={e => setNoteText(e.target.value)}
+          placeholder="Nhập đánh giá hiệu quả, đề xuất tối ưu hoặc lưu ý quan trọng cho dự án tại đây..."
+          style={{ width: "100%", height: 100, resize: "vertical", fontSize: 13, padding: 10, borderRadius: 8, border: "1px solid var(--line)", outline: "none", marginBottom: 12 }}
+        />
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <button
+            className="kt-btn kt-btn-primary"
+            onClick={() => onSaveNote(selectedCampaign, noteText)}
+            style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, padding: "8px 16px" }}
+          >
+            💾 Lưu Nhận xét & Đánh giá
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
@@ -1406,6 +1439,19 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem(LS_KEY, JSON.stringify(data));
   }, [data]);
+
+  const [insightsNotes, setInsightsNotes] = useState(() => {
+    try {
+      const s = localStorage.getItem("kol_tracker_insights_notes_v1");
+      return s ? JSON.parse(s) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem("kol_tracker_insights_notes_v1", JSON.stringify(insightsNotes));
+  }, [insightsNotes]);
 
   const [wizardData, setWizardData] = useState(null); // { rawHeaders, rawRows, fileName }
 
@@ -1620,7 +1666,16 @@ export default function App() {
         <div style={{ background: "var(--card)", borderRadius: 12, border: "1px solid var(--line)", overflow: "clip" }}>
           {view === "table" && <TableView rows={filtered} onOpen={r => setSelected(r)} />}
           {view === "kanban" && <KanbanView rows={filtered} onOpen={r => setSelected(r)} />}
-          {view === "insights" && <InsightsView rows={filtered} />}
+          {view === "insights" && (
+            <InsightsView
+              rows={data}
+              insightsNotes={insightsNotes}
+              onSaveNote={(campaign, text) => {
+                setInsightsNotes(prev => ({ ...prev, [campaign]: text }));
+                showToast("Đã lưu nhận xét thành công!");
+              }}
+            />
+          )}
         </div>
       </div>
 
