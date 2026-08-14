@@ -811,21 +811,32 @@ const StatCard = ({ title, value, subtext, color = "var(--ink)" }) => (
 
 const InsightsView = ({ rows }) => {
   const [subView, setSubView] = useState("account");
+  const [selectedCampaign, setSelectedCampaign] = useState("all");
+
+  const campaigns = useMemo(() => {
+    const list = Array.from(new Set(rows.map(r => r.campaign).filter(Boolean)));
+    return ["all", ...list];
+  }, [rows]);
+
+  const activeRows = useMemo(() => {
+    if (selectedCampaign === "all") return rows;
+    return rows.filter(r => r.campaign === selectedCampaign);
+  }, [rows, selectedCampaign]);
 
   const metrics = useMemo(() => {
-    if (rows.length === 0) return null;
+    if (activeRows.length === 0) return null;
 
-    const totalKOL = rows.length;
-    const totalCost = rows.reduce((sum, r) => sum + (Number(r.cost) || 0), 0);
+    const totalKOL = activeRows.length;
+    const totalCost = activeRows.reduce((sum, r) => sum + (Number(r.cost) || 0), 0);
     const avgCost = totalCost / totalKOL;
-    const airedKOLs = rows.filter(r => r.statusKey === "aired");
+    const airedKOLs = activeRows.filter(r => r.statusKey === "aired");
     const airedCount = airedKOLs.length;
     const airedRate = Math.round((airedCount / totalKOL) * 100);
-    const zeroCostCount = rows.filter(r => (Number(r.cost) || 0) === 0).length;
+    const zeroCostCount = activeRows.filter(r => (Number(r.cost) || 0) === 0).length;
 
     // 1. Account: Campaign Analysis
     const campaignMap = {};
-    rows.forEach(r => {
+    activeRows.forEach(r => {
       const c = r.campaign || "Unknown";
       if (!campaignMap[c]) {
         campaignMap[c] = { campaign: c, count: 0, cost: 0, airedCount: 0 };
@@ -838,7 +849,7 @@ const InsightsView = ({ rows }) => {
 
     // Account: Bottlenecks (stages where statusKey !== 'aired')
     const statusMap = {};
-    rows.forEach(r => {
+    activeRows.forEach(r => {
       if (r.statusKey !== "aired") {
         const s = r.statusKey || "waiting_food";
         statusMap[s] = (statusMap[s] || 0) + 1;
@@ -853,7 +864,7 @@ const InsightsView = ({ rows }) => {
 
     // 2. Marketing: Tiers
     const tierMap = {};
-    rows.forEach(r => {
+    activeRows.forEach(r => {
       const t = r.type || "Chưa phân loại";
       if (!tierMap[t]) {
         tierMap[t] = { name: t, count: 0, cost: 0, followers: 0 };
@@ -866,7 +877,7 @@ const InsightsView = ({ rows }) => {
 
     // Marketing: Locations
     const locMap = {};
-    rows.forEach(r => {
+    activeRows.forEach(r => {
       const l = r.location || "Chưa xác định";
       if (!locMap[l]) {
         locMap[l] = { name: l, count: 0, cost: 0 };
@@ -878,7 +889,7 @@ const InsightsView = ({ rows }) => {
 
     // Marketing: Audience Groups
     const groupMap = {};
-    rows.forEach(r => {
+    activeRows.forEach(r => {
       const g = r.group || "Chưa xác định";
       if (!groupMap[g]) {
         groupMap[g] = { name: g, count: 0 };
@@ -888,10 +899,10 @@ const InsightsView = ({ rows }) => {
     const groupList = Object.values(groupMap).sort((a, b) => b.count - a.count);
 
     // Total followers
-    const totalFollowers = rows.reduce((sum, r) => sum + parseFollowers(r.follower), 0);
+    const totalFollowers = activeRows.reduce((sum, r) => sum + parseFollowers(r.follower), 0);
 
     // 3. Ecom: Cost efficiency
-    const ecomList = rows
+    const ecomList = activeRows
       .map(r => {
         const fl = parseFollowers(r.follower);
         const cost = Number(r.cost) || 0;
@@ -907,14 +918,14 @@ const InsightsView = ({ rows }) => {
       .sort((a, b) => a.cpf - b.cpf);
 
     // Ecom: Aired link status
-    const airedKOLsCount = rows.filter(r => r.statusKey === "aired").length;
-    const airedWithLink = rows.filter(r => r.statusKey === "aired" && r.airedLink && r.airedLink.trim().startsWith("http")).length;
+    const airedKOLsCount = activeRows.filter(r => r.statusKey === "aired").length;
+    const airedWithLink = activeRows.filter(r => r.statusKey === "aired" && r.airedLink && r.airedLink.trim().startsWith("http")).length;
     const linkAiredRate = airedKOLsCount ? Math.round((airedWithLink / airedKOLsCount) * 100) : 0;
-    const airedMissingLink = rows.filter(r => r.statusKey === "aired" && (!r.airedLink || !r.airedLink.trim().startsWith("http")));
+    const airedMissingLink = activeRows.filter(r => r.statusKey === "aired" && (!r.airedLink || !r.airedLink.trim().startsWith("http")));
 
     // Ecom: Dish analysis
     const dishMap = {};
-    rows.forEach(r => {
+    activeRows.forEach(r => {
       if (r.monAn) {
         const firstLine = r.monAn.split("\n")[0].trim();
         if (firstLine) {
@@ -937,7 +948,7 @@ const InsightsView = ({ rows }) => {
       tierList, locList, groupList, totalFollowers,
       sortedEcom, linkAiredRate, airedMissingLink, dishList, cpmEst
     };
-  }, [rows]);
+  }, [activeRows]);
 
   if (!metrics) return null;
 
@@ -1001,6 +1012,40 @@ const InsightsView = ({ rows }) => {
 
   return (
     <div style={{ padding: 20 }}>
+      {/* ── Campaign Selector ── */}
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        marginBottom: 20,
+        flexWrap: "wrap",
+        background: "var(--red-soft)",
+        padding: "10px 16px",
+        borderRadius: 10,
+        border: "1px solid var(--line)"
+      }}>
+        <span style={{ fontSize: 12, fontWeight: 700, color: "var(--ink)", whiteSpace: "nowrap" }}>📁 Chọn Báo cáo Dự án:</span>
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+          <button
+            className={`kt-btn ${selectedCampaign === "all" ? "kt-btn-primary" : "kt-btn-ghost"}`}
+            onClick={() => setSelectedCampaign("all")}
+            style={{ fontSize: 11, padding: "4px 10px", borderRadius: 6 }}
+          >
+            Tổng cộng (Tất cả)
+          </button>
+          {campaigns.filter(c => c !== "all").map(c => (
+            <button
+              key={c}
+              className={`kt-btn ${selectedCampaign === c ? "kt-btn-primary" : "kt-btn-ghost"}`}
+              onClick={() => setSelectedCampaign(c)}
+              style={{ fontSize: 11, padding: "4px 10px", borderRadius: 6 }}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* ── Role perspective selector tabs ── */}
       <div style={{
         display: "flex",
