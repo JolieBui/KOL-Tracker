@@ -935,6 +935,7 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
   const [selectedCampaign, setSelectedCampaign] = useState("all");
   const [noteText, setNoteText] = useState("");
   const [activeDetail, setActiveDetail] = useState(null);
+  const [showGlossary, setShowGlossary] = useState(false);
 
   useEffect(() => {
     setNoteText(insightsNotes[selectedCampaign] || "");
@@ -1375,6 +1376,48 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
             </div>
           </div>
 
+          {/* Campaign Budget Comparison Chart */}
+          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 16px 0", color: "var(--ink)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span>📊 Biểu đồ So sánh Chi phí giữa các Chiến dịch</span>
+              <div style={{ display: "flex", gap: 10, fontSize: 10 }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 4 }}><span style={{ display: "inline-block", width: 8, height: 8, borderRadius: 2, background: "var(--blue)" }} /> Booking</span>
+                <span style={{ display: "flex", alignItems: "center", gap: 4 }}><span style={{ display: "inline-block", width: 8, height: 8, borderRadius: 2, background: "rgba(59,130,246,0.5)" }} /> Chạy Ads</span>
+              </div>
+            </h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {metrics.campaignList.map(c => {
+                const maxSpend = Math.max(...metrics.campaignList.map(item => item.totalSpend)) || 1;
+                const pct = Math.round((c.totalSpend / maxSpend) * 100);
+                const bookingPct = c.totalSpend > 0 ? (c.cost / c.totalSpend) : 0;
+                const adsPct = 1 - bookingPct;
+                const campColor = CAMPAIGN_COLOR[c.campaign] || "var(--blue)";
+                return (
+                  <div key={c.campaign} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, width: 70, color: "var(--ink)" }}>{c.campaign}</div>
+                    <div style={{ flex: 1, height: 22, background: "var(--paper)", borderRadius: 6, overflow: "hidden", display: "flex", position: "relative", border: "1px solid var(--line)" }}>
+                      {bookingPct > 0 && (
+                        <div 
+                          style={{ width: `${pct * bookingPct}%`, background: campColor, height: "100%", transition: "all 0.3s ease" }} 
+                          title={`Booking: ${fmtVND(c.cost)}`} 
+                        />
+                      )}
+                      {adsPct > 0 && (
+                        <div 
+                          style={{ width: `${pct * adsPct}%`, background: `${campColor}88`, height: "100%", transition: "all 0.3s ease" }} 
+                          title={`Chạy Ads: ${fmtVND(c.adSpend)}`} 
+                        />
+                      )}
+                      <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 10, fontWeight: 700, color: "#fff", textShadow: "0 1px 2px rgba(0,0,0,0.6)" }}>
+                        {fmtVND(c.totalSpend)}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Bottlenecks */}
           <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
             <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)", display: "flex", alignItems: "center", gap: 6 }}>
@@ -1778,6 +1821,36 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
             )}
           </div>
 
+          {/* GMV Contribution Chart */}
+          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 16px 0", color: "var(--ink)" }}>📈 Đóng góp Doanh số (GMV) của các Chiến dịch</h3>
+            {metrics.totalRevenue > 0 ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {metrics.campaignList.map(c => {
+                  const gmv = activeRows.filter(r => r.campaign === c.campaign).reduce((sum, r) => sum + (Number(r.revenue) || 0), 0);
+                  const pct = metrics.totalRevenue > 0 ? Math.round((gmv / metrics.totalRevenue) * 100) : 0;
+                  if (gmv === 0) return null;
+                  const campColor = CAMPAIGN_COLOR[c.campaign] || "var(--green)";
+                  return (
+                    <div key={c.campaign} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, width: 70, color: "var(--ink)" }}>{c.campaign}</div>
+                      <div style={{ flex: 1, height: 18, background: "var(--paper)", borderRadius: 6, overflow: "hidden", display: "flex", position: "relative", border: "1px solid var(--line)" }}>
+                        <div style={{ width: `${pct}%`, background: campColor, height: "100%", transition: "all 0.3s ease" }} />
+                        <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 10, fontWeight: 700, color: pct > 15 ? "#fff" : "var(--ink)", textShadow: pct > 15 ? "0 1px 1px rgba(0,0,0,0.5)" : "none" }}>
+                          {fmtVND(gmv)} ({pct}%)
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div style={{ padding: 12, borderRadius: 8, background: "var(--amber-soft)", color: "var(--amber)", fontSize: 12 }}>
+                ⚠️ Chưa có dữ liệu doanh số để thống kê tỷ lệ đóng góp.
+              </div>
+            )}
+          </div>
+
           {/* Top Sales KOLs */}
           <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
             <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)", display: "flex", alignItems: "center", gap: 6 }}>
@@ -1889,6 +1962,51 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
             💾 Lưu Nhận xét & Đánh giá
           </button>
         </div>
+      </div>
+
+      {/* ── Collapsible Glossary Card ── */}
+      <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginTop: 20 }}>
+        <h3 
+          style={{ fontSize: 13, fontWeight: 700, margin: 0, color: "var(--ink)", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", userSelect: "none" }} 
+          onClick={() => setShowGlossary(!showGlossary)}
+        >
+          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>📘 Giải thích định nghĩa & công thức các chỉ số (Metrics Glossary)</span>
+          <span style={{ fontSize: 10, color: "var(--ink-soft)" }}>{showGlossary ? "Thu gọn ▲" : "Mở rộng ▼"}</span>
+        </h3>
+        {showGlossary && (
+          <div style={{ marginTop: 14, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 }} className="kt-anim">
+            <div style={{ padding: 12, background: "var(--paper)", borderRadius: 8, border: "1px solid var(--line)" }}>
+              <strong style={{ color: "var(--red)", fontSize: 12 }}>ROAS (Return on Ad Spend)</strong>
+              <p style={{ margin: "6px 0 0 0", color: "var(--ink-soft)", fontSize: 11, lineHeight: 1.4 }}>
+                Tỷ số sinh lời trên chi phí quảng cáo. Công thức: <code>Doanh thu / Chi phí chạy Ads</code>. Thể hiện một đồng quảng cáo đem lại bao nhiêu đồng doanh số.
+              </p>
+            </div>
+            <div style={{ padding: 12, background: "var(--paper)", borderRadius: 8, border: "1px solid var(--line)" }}>
+              <strong style={{ color: "var(--blue)", fontSize: 12 }}>CPV (Cost Per View)</strong>
+              <p style={{ margin: "6px 0 0 0", color: "var(--ink-soft)", fontSize: 11, lineHeight: 1.4 }}>
+                Chi phí trung bình trên mỗi lượt xem. Công thức: <code>Chi phí chạy Ads / Tổng lượt xem (Views)</code>. Đánh giá hiệu suất tối ưu phân phối video ads.
+              </p>
+            </div>
+            <div style={{ padding: 12, background: "var(--paper)", borderRadius: 8, border: "1px solid var(--line)" }}>
+              <strong style={{ color: "var(--green)", fontSize: 12 }}>CPM (Cost Per Mille)</strong>
+              <p style={{ margin: "6px 0 0 0", color: "var(--ink-soft)", fontSize: 11, lineHeight: 1.4 }}>
+                Chi phí trên 1000 lượt followers tiếp cận. Công thức: <code>(Chi phí Booking / Followers) * 1000</code>. Dùng để so sánh độ đắt/rẻ của giá booking.
+              </p>
+            </div>
+            <div style={{ padding: 12, background: "var(--paper)", borderRadius: 8, border: "1px solid var(--line)" }}>
+              <strong style={{ color: "var(--amber)", fontSize: 12 }}>ER (Engagement Rate)</strong>
+              <p style={{ margin: "6px 0 0 0", color: "var(--ink-soft)", fontSize: 11, lineHeight: 1.4 }}>
+                Tỷ lệ tương tác trên tổng lượt xem. Công thức: <code>(Likes + Comments + Saves + Shares) / Views * 100%</code>. Đo lường sức hút và chất lượng nội dung.
+              </p>
+            </div>
+            <div style={{ padding: 12, background: "var(--paper)", borderRadius: 8, border: "1px solid var(--line)" }}>
+              <strong style={{ color: "var(--ink)", fontSize: 12 }}>CPF (Cost Per Follower)</strong>
+              <p style={{ margin: "6px 0 0 0", color: "var(--ink-soft)", fontSize: 11, lineHeight: 1.4 }}>
+                Chi phí tiếp cận trên một người theo dõi của KOL. Công thức: <code>Chi phí booking / Followers</code>. CPF càng thấp tức KOL tiếp cận hiệu quả chi phí càng cao.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── STAT CARD DETAIL MODAL ── */}
