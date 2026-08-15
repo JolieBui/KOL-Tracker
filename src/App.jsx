@@ -264,6 +264,17 @@ const COL_ALIASES = {
   link:          ["link tiktok", "tiktok link", "tiktok url", "profile link", "url", "link", "link"],
   campaign:      ["campaign", "chiến dịch", "chien dich"],
   id:            ["id"],
+  estView:       ["estview", "est view", "est. view", "views kpi", "kpi view", "est. views", "est views", "kpi views"],
+  estEng:        ["esteng", "est engagement", "est. engagement", "est eng", "est. eng", "estimated engagement"],
+  views:         ["views", "view", "video views", "video view", "lượt xem", "luot xem", "view actual", "actual views"],
+  likes:         ["likes", "like", "lượt thích", "luot thich", "paid likes"],
+  comments:      ["comments", "comment", "bình luận", "binh luan", "paid comments"],
+  saves:         ["saves", "save", "lượt lưu", "luot luu"],
+  shares:        ["shares", "share", "chia sẻ", "chia se", "paid shares"],
+  adSpend:       ["adspend", "ad spend", "chi phí ads", "chi phi ads", "ads spend", "spend"],
+  conversions:   ["conversions", "conversion", "chuyển đổi", "chuyen doi", "results", "orders"],
+  addToCart:     ["addtocart", "adds to cart", "add to cart", "thêm giỏ hàng", "them gio hang", "adds to cart (shop)"],
+  revenue:       ["revenue", "gross revenue", "gross revenue (shop)", "revenue", "gmv", "doanh thu", "sales"],
 };
 
 const INTERNAL_FIELDS = Object.keys(COL_ALIASES);
@@ -345,6 +356,17 @@ const emptyKOL = () => ({
   airedLink: "",
   airedFb: "",
   giftSent: "",
+  estView: 0,
+  estEng: 0,
+  views: 0,
+  likes: 0,
+  comments: 0,
+  saves: 0,
+  shares: 0,
+  adSpend: 0,
+  conversions: 0,
+  addToCart: 0,
+  revenue: 0,
   updatedAt: new Date().toISOString().slice(0, 10),
 });
 
@@ -363,6 +385,17 @@ const FIELD_LABELS = {
   status: "Status (label)", monAn: "Món ăn", ngayGuiScript: "Ngày gửi Script",
   ngayGuiDemo: "Ngày gửi Demo", ngayAir: "Ngày Air",
   airedLink: "Link Aired", airedFb: "Reup FB/IG", giftSent: "Quà tặng",
+  estView: "KPI Views (Dự kiến)",
+  estEng: "KPI Engagement",
+  views: "Views (Thực tế)",
+  likes: "Likes",
+  comments: "Comments",
+  saves: "Saves",
+  shares: "Shares",
+  adSpend: "Chi phí Ads (VNĐ)",
+  conversions: "Đơn hàng (Conversions)",
+  addToCart: "Thêm giỏ hàng (ATC)",
+  revenue: "Doanh thu / GMV (VNĐ)",
 };
 
 const applyMapping = (rawRows, mapping) => {
@@ -390,8 +423,9 @@ const applyMapping = (rawRows, mapping) => {
         val = raw == null ? "" : String(raw).trim();
       }
 
-      if (field === "cost") {
-        out.cost = parseFloat(val.replace(/[^0-9.]/g, "")) || 0;
+      const numericFields = ["cost", "estView", "estEng", "views", "likes", "comments", "saves", "shares", "adSpend", "conversions", "addToCart", "revenue"];
+      if (numericFields.includes(field)) {
+        out[field] = parseFloat(val.replace(/[^0-9.-]/g, "")) || 0;
       } else if (field === "status") {
         out.statusKey = STATUS_LABEL_TO_KEY[val.toLowerCase()] || "waiting_food";
       } else if (field === "statusKey") {
@@ -608,6 +642,29 @@ const DetailModal = ({ kol, onClose, onSave, onDelete }) => {
             <Field label="Link aired (TikTok)" field="airedLink" />
             <Field label="Link reup (FB/IG/YT)" field="airedFb" type="textarea" />
             <Field label="Quà tặng" field="giftSent" />
+          </div>
+
+          {/* Performance & Sales Metrics Section */}
+          <div style={{ gridColumn: "1 / -1", borderTop: "1px solid var(--line)", paddingTop: 16, marginTop: 10 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)", display: "flex", alignItems: "center", gap: 6 }}>
+              📊 Hiệu quả & Đo lường (Performance & Sales)
+            </h3>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0 16px" }}>
+              <Field label="KPI Views (Dự kiến)" field="estView" type="number" />
+              <Field label="KPI Engagement" field="estEng" type="number" />
+              <Field label="Actual Views (Thực tế)" field="views" type="number" />
+
+              <Field label="Lượt Thích (Likes)" field="likes" type="number" />
+              <Field label="Bình luận (Comments)" field="comments" type="number" />
+              <Field label="Lượt Lưu (Saves)" field="saves" type="number" />
+
+              <Field label="Lượt Chia sẻ (Shares)" field="shares" type="number" />
+              <Field label="Chi phí chạy Ads (VNĐ)" field="adSpend" type="number" />
+              <Field label="Lượt chuyển đổi (Orders)" field="conversions" type="number" />
+
+              <Field label="Thêm giỏ hàng (ATC)" field="addToCart" type="number" />
+              <Field label="Doanh thu / GMV (VNĐ)" field="revenue" type="number" />
+            </div>
           </div>
         </div>
 
@@ -854,18 +911,53 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote }) => {
     const airedRate = Math.round((airedCount / totalKOL) * 100);
     const zeroCostCount = activeRows.filter(r => (Number(r.cost) || 0) === 0).length;
 
+    // Phase 2 performance & Ecom metrics
+    const totalViews = activeRows.reduce((sum, r) => sum + (Number(r.views) || 0), 0);
+    const totalEstViews = activeRows.reduce((sum, r) => sum + (Number(r.estView) || 0), 0);
+    const kpiViewsAchievedRate = totalEstViews > 0 ? Math.round((totalViews / totalEstViews) * 100) : 0;
+
+    const totalLikes = activeRows.reduce((sum, r) => sum + (Number(r.likes) || 0), 0);
+    const totalComments = activeRows.reduce((sum, r) => sum + (Number(r.comments) || 0), 0);
+    const totalSaves = activeRows.reduce((sum, r) => sum + (Number(r.saves) || 0), 0);
+    const totalShares = activeRows.reduce((sum, r) => sum + (Number(r.shares) || 0), 0);
+    const totalEngagement = totalLikes + totalComments + totalSaves + totalShares;
+    const avgEngRate = totalViews > 0 ? parseFloat(((totalEngagement / totalViews) * 100).toFixed(2)) : 0;
+
+    const totalAdSpend = activeRows.reduce((sum, r) => sum + (Number(r.adSpend) || 0), 0);
+    const totalSpend = totalCost + totalAdSpend;
+
+    const totalConversions = activeRows.reduce((sum, r) => sum + (Number(r.conversions) || 0), 0);
+    const totalAddToCart = activeRows.reduce((sum, r) => sum + (Number(r.addToCart) || 0), 0);
+    const totalRevenue = activeRows.reduce((sum, r) => sum + (Number(r.revenue) || 0), 0);
+
+    const roas = totalAdSpend > 0 ? parseFloat((totalRevenue / totalAdSpend).toFixed(2)) : 0;
+    const cpv = totalViews > 0 ? Math.round(totalAdSpend / totalViews) : 0;
+
+    // Top 5 viral and Top 5 sales creators
+    const topKOLsByViews = [...activeRows]
+      .filter(r => (Number(r.views) || 0) > 0)
+      .sort((a, b) => (Number(b.views) || 0) - (Number(a.views) || 0))
+      .slice(0, 5);
+
+    const topKOLsByRevenue = [...activeRows]
+      .filter(r => (Number(r.revenue) || 0) > 0)
+      .sort((a, b) => (Number(b.revenue) || 0) - (Number(a.revenue) || 0))
+      .slice(0, 5);
+
     // 1. Account: Campaign Analysis
     const campaignMap = {};
     activeRows.forEach(r => {
       const c = r.campaign || "Unknown";
       if (!campaignMap[c]) {
-        campaignMap[c] = { campaign: c, count: 0, cost: 0, airedCount: 0 };
+        campaignMap[c] = { campaign: c, count: 0, cost: 0, adSpend: 0, totalSpend: 0, airedCount: 0 };
       }
       campaignMap[c].count += 1;
       campaignMap[c].cost += (Number(r.cost) || 0);
+      campaignMap[c].adSpend += (Number(r.adSpend) || 0);
+      campaignMap[c].totalSpend += ((Number(r.cost) || 0) + (Number(r.adSpend) || 0));
       if (r.statusKey === "aired") campaignMap[c].airedCount += 1;
     });
-    const campaignList = Object.values(campaignMap).sort((a, b) => b.cost - a.cost);
+    const campaignList = Object.values(campaignMap).sort((a, b) => b.totalSpend - a.totalSpend);
 
     // Account: Bottlenecks (stages where statusKey !== 'aired')
     const statusMap = {};
@@ -966,7 +1058,11 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote }) => {
       totalKOL, totalCost, avgCost, airedCount, airedRate, zeroCostCount,
       campaignList, bottlenecks,
       tierList, locList, groupList, totalFollowers,
-      sortedEcom, linkAiredRate, airedMissingLink, dishList, cpmEst
+      sortedEcom, linkAiredRate, airedMissingLink, dishList, cpmEst,
+      totalViews, totalEstViews, kpiViewsAchievedRate,
+      totalLikes, totalComments, totalSaves, totalShares, totalEngagement, avgEngRate,
+      totalAdSpend, totalSpend, totalConversions, totalAddToCart, totalRevenue, roas, cpv,
+      topKOLsByViews, topKOLsByRevenue
     };
   }, [activeRows]);
 
@@ -979,8 +1075,8 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote }) => {
   const accountInsights = [];
   const topCampaign = metrics.campaignList[0];
   if (topCampaign) {
-    const pct = Math.round((topCampaign.cost / metrics.totalCost) * 100);
-    accountInsights.push(`💼 Chiến dịch <strong>${topCampaign.campaign}</strong> đang dẫn đầu về ngân sách đầu tư với <strong>${fmtVND(topCampaign.cost)}</strong> (chiếm <strong>${pct}%</strong> tổng ngân sách).`);
+    const pct = Math.round((topCampaign.totalSpend / metrics.totalSpend) * 100);
+    accountInsights.push(`💼 Chiến dịch <strong>${topCampaign.campaign}</strong> đang dẫn đầu về tổng ngân sách đầu tư (Booking + Ads) với <strong>${fmtVND(topCampaign.totalSpend)}</strong> (chiếm <strong>${pct}%</strong> tổng ngân sách).`);
   }
   const topBottleneck = metrics.bottlenecks[0];
   if (topBottleneck && topBottleneck.count > 0) {
@@ -1009,6 +1105,12 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote }) => {
   if (topGroup) {
     marketingInsights.push(`👥 Nhóm đối tượng độc giả <strong>"${topGroup.name}"</strong> đang được phủ sóng nhiều nhất.`);
   }
+  if (metrics.totalViews > 0) {
+    marketingInsights.push(`📈 Tổng lượt xem thực tế đạt <strong>${metrics.totalViews.toLocaleString()} views</strong>, hoàn thành <strong>${metrics.kpiViewsAchievedRate}%</strong> so với KPI dự kiến.`);
+  }
+  if (metrics.totalEngagement > 0) {
+    marketingInsights.push(`🔥 Tệp nội dung tạo ra <strong>${metrics.totalEngagement.toLocaleString()} tương tác</strong> (Likes, Comments, Saves, Shares), đạt tỷ lệ tương tác bình quân <strong>${metrics.avgEngRate}%</strong> trên lượt xem.`);
+  }
   if (metrics.totalFollowers > 0) {
     marketingInsights.push(`📢 Tổng độ phủ truyền thông (followers) tích lũy của tệp KOL đạt khoảng <strong>${fmtFollowers(metrics.totalFollowers)}</strong>.`);
   }
@@ -1018,9 +1120,15 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote }) => {
   if (bestKOL) {
     ecomInsights.push(`🛒 KOL <strong>${bestKOL.kol}</strong> (${bestKOL.follower}) đạt hiệu số tiếp cận tối ưu nhất với chi phí chỉ <strong>${Math.round(bestKOL.cpf).toLocaleString()}đ</strong> / follower.`);
   }
+  if (metrics.totalRevenue > 0) {
+    ecomInsights.push(`💰 Tổng doanh thu / GMV ghi nhận đạt <strong>${fmtVND(metrics.totalRevenue)}</strong>. Tỷ lệ doanh số trên chi phí chạy ads (ROAS) đạt <strong>${metrics.roas}x</strong>.`);
+  }
+  if (metrics.totalAdSpend > 0) {
+    ecomInsights.push(`💸 Tổng ngân sách chạy quảng cáo ads đã giải ngân là <strong>${fmtVND(metrics.totalAdSpend)}</strong>, với chi phí bình quân trên mỗi lượt xem (CPV) là <strong>${metrics.cpv}đ/view</strong>.`);
+  }
   if (metrics.linkAiredRate < 100 && metrics.airedCount > 0) {
     const missingCount = metrics.airedMissingLink.length;
-    ecomInsights.push(`🔗 Còn <strong>${missingCount} KOL</strong> đã lên sóng nhưng chưa cập nhật Link Video. Cần bổ sung để chạy ads / đo lường giỏ hàng.`);
+    ecomInsights.push(`🔗 Còn <strong>${missingCount} KOL</strong> đã lên sóng nhưng chưa cập nhật Link Video. Cần bổ sinh link video để chạy ads / đo lường giỏ hàng.`);
   }
   const topDish = metrics.dishList[0];
   if (topDish) {
@@ -1103,8 +1211,8 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote }) => {
         <div className="kt-anim">
           {/* Stats grid */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, marginBottom: 20 }}>
-            <StatCard title="Tổng ngân sách" value={fmtVND(metrics.totalCost)} subtext="Tổng chi phí chiến dịch" color="var(--red)" />
-            <StatCard title="Chi phí trung bình" value={fmtVND(metrics.avgCost)} subtext="Chi phí trên mỗi KOL" />
+            <StatCard title="Tổng ngân sách" value={fmtVND(metrics.totalSpend)} subtext={`Booking: ${fmtVND(metrics.totalCost)} | Ads: ${fmtVND(metrics.totalAdSpend)}`} color="var(--red)" />
+            <StatCard title="Chi phí trung bình" value={fmtVND(metrics.totalSpend / metrics.totalKOL)} subtext="Tổng chi phí trên mỗi KOL" />
             <StatCard title="Tỷ lệ lên sóng" value={`${metrics.airedRate}%`} subtext={`${metrics.airedCount} / ${metrics.totalKOL} KOL đã hoàn thành`} color="var(--green)" />
             <StatCard title="KOL đổi quà (0đ)" value={`${metrics.zeroCostCount} KOL`} subtext="Không tính phí booking" color="var(--amber)" />
           </div>
@@ -1113,13 +1221,15 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote }) => {
           <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
             <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>Phân bổ ngân sách theo Chiến dịch</h3>
             <div style={{ overflowX: "auto" }} className="kt-scrollbar">
-              <table className="kt-table" style={{ margin: 0, minWidth: 500 }}>
+              <table className="kt-table" style={{ margin: 0, minWidth: 600 }}>
                 <thead>
                   <tr>
                     <th>Chiến dịch</th>
                     <th>Số lượng KOL</th>
-                    <th>Tổng ngân sách</th>
-                    <th>Chi phí trung bình</th>
+                    <th>Booking Cost</th>
+                    <th>Ad Spend</th>
+                    <th>Tổng Chi Phí</th>
+                    <th>Chi phí TB/KOL</th>
                     <th>Tiến độ đã Aired</th>
                   </tr>
                 </thead>
@@ -1131,7 +1241,9 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote }) => {
                         <td><strong>{c.campaign}</strong></td>
                         <td>{c.count}</td>
                         <td>{fmtVND(c.cost)}</td>
-                        <td>{fmtVND(c.cost / c.count)}</td>
+                        <td>{fmtVND(c.adSpend)}</td>
+                        <td><strong>{fmtVND(c.totalSpend)}</strong></td>
+                        <td>{fmtVND(c.totalSpend / c.count)}</td>
                         <td>
                           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                             <div style={{ flex: 1, height: 6, borderRadius: 3, background: "var(--line)", overflow: "hidden", minWidth: 80 }}>
@@ -1184,11 +1296,11 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote }) => {
       {subView === "marketing" && (
         <div className="kt-anim">
           {/* Stats grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, marginBottom: 20 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, marginBottom: 20 }}>
             <StatCard title="Tổng số người theo dõi" value={fmtFollowers(metrics.totalFollowers)} subtext="Tích lũy tệp truyền thông" color="var(--red)" />
+            <StatCard title="Tổng lượt xem (Views)" value={metrics.totalViews.toLocaleString()} subtext={`Đạt ${metrics.kpiViewsAchievedRate}% KPI (${metrics.totalEstViews.toLocaleString()} views)`} color="var(--blue)" />
+            <StatCard title="Tổng tương tác" value={metrics.totalEngagement.toLocaleString()} subtext={`Tỷ lệ tương tác/views: ${metrics.avgEngRate}%`} color="var(--green)" />
             <StatCard title="Phân khúc chủ đạo" value={metrics.tierList[0]?.name || "N/A"} subtext="Loại KOL chiếm số đông" />
-            <StatCard title="Điểm nóng địa lý" value={metrics.locList[0]?.name || "N/A"} subtext="Khu vực tập trung nhiều nhất" color="var(--green)" />
-            <StatCard title="Nhóm target lớn nhất" value={metrics.groupList[0]?.name || "N/A"} subtext="Nhóm khán giả của KOL" color="var(--amber)" />
           </div>
 
           {/* Tiers Segmented Bar Chart */}
@@ -1295,6 +1407,58 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote }) => {
             </div>
           </div>
 
+          {/* Top Viral KOLs */}
+          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)", display: "flex", alignItems: "center", gap: 6 }}>
+              🔥 Top 5 KOLs Đạt Lượt Xem (Views) Cao Nhất
+            </h3>
+            {metrics.topKOLsByViews.length > 0 ? (
+              <div style={{ overflowX: "auto" }} className="kt-scrollbar">
+                <table className="kt-table" style={{ margin: 0, minWidth: 500 }}>
+                  <thead>
+                    <tr>
+                      <th>KOL</th>
+                      <th>Chiến dịch</th>
+                      <th>KPI Views</th>
+                      <th>Views thực tế</th>
+                      <th>Đạt KPI</th>
+                      <th>Tỷ lệ Tương tác (ER)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {metrics.topKOLsByViews.map(r => {
+                      const totalEng = (Number(r.likes) || 0) + (Number(r.comments) || 0) + (Number(r.saves) || 0) + (Number(r.shares) || 0);
+                      const er = (Number(r.views) || 0) > 0 ? ((totalEng / r.views) * 100).toFixed(2) + "%" : "0%";
+                      const kpiPct = (Number(r.estView) || 0) > 0 ? Math.round((r.views / r.estView) * 100) + "%" : "—";
+                      return (
+                        <tr key={r.id}>
+                          <td><strong>{r.kol}</strong></td>
+                          <td>{r.campaign}</td>
+                          <td>{Number(r.estView) ? Number(r.estView).toLocaleString() : "—"}</td>
+                          <td><strong style={{ color: "var(--blue)" }}>{Number(r.views).toLocaleString()}</strong></td>
+                          <td>
+                            <span className="kt-badge" style={{
+                              background: parseFloat(kpiPct) >= 100 ? "var(--green-soft)" : "var(--amber-soft)",
+                              color: parseFloat(kpiPct) >= 100 ? "var(--green)" : "var(--amber)",
+                              border: `1px solid ${parseFloat(kpiPct) >= 100 ? "var(--green)" : "var(--amber)"}`
+                            }}>
+                              {kpiPct}
+                            </span>
+                          </td>
+                          <td>{er}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div style={{ padding: 12, borderRadius: 8, background: "var(--amber-soft)", color: "var(--amber)", fontSize: 12 }}>
+                ⚠️ Chưa có dữ liệu Lượt Xem thực tế được nhập.
+              </div>
+            )}
+          </div>
+
           {/* Insights statements */}
           <div style={{ background: "var(--red-soft)", borderRadius: 12, padding: 16, border: "1px solid var(--line)" }}>
             <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 10px 0", color: "var(--red)" }}>💡 Đúc kết Insight cho Marketing</h3>
@@ -1310,11 +1474,11 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote }) => {
       {subView === "ecom" && (
         <div className="kt-anim">
           {/* Stats grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, marginBottom: 20 }}>
-            <StatCard title="Chi phí/1000 Follower" value={metrics.cpmEst ? `${fmtVND(metrics.cpmEst)}` : "N/A"} subtext="CPM trung bình toàn chiến dịch" color="var(--red)" />
-            <StatCard title="Tỷ lệ cập nhật Video Link" value={`${metrics.linkAiredRate}%`} subtext={`${metrics.airedCount - metrics.airedMissingLink.length} / ${metrics.airedCount} bài aired đã có link`} />
-            <StatCard title="Món ăn hot nhất" value={metrics.dishList[0]?.name || "N/A"} subtext={`${metrics.dishList[0]?.count || 0} bài lên kịch bản`} color="var(--green)" />
-            <StatCard title="KOL tối ưu nhất" value={metrics.sortedEcom[0]?.kol || "N/A"} subtext={metrics.sortedEcom[0] ? `Hiệu số tiếp cận: ${fmtVND(metrics.sortedEcom[0].cpf)} / follower` : ""} color="var(--amber)" />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, marginBottom: 20 }}>
+            <StatCard title="Tổng doanh số (GMV)" value={fmtVND(metrics.totalRevenue)} subtext={`Chỉ số sinh lời ROAS: ${metrics.roas}x`} color="var(--red)" />
+            <StatCard title="Chi phí chạy Ads" value={fmtVND(metrics.totalAdSpend)} subtext={`CPV trung bình: ${metrics.cpv}đ / view`} color="var(--blue)" />
+            <StatCard title="Đơn hàng (Conversions)" value={`${metrics.totalConversions.toLocaleString()} đơn`} subtext={`Thêm giỏ hàng: ${metrics.totalAddToCart.toLocaleString()} lượt`} color="var(--green)" />
+            <StatCard title="CPM toàn chiến dịch" value={metrics.cpmEst ? `${fmtVND(metrics.cpmEst)}` : "N/A"} subtext="CPM trên 1000 followers tiếp cận" color="var(--amber)" />
           </div>
 
           {/* Top 5 cost-effective KOLs */}
@@ -1348,6 +1512,45 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote }) => {
             ) : (
               <div style={{ padding: 12, borderRadius: 8, background: "var(--amber-soft)", color: "var(--amber)", fontSize: 12, fontWeight: 600 }}>
                 Không tìm thấy KOL nào có ghi nhận thông tin Followers để tính chỉ số hiệu suất.
+              </div>
+            )}
+          </div>
+
+          {/* Top Sales KOLs */}
+          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)", display: "flex", alignItems: "center", gap: 6 }}>
+              🛍 Top 5 KOLs Mang Lại Doanh Số / GMV Cao Nhất
+            </h3>
+            {metrics.topKOLsByRevenue.length > 0 ? (
+              <div style={{ overflowX: "auto" }} className="kt-scrollbar">
+                <table className="kt-table" style={{ margin: 0, minWidth: 500 }}>
+                  <thead>
+                    <tr>
+                      <th>KOL</th>
+                      <th>Chiến dịch</th>
+                      <th>Chi phí Ads</th>
+                      <th>Đơn hàng</th>
+                      <th>Lượt thêm giỏ</th>
+                      <th>Doanh thu (GMV)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {metrics.topKOLsByRevenue.map(r => (
+                      <tr key={r.id}>
+                        <td><strong>{r.kol}</strong></td>
+                        <td>{r.campaign}</td>
+                        <td>{fmtVND(r.adSpend)}</td>
+                        <td>{Number(r.conversions).toLocaleString()}</td>
+                        <td>{Number(r.addToCart).toLocaleString()}</td>
+                        <td><strong style={{ color: "var(--green)" }}>{fmtVND(r.revenue)}</strong></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div style={{ padding: 12, borderRadius: 8, background: "var(--amber-soft)", color: "var(--amber)", fontSize: 12 }}>
+                ⚠️ Chưa có dữ liệu doanh số/GMV được ghi nhận.
               </div>
             )}
           </div>
