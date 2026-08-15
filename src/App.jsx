@@ -25,6 +25,9 @@ const GlobalStyle = () => (
       background: var(--paper);
       min-height: 100vh;
     }
+    .kt-root input, .kt-root select, .kt-root button, .kt-root textarea {
+      font-family: 'Questrial', sans-serif;
+    }
     .kt-display { font-family: 'Questrial', sans-serif; letter-spacing: 0.02em; text-transform: uppercase; }
     .kt-mono { font-family: 'IBM Plex Mono', monospace; }
 
@@ -203,6 +206,12 @@ const GlobalStyle = () => (
       position: sticky;
       top: 184px;
       z-index: 10;
+    }
+    .kt-table-sticky th:first-child {
+      border-top-left-radius: 11px;
+    }
+    .kt-table-sticky th:last-child {
+      border-top-right-radius: 11px;
     }
     .kt-table-sticky-modal th {
       position: sticky;
@@ -2442,7 +2451,7 @@ export default function App() {
 
       {/* ── BODY ── */}
       <div style={{ padding: "20px" }}>
-        <div style={{ background: "var(--card)", borderRadius: 12, border: "1px solid var(--line)", overflow: "clip" }}>
+        <div style={{ background: "var(--card)", borderRadius: 12, border: "1px solid var(--line)", overflow: "visible" }}>
           {view === "table" && <TableView rows={filtered} onOpen={r => setSelected(r)} />}
           {view === "kanban" && <KanbanView rows={filtered} onOpen={r => setSelected(r)} />}
           {view === "insights" && (
