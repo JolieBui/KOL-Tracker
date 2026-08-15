@@ -4,7 +4,7 @@ import * as XLSX from "xlsx";
 /* ---------------- Design tokens (injected via <style>) ---------------- */
 const GlobalStyle = () => (
   <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Questrial&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
     .kt-root {
       --ink: #432F2E; /* Chestnut Hollow */
@@ -20,12 +20,12 @@ const GlobalStyle = () => (
       --green-soft: #EBF5EE;
       --blue: #2A688C;
       --blue-soft: #C3DAE8; /* Arctic Whisper */
-      font-family: 'Inter', sans-serif;
+      font-family: 'Questrial', 'Inter', sans-serif;
       color: var(--ink);
       background: var(--paper);
       min-height: 100vh;
     }
-    .kt-display { font-family: 'Oswald', sans-serif; letter-spacing: 0.02em; text-transform: uppercase; }
+    .kt-display { font-family: 'Questrial', sans-serif; letter-spacing: 0.02em; text-transform: uppercase; }
     .kt-mono { font-family: 'IBM Plex Mono', monospace; }
 
     .kt-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
@@ -755,9 +755,10 @@ const StatsBar = ({ rows }) => {
       ].map(({ label, value, color }) => (
         <div key={label} style={{
           background: "var(--card)", border: "1px solid var(--line)",
-          borderRadius: 10, padding: "10px 16px", minWidth: 130
+          borderRadius: 10, padding: "10px 16px", flex: "1 1 160px", minWidth: 160,
+          boxSizing: "border-box"
         }}>
-          <div style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>{label}</div>
+          <div style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap" }}>{label}</div>
           <div className="kt-display" style={{ fontSize: 20, color, marginTop: 2 }}>{value}</div>
         </div>
       ))}
