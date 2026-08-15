@@ -2900,6 +2900,17 @@ export default function App() {
           currentStatus={filterStatus}
           onCardClick={statusKey => setFilterStatus(statusKey)}
         />
+
+        {/* Yellow cover spacer to hide table rows scrolling through the 20px gap below the header */}
+        <div style={{
+          position: "absolute",
+          left: 0, right: 0,
+          top: "100%",
+          height: 20,
+          background: "#FAF6E9",
+          zIndex: 50,
+          pointerEvents: "none"
+        }} />
       </div>
 
       {/* ── BODY ── */}
