@@ -283,13 +283,13 @@ const GlobalStyle = () => (
     /* Table */
     .kt-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
     .kt-table th {
-      background: var(--card);
-      border-bottom: 2px solid var(--line);
+      background: #F5E6E3;
+      border-bottom: 2px solid var(--ink-mid);
       padding: 10px 12px;
       text-align: left;
       font-size: 11px;
       font-weight: 700;
-      color: var(--ink-soft);
+      color: var(--ink);
       text-transform: uppercase;
       letter-spacing: 0.04em;
       white-space: nowrap;
@@ -298,20 +298,21 @@ const GlobalStyle = () => (
       position: sticky;
       top: 0;
       z-index: 10;
-      background: var(--card) !important;
+      background: #F5E6E3;
+      border-bottom: 2px solid var(--ink-mid) !important;
     }
     .kt-table-sticky th:first-child {
-      border-top-left-radius: 11px;
+      border-top-left-radius: 2px;
     }
     .kt-table-sticky th:last-child {
-      border-top-right-radius: 11px;
+      border-top-right-radius: 2px;
     }
     .kt-table-sticky-modal th {
       position: sticky;
       top: 0;
       z-index: 10;
-      background: var(--card) !important;
-      box-shadow: inset 0 -1px 0 var(--line);
+      background: #F5E6E3;
+      box-shadow: inset 0 -2px 0 var(--ink-mid);
     }
     .kt-table td {
       padding: 10px 12px;
@@ -948,8 +949,8 @@ const TableView = ({ rows, onOpen }) => {
           cursor: "pointer",
           userSelect: "none",
           whiteSpace: "nowrap",
-          background: active ? "rgba(234,107,126,0.12)" : undefined,
-          color: active ? "#C0392B" : undefined,
+          background: active ? "#EEDAD6" : undefined,
+          color: active ? "var(--accent)" : undefined,
           ...thStyle,
         }}
       >
