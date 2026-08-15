@@ -2038,9 +2038,15 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
           <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
             <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 16px 0", color: "var(--ink)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span>📊 Biểu đồ So sánh Chi phí giữa các Chiến dịch</span>
-              <div style={{ display: "flex", gap: 10, fontSize: 10 }}>
-                <span style={{ display: "flex", alignItems: "center", gap: 4 }}><span style={{ display: "inline-block", width: 8, height: 8, borderRadius: 2, background: "var(--blue)" }} /> Booking</span>
-                <span style={{ display: "flex", alignItems: "center", gap: 4 }}><span style={{ display: "inline-block", width: 8, height: 8, borderRadius: 2, background: "rgba(59,130,246,0.5)" }} /> Chạy Ads</span>
+              <div style={{ display: "flex", gap: 14, fontSize: 10, color: "var(--ink-soft)" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                  <span style={{ display: "inline-block", width: 12, height: 10, borderRadius: 2, background: "var(--ink)" }} /> 
+                  <strong>Booking Cost</strong> (Tông màu đậm)
+                </span>
+                <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                  <span style={{ display: "inline-block", width: 12, height: 10, borderRadius: 2, background: "var(--line)" }} /> 
+                  <strong>Ad Spend</strong> (Tông màu nhạt)
+                </span>
               </div>
             </h3>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
