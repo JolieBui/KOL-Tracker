@@ -372,13 +372,13 @@ Error generating stack: `+e.message+`
       overflow: hidden;
     }
     .kt-section-header {
-      background: linear-gradient(135deg, #1E40AF 0%, #2563EB 100%);
+      background: #1E40AF;
       color: #FFFFFF;
       padding: 12px 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
     }
     .kt-section-title {
       font-family: 'Be Vietnam Pro', sans-serif;
