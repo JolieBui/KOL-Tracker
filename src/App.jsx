@@ -3192,8 +3192,31 @@ const LS_KEY = "kol_tracker_v1";
 
 export default function App() {
   const [data, rawSetData] = useState(() => {
-    try { const s = localStorage.getItem(LS_KEY); return s ? JSON.parse(s) : SEED_DATA; }
-    catch { return SEED_DATA; }
+    try {
+      const s = localStorage.getItem(LS_KEY);
+      const parsed = s ? JSON.parse(s) : SEED_DATA;
+      // One-time cleanup: strip auto-generated fake performance data
+      // Detect: revenue === conversions * 165000 AND addToCart === conversions * 5
+      const cleaned = parsed.map(r => {
+        const conv = Number(r.conversions) || 0;
+        const rev = Number(r.revenue) || 0;
+        const atc = Number(r.addToCart) || 0;
+        const isFakeRevenue = conv > 0 && rev === conv * 165000;
+        const isFakeATC = conv > 0 && atc === conv * 5;
+        if (isFakeRevenue && isFakeATC) {
+          return {
+            ...r,
+            adSpend: 0, conversions: 0, addToCart: 0, revenue: 0,
+            views: 0, likes: 0, comments: 0, saves: 0, shares: 0,
+            estView: r.estView || 0, estEng: r.estEng || 0,
+          };
+        }
+        return r;
+      });
+      return cleaned;
+    } catch {
+      return SEED_DATA;
+    }
   });
   const [view, setView] = useState("table"); // "table" | "kanban"
   const [search, setSearch] = useState("");
@@ -3209,42 +3232,8 @@ export default function App() {
     localStorage.setItem(LS_KEY, JSON.stringify(data));
   }, [data]);
 
-  useEffect(() => {
-    const hasAnyPerformance = data.some(r => (Number(r.views) || 0) > 0 || (Number(r.adSpend) || 0) > 0 || (Number(r.revenue) || 0) > 0);
-    if (!hasAnyPerformance && data.length > 0) {
-      const migrated = data.map((r, idx) => {
-        if (r.statusKey === "aired") {
-          const flStr = r.follower ? r.follower.toString().replace(/,/g, "") : "";
-          let fl = parseFloat(flStr);
-          if (flStr.toLowerCase().endsWith("m")) fl = parseFloat(flStr) * 1000000;
-          else if (flStr.toLowerCase().endsWith("k")) fl = parseFloat(flStr) * 1000;
-          if (isNaN(fl) || fl <= 0) fl = 50000;
 
-          const estView = Math.round(fl * (0.1 + (idx % 3) * 0.05));
-          const views = Math.round(estView * (0.85 + (idx % 4) * 0.1));
-          const estEng = Math.round(estView * 0.03);
-          const likes = Math.round(views * (0.015 + (idx % 5) * 0.005));
-          const comments = Math.round(likes * 0.05);
-          const saves = Math.round(likes * 0.08);
-          const shares = Math.round(likes * 0.02);
-          
-          const hasAds = (idx % 3) !== 0;
-          const adSpend = hasAds ? (1500000 + (idx % 5) * 1000000) : 0;
-          const conversions = hasAds ? Math.round(adSpend / (12000 + (idx % 4) * 2000)) : 0;
-          const addToCart = conversions * 5;
-          const revenue = conversions * 165000;
 
-          return {
-            ...r,
-            estView, estEng, views, likes, comments, saves, shares,
-            adSpend, conversions, addToCart, revenue
-          };
-        }
-        return r;
-      });
-      setData(migrated);
-    }
-  }, []);
 
   const [insightsNotes, setInsightsNotes] = useState(() => {
     try {
