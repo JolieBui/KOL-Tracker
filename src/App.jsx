@@ -219,7 +219,7 @@ const GlobalStyle = () => (
     }
     .kt-table-sticky th {
       position: sticky;
-      top: 184px;
+      top: calc(var(--header-height, 184px) + 20px);
       z-index: 10;
     }
     .kt-table-sticky th:first-child {
@@ -1019,6 +1019,260 @@ const KanbanView = ({ rows, onOpen, onUpdateStatus }) => (
     })}
   </div>
 );
+
+/* ================================================================
+   CALENDAR VIEW
+================================================================ */
+const CalendarView = ({ rows, onOpen, onUpdateRow }) => {
+  const [currentMonth, setCurrentMonth] = useState(new Date(2026, 7, 15)); // August 2026 by default
+  const [draggedOverDay, setDraggedOverDay] = useState(null); // String identifier of day cell 'YYYY-MM-DD'
+
+  const year = currentMonth.getFullYear();
+  const month = currentMonth.getMonth();
+
+  const handlePrevMonth = () => {
+    setCurrentMonth(new Date(year, month - 1, 1));
+  };
+  const handleNextMonth = () => {
+    setCurrentMonth(new Date(year, month + 1, 1));
+  };
+  const handleToday = () => {
+    setCurrentMonth(new Date(2026, 7, 15));
+  };
+
+  // Helper date parsing
+  const parseDateStr = (str) => {
+    if (!str) return null;
+    const s = str.toString().trim();
+    if (!s || s.startsWith("http")) return null;
+    const match = s.match(/^(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?$/);
+    if (match) {
+      const day = parseInt(match[1], 10);
+      const m = parseInt(match[2], 10) - 1;
+      const y = match[3] ? (match[3].length === 2 ? 2000 + parseInt(match[3], 10) : parseInt(match[3], 10)) : 2026;
+      return { day, month: m, year: y };
+    }
+    const d = new Date(s);
+    if (!isNaN(d.getTime())) {
+      return { day: d.getDate(), month: d.getMonth(), year: d.getFullYear() };
+    }
+    return null;
+  };
+
+  // Month grid calculations (Monday-start indexing: 0 = Mon, 6 = Sun)
+  const firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7;
+  const totalDays = new Date(year, month + 1, 0).getDate();
+  const prevTotalDays = new Date(year, month, 0).getDate();
+
+  const cells = [];
+  // Padding previous month
+  for (let i = firstDayIndex - 1; i >= 0; i--) {
+    cells.push({
+      day: prevTotalDays - i,
+      month: month === 0 ? 11 : month - 1,
+      year: month === 0 ? year - 1 : year,
+      isCurrentMonth: false
+    });
+  }
+  // Current month
+  for (let i = 1; i <= totalDays; i++) {
+    cells.push({
+      day: i,
+      month: month,
+      year: year,
+      isCurrentMonth: true
+    });
+  }
+  // Padding next month
+  const remaining = 42 - cells.length;
+  for (let i = 1; i <= remaining; i++) {
+    cells.push({
+      day: i,
+      month: month === 11 ? 0 : month + 1,
+      year: month === 11 ? year + 1 : year,
+      isCurrentMonth: false
+    });
+  }
+
+  // Filter KOLs scheduled vs unscheduled
+  const scheduledMap = {};
+  const unscheduled = [];
+
+  rows.forEach(r => {
+    const dt = parseDateStr(r.ngayAir);
+    if (dt) {
+      const key = `${dt.year}-${dt.month}-${dt.day}`;
+      if (!scheduledMap[key]) scheduledMap[key] = [];
+      scheduledMap[key].push(r);
+    } else {
+      unscheduled.push(r);
+    }
+  });
+
+  const handleDrop = (e, cell) => {
+    e.preventDefault();
+    setDraggedOverDay(null);
+    const id = e.dataTransfer.getData("text/plain");
+    if (id) {
+      // Format as DD/MM
+      const dateStr = `${cell.day}/${cell.month + 1}`;
+      onUpdateRow(id, { ngayAir: dateStr });
+    }
+  };
+
+  const weekdays = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
+
+  return (
+    <div style={{ display: "flex", gap: 16, height: "calc(100vh - 280px)", minHeight: 450, padding: 12 }}>
+      {/* Left panel: Calendar Grid */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "var(--card)", borderRadius: 12, border: "1px solid var(--line)", padding: 14 }}>
+        {/* Navigation */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <h2 style={{ fontSize: 16, fontWeight: 800, margin: 0, color: "var(--ink)", width: 140 }}>
+              Tháng {month + 1}, {year}
+            </h2>
+            <button className="kt-btn kt-btn-ghost" onClick={handleToday} style={{ fontSize: 11, padding: "4px 8px" }}>Hôm nay</button>
+          </div>
+          <div style={{ display: "flex", gap: 6 }}>
+            <button className="kt-btn kt-btn-ghost" onClick={handlePrevMonth} style={{ padding: "4px 10px", fontSize: 13 }}>◀</button>
+            <button className="kt-btn kt-btn-ghost" onClick={handleNextMonth} style={{ padding: "4px 10px", fontSize: 13 }}>▶</button>
+          </div>
+        </div>
+
+        {/* Calendar Week Header */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 4, marginBottom: 4, textAlign: "center" }}>
+          {weekdays.map(d => (
+            <div key={d} style={{ fontSize: 10, fontWeight: 700, color: "var(--ink-soft)", padding: "4px 0", textTransform: "uppercase" }}>{d}</div>
+          ))}
+        </div>
+
+        {/* Month grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gridTemplateRows: "repeat(6, 1fr)", gap: 6, flex: 1 }}>
+          {cells.map((cell, idx) => {
+            const cellKey = `${cell.year}-${cell.month}-${cell.day}`;
+            const kols = scheduledMap[cellKey] || [];
+            const isToday = cell.day === 15 && cell.month === 7 && cell.year === 2026; // Highlight static Today
+            const isDragOver = draggedOverDay === cellKey;
+
+            return (
+              <div
+                key={idx}
+                onDragOver={(e) => { e.preventDefault(); if (draggedOverDay !== cellKey) setDraggedOverDay(cellKey); }}
+                onDragLeave={() => setDraggedOverDay(null)}
+                onDrop={(e) => handleDrop(e, cell)}
+                style={{
+                  background: isDragOver ? "var(--red-soft)" : (cell.isCurrentMonth ? "var(--paper)" : "#FAF9F5"),
+                  border: isDragOver ? "1px dashed var(--red)" : `1px solid ${isToday ? "var(--blue)" : "var(--line)"}`,
+                  borderRadius: 8,
+                  padding: 4,
+                  display: "flex",
+                  flexDirection: "column",
+                  minHeight: 50,
+                  overflow: "hidden",
+                  transition: "all 0.15s ease",
+                  transform: isDragOver ? "scale(1.02)" : "none",
+                  boxShadow: isToday ? "0 0 0 2px var(--blue-soft)" : "none"
+                }}
+              >
+                {/* Day number */}
+                <div style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  color: cell.isCurrentMonth ? (isToday ? "var(--blue)" : "var(--ink)") : "var(--ink-soft)",
+                  alignSelf: "flex-end",
+                  opacity: cell.isCurrentMonth ? 1 : 0.45,
+                  marginBottom: 2
+                }}>
+                  {cell.day}
+                </div>
+
+                {/* KOL Badges in this day */}
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 3, overflowY: "auto" }} className="kt-scrollbar">
+                  {kols.map(r => (
+                    <div
+                      key={r.id}
+                      onClick={() => onOpen(r)}
+                      draggable
+                      onDragStart={(e) => {
+                        e.dataTransfer.setData("text/plain", r.id);
+                      }}
+                      style={{
+                        background: "var(--card)",
+                        borderLeft: `3px solid ${CAMPAIGN_COLOR[r.campaign] || "var(--green)"}`,
+                        borderRadius: 4,
+                        padding: "2px 4px",
+                        fontSize: 9,
+                        fontWeight: 600,
+                        color: "var(--ink)",
+                        cursor: "grab",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        boxShadow: "0 1px 2px rgba(0,0,0,0.02)"
+                      }}
+                      title={`${r.kol} (${r.campaign}) - ${r.monAn || "Chưa có món ăn"}`}
+                    >
+                      {r.kol}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Right panel: Unscheduled KOLs Sidebar */}
+      <div style={{ width: 220, display: "flex", flexDirection: "column", background: "var(--card)", borderRadius: 12, border: "1px solid var(--line)", padding: 14 }}>
+        <h3 style={{ fontSize: 12, fontWeight: 700, margin: "0 0 10px 0", color: "var(--ink)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span>📅 Chưa lên lịch</span>
+          <span className="kt-badge" style={{ background: "var(--red-soft)", color: "var(--red)", fontSize: 10 }}>{unscheduled.length}</span>
+        </h3>
+        <div style={{ fontSize: 10, color: "var(--ink-soft)", marginBottom: 12, lineHeight: 1.4 }}>
+          Kéo thả KOL vào lịch tháng bên cạnh để sắp xếp ngày lên sóng (Air date).
+        </div>
+
+        <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 8 }} className="kt-scrollbar">
+          {unscheduled.map(r => (
+            <div
+              key={r.id}
+              draggable
+              onDragStart={(e) => {
+                e.dataTransfer.setData("text/plain", r.id);
+                e.dataTransfer.effectAllowed = "move";
+              }}
+              onClick={() => onOpen(r)}
+              style={{
+                padding: "8px 10px",
+                borderRadius: 8,
+                background: "var(--paper)",
+                border: "1px solid var(--line)",
+                cursor: "grab",
+                transition: "all 0.15s ease",
+                boxShadow: "0 1px 2px rgba(0,0,0,0.01)"
+              }}
+              className="kt-kanban-card"
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                <CampaignDot campaign={r.campaign} />
+                <span className="kt-mono" style={{ fontSize: 8, color: "var(--ink-soft)" }}>{r.id}</span>
+              </div>
+              <div style={{ fontWeight: 600, fontSize: 11, color: "var(--ink)" }}>{r.kol}</div>
+              <div style={{ fontSize: 9, color: "var(--ink-soft)", marginTop: 2 }}>{r.type || "Chưa phân loại"}</div>
+            </div>
+          ))}
+          {unscheduled.length === 0 && (
+            <div style={{ textAlign: "center", padding: "40px 0", color: "var(--ink-soft)", fontSize: 11 }}>
+              🎉 Tất cả KOL đã được lên lịch!
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
 /* ================================================================
    INSIGHTS & SUMMARY VIEW
@@ -2605,7 +2859,7 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
 const LS_KEY = "kol_tracker_v1";
 
 export default function App() {
-  const [data, setData] = useState(() => {
+  const [data, rawSetData] = useState(() => {
     try { const s = localStorage.getItem(LS_KEY); return s ? JSON.parse(s) : SEED_DATA; }
     catch { return SEED_DATA; }
   });
@@ -2618,6 +2872,19 @@ export default function App() {
   const [showNew, setShowNew] = useState(false);
   const [toast, setToast] = useState(null); // { msg, ok }
   const importRef = useRef(null);
+  const headerRef = useRef(null);
+  const [headerHeight, setHeaderHeight] = useState(184);
+
+  useEffect(() => {
+    if (!headerRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        setHeaderHeight(entry.target.clientHeight);
+      }
+    });
+    observer.observe(headerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     localStorage.setItem(LS_KEY, JSON.stringify(data));
@@ -2679,6 +2946,76 @@ export default function App() {
     setToast({ msg, ok });
     setTimeout(() => setToast(null), 3500);
   };
+
+  const [history, setHistory] = useState([]);
+  const [redoHistory, setRedoHistory] = useState([]);
+
+  const setData = useCallback((nextVal) => {
+    rawSetData(prev => {
+      const resolved = typeof nextVal === 'function' ? nextVal(prev) : nextVal;
+      if (JSON.stringify(prev) !== JSON.stringify(resolved)) {
+        setHistory(h => [...h, prev].slice(-50));
+        setRedoHistory([]);
+      }
+      return resolved;
+    });
+  }, []);
+
+  const handleUndo = useCallback(() => {
+    setHistory(h => {
+      if (h.length === 0) {
+        showToast("⚠️ Không có hành động nào trước đó để Undo!");
+        return h;
+      }
+      const prev = h[h.length - 1];
+      rawSetData(current => {
+        setRedoHistory(r => [...r, current]);
+        return prev;
+      });
+      showToast("↩️ Đã Hoàn tác (Undo)");
+      return h.slice(0, -1);
+    });
+  }, []);
+
+  const handleRedo = useCallback(() => {
+    setRedoHistory(r => {
+      if (r.length === 0) {
+        showToast("⚠️ Không có hành động nào để Redo!");
+        return r;
+      }
+      const next = r[r.length - 1];
+      rawSetData(current => {
+        setHistory(h => [...h, current]);
+        return next;
+      });
+      showToast("↪️ Đã Làm lại (Redo)");
+      return r.slice(0, -1);
+    });
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const isInput = e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.isContentEditable;
+      if (isInput) return;
+
+      if ((e.ctrlKey || e.metaKey) && e.key === "z") {
+        if (e.shiftKey) {
+          e.preventDefault();
+          handleRedo();
+        } else {
+          e.preventDefault();
+          handleUndo();
+        }
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === "y") {
+        e.preventDefault();
+        handleRedo();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleUndo, handleRedo]);
 
   // Parse Excel or JSON → open wizard
   const handleImport = useCallback((e) => {
@@ -2818,11 +3155,11 @@ export default function App() {
   };
 
   return (
-    <div className="kt-root">
+    <div className="kt-root" style={{ "--header-height": `${headerHeight}px` }}>
       <GlobalStyle />
 
       {/* ── HEADER ── */}
-      <div style={{
+      <div ref={headerRef} style={{
         background: "var(--card)",
         borderBottom: "1px solid var(--line)",
         padding: "14px 20px",
@@ -2844,6 +3181,8 @@ export default function App() {
                 onClick={() => setView("kanban")}>⬛ Kanban</button>
               <button className={`kt-btn kt-btn-ghost${view === "insights" ? " active" : ""}`}
                 onClick={() => setView("insights")}>📊 Insights</button>
+              <button className={`kt-btn kt-btn-ghost${view === "calendar" ? " active" : ""}`}
+                onClick={() => setView("calendar")}>📅 Lịch</button>
             </div>
 
             {/* Excel / JSON Actions */}
@@ -2860,6 +3199,25 @@ export default function App() {
 
             {/* Add & Reset */}
             <button className="kt-btn kt-btn-primary" onClick={() => setShowNew(true)}>＋ Thêm KOL</button>
+            {/* Undo / Redo */}
+            <button 
+              className="kt-btn kt-btn-ghost" 
+              onClick={handleUndo} 
+              disabled={history.length === 0}
+              title="Hoàn tác (Ctrl+Z)" 
+              style={{ padding: "8px 12px", opacity: history.length === 0 ? 0.4 : 1, cursor: history.length === 0 ? "not-allowed" : "pointer" }}
+            >
+              ↩️
+            </button>
+            <button 
+              className="kt-btn kt-btn-ghost" 
+              onClick={handleRedo} 
+              disabled={redoHistory.length === 0}
+              title="Làm lại (Ctrl+Y)" 
+              style={{ padding: "8px 12px", opacity: redoHistory.length === 0 ? 0.4 : 1, cursor: redoHistory.length === 0 ? "not-allowed" : "pointer" }}
+            >
+              ↪️
+            </button>
             <button className="kt-btn kt-btn-ghost" onClick={handleReset} title="Reset data" style={{ padding: "8px 12px" }}>↺</button>
           </div>
         </div>
@@ -2924,6 +3282,16 @@ export default function App() {
               onUpdateStatus={(id, newStatus) => {
                 setData(prev => prev.map(item => item.id === id ? { ...item, statusKey: newStatus } : item));
                 showToast(`Đã chuyển trạng thái sang: ${STATUS_MAP[newStatus]?.label || newStatus}`);
+              }}
+            />
+          )}
+          {view === "calendar" && (
+            <CalendarView 
+              rows={filtered} 
+              onOpen={r => setSelected(r)} 
+              onUpdateRow={(id, updatedFields) => {
+                setData(prev => prev.map(item => item.id === id ? { ...item, ...updatedFields } : item));
+                showToast(`Đã xếp lịch lên sóng cho KOL!`);
               }}
             />
           )}
