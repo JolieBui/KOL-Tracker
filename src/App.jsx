@@ -70,6 +70,53 @@ const GlobalStyle = () => (
       opacity: 0.9;
     }
 
+    /* Tooltip styles */
+    .kt-tooltip-wrapper {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+    }
+    .kt-tooltip {
+      visibility: hidden;
+      width: 240px;
+      background-color: var(--ink);
+      color: #fff;
+      text-align: left;
+      border-radius: 8px;
+      padding: 10px 12px;
+      position: absolute;
+      z-index: 1000;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      font-size: 11px;
+      line-height: 1.45;
+      font-weight: normal;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+      border: 1px solid var(--line);
+      pointer-events: none;
+      white-space: normal;
+      text-transform: none;
+      letter-spacing: normal;
+    }
+    .kt-tooltip::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 6px;
+      border-style: solid;
+      border-color: var(--ink) transparent transparent transparent;
+    }
+    .kt-tooltip-wrapper:hover .kt-tooltip {
+      visibility: visible;
+      opacity: 1;
+      transform: translateX(-50%) translateY(-4px);
+    }
+
     .kt-btn {
       font-family: 'Inter', sans-serif;
       font-weight: 600;
@@ -157,24 +204,12 @@ const GlobalStyle = () => (
       top: 184px;
       z-index: 10;
     }
-    .kt-table-sticky th:first-child {
-      border-top-left-radius: 11px;
-    }
-    .kt-table-sticky th:last-child {
-      border-top-right-radius: 11px;
-    }
     .kt-table-sticky-modal th {
       position: sticky;
       top: 0;
       z-index: 10;
       background: var(--red-soft) !important;
       box-shadow: inset 0 -1px 0 var(--line);
-    }
-    .kt-table-sticky-modal th:first-child {
-      border-top-left-radius: 11px;
-    }
-    .kt-table-sticky-modal th:last-child {
-      border-top-right-radius: 11px;
     }
     .kt-table td {
       padding: 10px 12px;
@@ -905,7 +940,17 @@ const renderUrlOrText = (val) => {
   return s;
 };
 
-const StatCard = ({ title, value, subtext, color = "var(--ink)", onClick }) => (
+const MetricTooltip = ({ text, tooltip, style }) => {
+  if (!tooltip) return <span style={style}>{text}</span>;
+  return (
+    <span className="kt-tooltip-wrapper" style={{ borderBottom: "1px dashed var(--ink-soft)", display: "inline-block", ...style }}>
+      {text}
+      <span className="kt-tooltip">{tooltip}</span>
+    </span>
+  );
+};
+
+const StatCard = ({ title, value, subtext, color = "var(--ink)", onClick, tooltip }) => (
   <div 
     onClick={onClick}
     className={onClick ? "kt-anim" : ""}
@@ -934,7 +979,11 @@ const StatCard = ({ title, value, subtext, color = "var(--ink)", onClick }) => (
     }) : undefined}
   >
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-      <span style={{ fontSize: 9, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em" }}>{title}</span>
+      <MetricTooltip 
+        text={title} 
+        tooltip={tooltip} 
+        style={{ fontSize: 9, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em" }} 
+      />
       {onClick && <span style={{ fontSize: 9, color: "var(--blue)", fontWeight: 700 }}>Chi tiết ↗</span>}
     </div>
     <span style={{ fontSize: 18, fontWeight: 800, color: color, margin: "4px 0", wordBreak: "break-all" }}>{value}</span>
@@ -1279,6 +1328,7 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
               value={fmtVND(metrics.totalSpend)} 
               subtext={`Booking: ${fmtVND(metrics.totalCost)} | Ads: ${fmtVND(metrics.totalAdSpend)}`} 
               color="var(--red)" 
+              tooltip="Tổng ngân sách thực tế đã giải ngân (Booking Cost + Ad Spend) của các dự án."
               onClick={() => setActiveDetail({
                 title: "Phân bổ Tổng Ngân Sách",
                 description: "Danh sách tất cả KOLs sắp xếp theo Tổng chi phí (Booking Cost + Ad Spend) từ cao xuống thấp.",
@@ -1296,6 +1346,7 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
               title="Chi phí trung bình" 
               value={fmtVND(metrics.totalSpend / metrics.totalKOL)} 
               subtext="Tổng chi phí trên mỗi KOL" 
+              tooltip="Chi phí trung bình trên một người ảnh hưởng (bao gồm booking và chi phí đẩy quảng cáo)."
               onClick={() => setActiveDetail({
                 title: "Chi phí phân bổ theo KOL",
                 description: "Danh sách tất cả KOLs kèm theo chi tiết chi phí booking và ads chạy chiến dịch.",
@@ -1314,6 +1365,7 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
               value={`${metrics.airedRate}%`} 
               subtext={`${metrics.airedCount} / ${metrics.totalKOL} KOL đã hoàn thành`} 
               color="var(--green)" 
+              tooltip="Tỷ lệ phần trăm video của KOL đã đăng tải chính thức (Aired) trên tổng số KOL đã lên hợp đồng."
               onClick={() => setActiveDetail({
                 title: "KOL đã Lên Sóng (Aired)",
                 description: `Danh sách các nhà sáng tạo đã nghiệm thu video lên sóng thành công (Tổng cộng: ${metrics.airedCount} KOLs).`,
@@ -1331,6 +1383,7 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
               value={`${metrics.zeroCostCount} KOL`} 
               subtext="Không tính phí booking" 
               color="var(--amber)" 
+              tooltip="Số lượng nhà sáng tạo tham gia hợp tác với chi phí booking 0đ (nhận tài trợ sản phẩm/quà tặng FOC)."
               onClick={() => setActiveDetail({
                 title: "KOL đổi quà / FOC",
                 description: "Các nhà sáng tạo tham gia chiến dịch với chi phí booking 0đ (Nhận quà/FOC tài trợ sản phẩm).",
@@ -1472,6 +1525,7 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
               value={fmtFollowers(metrics.totalFollowers)} 
               subtext="Tích lũy tệp truyền thông" 
               color="var(--red)" 
+              tooltip="Độ phủ truyền thông cộng dồn (Tổng lượng người theo dõi) của toàn bộ tệp KOL tham gia dự án."
               onClick={() => setActiveDetail({
                 title: "Độ phủ truyền thông (Followers)",
                 description: "Danh sách tất cả KOLs sắp xếp theo lượng người theo dõi (Followers) giảm dần.",
@@ -1489,6 +1543,7 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
               value={metrics.totalViews.toLocaleString()} 
               subtext={`Đạt ${metrics.kpiViewsAchievedRate}% KPI (${metrics.totalEstViews.toLocaleString()} views)`} 
               color="var(--blue)" 
+              tooltip="Tổng số lượt xem video thực tế tích lũy. Thể hiện tiến độ hoàn thành so với mục tiêu KPI views dự kiến."
               onClick={() => setActiveDetail({
                 title: "Thống kê Lượt xem thực tế (Views)",
                 description: "Danh sách tất cả KOLs sắp xếp theo lượt xem video thực tế trên TikTok từ cao xuống thấp.",
@@ -1507,6 +1562,7 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
               value={metrics.totalEngagement.toLocaleString()} 
               subtext={`Tỷ lệ tương tác/views: ${metrics.avgEngRate}%`} 
               color="var(--green)" 
+              tooltip="Tổng tương tác thực tế (Likes + Comments + Saves + Shares). Tỷ lệ ER = Tổng tương tác / Lượt xem * 100%."
               onClick={() => setActiveDetail({
                 title: "Thống kê Tương tác (Likes, Comments, Saves, Shares)",
                 description: "Danh sách tất cả KOLs sắp xếp theo tổng lượng tương tác thực tế của video bài đăng.",
@@ -1530,6 +1586,7 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
               title="Phân khúc chủ đạo" 
               value={metrics.tierList[0]?.name || "N/A"} 
               subtext="Loại KOL chiếm số đông" 
+              tooltip="Phân nhóm quy mô sáng tạo (Micro, Mid-tier, Macro...) chiếm tỷ trọng cao nhất trong tổng số KOLs tham gia."
               onClick={() => setActiveDetail({
                 title: "Phân loại KOL theo Tiers",
                 description: "Danh sách tất cả KOLs kèm theo chi phí và phân nhóm quy mô sáng tạo (Micro, Mid-tier, Macro...).",
@@ -2037,7 +2094,7 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
             {/* Body */}
             <div style={{ padding: "18px 22px", display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
               {activeDetail.description && <p style={{ fontSize: 12, color: "var(--ink-soft)", margin: "0 0 12px 0", lineHeight: 1.4 }}>{activeDetail.description}</p>}
-              <div style={{ border: "1px solid var(--line)", borderRadius: 8, overflowY: "auto", flex: 1, maxHeight: 380 }} className="kt-scrollbar">
+              <div style={{ border: "1px solid var(--line)", borderRadius: 8, overflowY: "auto", flex: 1, maxHeight: 380, isolation: "isolate", position: "relative" }} className="kt-scrollbar">
                 <table className="kt-table kt-table-sticky-modal" style={{ margin: 0 }}>
                   <thead>
                     <tr>
