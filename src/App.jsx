@@ -4,7 +4,7 @@ import * as XLSX from "xlsx";
 /* ---------------- Design tokens (injected via <style>) ---------------- */
 const GlobalStyle = () => (
   <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Questrial&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
     .kt-root {
       --ink: #432F2E; /* Chestnut Hollow */
@@ -20,15 +20,15 @@ const GlobalStyle = () => (
       --green-soft: #EBF5EE;
       --blue: #2A688C;
       --blue-soft: #C3DAE8; /* Arctic Whisper */
-      font-family: 'Questrial', 'Inter', sans-serif;
+      font-family: 'Be Vietnam Pro', sans-serif;
       color: var(--ink);
       background: var(--paper);
       min-height: 100vh;
     }
     .kt-root input, .kt-root select, .kt-root button, .kt-root textarea {
-      font-family: 'Questrial', sans-serif;
+      font-family: 'Be Vietnam Pro', sans-serif;
     }
-    .kt-display { font-family: 'Questrial', sans-serif; letter-spacing: 0.02em; text-transform: uppercase; }
+    .kt-display { font-family: 'Be Vietnam Pro', sans-serif; letter-spacing: 0.02em; text-transform: uppercase; }
     .kt-mono { font-family: 'IBM Plex Mono', monospace; }
 
     .kt-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
