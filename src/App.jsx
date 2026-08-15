@@ -1369,7 +1369,125 @@ const StatCard = ({ title, value, subtext, color = "var(--ink)", onClick, toolti
   </div>
 );
 
+// ── METRICS GLOSSARY PANEL ──
+const GLOSSARY_CATEGORIES = [
+  {
+    id: "ecom",
+    label: "🛒 Ecom",
+    color: "#16A34A",
+    metrics: [
+      { name: "ROAS (Return on Ad Spend)", formula: "Doanh thu / Chi phí chạy Ads", desc: "Tỷ số sinh lời trên chi phí quảng cáo. Mỗi đồng chi cho Ads đem về bao nhiêu đồng doanh số. ROAS > 3 là hiệu quả tốt với FMCG." },
+      { name: "Revenue per KOL", formula: "Tổng doanh thu / Số KOL tham gia", desc: "Doanh thu trung bình mỗi KOL đóng góp vào campaign. So sánh hiệu quả từng KOL." },
+      { name: "Conversion Rate (CVR)", formula: "(Đơn hàng / Lượt click link) × 100%", desc: "Tỷ lệ chuyển đổi từ traffic KOL sang đơn hàng thực. Phản ánh chất lượng audience và sức thuyết phục content." },
+      { name: "CPA (Cost Per Acquisition)", formula: "Tổng chi phí / Số đơn hàng", desc: "Chi phí để có 1 đơn hàng. CPA càng thấp, hiệu quả ecom càng cao." },
+      { name: "Average Order Value (AOV)", formula: "Tổng doanh thu / Số đơn hàng", desc: "Giá trị trung bình mỗi đơn hàng từ traffic KOL. Giúp tối ưu chiến lược upsell." },
+      { name: "GMV (Gross Merchandise Value)", formula: "Tổng giá trị hàng hóa được bán qua KOL", desc: "Tổng giá trị giao dịch thô trước khi trừ hoàn/hủy. Chỉ số đo quy mô doanh thu KOL." },
+    ],
+  },
+  {
+    id: "performance",
+    label: "🚀 Performance",
+    color: "#2563EB",
+    metrics: [
+      { name: "CPV (Cost Per View)", formula: "Chi phí Ads / Tổng Views", desc: "Chi phí trung bình cho 1 lượt xem video. Đánh giá hiệu suất phân phối nội dung qua paid media." },
+      { name: "CPM (Cost Per Mille)", formula: "(Chi phí Booking / Followers) × 1000", desc: "Chi phí để tiếp cận 1.000 followers. Dùng để so sánh giá booking giữa các KOL." },
+      { name: "CTR (Click-Through Rate)", formula: "(Clicks / Impressions) × 100%", desc: "Tỷ lệ nhấp vào link trong content KOL. CTR cao cho thấy CTA hiệu quả và audience quan tâm đến sản phẩm." },
+      { name: "ER (Engagement Rate)", formula: "(Likes + Comments + Saves + Shares) / Views × 100%", desc: "Tỷ lệ tương tác trên tổng lượt xem. Đo sức hút và chất lượng nội dung KOL tạo ra." },
+      { name: "View Rate", formula: "(Views / Impressions) × 100%", desc: "Tỷ lệ người xem video sau khi thấy bài đăng. View Rate cao tức thumbnail/hook đủ hấp dẫn." },
+      { name: "Completion Rate", formula: "(Lượt xem hết video / Tổng views) × 100%", desc: "Tỷ lệ xem hết video. Phản ánh độ giữ chân người xem – quan trọng với algorithm TikTok/Reels." },
+    ],
+  },
+  {
+    id: "booking",
+    label: "📋 Booking",
+    color: "#7C3AED",
+    metrics: [
+      { name: "CPF (Cost Per Follower)", formula: "Chi phí booking / Followers", desc: "Chi phí để tiếp cận 1 follower. CPF thấp = KOL hiệu quả chi phí hơn. So sánh giữa micro vs macro KOL." },
+      { name: "Booking Efficiency Score", formula: "Views thực tế / (Chi phí booking / 1000)", desc: "Đo lường hiệu quả booking: bao nhiêu views thực tế trên mỗi 1.000đ chi booking. Càng cao càng tốt." },
+      { name: "Content Quality Index (CQI)", formula: "(ER × Views) / Chi phí booking", desc: "Chỉ số tổng hợp đánh giá chất lượng nội dung so với chi phí đầu tư booking." },
+      { name: "Booking ROI", formula: "(Doanh thu từ KOL – Chi phí booking) / Chi phí booking × 100%", desc: "Lợi nhuận ròng từ chi phí booking KOL. Phân biệt với ROAS (tính cả ads spend)." },
+      { name: "Reach per Budget", formula: "Tổng Reach / Tổng ngân sách", desc: "Số người tiếp cận được trên mỗi đồng chi. So sánh hiệu quả giữa các loại hình booking." },
+    ],
+  },
+  {
+    id: "affiliate",
+    label: "🔗 Affiliate",
+    color: "#D97706",
+    metrics: [
+      { name: "Commission Rate", formula: "Hoa hồng / Doanh thu × 100%", desc: "Tỷ lệ % hoa hồng KOL nhận trên mỗi đơn hàng. Thường 5-15% tùy ngành FMCG/Beauty/F&B." },
+      { name: "EPC (Earnings Per Click)", formula: "Tổng hoa hồng / Tổng clicks", desc: "Thu nhập affiliate trung bình mỗi click. KOL có EPC cao = audience có intent mua hàng tốt." },
+      { name: "Affiliate CVR", formula: "(Đơn hàng affiliate / Clicks affiliate) × 100%", desc: "Conversion rate riêng cho kênh affiliate. Đánh giá chất lượng traffic KOL mang về." },
+      { name: "Net Affiliate Cost", formula: "Tổng hoa hồng trả KOL – Booking fee tiết kiệm được", desc: "Chi phí thực sự của mô hình affiliate so với booking cố định. Affiliate tốt khi sale cao." },
+      { name: "Affiliate Contribution %", formula: "Doanh thu affiliate / Tổng doanh thu campaign × 100%", desc: "Tỷ trọng doanh thu đến từ kênh affiliate trong tổng campaign. Đo sức mạnh của KOL affiliate." },
+    ],
+  },
+  {
+    id: "mkt",
+    label: "📣 Marketing",
+    color: "#DC2626",
+    metrics: [
+      { name: "Share of Voice (SOV)", formula: "Mentions brand / Tổng mentions ngành × 100%", desc: "Tỷ lệ nhắc đến thương hiệu so với tổng ngành. Campaign KOL tốt tăng SOV đáng kể." },
+      { name: "Brand Sentiment Score", formula: "% positive comments / (% positive + % negative)", desc: "Tỷ lệ cảm xúc tích cực trong comment. Phản ánh hình ảnh thương hiệu sau campaign." },
+      { name: "CPE (Cost Per Engagement)", formula: "Chi phí campaign / Tổng engagements", desc: "Chi phí để tạo ra 1 tương tác (like/cmt/share). Đánh giá hiệu quả xây dựng cộng đồng." },
+      { name: "Earned Media Value (EMV)", formula: "Tổng impressions × Giá CPM tham chiếu", desc: "Giá trị truyền thông tự nhiên do KOL tạo ra, quy đổi sang giá trị paid media tương đương." },
+      { name: "KOL ROI Index", formula: "(EMV + Doanh thu) / Tổng chi phí KOL", desc: "Chỉ số ROI toàn diện kết hợp giá trị truyền thông lẫn doanh thu thực tế. Đánh giá tổng thể campaign." },
+      { name: "Audience Overlap Rate", formula: "Shared followers / Tổng unique followers × 100%", desc: "Tỷ lệ audience trùng nhau giữa các KOL trong cùng campaign. Thấp = tiếp cận đa dạng hơn." },
+    ],
+  },
+];
+
+const GlossaryPanel = () => {
+  const [activeTab, setActiveTab] = useState("ecom");
+  const activeCat = GLOSSARY_CATEGORIES.find(c => c.id === activeTab);
+  return (
+    <div className="kt-anim" style={{ marginTop: 14 }}>
+      {/* Category Tabs */}
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
+        {GLOSSARY_CATEGORIES.map(cat => (
+          <button
+            key={cat.id}
+            onClick={() => setActiveTab(cat.id)}
+            style={{
+              padding: "5px 12px",
+              borderRadius: 20,
+              fontSize: 11,
+              fontWeight: 700,
+              border: `1.5px solid ${activeTab === cat.id ? cat.color : "var(--line)"}`,
+              background: activeTab === cat.id ? cat.color : "transparent",
+              color: activeTab === cat.id ? "#fff" : "var(--ink-soft)",
+              cursor: "pointer",
+              transition: "all 0.18s",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {cat.label}
+          </button>
+        ))}
+      </div>
+      {/* Metrics Grid */}
+      {activeCat && (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
+          {activeCat.metrics.map(m => (
+            <div key={m.name} style={{ padding: "12px 14px", background: "var(--paper)", borderRadius: 10, border: `1.5px solid ${activeCat.color}22`, borderLeft: `3px solid ${activeCat.color}` }}>
+              <strong style={{ color: activeCat.color, fontSize: 11.5, display: "block", marginBottom: 4 }}>{m.name}</strong>
+              <div style={{ fontSize: 10, color: "var(--ink)", background: `${activeCat.color}12`, borderRadius: 4, padding: "2px 6px", display: "inline-block", marginBottom: 6, fontFamily: "monospace", fontWeight: 600 }}>
+                {m.formula}
+              </div>
+              <p style={{ margin: 0, color: "var(--ink-soft)", fontSize: 10.5, lineHeight: 1.5 }}>{m.desc}</p>
+            </div>
+          ))}
+        </div>
+      )}
+      {/* Legend note */}
+      <div style={{ marginTop: 12, padding: "8px 12px", background: "var(--paper)", borderRadius: 8, fontSize: 10, color: "var(--ink-soft)", display: "flex", alignItems: "center", gap: 6 }}>
+        💡 Tất cả công thức dựa trên dữ liệu hiện có trong bảng KOL. Benchmark ngành có thể thay đổi theo danh mục sản phẩm và nền tảng.
+      </div>
+    </div>
+  );
+};
+
 const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
+
   const [subView, setSubView] = useState("overview");
   const [selectedCampaign, setSelectedCampaign] = useState("all");
   const [noteText, setNoteText] = useState("");
@@ -2749,40 +2867,10 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
           <span style={{ fontSize: 10, color: "var(--ink-soft)" }}>{showGlossary ? "Thu gọn ▲" : "Mở rộng ▼"}</span>
         </h3>
         {showGlossary && (
-          <div style={{ marginTop: 14, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 }} className="kt-anim">
-            <div style={{ padding: 12, background: "var(--paper)", borderRadius: 8, border: "1px solid var(--line)" }}>
-              <strong style={{ color: "var(--red)", fontSize: 12 }}>ROAS (Return on Ad Spend)</strong>
-              <p style={{ margin: "6px 0 0 0", color: "var(--ink-soft)", fontSize: 11, lineHeight: 1.4 }}>
-                Tỷ số sinh lời trên chi phí quảng cáo. Công thức: <code>Doanh thu / Chi phí chạy Ads</code>. Thể hiện một đồng quảng cáo đem lại bao nhiêu đồng doanh số.
-              </p>
-            </div>
-            <div style={{ padding: 12, background: "var(--paper)", borderRadius: 8, border: "1px solid var(--line)" }}>
-              <strong style={{ color: "var(--blue)", fontSize: 12 }}>CPV (Cost Per View)</strong>
-              <p style={{ margin: "6px 0 0 0", color: "var(--ink-soft)", fontSize: 11, lineHeight: 1.4 }}>
-                Chi phí trung bình trên mỗi lượt xem. Công thức: <code>Chi phí chạy Ads / Tổng lượt xem (Views)</code>. Đánh giá hiệu suất tối ưu phân phối video ads.
-              </p>
-            </div>
-            <div style={{ padding: 12, background: "var(--paper)", borderRadius: 8, border: "1px solid var(--line)" }}>
-              <strong style={{ color: "var(--green)", fontSize: 12 }}>CPM (Cost Per Mille)</strong>
-              <p style={{ margin: "6px 0 0 0", color: "var(--ink-soft)", fontSize: 11, lineHeight: 1.4 }}>
-                Chi phí trên 1000 lượt followers tiếp cận. Công thức: <code>(Chi phí Booking / Followers) * 1000</code>. Dùng để so sánh độ đắt/rẻ của giá booking.
-              </p>
-            </div>
-            <div style={{ padding: 12, background: "var(--paper)", borderRadius: 8, border: "1px solid var(--line)" }}>
-              <strong style={{ color: "var(--amber)", fontSize: 12 }}>ER (Engagement Rate)</strong>
-              <p style={{ margin: "6px 0 0 0", color: "var(--ink-soft)", fontSize: 11, lineHeight: 1.4 }}>
-                Tỷ lệ tương tác trên tổng lượt xem. Công thức: <code>(Likes + Comments + Saves + Shares) / Views * 100%</code>. Đo lường sức hút và chất lượng nội dung.
-              </p>
-            </div>
-            <div style={{ padding: 12, background: "var(--paper)", borderRadius: 8, border: "1px solid var(--line)" }}>
-              <strong style={{ color: "var(--ink)", fontSize: 12 }}>CPF (Cost Per Follower)</strong>
-              <p style={{ margin: "6px 0 0 0", color: "var(--ink-soft)", fontSize: 11, lineHeight: 1.4 }}>
-                Chi phí tiếp cận trên một người theo dõi của KOL. Công thức: <code>Chi phí booking / Followers</code>. CPF càng thấp tức KOL tiếp cận hiệu quả chi phí càng cao.
-              </p>
-            </div>
-          </div>
+          <GlossaryPanel />
         )}
       </div>
+
 
       {/* ── STAT CARD DETAIL MODAL ── */}
       {activeDetail && (
