@@ -7,13 +7,14 @@ const GlobalStyle = () => (
     @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
     .kt-root {
-      --ink: #2D2A26;
-      --ink-soft: #7A726B;
-      --paper: linear-gradient(135deg, #F0EDE8 0%, #E8E4F0 50%, #E4EDF0 100%);
-      --paper-bg: #EEE9F4;
-      --card: rgba(255,255,255,0.62);
-      --card-border: rgba(255,255,255,0.85);
-      --line: rgba(180,170,200,0.28);
+      --ink: #4C1413;
+      --ink-soft: #9B6B6A;
+      --paper-bg: #FFDBED;
+      --card: rgba(255,255,255,0.88);
+      --card-border: rgba(255,255,255,0.95);
+      --line: rgba(234,107,126,0.18);
+      --pink: #EA6B7E;
+      --pink-soft: rgba(234,107,126,0.12);
       --red: #C0392B;
       --red-soft: rgba(255,180,180,0.18);
       --amber: #B07D2A;
@@ -38,25 +39,25 @@ const GlobalStyle = () => (
 
     /* Glass card utility */
     .kt-glass {
-      background: rgba(255,255,255,0.58);
-      backdrop-filter: blur(16px) saturate(1.6);
-      -webkit-backdrop-filter: blur(16px) saturate(1.6);
-      border: 1px solid rgba(255,255,255,0.82);
-      box-shadow: 0 2px 16px rgba(120,100,180,0.08), inset 0 1px 0 rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(20px) saturate(1.4);
+      -webkit-backdrop-filter: blur(20px) saturate(1.4);
+      border: 1px solid rgba(255,255,255,0.95);
+      box-shadow: 0 2px 16px rgba(234,107,126,0.10), inset 0 1px 0 rgba(255,255,255,0.8);
     }
 
     .kt-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
-    .kt-scrollbar::-webkit-scrollbar-thumb { background: rgba(160,130,200,0.25); border-radius: 4px; }
+    .kt-scrollbar::-webkit-scrollbar-thumb { background: rgba(234,107,126,0.28); border-radius: 4px; }
     .kt-scrollbar::-webkit-scrollbar-track { background: transparent; }
 
     .kt-ticket {
       position: relative;
       background: var(--card);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--card-border);
       border-radius: 10px;
-      box-shadow: 0 2px 12px rgba(100,80,160,0.07);
+      box-shadow: 0 2px 12px rgba(234,107,126,0.10);
     }
     .kt-ticket .kt-perf {
       position: relative;
@@ -152,24 +153,24 @@ const GlobalStyle = () => (
       white-space: nowrap;
     }
     .kt-btn-primary {
-      background: linear-gradient(135deg, #C0392B, #9B1D1D);
+      background: linear-gradient(135deg, #EA6B7E, #C0392B);
       color: #fff;
-      box-shadow: 0 2px 8px rgba(192,57,43,0.25);
+      box-shadow: 0 2px 8px rgba(234,107,126,0.30);
     }
-    .kt-btn-primary:hover { background: linear-gradient(135deg, #A93226, #7B1111); transform: translateY(-1px); }
+    .kt-btn-primary:hover { background: linear-gradient(135deg, #D45A6D, #A93226); transform: translateY(-1px); }
     .kt-btn-ghost {
-      background: rgba(255,255,255,0.45);
+      background: rgba(255,255,255,0.68);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       color: var(--ink);
-      border-color: rgba(200,190,220,0.45);
+      border-color: rgba(234,107,126,0.25);
     }
-    .kt-btn-ghost:hover { background: rgba(255,255,255,0.72); border-color: rgba(160,120,200,0.4); }
+    .kt-btn-ghost:hover { background: rgba(255,255,255,0.90); border-color: rgba(234,107,126,0.45); }
     .kt-btn-ghost.active {
       background: var(--ink);
       color: #fff;
       border-color: var(--ink);
-      box-shadow: 0 2px 8px rgba(45,42,38,0.18);
+      box-shadow: 0 2px 8px rgba(76,20,19,0.20);
     }
     .kt-btn-danger { background: rgba(255,180,180,0.22); color: #991b1b; border-color: rgba(252,165,165,0.5); }
     .kt-btn-danger:hover { background: rgba(252,165,165,0.35); }
@@ -180,8 +181,8 @@ const GlobalStyle = () => (
       user-select: none;
     }
     .kt-stats-card-hover:hover {
-      border-color: rgba(160,122,201,0.5) !important;
-      box-shadow: 0 6px 24px rgba(120,100,180,0.13) !important;
+      border-color: rgba(234,107,126,0.55) !important;
+      box-shadow: 0 6px 24px rgba(234,107,126,0.15) !important;
       transform: translateY(-2px);
     }
     .kt-stats-card-hover:active {
@@ -190,10 +191,10 @@ const GlobalStyle = () => (
 
     .kt-input, .kt-select, .kt-textarea {
       font-family: 'Be Vietnam Pro', sans-serif;
-      background: rgba(255,255,255,0.55);
+      background: rgba(255,255,255,0.80);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(200,190,220,0.45);
+      border: 1px solid rgba(234,107,126,0.28);
       border-radius: 8px;
       padding: 7px 10px;
       font-size: 13px;
@@ -202,8 +203,8 @@ const GlobalStyle = () => (
       outline: none;
     }
     .kt-input:focus, .kt-select:focus, .kt-textarea:focus {
-      border-color: rgba(160,122,201,0.7);
-      box-shadow: 0 0 0 3px rgba(160,122,201,0.15);
+      border-color: #EA6B7E;
+      box-shadow: 0 0 0 3px rgba(234,107,126,0.18);
     }
     .kt-label { font-size: 11px; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; display: block; }
 
@@ -223,8 +224,8 @@ const GlobalStyle = () => (
     /* Modal overlay */
     .kt-overlay {
       position: fixed; inset: 0;
-      background: rgba(40,30,60,0.38);
-      backdrop-filter: blur(6px);
+      background: rgba(76,20,19,0.28);
+      backdrop-filter: blur(8px);
       z-index: 100;
       display: flex; align-items: center; justify-content: center;
       padding: 16px;
@@ -907,8 +908,8 @@ const TableView = ({ rows, onOpen }) => {
           cursor: "pointer",
           userSelect: "none",
           whiteSpace: "nowrap",
-          background: active ? "rgba(160,122,201,0.12)" : undefined,
-          color: active ? "#6B46A8" : undefined,
+          background: active ? "rgba(234,107,126,0.12)" : undefined,
+          color: active ? "#C0392B" : undefined,
           ...thStyle,
         }}
       >
