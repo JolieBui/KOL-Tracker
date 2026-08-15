@@ -157,6 +157,13 @@ const GlobalStyle = () => (
       top: 184px;
       z-index: 10;
     }
+    .kt-table-sticky-modal th {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--red-soft) !important;
+      box-shadow: inset 0 -1px 0 var(--line);
+    }
     .kt-table td {
       padding: 10px 12px;
       border-bottom: 1px solid var(--line);
@@ -1898,10 +1905,10 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
             </div>
 
             {/* Body */}
-            <div style={{ padding: "18px 22px", overflowY: "auto", flex: 1 }} className="kt-scrollbar">
-              {activeDetail.description && <p style={{ fontSize: 12, color: "var(--ink-soft)", margin: "0 0 16px 0", lineHeight: 1.4 }}>{activeDetail.description}</p>}
-              <div style={{ border: "1px solid var(--line)", borderRadius: 8, overflow: "hidden" }}>
-                <table className="kt-table" style={{ margin: 0 }}>
+            <div style={{ padding: "18px 22px", display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
+              {activeDetail.description && <p style={{ fontSize: 12, color: "var(--ink-soft)", margin: "0 0 12px 0", lineHeight: 1.4 }}>{activeDetail.description}</p>}
+              <div style={{ border: "1px solid var(--line)", borderRadius: 8, overflowY: "auto", flex: 1, maxHeight: 380 }} className="kt-scrollbar">
+                <table className="kt-table kt-table-sticky-modal" style={{ margin: 0 }}>
                   <thead>
                     <tr>
                       {activeDetail.columns.map(col => <th key={col.key}>{col.label}</th>)}
