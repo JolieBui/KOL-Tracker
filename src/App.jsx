@@ -23,7 +23,10 @@ const GlobalStyle = () => (
       font-family: 'Be Vietnam Pro', sans-serif;
       color: var(--ink);
       background: var(--paper);
-      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
     }
     .kt-root input, .kt-root select, .kt-root button, .kt-root textarea {
       font-family: 'Be Vietnam Pro', sans-serif;
@@ -219,8 +222,9 @@ const GlobalStyle = () => (
     }
     .kt-table-sticky th {
       position: sticky;
-      top: calc(var(--header-height, 184px) + 20px);
+      top: 0;
       z-index: 10;
+      background: var(--card) !important;
     }
     .kt-table-sticky th:first-child {
       border-top-left-radius: 11px;
@@ -827,7 +831,7 @@ const StatsBar = ({ rows, currentStatus = "all", onCardClick }) => {
    TABLE VIEW
 ================================================================ */
 const TableView = ({ rows, onOpen }) => (
-  <div style={{ overflow: "visible" }}>
+  <div className="kt-scrollbar" style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
     <table className="kt-table kt-table-sticky">
       <thead>
         <tr>
@@ -938,7 +942,7 @@ const KanbanColumn = ({ stage, cards, onOpen, onUpdateStatus }) => {
         maxWidth: 260,
         display: "flex",
         flexDirection: "column",
-        maxHeight: "calc(100vh - 280px)"
+        height: "100%"
       }}
     >
       {/* Column header */}
@@ -1003,7 +1007,7 @@ const KanbanColumn = ({ stage, cards, onOpen, onUpdateStatus }) => {
 };
 
 const KanbanView = ({ rows, onOpen, onUpdateStatus }) => (
-  <div style={{ display: "flex", gap: 14, overflowX: "auto", padding: 16, alignItems: "flex-start" }}
+  <div style={{ display: "flex", gap: 14, overflowX: "auto", padding: 16, alignItems: "stretch", flex: 1, height: "100%" }}
     className="kt-scrollbar">
     {STATUS_STAGES.map(stage => {
       const cards = rows.filter(r => r.statusKey === stage.key);
@@ -1123,7 +1127,7 @@ const CalendarView = ({ rows, onOpen, onUpdateRow }) => {
   const weekdays = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
 
   return (
-    <div style={{ display: "flex", gap: 16, height: "calc(100vh - 280px)", minHeight: 450, padding: 12 }}>
+    <div style={{ display: "flex", gap: 16, flex: 1, minHeight: 0, padding: 12 }}>
       {/* Left panel: Calendar Grid */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "var(--card)", borderRadius: 12, border: "1px solid var(--line)", padding: 14 }}>
         {/* Navigation */}
@@ -1625,7 +1629,7 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
   }
 
   return (
-    <div style={{ padding: 20 }}>
+    <div className="kt-scrollbar" style={{ flex: 1, overflowY: "auto", padding: 20, minHeight: 0 }}>
       {/* ── Campaign Selector ── */}
       <div style={{
         display: "flex",
@@ -2878,19 +2882,6 @@ export default function App() {
   const [showNew, setShowNew] = useState(false);
   const [toast, setToast] = useState(null); // { msg, ok }
   const importRef = useRef(null);
-  const headerRef = useRef(null);
-  const [headerHeight, setHeaderHeight] = useState(184);
-
-  useEffect(() => {
-    if (!headerRef.current) return;
-    const observer = new ResizeObserver((entries) => {
-      for (let entry of entries) {
-        setHeaderHeight(entry.target.clientHeight);
-      }
-    });
-    observer.observe(headerRef.current);
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     localStorage.setItem(LS_KEY, JSON.stringify(data));
@@ -3161,18 +3152,18 @@ export default function App() {
   };
 
   return (
-    <div className="kt-root" style={{ "--header-height": `${headerHeight}px` }}>
+    <div className="kt-root">
       <GlobalStyle />
 
       {/* ── HEADER ── */}
-      <div ref={headerRef} style={{
+      <div style={{
         background: "var(--card)",
         borderBottom: "1px solid var(--line)",
         padding: "14px 20px",
         display: "flex",
         flexDirection: "column",
         gap: 12,
-        position: "sticky", top: 0, zIndex: 50,
+        flexShrink: 0
       }}>
         {/* Top Row: Title + Main Actions */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
@@ -3228,58 +3219,60 @@ export default function App() {
           </div>
         </div>
 
-        {/* Bottom Row: Filters */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-          {/* Search */}
-          <input className="kt-input" placeholder="🔍 Tìm tên KOL, món ăn…"
-            value={search} onChange={e => setSearch(e.target.value)}
-            style={{ width: 220 }} />
+        {/* Bottom Row: Filters (Only visible for table, kanban, calendar) */}
+        {view !== "insights" && (
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+            {/* Search */}
+            <input className="kt-input" placeholder="🔍 Tìm tên KOL, món ăn…"
+              value={search} onChange={e => setSearch(e.target.value)}
+              style={{ width: 220 }} />
 
-          {/* Campaign filter */}
-          <select className="kt-select" value={filterCampaign} onChange={e => setFilterCampaign(e.target.value)}
-            style={{ width: 160 }}>
-            <option value="all">All campaigns</option>
-            {CAMPAIGNS.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
-          </select>
+            {/* Campaign filter */}
+            <select className="kt-select" value={filterCampaign} onChange={e => setFilterCampaign(e.target.value)}
+              style={{ width: 160 }}>
+              <option value="all">All campaigns</option>
+              {CAMPAIGNS.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
+            </select>
 
-           {/* Status filter */}
-          <select className="kt-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
-            style={{ width: 190 }}>
-            <option value="all">All status</option>
-            <option value="in_progress">Đang xử lý (Chưa lên sóng)</option>
-            {STATUS_STAGES.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
-          </select>
+             {/* Status filter */}
+            <select className="kt-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
+              style={{ width: 190 }}>
+              <option value="all">All status</option>
+              <option value="in_progress">Đang xử lý (Chưa lên sóng)</option>
+              {STATUS_STAGES.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
+            </select>
 
-          {/* Type filter */}
-          <select className="kt-select" value={filterType} onChange={e => setFilterType(e.target.value)}
-            style={{ width: 130 }}>
-            <option value="all">All types</option>
-            {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-          </select>
-        </div>
+            {/* Type filter */}
+            <select className="kt-select" value={filterType} onChange={e => setFilterType(e.target.value)}
+              style={{ width: 130 }}>
+              <option value="all">All types</option>
+              {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+          </div>
+        )}
 
-        {/* Stats Row */}
-        <StatsBar 
-          rows={statsRows} 
-          currentStatus={filterStatus}
-          onCardClick={statusKey => setFilterStatus(statusKey)}
-        />
-
-        {/* Yellow cover spacer to hide table rows scrolling through the 20px gap below the header */}
-        <div style={{
-          position: "absolute",
-          left: 0, right: 0,
-          top: "100%",
-          height: 20,
-          background: "#FAF6E9",
-          zIndex: 50,
-          pointerEvents: "none"
-        }} />
+        {/* Stats Row (Only visible for table, kanban) */}
+        {(view === "table" || view === "kanban") && (
+          <StatsBar 
+            rows={statsRows} 
+            currentStatus={filterStatus}
+            onCardClick={statusKey => setFilterStatus(statusKey)}
+          />
+        )}
       </div>
 
       {/* ── BODY ── */}
-      <div style={{ padding: "20px" }}>
-        <div style={{ background: "var(--card)", borderRadius: 12, border: "1px solid var(--line)", overflow: "visible" }}>
+      <div style={{ padding: "20px", flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minHeight: 0 }}>
+        <div style={{ 
+          background: "var(--card)", 
+          borderRadius: 12, 
+          border: "1px solid var(--line)", 
+          overflow: "hidden", 
+          flex: 1, 
+          display: "flex", 
+          flexDirection: "column", 
+          minHeight: 0 
+        }}>
           {view === "table" && <TableView rows={filtered} onOpen={r => setSelected(r)} />}
           {view === "kanban" && (
             <KanbanView 
