@@ -112,33 +112,55 @@ Error generating stack: `+e.message+`
 `;var n=Oy(e,t);return P===void 0||t.type==`string`?n:`ÿþ`+P.utils.encode(1200,n,`str`)}function Ay(e){var t=``,n,r=``;if(e==null||e[`!ref`]==null)return[];var i=ei(e[`!ref`]),a=``,o=[],s,c=[],l=Array.isArray(e);for(s=i.s.c;s<=i.e.c;++s)o[s]=Jr(s);for(var u=i.s.r;u<=i.e.r;++u)for(a=Wr(u),s=i.s.c;s<=i.e.c;++s)if(t=o[s]+a,n=l?(e[u]||[])[s]:e[t],r=``,n!==void 0){if(n.F!=null){if(t=n.F,!n.f)continue;r=n.f,t.indexOf(`:`)==-1&&(t=t+`:`+t)}if(n.f!=null)r=n.f;else if(n.t==`z`)continue;else if(n.t==`n`&&n.v!=null)r=``+n.v;else if(n.t==`b`)r=n.v?`TRUE`:`FALSE`;else if(n.w!==void 0)r=`'`+n.w;else if(n.v===void 0)continue;else r=n.t==`s`?`'`+n.v:``+n.v;c[c.length]=t+`=`+r}return c}function jy(e,t,n){var r=n||{},i=+!r.skipHeader,a=e||{},o=0,s=0;if(a&&r.origin!=null){if(typeof r.origin==`number`)o=r.origin;else{var c=typeof r.origin==`string`?Qr(r.origin):r.origin;o=c.r,s=c.c}}var l,u={s:{c:0,r:0},e:{c:s,r:o+t.length-1+i}};if(a[`!ref`]){var d=ei(a[`!ref`]);u.e.c=Math.max(u.e.c,d.e.c),u.e.r=Math.max(u.e.r,d.e.r),o==-1&&(o=d.e.r+1,u.e.r=o+t.length-1+i)}else o==-1&&(o=0,u.e.r=t.length-1+i);var f=r.header||[],p=0;t.forEach(function(e,t){kt(e).forEach(function(n){(p=f.indexOf(n))==-1&&(f[p=f.length]=n);var c=e[n],u=`z`,d=``,m=J({c:s+p,r:o+t+i});l=Ny(a,m),c&&typeof c==`object`&&!(c instanceof Date)?a[m]=c:(typeof c==`number`?u=`n`:typeof c==`boolean`?u=`b`:typeof c==`string`?u=`s`:c instanceof Date?(u=`d`,r.cellDates||(u=`n`,c=Ft(c)),d=r.dateNF||V[14]):c===null&&r.nullError&&(u=`e`,c=0),l?(l.t=u,l.v=c,delete l.w,delete l.R,d&&(l.z=d)):a[m]=l={t:u,v:c},d&&(l.z=d))})}),u.e.c=Math.max(u.e.c,s+f.length-1);var m=Wr(o);if(i)for(p=0;p<f.length;++p)a[Jr(p+s)+m]={t:`s`,v:f[p]};return a[`!ref`]=Y(u),a}function My(e,t){return jy(null,e,t)}function Ny(e,t,n){if(typeof t==`string`){if(Array.isArray(e)){var r=Qr(t);return e[r.r]||(e[r.r]=[]),e[r.r][r.c]||(e[r.r][r.c]={t:`z`})}return e[t]||(e[t]={t:`z`})}return typeof t==`number`?Ny(e,J({r:t,c:n||0})):Ny(e,J(t))}function Py(e,t){if(typeof t==`number`){if(t>=0&&e.SheetNames.length>t)return t;throw Error(`Cannot find sheet # `+t)}if(typeof t==`string`){var n=e.SheetNames.indexOf(t);if(n>-1)return n;throw Error(`Cannot find sheet name |`+t+`|`)}throw Error(`Cannot find sheet |`+t+`|`)}function Fy(){return{SheetNames:[],Sheets:{}}}function Iy(e,t,n,r){var i=1;if(!n)for(;i<=65535&&e.SheetNames.indexOf(n=`Sheet`+i)!=-1;++i,n=void 0);if(!n||e.SheetNames.length>=65535)throw Error(`Too many worksheets`);if(r&&e.SheetNames.indexOf(n)>=0){var a=n.match(/(^.*?)(\d+)$/);i=a&&+a[2]||0;var o=a&&a[1]||n;for(++i;i<=65535&&e.SheetNames.indexOf(n=o+i)!=-1;++i);}if(sg(n),e.SheetNames.indexOf(n)>=0)throw Error(`Worksheet with name |`+n+`| already exists!`);return e.SheetNames.push(n),e.Sheets[n]=t,n}function Ly(e,t,n){e.Workbook||={},e.Workbook.Sheets||(e.Workbook.Sheets=[]);var r=Py(e,t);switch(e.Workbook.Sheets[r]||(e.Workbook.Sheets[r]={}),n){case 0:case 1:case 2:break;default:throw Error(`Bad sheet visibility setting `+n)}e.Workbook.Sheets[r].Hidden=n}function Ry(e,t){return e.z=t,e}function zy(e,t,n){return t?(e.l={Target:t},n&&(e.l.Tooltip=n)):delete e.l,e}function By(e,t,n){return zy(e,`#`+t,n)}function Vy(e,t,n){e.c||=[],e.c.push({t,a:n||`SheetJS`})}function Hy(e,t,n,r){for(var i=typeof t==`string`?ei(t):t,a=typeof t==`string`?t:Y(t),o=i.s.r;o<=i.e.r;++o)for(var s=i.s.c;s<=i.e.c;++s){var c=Ny(e,o,s);c.t=`n`,c.F=a,delete c.v,o==i.s.r&&s==i.s.c&&(c.f=n,r&&(c.D=!0))}return e}var Uy={encode_col:Jr,encode_row:Wr,encode_cell:J,encode_range:Y,decode_col:qr,decode_row:Ur,split_cell:Zr,decode_cell:Qr,decode_range:$r,format_cell:ni,sheet_add_aoa:ii,sheet_add_json:jy,sheet_add_dom:$_,aoa_to_sheet:ai,json_to_sheet:My,table_to_sheet:ev,table_to_book:tv,sheet_to_csv:Oy,sheet_to_txt:ky,sheet_to_json:Ty,sheet_to_html:Q_,sheet_to_formulae:Ay,sheet_to_row_object_array:Ty,sheet_get_cell:Ny,book_new:Fy,book_append_sheet:Iy,book_set_sheet_visibility:Ly,cell_set_number_format:Ry,cell_set_hyperlink:zy,cell_set_internal_link:By,cell_add_comment:Vy,sheet_set_array_formula:Hy,consts:{SHEET_VISIBLE:0,SHEET_HIDDEN:1,SHEET_VERY_HIDDEN:2}};y.version;var Wy=o((e=>{var t=Symbol.for(`react.transitional.element`);function n(e,n,r){var i=null;if(r!==void 0&&(i=``+r),n.key!==void 0&&(i=``+n.key),`key`in n)for(var a in r={},n)a!==`key`&&(r[a]=n[a]);else r=n;return n=r.ref,{$$typeof:t,type:e,key:i,ref:n===void 0?null:n,props:r}}e.jsx=n,e.jsxs=n})),Z=o(((e,t)=>{t.exports=Wy()}))(),Gy=()=>(0,Z.jsx)(`style`,{children:`
     @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
-    /* ── UNIFIED DESIGN TOKENS: Apple Minimal Precision ── */
+    /* ── BRAND GUIDELINE DESIGN TOKENS ── */
     .kt-root {
-      --ink:        #1D1D1F;
-      --ink-mid:    #424245;
-      --ink-soft:   #86868B;
-      --ink-faint:  #D2D2D7;
-      --paper:      #F5F5F7;
-      --card:       #FFFFFF;
-      --rule:       #E5E5EA;
-      --accent:     #0066CC;
-      --accent-dim: rgba(0, 102, 204, 0.15);
-      --accent-bg:  #F0F6FF;
-      --ok:         #248A3D;
-      --ok-bg:      #EAF7ED;
-      --warn:       #B25900;
-      --warn-bg:    #FFF4E5;
-      --danger:     #D70015;
-      --danger-bg:  #FFEBEB;
-      --blue:       #0066CC;
-      --blue-bg:    #F0F6FF;
-      --acid-green: #248A3D;
-      --acid-bg:    #1D1D1F;
+      --c-bg:            #F8F5F1;
+      --c-surface:       #FFFFFF;
+      --c-border:        #E5E5EA;
+      --c-border-strong: #C9B5AF;
+      --c-ink:           #1D1D1F;
+      --c-ink-2:         #424245;
+      --c-ink-3:         #86868B;
+      --c-accent:        #0066CC;
+      --c-accent-hover:  #0052A3;
+      --c-accent-light:  #F0F6FF;
+      --c-accent-border: #BAE6FD;
+
+      --c-ok:            #248A3D;
+      --c-ok-bg:         #EAF7ED;
+      --c-warn:          #B25900;
+      --c-warn-bg:       #FFF4E5;
+      --c-error:         #D70015;
+      --c-error-bg:      #FFEBEB;
+      --c-info:          #0066CC;
+      --c-info-bg:       #F0F6FF;
+
+      /* Standard backward-compatible aliases */
+      --paper:      var(--c-bg);
+      --card:       var(--c-surface);
+      --rule:       var(--c-border);
+      --ink:        var(--c-ink);
+      --ink-mid:    var(--c-ink-2);
+      --ink-soft:   var(--c-ink-3);
+      --ink-faint:  var(--c-border-strong);
+      --accent:     var(--c-accent);
+      --accent-dim: var(--c-accent-light);
+      --accent-bg:  var(--c-accent-light);
+      --ok:         var(--c-ok);
+      --ok-bg:      var(--c-ok-bg);
+      --warn:       var(--c-warn);
+      --warn-bg:    var(--c-warn-bg);
+      --danger:     var(--c-error);
+      --danger-bg:  var(--c-error-bg);
+      --blue:       var(--c-info);
+      --blue-bg:    var(--c-info-bg);
+      --acid-green: var(--c-ok);
+      --acid-bg:    var(--c-ink);
 
       font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       font-size: 14px;
-      color: var(--ink);
-      background-color: var(--paper);
+      color: var(--c-ink);
+      background-color: var(--c-bg);
 
       display: flex;
       flex-direction: column;
