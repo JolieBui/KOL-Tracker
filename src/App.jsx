@@ -4,28 +4,38 @@ import * as XLSX from "xlsx";
 /* ---------------- Design tokens (injected via <style>) ---------------- */
 const GlobalStyle = () => (
   <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
 
+    /* ── DESIGN TOKENS: Analog Studio ── */
     .kt-root {
-      --ink: #4C1413;
-      --ink-soft: #9B6B6A;
-      --paper-bg: #FFDBED;
-      --card: rgba(255,255,255,0.88);
-      --card-border: rgba(255,255,255,0.95);
-      --line: rgba(234,107,126,0.18);
-      --pink: #EA6B7E;
-      --pink-soft: rgba(234,107,126,0.12);
-      --red: #C0392B;
-      --red-soft: rgba(255,180,180,0.18);
-      --amber: #B07D2A;
-      --amber-soft: rgba(255,213,120,0.22);
-      --green: #2E7D5A;
-      --green-soft: rgba(120,210,160,0.18);
-      --blue: #2563A8;
-      --blue-soft: rgba(120,170,255,0.18);
+      --ink:        #1C0A09;
+      --ink-mid:    #5C2B28;
+      --ink-soft:   #9E6B68;
+      --ink-faint:  #C9A8A5;
+      --paper:      #FDF3F0;
+      --card:       #FFFFFF;
+      --rule:       #ECD8D4;
+      --accent:     #E8566A;
+      --accent-dim: #F5BDC4;
+      --accent-bg:  #FFF0F2;
+      --ok:         #2A6B45;
+      --ok-bg:      #EBF7F1;
+      --warn:       #956B00;
+      --warn-bg:    #FEF8E7;
+      --danger:     #B52B1C;
+      --danger-bg:  #FEF0EE;
+      --blue:       #1B4F8A;
+      --blue-bg:    #EBF2FB;
+
       font-family: 'Be Vietnam Pro', sans-serif;
+      font-size: 14px;
       color: var(--ink);
-      background: var(--paper-bg);
+      background-color: var(--paper);
+
+      /* CSS noise texture — no external image */
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+      background-size: 180px 180px;
+
       display: flex;
       flex-direction: column;
       height: 100vh;
@@ -34,34 +44,45 @@ const GlobalStyle = () => (
     .kt-root input, .kt-root select, .kt-root button, .kt-root textarea {
       font-family: 'Be Vietnam Pro', sans-serif;
     }
-    .kt-display { font-family: 'Be Vietnam Pro', sans-serif; letter-spacing: 0.02em; text-transform: uppercase; }
-    .kt-mono { font-family: 'IBM Plex Mono', monospace; }
+    .kt-serif  { font-family: 'Playfair Display', Georgia, serif; }
+    .kt-mono   { font-family: 'IBM Plex Mono', monospace; }
+    .kt-caps   { text-transform: uppercase; letter-spacing: 0.09em; font-size: 0.72em; font-weight: 700; }
 
-    /* Glass card utility */
-    .kt-glass {
-      background: rgba(255,255,255,0.88);
-      backdrop-filter: blur(20px) saturate(1.4);
-      -webkit-backdrop-filter: blur(20px) saturate(1.4);
-      border: 1px solid rgba(255,255,255,0.95);
-      box-shadow: 0 2px 16px rgba(234,107,126,0.10), inset 0 1px 0 rgba(255,255,255,0.8);
-    }
-
-    .kt-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
-    .kt-scrollbar::-webkit-scrollbar-thumb { background: rgba(234,107,126,0.28); border-radius: 4px; }
+    /* ── SCROLLBAR ── */
+    .kt-scrollbar::-webkit-scrollbar       { height: 5px; width: 5px; }
+    .kt-scrollbar::-webkit-scrollbar-thumb { background: var(--accent-dim); border-radius: 0; }
     .kt-scrollbar::-webkit-scrollbar-track { background: transparent; }
 
+    /* ── CARDS: flat, left-accent, sharp corners ── */
+    .kt-card {
+      background: var(--card);
+      border: 1px solid var(--rule);
+      border-radius: 0;
+      border-left: 3px solid var(--accent);
+    }
+    .kt-card-neutral {
+      background: var(--card);
+      border: 1px solid var(--rule);
+      border-radius: 0;
+    }
+    .kt-glass {
+      background: var(--card);
+      border: 1px solid var(--rule);
+      border-radius: 0;
+    }
+
+    /* ── TICKET (kanban card) ── */
     .kt-ticket {
       position: relative;
       background: var(--card);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--card-border);
-      border-radius: 10px;
-      box-shadow: 0 2px 12px rgba(234,107,126,0.10);
+      border: 1px solid var(--rule);
+      border-left: 3px solid var(--accent);
+      border-radius: 0;
+      box-shadow: none;
     }
     .kt-ticket .kt-perf {
       position: relative;
-      border-top: 1px dashed var(--line);
+      border-top: 1px dashed var(--rule);
       margin: 0 14px;
     }
     .kt-ticket .kt-perf::before, .kt-ticket .kt-perf::after {
@@ -71,165 +92,184 @@ const GlobalStyle = () => (
       width: 14px; height: 14px;
       border-radius: 50%;
       background: var(--paper);
-      border: 1px solid var(--line);
+      border: 1px solid var(--rule);
     }
     .kt-ticket .kt-perf::before { left: -21px; }
-    .kt-ticket .kt-perf::after { right: -21px; }
+    .kt-ticket .kt-perf::after  { right: -21px; }
 
+    /* ── STAMP ── */
     .kt-stamp {
       display: inline-block;
-      transform: rotate(-6deg);
-      border: 2px solid var(--green);
-      color: var(--green);
-      font-family: 'Oswald', sans-serif;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 11px;
+      transform: rotate(-4deg);
+      border: 1.5px solid var(--ok);
+      color: var(--ok);
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      padding: 1px 7px;
+      border-radius: 2px;
+      font-size: 10px;
       text-transform: uppercase;
-      opacity: 0.9;
     }
 
-    /* Tooltip styles */
-    .kt-tooltip-wrapper {
-      position: relative;
-      display: inline-block;
-      cursor: help;
-    }
+    /* ── TOOLTIP ── */
+    .kt-tooltip-wrapper { position: relative; display: inline-block; cursor: help; }
     .kt-tooltip {
-      visibility: hidden;
-      width: 240px;
-      background-color: var(--ink);
-      color: #fff;
-      text-align: left;
-      border-radius: 8px;
-      padding: 10px 12px;
-      position: absolute;
-      z-index: 1000;
-      bottom: 125%;
-      left: 50%;
+      visibility: hidden; width: 240px;
+      background: var(--ink); color: #fff;
+      text-align: left; border-radius: 3px;
+      padding: 10px 12px; position: absolute;
+      z-index: 1000; bottom: 125%; left: 50%;
       transform: translateX(-50%);
-      opacity: 0;
-      transition: opacity 0.2s ease, transform 0.2s ease;
-      font-size: 11px;
-      line-height: 1.45;
-      font-weight: normal;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.18);
-      border: 1px solid var(--line);
-      pointer-events: none;
-      white-space: normal;
-      text-transform: none;
-      letter-spacing: normal;
+      opacity: 0; transition: opacity 0.15s ease;
+      font-size: 11px; line-height: 1.5; font-weight: 400;
+      box-shadow: 4px 4px 0 rgba(0,0,0,0.12);
+      border: 1px solid var(--ink-mid); pointer-events: none;
+      white-space: normal; text-transform: none; letter-spacing: normal;
     }
     .kt-tooltip::after {
-      content: "";
-      position: absolute;
-      top: 100%;
-      left: 50%;
+      content: ""; position: absolute; top: 100%; left: 50%;
       transform: translateX(-50%);
-      border-width: 6px;
-      border-style: solid;
-      border-color: var(--ink) transparent transparent transparent;
+      border: 6px solid transparent;
+      border-top-color: var(--ink);
     }
-    .kt-tooltip-wrapper:hover .kt-tooltip {
-      visibility: visible;
-      opacity: 1;
-      transform: translateX(-50%) translateY(-4px);
-    }
+    .kt-tooltip-wrapper:hover .kt-tooltip { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(-4px); }
 
+    /* ── BUTTONS ── */
     .kt-btn {
       font-family: 'Be Vietnam Pro', sans-serif;
-      font-weight: 600;
-      border-radius: 10px;
-      padding: 8px 14px;
-      font-size: 13px;
-      cursor: pointer;
-      border: 1px solid transparent;
-      transition: all 0.18s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
+      font-weight: 600; border-radius: 2px;
+      padding: 7px 14px; font-size: 12px;
+      cursor: pointer; border: 1px solid transparent;
+      transition: all 0.14s ease;
+      display: inline-flex; align-items: center; gap: 6px;
+      white-space: nowrap; letter-spacing: 0.01em;
     }
     .kt-btn-primary {
-      background: linear-gradient(135deg, #EA6B7E, #C0392B);
-      color: #fff;
-      box-shadow: 0 2px 8px rgba(234,107,126,0.30);
+      background: var(--accent); color: #fff;
+      border-color: var(--accent);
+      box-shadow: 3px 3px 0 var(--ink-mid);
     }
-    .kt-btn-primary:hover { background: linear-gradient(135deg, #D45A6D, #A93226); transform: translateY(-1px); }
+    .kt-btn-primary:hover {
+      background: #D0455A; border-color: #D0455A;
+      box-shadow: 1px 1px 0 var(--ink-mid);
+      transform: translate(2px,2px);
+    }
     .kt-btn-ghost {
-      background: rgba(255,255,255,0.68);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      color: var(--ink);
-      border-color: rgba(234,107,126,0.25);
+      background: transparent; color: var(--ink);
+      border-color: var(--rule);
     }
-    .kt-btn-ghost:hover { background: rgba(255,255,255,0.90); border-color: rgba(234,107,126,0.45); }
+    .kt-btn-ghost:hover { background: var(--accent-bg); border-color: var(--accent-dim); }
     .kt-btn-ghost.active {
-      background: var(--ink);
-      color: #fff;
-      border-color: var(--ink);
-      box-shadow: 0 2px 8px rgba(76,20,19,0.20);
+      background: var(--ink); color: #fff; border-color: var(--ink);
     }
-    .kt-btn-danger { background: rgba(255,180,180,0.22); color: #991b1b; border-color: rgba(252,165,165,0.5); }
-    .kt-btn-danger:hover { background: rgba(252,165,165,0.35); }
+    .kt-btn-danger { background: var(--danger-bg); color: var(--danger); border-color: var(--accent-dim); }
+    .kt-btn-danger:hover { background: #FDDAD6; }
 
+    /* ── STAT CARD HOVER ── */
     .kt-stats-card-hover {
       cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.16s ease;
       user-select: none;
     }
     .kt-stats-card-hover:hover {
-      border-color: rgba(234,107,126,0.55) !important;
-      box-shadow: 0 6px 24px rgba(234,107,126,0.15) !important;
-      transform: translateY(-2px);
+      border-left-color: var(--accent) !important;
+      background: var(--accent-bg) !important;
     }
-    .kt-stats-card-hover:active {
-      transform: translateY(0);
-    }
+    .kt-stats-card-hover:active { transform: translateY(1px); }
 
+    /* ── FORM ELEMENTS ── */
     .kt-input, .kt-select, .kt-textarea {
       font-family: 'Be Vietnam Pro', sans-serif;
-      background: rgba(255,255,255,0.80);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(234,107,126,0.28);
-      border-radius: 8px;
+      background: var(--card);
+      border: 1px solid var(--rule);
+      border-bottom: 2px solid var(--ink-faint);
+      border-radius: 0;
       padding: 7px 10px;
       font-size: 13px;
       color: var(--ink);
       width: 100%;
       outline: none;
+      transition: border-color 0.15s;
     }
     .kt-input:focus, .kt-select:focus, .kt-textarea:focus {
-      border-color: #EA6B7E;
-      box-shadow: 0 0 0 3px rgba(234,107,126,0.18);
+      border-bottom-color: var(--accent);
+      background: var(--accent-bg);
     }
-    .kt-label { font-size: 11px; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; display: block; }
+    .kt-label {
+      font-size: 10px; font-weight: 700; color: var(--ink-soft);
+      text-transform: uppercase; letter-spacing: 0.09em;
+      margin-bottom: 4px; display: block;
+    }
+    .kt-badge {
+      font-size: 10px; font-weight: 700;
+      padding: 2px 7px; border-radius: 1px;
+      white-space: nowrap; display: inline-block;
+      letter-spacing: 0.03em;
+    }
 
-    .kt-badge { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 999px; white-space: nowrap; display: inline-block; }
+    /* ── ANIMATIONS ── */
 
-    @keyframes kt-fade-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-    .kt-anim { animation: kt-fade-in 0.25s ease; }
+    /* Curtain reveal — slides in from left edge */
+    @keyframes kt-curtain {
+      from { clip-path: inset(0 100% 0 0); }
+      to   { clip-path: inset(0 0% 0 0); }
+    }
+    .kt-anim { animation: kt-curtain 0.38s cubic-bezier(0.77,0,0.18,1) both; }
 
+    /* Slot machine roll-up for numbers */
+    @keyframes kt-roll {
+      0%   { transform: translateY(60%); opacity: 0; }
+      60%  { transform: translateY(-6%);  opacity: 1; }
+      100% { transform: translateY(0);    opacity: 1; }
+    }
+    .kt-slide-up { animation: kt-roll 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+    /* Ruled line scan — horizontal sweep on table rows */
+    @keyframes kt-scan {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .kt-table tbody tr { animation: kt-scan 0.22s ease both; }
+    .kt-table tbody tr:nth-child(1)    { animation-delay: 0.00s; }
+    .kt-table tbody tr:nth-child(2)    { animation-delay: 0.03s; }
+    .kt-table tbody tr:nth-child(3)    { animation-delay: 0.06s; }
+    .kt-table tbody tr:nth-child(4)    { animation-delay: 0.09s; }
+    .kt-table tbody tr:nth-child(5)    { animation-delay: 0.12s; }
+    .kt-table tbody tr:nth-child(6)    { animation-delay: 0.15s; }
+    .kt-table tbody tr:nth-child(7)    { animation-delay: 0.18s; }
+    .kt-table tbody tr:nth-child(8)    { animation-delay: 0.21s; }
+    .kt-table tbody tr:nth-child(9)    { animation-delay: 0.24s; }
+    .kt-table tbody tr:nth-child(10)   { animation-delay: 0.27s; }
+    .kt-table tbody tr:nth-child(n+11) { animation-delay: 0.30s; }
+
+    /* Thin underline indicator for active nav */
+    @keyframes kt-underline {
+      from { transform: scaleX(0); }
+      to   { transform: scaleX(1); }
+    }
+
+    /* Bar chart grow */
+    @keyframes kt-bar-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+    .kt-bar-anim { transform-origin: left; animation: kt-bar-grow 0.65s cubic-bezier(0.77,0,0.18,1) both; }
+
+    /* ── KANBAN ── */
     .kt-kanban-col {
-      min-width: 260px;
-      max-width: 260px;
-      display: flex;
-      flex-direction: column;
+      min-width: 260px; max-width: 260px;
+      display: flex; flex-direction: column;
       max-height: calc(100vh - 280px);
     }
 
-    /* Modal overlay */
+    /* ── MODAL ── */
     .kt-overlay {
       position: fixed; inset: 0;
-      background: rgba(76,20,19,0.28);
-      backdrop-filter: blur(8px);
+      background: rgba(28,10,9,0.55);
+      backdrop-filter: blur(2px);
       z-index: 100;
       display: flex; align-items: center; justify-content: center;
       padding: 16px;
     }
+
     .kt-modal {
       background: var(--card);
       border-radius: 14px;
@@ -439,7 +479,7 @@ const LOCATIONS = ["Urban", "Rural", "TP HCM", "HCM", "HN", "Hà Nội", "Hải 
 
 const fmtVND = (n) => {
   if (!n && n !== 0) return "—";
-  return new Intl.NumberFormat("vi-VN").format(n) + "đ";
+  return new Intl.NumberFormat("vi-VN").format(Math.round(Number(n))) + "đ";
 };
 
 const urlify = (text) => {
@@ -564,12 +604,12 @@ const ImportWizard = ({ rawHeaders, rawRows, sheetInfo, fileName, onConfirm, onC
 
   return (
     <div className="kt-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="kt-modal kt-anim" style={{ maxWidth: 860 }}>
+      <div className="kt-modal kt-anim" style={{ maxWidth: 860, borderRadius: 2 }}>
         {/* Header */}
         <div style={{ padding: "18px 22px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 11, fontWeight: 600, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
-              📥 Import Wizard
+              Import Wizard
             </div>
             <div style={{ fontSize: 16, fontWeight: 700 }}>"{fileName}" · {totalRows} KOLs · {visibleHeaders.length} cột</div>
             {sheetInfo && (
@@ -588,10 +628,10 @@ const ImportWizard = ({ rawHeaders, rawRows, sheetInfo, fileName, onConfirm, onC
         <div style={{ padding: "18px 22px" }}>
           {/* Column mapping table */}
           <div style={{ marginBottom: 18 }}>
-            <div className="kt-label" style={{ marginBottom: 10 }}>🔍 Mapping cột — kiểm tra và chỉnh nếu cần</div>
+            <div className="kt-label" style={{ marginBottom: 10 }}>Mapping cột — kiểm tra và chỉnh nếu cần</div>
             {unmapped.length > 0 && (
-              <div style={{ background: "#FFF7ED", border: "1px solid #FED7AA", borderRadius: 8, padding: "8px 12px", marginBottom: 12, fontSize: 12, color: "#92400E" }}>
-                ⚠️ Chưa nhận diện được: <strong>{unmapped.join(", ")}</strong> — chọn field tương ứng bên dưới
+              <div style={{ background: "var(--warn-bg)", border: "1px solid var(--accent-dim)", borderRadius: 2, padding: "8px 12px", marginBottom: 12, fontSize: 12, color: "var(--warn)" }}>
+                Chưa nhận diện được: <strong>{unmapped.join(", ")}</strong> — chọn field tương ứng bên dưới
               </div>
             )}
             <div style={{ overflowX: "auto" }}>
@@ -632,8 +672,8 @@ const ImportWizard = ({ rawHeaders, rawRows, sheetInfo, fileName, onConfirm, onC
 
           {/* Preview rows */}
           <div>
-            <div className="kt-label" style={{ marginBottom: 8 }}>👀 Preview {previewRows.length} dòng đầu sau khi map</div>
-            <div style={{ overflowX: "auto", background: "var(--paper)", borderRadius: 8, padding: 12 }}>
+            <div className="kt-label" style={{ marginBottom: 8 }}>Preview {previewRows.length} dòng đầu sau khi map</div>
+            <div style={{ overflowX: "auto", background: "var(--paper)", borderRadius: 2, padding: 12 }}>
               {preview.map((r, i) => (
                 <div key={i} style={{ display: "flex", gap: 12, marginBottom: 8, flexWrap: "wrap", fontSize: 12 }}>
                   <span style={{ fontWeight: 700, minWidth: 60 }}>{r.kol || `Row ${i+1}`}</span>
@@ -641,7 +681,7 @@ const ImportWizard = ({ rawHeaders, rawRows, sheetInfo, fileName, onConfirm, onC
                   <span className="kt-mono">{r.follower || "?"}</span>
                   <StatusBadge statusKey={r.statusKey} />
                   <span className="kt-mono" style={{ color: "var(--red)" }}>{fmtVND(r.cost)}</span>
-                  {r.monAn && <span style={{ color: "var(--ink-soft)" }}>🍽 {r.monAn.slice(0, 40)}{r.monAn.length > 40 ? "…" : ""}</span>}
+                  {r.monAn && <span style={{ color: "var(--ink-soft)" }}>{r.monAn.slice(0, 40)}{r.monAn.length > 40 ? "…" : ""}</span>}
                 </div>
               ))}
             </div>
@@ -655,7 +695,7 @@ const ImportWizard = ({ rawHeaders, rawRows, sheetInfo, fileName, onConfirm, onC
             <button className="kt-btn kt-btn-ghost" onClick={onClose}>Huỷ</button>
             <button className="kt-btn kt-btn-primary"
               onClick={() => onConfirm(applyMapping(rawRows, mapping))}>
-              ✅ Xác nhận import {rawRows.length} KOLs
+              Xác nhận import {rawRows.length} KOLs
             </button>
           </div>
         </div>
@@ -1417,46 +1457,94 @@ const MetricTooltip = ({ text, tooltip, style }) => {
   );
 };
 
-const StatCard = ({ title, value, subtext, color = "var(--ink)", onClick, tooltip }) => (
-  <div 
-    onClick={onClick}
-    className={onClick ? "kt-anim" : ""}
-    style={{
-      background: "var(--card)",
-      border: "1px solid var(--line)",
-      borderRadius: 12,
-      padding: "14px 18px",
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "space-between",
-      boxShadow: "0 1px 3px rgba(0,0,0,0.02)",
-      cursor: onClick ? "pointer" : "default",
-      transition: "all 0.2s ease",
-      userSelect: "none",
-    }}
-    onMouseEnter={onClick ? (e => {
-      e.currentTarget.style.borderColor = "var(--blue)";
-      e.currentTarget.style.boxShadow = "0 4px 12px rgba(59,130,246,0.08)";
-      e.currentTarget.style.transform = "translateY(-2px)";
-    }) : undefined}
-    onMouseLeave={onClick ? (e => {
-      e.currentTarget.style.borderColor = "var(--line)";
-      e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.02)";
-      e.currentTarget.style.transform = "translateY(0)";
-    }) : undefined}
-  >
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-      <MetricTooltip 
-        text={title} 
-        tooltip={tooltip} 
-        style={{ fontSize: 9, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em" }} 
-      />
-      {onClick && <span style={{ fontSize: 9, color: "var(--blue)", fontWeight: 700 }}>Chi tiết ↗</span>}
+const useCountUp = (target, duration = 900) => {
+  const [val, setVal] = useState(0);
+  const numTarget = parseFloat(String(target).replace(/[^0-9.]/g, "")) || 0;
+  useEffect(() => {
+    if (numTarget === 0) { setVal(0); return; }
+    let start = null;
+    const step = (ts) => {
+      if (!start) start = ts;
+      const p = Math.min((ts - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      setVal(Math.round(ease * numTarget));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    const raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [numTarget, duration]);
+  return val;
+};
+
+const StatCard = ({ title, value, subtext, color = "var(--ink)", onClick, tooltip }) => {
+  // Extract numeric part and suffix for counter animation
+  const strVal = String(value);
+  const numMatch = strVal.match(/^([\d,.]+)/);
+  const suffix = numMatch ? strVal.slice(numMatch[0].length) : "";
+  const rawNum = numMatch ? parseFloat(numMatch[1].replace(/,/g, "")) : null;
+  const counted = useCountUp(rawNum ?? 0, 800);
+  const displayValue = rawNum !== null
+    ? (rawNum >= 1000000
+        ? (counted / 1000000).toFixed(counted % 1000000 === 0 ? 0 : 1) + "M" + suffix
+        : rawNum >= 1000
+        ? counted.toLocaleString() + suffix
+        : counted + suffix)
+    : value;
+
+  return (
+    <div
+      onClick={onClick}
+      className="kt-slide-up"
+      style={{
+        background: "var(--card)",
+        border: "1px solid var(--line)",
+        borderRadius: 14,
+        padding: "14px 18px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        boxShadow: "0 2px 8px rgba(234,107,126,0.06)",
+        cursor: onClick ? "pointer" : "default",
+        transition: "all 0.22s cubic-bezier(0.16,1,0.3,1)",
+        userSelect: "none",
+        position: "relative",
+        overflow: "hidden",
+      }}
+      onMouseEnter={onClick ? (e => {
+        e.currentTarget.style.borderColor = "var(--pink)";
+        e.currentTarget.style.boxShadow = "0 6px 20px rgba(234,107,126,0.15)";
+        e.currentTarget.style.transform = "translateY(-3px)";
+      }) : undefined}
+      onMouseLeave={onClick ? (e => {
+        e.currentTarget.style.borderColor = "var(--line)";
+        e.currentTarget.style.boxShadow = "0 2px 8px rgba(234,107,126,0.06)";
+        e.currentTarget.style.transform = "translateY(0)";
+      }) : undefined}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+        <MetricTooltip
+          text={title}
+          tooltip={tooltip}
+          style={{ fontSize: 9, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em" }}
+        />
+        {onClick && <span style={{ fontSize: 9, color: "var(--pink)", fontWeight: 700 }}>Chi tiết ↗</span>}
+      </div>
+      <span style={{ fontSize: 20, fontWeight: 800, color: color, margin: "4px 0", wordBreak: "break-all", fontVariantNumeric: "tabular-nums" }}>
+        {displayValue}
+      </span>
+      <span style={{ fontSize: 10, color: "var(--ink-soft)", lineHeight: 1.3 }}>{subtext}</span>
+      {/* subtle corner accent */}
+      <span style={{
+        position: "absolute", top: 0, right: 0,
+        width: 40, height: 40,
+        background: `linear-gradient(135deg, transparent 60%, ${color}22 100%)`,
+        borderBottomLeftRadius: 40,
+        pointerEvents: "none",
+      }} />
     </div>
-    <span style={{ fontSize: 18, fontWeight: 800, color: color, margin: "4px 0", wordBreak: "break-all" }}>{value}</span>
-    <span style={{ fontSize: 10, color: "var(--ink-soft)", lineHeight: 1.3 }}>{subtext}</span>
-  </div>
-);
+  );
+};
+
 
 // ── METRICS GLOSSARY PANEL ──
 // Chú thích availability:
@@ -2010,66 +2098,66 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
   const topCampaign = metrics.campaignList[0];
   if (topCampaign) {
     const pct = Math.round((topCampaign.totalSpend / metrics.totalSpend) * 100);
-    accountInsights.push(`💼 Chiến dịch <strong>${topCampaign.campaign}</strong> đang dẫn đầu về tổng ngân sách đầu tư (Booking + Ads) với <strong>${fmtVND(topCampaign.totalSpend)}</strong> (chiếm <strong>${pct}%</strong> tổng ngân sách).`);
+    accountInsights.push(`Chiến dịch <strong>${topCampaign.campaign}</strong> đang dẫn đầu về tổng ngân sách đầu tư (Booking + Ads) với <strong>${fmtVND(topCampaign.totalSpend)}</strong> (chiếm <strong>${pct}%</strong> tổng ngân sách).`);
   }
   const topBottleneck = metrics.bottlenecks[0];
   if (topBottleneck && topBottleneck.count > 0) {
-    accountInsights.push(`⚠️ Trạng thái <strong>"${topBottleneck.label}"</strong> hiện là nút thắt cổ chai lớn nhất với <strong>${topBottleneck.count} KOL</strong> đang chờ xử lý/phê duyệt.`);
+    accountInsights.push(`Trạng thái <strong>"${topBottleneck.label}"</strong> hiện là nút thắt cổ chai lớn nhất với <strong>${topBottleneck.count} KOL</strong> đang chờ xử lý/phê duyệt.`);
   }
   if (metrics.zeroCostCount > 0) {
-    accountInsights.push(`🎁 Có <strong>${metrics.zeroCostCount} KOL</strong> chạy hình thức đổi quà/miễn phí booking trực tiếp, giúp tiết kiệm chi phí.`);
+    accountInsights.push(`Có <strong>${metrics.zeroCostCount} KOL</strong> chạy hình thức đổi quà/miễn phí booking trực tiếp, giúp tiết kiệm chi phí.`);
   }
   if (metrics.airedRate > 70) {
-    accountInsights.push(`📈 Tỷ lệ hoàn thành lên sóng đạt mức cao (<strong>${metrics.airedRate}%</strong>), dự án đang nghiệm thu tốt.`);
+    accountInsights.push(`Tỷ lệ hoàn thành lên sóng đạt mức cao (<strong>${metrics.airedRate}%</strong>), dự án đang nghiệm thu tốt.`);
   } else if (metrics.airedRate < 35) {
-    accountInsights.push(`⏳ Tỷ lệ lên sóng hiện tại khá thấp (<strong>${metrics.airedRate}%</strong>), team Account cần đôn đốc duyệt kịch bản & demo.`);
+    accountInsights.push(`Tỷ lệ lên sóng hiện tại khá thấp (<strong>${metrics.airedRate}%</strong>), team Account cần đôn đốc duyệt kịch bản & demo.`);
   }
 
   const marketingInsights = [];
   const topTier = metrics.tierList[0];
   if (topTier) {
     const pct = Math.round((topTier.count / metrics.totalKOL) * 100);
-    marketingInsights.push(`🎯 Phân khúc <strong>${topTier.name}</strong> chiếm đa số với <strong>${topTier.count} KOLs</strong> (tỷ lệ <strong>${pct}%</strong>).`);
+    marketingInsights.push(`Phân khúc <strong>${topTier.name}</strong> chiếm đa số với <strong>${topTier.count} KOLs</strong> (tỷ lệ <strong>${pct}%</strong>).`);
   }
   const topLoc = metrics.locList[0];
   if (topLoc) {
-    marketingInsights.push(`📍 Điểm nóng địa lý tập trung cao nhất tại <strong>${topLoc.name}</strong> với <strong>${topLoc.count} KOLs</strong>.`);
+    marketingInsights.push(`Điểm nóng địa lý tập trung cao nhất tại <strong>${topLoc.name}</strong> với <strong>${topLoc.count} KOLs</strong>.`);
   }
   const topGroup = metrics.groupList[0];
   if (topGroup) {
-    marketingInsights.push(`👥 Nhóm đối tượng độc giả <strong>"${topGroup.name}"</strong> đang được phủ sóng nhiều nhất.`);
+    marketingInsights.push(`Nhóm đối tượng độc giả <strong>"${topGroup.name}"</strong> đang được phủ sóng nhiều nhất.`);
   }
   if (metrics.totalViews > 0) {
-    marketingInsights.push(`📈 Tổng lượt xem thực tế đạt <strong>${metrics.totalViews.toLocaleString()} views</strong>, hoàn thành <strong>${metrics.kpiViewsAchievedRate}%</strong> so với KPI dự kiến.`);
+    marketingInsights.push(`Tổng lượt xem thực tế đạt <strong>${metrics.totalViews.toLocaleString()} views</strong>, hoàn thành <strong>${metrics.kpiViewsAchievedRate}%</strong> so với KPI dự kiến.`);
   }
   if (metrics.totalEngagement > 0) {
-    marketingInsights.push(`🔥 Tệp nội dung tạo ra <strong>${metrics.totalEngagement.toLocaleString()} tương tác</strong> (Likes, Comments, Saves, Shares), đạt tỷ lệ tương tác bình quân <strong>${metrics.avgEngRate}%</strong> trên lượt xem.`);
+    marketingInsights.push(`Tệp nội dung tạo ra <strong>${metrics.totalEngagement.toLocaleString()} tương tác</strong> (Likes, Comments, Saves, Shares), đạt tỷ lệ tương tác bình quân <strong>${metrics.avgEngRate}%</strong> trên lượt xem.`);
   }
   if (metrics.totalFollowers > 0) {
-    marketingInsights.push(`📢 Tổng độ phủ truyền thông (followers) tích lũy của tệp KOL đạt khoảng <strong>${fmtFollowers(metrics.totalFollowers)}</strong>.`);
+    marketingInsights.push(`Tổng độ phủ truyền thông (followers) tích lũy của tệp KOL đạt khoảng <strong>${fmtFollowers(metrics.totalFollowers)}</strong>.`);
   }
 
   const ecomInsights = [];
   const bestKOL = metrics.sortedEcom[0];
   if (bestKOL) {
-    ecomInsights.push(`🛒 KOL <strong>${bestKOL.kol}</strong> (${bestKOL.follower}) đạt hiệu số tiếp cận tối ưu nhất với chi phí chỉ <strong>${Math.round(bestKOL.cpf).toLocaleString()}đ</strong> / follower.`);
+    ecomInsights.push(`KOL <strong>${bestKOL.kol}</strong> (${bestKOL.follower}) đạt hiệu số tiếp cận tối ưu nhất với chi phí chỉ <strong>${Math.round(bestKOL.cpf).toLocaleString()}đ</strong> / follower.`);
   }
   if (metrics.totalRevenue > 0) {
-    ecomInsights.push(`💰 Tổng doanh thu / GMV ghi nhận đạt <strong>${fmtVND(metrics.totalRevenue)}</strong>. Tỷ lệ doanh số trên chi phí chạy ads (ROAS) đạt <strong>${metrics.roas}x</strong>.`);
+    ecomInsights.push(`Tổng doanh thu / GMV ghi nhận đạt <strong>${fmtVND(metrics.totalRevenue)}</strong>. Tỷ lệ doanh số trên chi phí chạy ads (ROAS) đạt <strong>${metrics.roas}x</strong>.`);
   }
   if (metrics.totalAdSpend > 0) {
-    ecomInsights.push(`💸 Tổng ngân sách chạy quảng cáo ads đã giải ngân là <strong>${fmtVND(metrics.totalAdSpend)}</strong>, với chi phí bình quân trên mỗi lượt xem (CPV) là <strong>${metrics.cpv}đ/view</strong>.`);
+    ecomInsights.push(`Tổng ngân sách chạy quảng cáo ads đã giải ngân là <strong>${fmtVND(metrics.totalAdSpend)}</strong>, với chi phí bình quân trên mỗi lượt xem (CPV) là <strong>${metrics.cpv}đ/view</strong>.`);
   }
   if (metrics.linkAiredRate < 100 && metrics.airedCount > 0) {
     const missingCount = metrics.airedMissingLink.length;
-    ecomInsights.push(`🔗 Còn <strong>${missingCount} KOL</strong> đã lên sóng nhưng chưa cập nhật Link Video. Cần bổ sinh link video để chạy ads / đo lường giỏ hàng.`);
+    ecomInsights.push(`Còn <strong>${missingCount} KOL</strong> đã lên sóng nhưng chưa cập nhật Link Video. Cần bổ sinh link video để chạy ads / đo lường giỏ hàng.`);
   }
   const topDish = metrics.dishList[0];
   if (topDish) {
-    ecomInsights.push(`🍽 Sản phẩm/Món ăn được quảng bá chủ đạo là <strong>"${topDish.name}"</strong> (${topDish.count} bài kịch bản).`);
+    ecomInsights.push(`Sản phẩm/Món ăn được quảng bá chủ đạo là <strong>"${topDish.name}"</strong> (${topDish.count} bài kịch bản).`);
   }
   if (metrics.cpmEst > 0) {
-    ecomInsights.push(`💸 Chỉ số CPM trung bình dự kiến của chiến dịch là <strong>${fmtVND(metrics.cpmEst)}</strong> / 1,000 followers tiếp cận.`);
+    ecomInsights.push(`Chỉ số CPM trung bình dự kiến của chiến dịch là <strong>${fmtVND(metrics.cpmEst)}</strong> / 1,000 followers tiếp cận.`);
   }
 
   return (
@@ -2086,7 +2174,7 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
         borderRadius: 10,
         border: "1px solid var(--line)"
       }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: "var(--ink)", whiteSpace: "nowrap" }}>📁 Chọn Báo cáo Dự án:</span>
+        <span style={{ fontSize: 12, fontWeight: 700, color: "var(--ink)", whiteSpace: "nowrap" }}>Chọn Báo cáo Dự án:</span>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           <button
             className={`kt-btn ${selectedCampaign === "all" ? "kt-btn-primary" : "kt-btn-ghost"}`}
@@ -2122,28 +2210,28 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
           onClick={() => setSubView("overview")}
           style={{ fontSize: 12, padding: "6px 14px", borderRadius: 8 }}
         >
-          🌟 Tổng quan (Overview)
+          Tổng quan (Overview)
         </button>
         <button
           className={`kt-btn ${subView === "account" ? "kt-btn-primary" : "kt-btn-ghost"}`}
           onClick={() => setSubView("account")}
           style={{ fontSize: 12, padding: "6px 14px", borderRadius: 8 }}
         >
-          💼 Chi tiết Account (Finance)
+          Chi tiết Account (Finance)
         </button>
         <button
           className={`kt-btn ${subView === "marketing" ? "kt-btn-primary" : "kt-btn-ghost"}`}
           onClick={() => setSubView("marketing")}
           style={{ fontSize: 12, padding: "6px 14px", borderRadius: 8 }}
         >
-          🎯 Chi tiết Marketing (Reach)
+          Chi tiết Marketing (Reach)
         </button>
         <button
           className={`kt-btn ${subView === "ecom" ? "kt-btn-primary" : "kt-btn-ghost"}`}
           onClick={() => setSubView("ecom")}
           style={{ fontSize: 12, padding: "6px 14px", borderRadius: 8 }}
         >
-          🛒 Chi tiết E-commerce (Sales)
+          Chi tiết E-commerce (Sales)
         </button>
       </div>
 
@@ -2253,8 +2341,8 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
           {/* Double Column grid */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: 16, marginBottom: 20 }}>
             {/* Campaign Summary & Progress */}
-            <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16 }}>
-              <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>📈 Tiến độ & Ngân sách các Chiến dịch</h3>
+            <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16 }}>
+              <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>Tiến độ & Ngân sách các Chiến dịch</h3>
               <div style={{ overflowX: "auto" }} className="kt-scrollbar">
                 <table className="kt-table" style={{ margin: 0 }}>
                   <thead>
@@ -2297,8 +2385,8 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
             </div>
 
             {/* Campaign GMV Contribution */}
-            <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16 }}>
-              <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 16px 0", color: "var(--ink)" }}>🛍 Đóng góp GMV & ROAS các Chiến dịch</h3>
+            <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16 }}>
+              <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 16px 0", color: "var(--ink)" }}>Đóng góp GMV & ROAS các Chiến dịch</h3>
               {metrics.totalRevenue > 0 ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   {metrics.campaignList.map(c => {
@@ -2318,9 +2406,9 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
                         data: activeRows.filter(r => r.campaign === c.campaign).sort((a,b) => (Number(b.revenue)||0) - (Number(a.revenue)||0))
                       })} style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }} title="Click để xem chi tiết">
                         <div style={{ fontSize: 11, fontWeight: 700, width: 70, color: "var(--ink)" }}>{c.campaign} ↗</div>
-                        <div style={{ flex: 1, height: 18, background: "var(--paper)", borderRadius: 6, overflow: "hidden", display: "flex", position: "relative", border: "1px solid var(--line)" }}>
+                        <div style={{ flex: 1, height: 18, background: "var(--paper)", borderRadius: 2, overflow: "hidden", display: "flex", position: "relative", border: "1px solid var(--line)" }}>
                           <div style={{ width: `${pct}%`, background: campColor, height: "100%", transition: "all 0.3s ease" }} />
-                          <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 10, fontWeight: 700, color: pct > 15 ? "#fff" : "var(--ink)", textShadow: pct > 15 ? "0 1px 1px rgba(0,0,0,0.5)" : "none" }}>
+                          <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 10, fontWeight: 700, color: pct > 15 ? "#fff" : "var(--ink)" }}>
                             {fmtVND(gmv)} ({pct}%)
                           </span>
                         </div>
@@ -2329,16 +2417,16 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
                   })}
                 </div>
               ) : (
-                <div style={{ padding: 12, borderRadius: 8, background: "var(--amber-soft)", color: "var(--amber)", fontSize: 12 }}>
-                  ⚠️ Chưa có dữ liệu doanh số ghi nhận.
+                <div style={{ padding: 12, borderRadius: 2, background: "var(--warn-bg)", color: "var(--warn)", fontSize: 12 }}>
+                  Chưa có dữ liệu doanh số ghi nhận.
                 </div>
               )}
             </div>
           </div>
 
           {/* Quick AI Summary */}
-          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
-            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>📢 Đánh giá nhanh dự án (Executive Highlights)</h3>
+          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16, marginBottom: 20 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>Đánh giá nhanh dự án (Executive Highlights)</h3>
             <ul style={{ margin: 0, paddingLeft: 20, fontSize: 12, color: "var(--ink)", lineHeight: 1.6 }}>
               {[...accountInsights, ...marketingInsights.slice(0, 2)].map((ins, i) => (
                 <li key={i} dangerouslySetInnerHTML={{ __html: ins }} style={{ marginBottom: 6 }} />
@@ -2483,16 +2571,16 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
           </div>
 
           {/* Campaign Budget Comparison Chart */}
-          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
+          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16, marginBottom: 20 }}>
             <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 16px 0", color: "var(--ink)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span>📊 Biểu đồ So sánh Chi phí giữa các Chiến dịch</span>
+              <span>Biểu đồ So sánh Chi phí giữa các Chiến dịch</span>
               <div style={{ display: "flex", gap: 14, fontSize: 10, color: "var(--ink-soft)" }}>
                 <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                  <span style={{ display: "inline-block", width: 12, height: 10, borderRadius: 2, background: "var(--ink)" }} /> 
+                  <span style={{ display: "inline-block", width: 12, height: 10, borderRadius: 1, background: "var(--ink)" }} /> 
                   <strong>Booking Cost</strong> (Tông màu đậm)
                 </span>
                 <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                  <span style={{ display: "inline-block", width: 12, height: 10, borderRadius: 2, background: "var(--line)" }} /> 
+                  <span style={{ display: "inline-block", width: 12, height: 10, borderRadius: 1, background: "var(--line)" }} /> 
                   <strong>Ad Spend</strong> (Tông màu nhạt)
                 </span>
               </div>
@@ -2507,10 +2595,10 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
                 return (
                   <div key={c.campaign} style={{ display: "flex", alignItems: "center", gap: 12 }}>
                     <div style={{ fontSize: 11, fontWeight: 700, width: 70, color: "var(--ink)" }}>{c.campaign}</div>
-                    <div style={{ flex: 1, height: 22, background: "var(--paper)", borderRadius: 6, overflow: "hidden", display: "flex", position: "relative", border: "1px solid var(--line)" }}>
+                    <div style={{ flex: 1, height: 22, background: "var(--paper)", borderRadius: 2, overflow: "hidden", display: "flex", position: "relative", border: "1px solid var(--line)" }}>
                       {bookingPct > 0 && (
                         <div 
-                          style={{ width: `${pct * bookingPct}%`, background: campColor, height: "100%", transition: "all 0.3s ease" }} 
+                           style={{ width: `${pct * bookingPct}%`, background: campColor, height: "100%", transition: "all 0.3s ease" }} 
                           title={`Booking: ${fmtVND(c.cost)}`} 
                         />
                       )}
@@ -2520,7 +2608,7 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
                           title={`Chạy Ads: ${fmtVND(c.adSpend)}`} 
                         />
                       )}
-                      <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 10, fontWeight: 700, color: "#fff", textShadow: "0 1px 2px rgba(0,0,0,0.6)" }}>
+                      <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 10, fontWeight: 700, color: "#fff" }}>
                         {fmtVND(c.totalSpend)}
                       </span>
                     </div>
@@ -2531,9 +2619,9 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
           </div>
 
           {/* Bottlenecks */}
-          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
+          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16, marginBottom: 20 }}>
             <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)", display: "flex", alignItems: "center", gap: 6 }}>
-              ⚠️ Cảnh báo điểm nghẽn duyệt kịch bản / demo
+              Cảnh báo điểm nghẽn duyệt kịch bản / demo
             </h3>
             {metrics.bottlenecks.length > 0 ? (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
@@ -2554,8 +2642,8 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
                     })}
                     style={{ 
                       padding: 12, 
-                      borderRadius: 8, 
-                      background: "var(--amber-soft)", 
+                      borderRadius: 2, 
+                      background: "var(--warn-bg)", 
                       border: "1px solid var(--line)",
                       cursor: "pointer",
                       transition: "all 0.15s ease"
@@ -2569,15 +2657,15 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
                 ))}
               </div>
             ) : (
-              <div style={{ padding: 12, borderRadius: 8, background: "var(--green-soft)", color: "var(--green)", fontSize: 12, fontWeight: 600 }}>
-                🎉 Tuyệt vời! Không có KOL nào đang bị nghẽn ở các bước duyệt trung gian.
+              <div style={{ padding: 12, borderRadius: 2, background: "var(--green-soft)", color: "var(--green)", fontSize: 12, fontWeight: 600 }}>
+                Không có KOL nào đang bị nghẽn ở các bước duyệt trung gian.
               </div>
             )}
           </div>
 
           {/* Insights statements */}
-          <div style={{ background: "var(--red-soft)", borderRadius: 12, padding: 16, border: "1px solid var(--line)" }}>
-            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 10px 0", color: "var(--red)" }}>💡 Đúc kết Insight cho Account</h3>
+          <div style={{ background: "var(--red-soft)", borderRadius: 2, padding: 16, border: "1px solid var(--line)" }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 10px 0", color: "var(--ink)" }}>Insight cho Account</h3>
             <ul style={{ margin: 0, paddingLeft: 20, display: "flex", flexDirection: "column", gap: 8, fontSize: 12, color: "var(--ink)" }}>
               {accountInsights.map((ins, i) => (
                 <li key={i} dangerouslySetInnerHTML={{ __html: ins }} />
@@ -2765,8 +2853,8 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
           {/* Locations & Groups grid */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16, marginBottom: 20 }}>
             {/* Locations */}
-            <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16 }}>
-              <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>📍 Địa bàn của KOL</h3>
+            <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16 }}>
+              <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>Địa bàn của KOL</h3>
               <table className="kt-table" style={{ margin: 0 }}>
                 <thead>
                   <tr>
@@ -2801,8 +2889,8 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
             </div>
 
             {/* Audience Groups */}
-            <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16 }}>
-              <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>👥 Nhóm target của KOL</h3>
+            <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16 }}>
+              <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>Nhóm target của KOL</h3>
               <table className="kt-table" style={{ margin: 0 }}>
                 <thead>
                   <tr>
@@ -2838,9 +2926,9 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
           </div>
 
           {/* Top Viral KOLs */}
-          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
+          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16, marginBottom: 20 }}>
             <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)", display: "flex", alignItems: "center", gap: 6 }}>
-              🔥 Top 5 KOLs Đạt Lượt Xem (Views) Cao Nhất
+              Top 5 KOLs Đạt Lượt Xem (Views) Cao Nhất
             </h3>
             {metrics.topKOLsByViews.length > 0 ? (
               <div style={{ overflowX: "auto" }} className="kt-scrollbar">
@@ -2889,15 +2977,15 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
                 </table>
               </div>
             ) : (
-              <div style={{ padding: 12, borderRadius: 8, background: "var(--amber-soft)", color: "var(--amber)", fontSize: 12 }}>
-                ⚠️ Chưa có dữ liệu Lượt Xem thực tế được nhập.
+              <div style={{ padding: 12, borderRadius: 2, background: "var(--warn-bg)", color: "var(--warn)", fontSize: 12 }}>
+                Chưa có dữ liệu Lượt Xem thực tế được nhập.
               </div>
             )}
           </div>
 
           {/* Insights statements */}
-          <div style={{ background: "var(--red-soft)", borderRadius: 12, padding: 16, border: "1px solid var(--line)" }}>
-            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 10px 0", color: "var(--red)" }}>💡 Đúc kết Insight cho Marketing</h3>
+          <div style={{ background: "var(--red-soft)", borderRadius: 2, padding: 16, border: "1px solid var(--line)" }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 10px 0", color: "var(--ink)" }}>Insight cho Marketing</h3>
             <ul style={{ margin: 0, paddingLeft: 20, display: "flex", flexDirection: "column", gap: 8, fontSize: 12, color: "var(--ink)" }}>
               {marketingInsights.map((ins, i) => (
                 <li key={i} dangerouslySetInnerHTML={{ __html: ins }} />
@@ -2993,8 +3081,8 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
           </div>
 
           {/* Top 5 cost-effective KOLs */}
-          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
-            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>🛒 Top 5 KOL có hiệu suất chi phí tiếp cận tối ưu nhất (CPF)</h3>
+          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16, marginBottom: 20 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>Top 5 KOL có hiệu suất chi phí tiếp cận tối ưu nhất (CPF)</h3>
             {metrics.sortedEcom.length > 0 ? (
               <div style={{ overflowX: "auto" }} className="kt-scrollbar">
                 <table className="kt-table" style={{ margin: 0, minWidth: 400 }}>
@@ -3021,15 +3109,15 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
                 </table>
               </div>
             ) : (
-              <div style={{ padding: 12, borderRadius: 8, background: "var(--amber-soft)", color: "var(--amber)", fontSize: 12, fontWeight: 600 }}>
+              <div style={{ padding: 12, borderRadius: 2, background: "var(--warn-bg)", color: "var(--warn)", fontSize: 12, fontWeight: 600 }}>
                 Không tìm thấy KOL nào có ghi nhận thông tin Followers để tính chỉ số hiệu suất.
               </div>
             )}
           </div>
 
           {/* GMV Contribution Chart */}
-          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
-            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 16px 0", color: "var(--ink)" }}>📈 Đóng góp Doanh số (GMV) của các Chiến dịch</h3>
+          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16, marginBottom: 20 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 16px 0", color: "var(--ink)" }}>Đóng góp Doanh số (GMV) của các Chiến dịch</h3>
             {metrics.totalRevenue > 0 ? (
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {metrics.campaignList.map(c => {
@@ -3050,9 +3138,9 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
                       data: activeRows.filter(r => r.campaign === c.campaign).sort((a,b) => (Number(b.revenue)||0) - (Number(a.revenue)||0))
                     })} style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }} title="Click để xem chi tiết danh sách KOL">
                       <div style={{ fontSize: 11, fontWeight: 700, width: 70, color: "var(--ink)" }}>{c.campaign} ↗</div>
-                      <div style={{ flex: 1, height: 18, background: "var(--paper)", borderRadius: 6, overflow: "hidden", display: "flex", position: "relative", border: "1px solid var(--line)" }}>
+                      <div style={{ flex: 1, height: 18, background: "var(--paper)", borderRadius: 2, overflow: "hidden", display: "flex", position: "relative", border: "1px solid var(--line)" }}>
                         <div style={{ width: `${pct}%`, background: campColor, height: "100%", transition: "all 0.3s ease" }} />
-                        <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 10, fontWeight: 700, color: pct > 15 ? "#fff" : "var(--ink)", textShadow: pct > 15 ? "0 1px 1px rgba(0,0,0,0.5)" : "none" }}>
+                        <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 10, fontWeight: 700, color: pct > 15 ? "#fff" : "var(--ink)" }}>
                           {fmtVND(gmv)} ({pct}%)
                         </span>
                       </div>
@@ -3061,16 +3149,16 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
                 })}
               </div>
             ) : (
-              <div style={{ padding: 12, borderRadius: 8, background: "var(--amber-soft)", color: "var(--amber)", fontSize: 12 }}>
-                ⚠️ Chưa có dữ liệu doanh số để thống kê tỷ lệ đóng góp.
+              <div style={{ padding: 12, borderRadius: 2, background: "var(--warn-bg)", color: "var(--warn)", fontSize: 12 }}>
+                Chưa có dữ liệu doanh số để thống kê tỷ lệ đóng góp.
               </div>
             )}
           </div>
 
           {/* Top Sales KOLs */}
-          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
+          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16, marginBottom: 20 }}>
             <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)", display: "flex", alignItems: "center", gap: 6 }}>
-              🛍 Top 5 KOLs Mang Lại Doanh Số / GMV Cao Nhất
+              Top 5 KOLs Mang Lại Doanh Số / GMV Cao Nhất
             </h3>
             {metrics.topKOLsByRevenue.length > 0 ? (
               <div style={{ overflowX: "auto" }} className="kt-scrollbar">
@@ -3100,19 +3188,19 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
                 </table>
               </div>
             ) : (
-              <div style={{ padding: 12, borderRadius: 8, background: "var(--amber-soft)", color: "var(--amber)", fontSize: 12 }}>
-                ⚠️ Chưa có dữ liệu doanh số/GMV được ghi nhận.
+              <div style={{ padding: 12, borderRadius: 2, background: "var(--warn-bg)", color: "var(--warn)", fontSize: 12 }}>
+                Chưa có dữ liệu doanh số/GMV được ghi nhận.
               </div>
             )}
           </div>
 
           {/* Ecom actions: Aired missing link checklist */}
-          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
-            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>🔗 Checklist việc cần làm: Thu thập Video Link các bài đã lên sóng (Aired)</h3>
+          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16, marginBottom: 20 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>Checklist việc cần làm: Thu thập Video Link các bài đã lên sóng (Aired)</h3>
             {metrics.airedMissingLink.length > 0 ? (
               <div>
                 <p style={{ fontSize: 11, color: "var(--ink-soft)", margin: "0 0 8px 0" }}>Phát hiện <strong>{metrics.airedMissingLink.length} bài</strong> đã lên sóng nhưng chưa có đường dẫn video để đối soát:</p>
-                <div style={{ maxHeight: 220, overflowY: "auto", border: "1px solid var(--line)", borderRadius: 8, isolation: "isolate" }} className="kt-scrollbar">
+                <div style={{ maxHeight: 220, overflowY: "auto", border: "1px solid var(--line)", borderRadius: 2, isolation: "isolate" }} className="kt-scrollbar">
                   <table className="kt-table kt-table-sticky" style={{ margin: 0, tableLayout: "fixed", width: "100%" }}>
                     <colgroup>
                       <col style={{ width: "22%" }} />
@@ -3142,15 +3230,15 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
                 </div>
               </div>
             ) : (
-              <div style={{ padding: 12, borderRadius: 8, background: "var(--green-soft)", color: "var(--green)", fontSize: 12, fontWeight: 600 }}>
-                ✅ Rất tốt! Toàn bộ KOL đã lên sóng (Aired) đều đã được gắn link video đầy đủ.
+              <div style={{ padding: 12, borderRadius: 2, background: "var(--green-soft)", color: "var(--green)", fontSize: 12, fontWeight: 600 }}>
+                Toàn bộ KOL đã lên sóng (Aired) đều đã được gắn link video đầy đủ.
               </div>
             )}
           </div>
 
           {/* Insights statements */}
-          <div style={{ background: "var(--red-soft)", borderRadius: 12, padding: 16, border: "1px solid var(--line)" }}>
-            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 10px 0", color: "var(--red)" }}>💡 Đúc kết Insight cho E-commerce</h3>
+          <div style={{ background: "var(--red-soft)", borderRadius: 2, padding: 16, border: "1px solid var(--line)" }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 10px 0", color: "var(--ink)" }}>Insight cho E-commerce</h3>
             <ul style={{ margin: 0, paddingLeft: 20, display: "flex", flexDirection: "column", gap: 8, fontSize: 12, color: "var(--ink)" }}>
               {ecomInsights.map((ins, i) => (
                 <li key={i} dangerouslySetInnerHTML={{ __html: ins }} />
@@ -3161,9 +3249,9 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
       )}
 
       {/* ── Custom Notes Card ── */}
-      <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginTop: 20 }}>
+      <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16, marginTop: 20 }}>
         <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 8px 0", color: "var(--ink)", display: "flex", alignItems: "center", gap: 6 }}>
-          📝 Nhận xét & Đánh giá của tôi
+          Nhận xét & Đánh giá của tôi
         </h3>
         <p style={{ fontSize: 11, color: "var(--ink-soft)", margin: "0 0 12px 0" }}>
           Ghi chú này sẽ được lưu riêng cho chiến dịch <strong>{selectedCampaign === "all" ? "Tổng cộng (Tất cả)" : selectedCampaign}</strong>.
@@ -3173,7 +3261,7 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
           value={noteText}
           onChange={e => setNoteText(e.target.value)}
           placeholder="Nhập đánh giá hiệu quả, đề xuất tối ưu hoặc lưu ý quan trọng cho dự án tại đây..."
-          style={{ width: "100%", height: 100, resize: "vertical", fontSize: 13, padding: 10, borderRadius: 8, border: "1px solid var(--line)", outline: "none", marginBottom: 12 }}
+          style={{ width: "100%", height: 100, resize: "vertical", fontSize: 13, padding: 10, borderRadius: 2, border: "1px solid var(--line)", outline: "none", marginBottom: 12 }}
         />
         <div style={{ display: "flex", justifyContent: "flex-end" }}>
           <button
@@ -3181,18 +3269,18 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
             onClick={() => onSaveNote(selectedCampaign, noteText)}
             style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, padding: "8px 16px" }}
           >
-            💾 Lưu Nhận xét & Đánh giá
+            Lưu Nhận xét & Đánh giá
           </button>
         </div>
       </div>
 
       {/* ── Collapsible Glossary Card ── */}
-      <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginTop: 20 }}>
+      <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16, marginTop: 20 }}>
         <h3 
-          style={{ fontSize: 13, fontWeight: 700, margin: 0, color: "var(--ink)", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", userSelect: "none" }} 
+          style={{ fontSize: 13, fontWeight: 700, margin: 0, color: "var(--ink)", display: "flex", alignItems: "center", justifySpace: "space-between", cursor: "pointer", userSelect: "none" }} 
           onClick={() => setShowGlossary(!showGlossary)}
         >
-          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>📘 Giải thích định nghĩa & công thức các chỉ số (Metrics Glossary)</span>
+          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>Giải thích định nghĩa & công thức các chỉ số (Metrics Glossary)</span>
           <span style={{ fontSize: 10, color: "var(--ink-soft)" }}>{showGlossary ? "Thu gọn ▲" : "Mở rộng ▼"}</span>
         </h3>
         {showGlossary && (
@@ -3561,6 +3649,11 @@ export default function App() {
     <div className="kt-root">
       <GlobalStyle />
 
+      {/* Animated background blobs */}
+      <div className="kt-blob kt-blob-1" />
+      <div className="kt-blob kt-blob-2" />
+      <div className="kt-blob kt-blob-3" />
+
       {/* ── HEADER ── */}
       <div style={{
         background: "var(--card)",
@@ -3579,13 +3672,13 @@ export default function App() {
             {/* View toggle */}
             <div style={{ display: "flex", gap: 4, marginRight: 8 }}>
               <button className={`kt-btn kt-btn-ghost${view === "table" ? " active" : ""}`}
-                onClick={() => setView("table")}>☰ Bảng</button>
+                onClick={() => setView("table")}>Bảng</button>
               <button className={`kt-btn kt-btn-ghost${view === "kanban" ? " active" : ""}`}
-                onClick={() => setView("kanban")}>⬛ Kanban</button>
+                onClick={() => setView("kanban")}>Kanban</button>
               <button className={`kt-btn kt-btn-ghost${view === "insights" ? " active" : ""}`}
-                onClick={() => setView("insights")}>📊 Insights</button>
+                onClick={() => setView("insights")}>Insights</button>
               <button className={`kt-btn kt-btn-ghost${view === "calendar" ? " active" : ""}`}
-                onClick={() => setView("calendar")}>📅 Lịch</button>
+                onClick={() => setView("calendar")}>Lịch</button>
             </div>
 
             {/* Excel / JSON Actions */}
@@ -3593,15 +3686,15 @@ export default function App() {
               style={{ display: "none" }} onChange={handleImport} />
             <button className="kt-btn kt-btn-ghost" onClick={handleDownloadTemplate}
               title="Tải file Excel mẫu đúng định dạng" style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              📎 Template
+              Template
             </button>
             <button className="kt-btn kt-btn-ghost" onClick={() => importRef.current?.click()}
               title="Import file Excel (.xlsx) hoặc JSON" style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              📥 Import Excel / JSON
+              Import
             </button>
 
             {/* Add & Reset */}
-            <button className="kt-btn kt-btn-primary" onClick={() => setShowNew(true)}>＋ Thêm KOL</button>
+            <button className="kt-btn kt-btn-primary" onClick={() => setShowNew(true)}>+ Thêm KOL</button>
             {/* Undo / Redo */}
             <button 
               className="kt-btn kt-btn-ghost" 
@@ -3610,7 +3703,7 @@ export default function App() {
               title="Hoàn tác (Ctrl+Z)" 
               style={{ padding: "8px 12px", opacity: history.length === 0 ? 0.4 : 1, cursor: history.length === 0 ? "not-allowed" : "pointer" }}
             >
-              ↩️
+              Undo
             </button>
             <button 
               className="kt-btn kt-btn-ghost" 
@@ -3619,9 +3712,9 @@ export default function App() {
               title="Làm lại (Ctrl+Y)" 
               style={{ padding: "8px 12px", opacity: redoHistory.length === 0 ? 0.4 : 1, cursor: redoHistory.length === 0 ? "not-allowed" : "pointer" }}
             >
-              ↪️
+              Redo
             </button>
-            <button className="kt-btn kt-btn-ghost" onClick={handleReset} title="Reset data" style={{ padding: "8px 12px" }}>↺</button>
+            <button className="kt-btn kt-btn-ghost" onClick={handleReset} title="Reset data" style={{ padding: "8px 12px" }}>Reset</button>
           </div>
         </div>
 
@@ -3629,7 +3722,7 @@ export default function App() {
         {view !== "insights" && (
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
             {/* Search */}
-            <input className="kt-input" placeholder="🔍 Tìm tên KOL, món ăn…"
+            <input className="kt-input" placeholder="Tìm tên KOL, món ăn…"
               value={search} onChange={e => setSearch(e.target.value)}
               style={{ width: 220 }} />
 
