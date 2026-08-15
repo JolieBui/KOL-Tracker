@@ -142,6 +142,21 @@ const GlobalStyle = () => (
     .kt-btn-danger { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
     .kt-btn-danger:hover { background: #fca5a5; }
 
+    .kt-stats-card-hover {
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+    }
+    .kt-stats-card-hover:hover {
+      border-color: var(--blue) !important;
+      box-shadow: 0 4px 12px rgba(42,104,140,0.08) !important;
+      transform: translateY(-1px);
+    }
+    .kt-stats-card-hover:active {
+      transform: translateY(0);
+      background: var(--paper) !important;
+    }
+
     .kt-input, .kt-select, .kt-textarea {
       font-family: 'Inter', sans-serif;
       background: var(--card);
@@ -749,28 +764,61 @@ const DetailModal = ({ kol, onClose, onSave, onDelete }) => {
 /* ================================================================
    SUMMARY STATS BAR
 ================================================================ */
-const StatsBar = ({ rows }) => {
-  const total = rows.reduce((s, r) => s + (r.cost || 0), 0);
+const StatsBar = ({ rows, currentStatus = "all", onCardClick }) => {
+  const total = rows.reduce((s, r) => s + (Number(r.cost) || 0), 0);
   const aired = rows.filter(r => r.statusKey === "aired").length;
   const inProgress = rows.filter(r => r.statusKey !== "aired").length;
 
   return (
     <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
       {[
-        { label: "Tổng KOL", value: rows.length, color: "var(--ink)" },
-        { label: "Đã lên sóng", value: aired, color: "var(--green)" },
-        { label: "Đang xử lý", value: inProgress, color: "var(--amber)" },
-        { label: "Tổng chi phí", value: fmtVND(total), color: "var(--red)" },
-      ].map(({ label, value, color }) => (
-        <div key={label} style={{
-          background: "var(--card)", border: "1px solid var(--line)",
-          borderRadius: 10, padding: "10px 16px", flex: "1 1 160px", minWidth: 160,
-          boxSizing: "border-box"
-        }}>
-          <div style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap" }}>{label}</div>
-          <div className="kt-display" style={{ fontSize: 20, color, marginTop: 2 }}>{value}</div>
-        </div>
-      ))}
+        { label: "Tổng KOL", value: rows.length, color: "var(--ink)", key: "all" },
+        { label: "Đã lên sóng", value: aired, color: "var(--green)", key: "aired" },
+        { label: "Đang xử lý", value: inProgress, color: "var(--amber)", key: "in_progress" },
+        { label: "Tổng chi phí", value: fmtVND(total), color: "var(--red)", key: "cost" },
+      ].map(({ label, value, color, key }) => {
+        const isClickable = key !== "cost";
+        const isActive = isClickable && currentStatus === key;
+        return (
+          <div 
+            key={label}
+            onClick={() => isClickable && onCardClick && onCardClick(key)}
+            className={isClickable ? "kt-stats-card-hover" : ""}
+            style={{
+              background: "var(--card)", 
+              border: `1px solid ${isActive ? "var(--blue)" : "var(--line)"}`,
+              borderRadius: 10, 
+              padding: "10px 16px", 
+              flex: "1 1 160px", 
+              minWidth: 160,
+              boxSizing: "border-box",
+              boxShadow: isActive ? "0 4px 12px rgba(42,104,140,0.08)" : "none",
+              position: "relative",
+              transform: isActive ? "translateY(-1px)" : "none"
+            }}
+          >
+            <div style={{ 
+              fontSize: 11, 
+              color: "var(--ink-soft)", 
+              fontWeight: 600, 
+              textTransform: "uppercase", 
+              letterSpacing: "0.04em", 
+              whiteSpace: "nowrap",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between"
+            }}>
+              <span>{label}</span>
+              {isClickable && (
+                <span style={{ fontSize: 9, color: isActive ? "var(--blue)" : "var(--ink-soft)", fontWeight: 700 }}>
+                  {isActive ? "Đang lọc ●" : "Lọc ↗"}
+                </span>
+              )}
+            </div>
+            <div className="kt-display" style={{ fontSize: 20, color, marginTop: 2 }}>{value}</div>
+          </div>
+        );
+      })}
     </div>
   );
 };
@@ -847,64 +895,126 @@ const TableView = ({ rows, onOpen }) => (
   </div>
 );
 
-/* ================================================================
-   KANBAN VIEW
-================================================================ */
-const KanbanView = ({ rows, onOpen }) => (
+const KanbanColumn = ({ stage, cards, onOpen, onUpdateStatus }) => {
+  const [isOver, setIsOver] = useState(false);
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    setIsOver(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsOver(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsOver(false);
+    const id = e.dataTransfer.getData("text/plain");
+    if (id) {
+      onUpdateStatus(id, stage.key);
+    }
+  };
+
+  return (
+    <div 
+      className="kt-kanban-col"
+      onDragOver={handleDragOver}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      style={{
+        background: isOver ? "var(--red-soft)" : "transparent",
+        borderRadius: 12,
+        padding: "4px 8px 12px 8px",
+        transition: "all 0.2s ease",
+        transform: isOver ? "scale(1.01)" : "scale(1)",
+        border: isOver ? "1px dashed var(--red)" : "1px solid transparent",
+        minWidth: 260,
+        maxWidth: 260,
+        display: "flex",
+        flexDirection: "column",
+        maxHeight: "calc(100vh - 280px)"
+      }}
+    >
+      {/* Column header */}
+      <div style={{
+        padding: "10px 12px",
+        borderRadius: 10,
+        background: stage.soft,
+        marginBottom: 10,
+      }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: stage.color, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+          {stage.label}
+        </div>
+        <div style={{ fontSize: 18, fontWeight: 700, color: stage.color }}>{cards.length}</div>
+      </div>
+
+      {/* Cards */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 10, overflowY: "auto", flex: 1, padding: "2px 0" }} className="kt-scrollbar">
+        {cards.map(r => (
+          <div 
+            key={r.id} 
+            className="kt-kanban-card kt-anim" 
+            onClick={() => onOpen(r)}
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.setData("text/plain", r.id);
+              e.dataTransfer.effectAllowed = "move";
+            }}
+            style={{ cursor: "grab" }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+              <CampaignDot campaign={r.campaign} />
+              <span className="kt-mono" style={{ fontSize: 10, color: "var(--ink-soft)" }}>{r.id}</span>
+            </div>
+            <div style={{ fontWeight: 600, fontSize: 13, color: "var(--ink)", marginBottom: 4, lineHeight: 1.3 }}>{r.kol}</div>
+            {r.type && <div style={{ fontSize: 11, color: "var(--ink-soft)", marginBottom: 4 }}>{r.type} · {r.follower || "?"}</div>}
+            {r.monAn && <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 6, paddingTop: 6, borderTop: "1px dashed var(--line)", lineHeight: 1.4, maxHeight: 56, overflow: "hidden" }}>
+              🍽 {r.monAn.split("\n")[0]}
+            </div>}
+            <div style={{ marginTop: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span className="kt-mono" style={{ fontSize: 11, color: "var(--red)", fontWeight: 600 }}>{fmtVND(r.cost)}</span>
+              {r.ngayAir && (
+                /^https?:\/\//.test(r.ngayAir) ? (
+                  <a href={r.ngayAir} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
+                    style={{ fontSize: 10, color: "var(--blue)", fontWeight: 600, textDecoration: "none" }}>
+                    Link ↗
+                  </a>
+                ) : (
+                  <span style={{ fontSize: 10, color: "var(--ink-soft)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 100 }} title={r.ngayAir}>
+                    {r.ngayAir}
+                  </span>
+                )
+              )}
+            </div>
+          </div>
+        ))}
+        {cards.length === 0 && (
+          <div style={{ textAlign: "center", padding: "20px 0", color: "var(--ink-soft)", fontSize: 12 }}>—</div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const KanbanView = ({ rows, onOpen, onUpdateStatus }) => (
   <div style={{ display: "flex", gap: 14, overflowX: "auto", padding: 16, alignItems: "flex-start" }}
     className="kt-scrollbar">
     {STATUS_STAGES.map(stage => {
       const cards = rows.filter(r => r.statusKey === stage.key);
       return (
-        <div key={stage.key} className="kt-kanban-col">
-          {/* Column header */}
-          <div style={{
-            padding: "10px 12px",
-            borderRadius: 10,
-            background: stage.soft,
-            marginBottom: 10,
-          }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: stage.color, textTransform: "uppercase", letterSpacing: "0.04em" }}>
-              {stage.label}
-            </div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: stage.color }}>{cards.length}</div>
-          </div>
-
-          {/* Cards */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 10, overflowY: "auto", flex: 1 }} className="kt-scrollbar">
-            {cards.map(r => (
-              <div key={r.id} className="kt-kanban-card kt-anim" onClick={() => onOpen(r)}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                  <CampaignDot campaign={r.campaign} />
-                  <span className="kt-mono" style={{ fontSize: 10, color: "var(--ink-soft)" }}>{r.id}</span>
-                </div>
-                <div style={{ fontWeight: 600, fontSize: 13, color: "var(--ink)", marginBottom: 4, lineHeight: 1.3 }}>{r.kol}</div>
-                {r.type && <div style={{ fontSize: 11, color: "var(--ink-soft)", marginBottom: 4 }}>{r.type} · {r.follower || "?"}</div>}
-                {r.monAn && <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 6, paddingTop: 6, borderTop: "1px dashed var(--line)", lineHeight: 1.4, maxHeight: 56, overflow: "hidden" }}>
-                  🍽 {r.monAn.split("\n")[0]}
-                </div>}
-                <div style={{ marginTop: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span className="kt-mono" style={{ fontSize: 11, color: "var(--red)", fontWeight: 600 }}>{fmtVND(r.cost)}</span>
-                  {r.ngayAir && (
-                    /^https?:\/\//.test(r.ngayAir) ? (
-                      <a href={r.ngayAir} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
-                        style={{ fontSize: 10, color: "var(--blue)", fontWeight: 600, textDecoration: "none" }}>
-                        Link ↗
-                      </a>
-                    ) : (
-                      <span style={{ fontSize: 10, color: "var(--ink-soft)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 100 }} title={r.ngayAir}>
-                        {r.ngayAir}
-                      </span>
-                    )
-                  )}
-                </div>
-              </div>
-            ))}
-            {cards.length === 0 && (
-              <div style={{ textAlign: "center", padding: "20px 0", color: "var(--ink-soft)", fontSize: 12 }}>—</div>
-            )}
-          </div>
-        </div>
+        <KanbanColumn 
+          key={stage.key}
+          stage={stage}
+          cards={cards}
+          onOpen={onOpen}
+          onUpdateStatus={onUpdateStatus}
+        />
       );
     })}
   </div>
@@ -1002,7 +1112,7 @@ const StatCard = ({ title, value, subtext, color = "var(--ink)", onClick, toolti
 );
 
 const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
-  const [subView, setSubView] = useState("account");
+  const [subView, setSubView] = useState("overview");
   const [selectedCampaign, setSelectedCampaign] = useState("all");
   const [noteText, setNoteText] = useState("");
   const [activeDetail, setActiveDetail] = useState(null);
@@ -1306,29 +1416,236 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
         flexWrap: "wrap"
       }}>
         <button
+          className={`kt-btn ${subView === "overview" ? "kt-btn-primary" : "kt-btn-ghost"}`}
+          onClick={() => setSubView("overview")}
+          style={{ fontSize: 12, padding: "6px 14px", borderRadius: 8 }}
+        >
+          🌟 Tổng quan (Overview)
+        </button>
+        <button
           className={`kt-btn ${subView === "account" ? "kt-btn-primary" : "kt-btn-ghost"}`}
           onClick={() => setSubView("account")}
           style={{ fontSize: 12, padding: "6px 14px", borderRadius: 8 }}
         >
-          💼 Account (Tài chính & Tiến độ)
+          💼 Chi tiết Account (Finance)
         </button>
         <button
           className={`kt-btn ${subView === "marketing" ? "kt-btn-primary" : "kt-btn-ghost"}`}
           onClick={() => setSubView("marketing")}
           style={{ fontSize: 12, padding: "6px 14px", borderRadius: 8 }}
         >
-          🎯 Marketing (Đối tượng & Độ phủ)
+          🎯 Chi tiết Marketing (Reach)
         </button>
         <button
           className={`kt-btn ${subView === "ecom" ? "kt-btn-primary" : "kt-btn-ghost"}`}
           onClick={() => setSubView("ecom")}
           style={{ fontSize: 12, padding: "6px 14px", borderRadius: 8 }}
         >
-          🛒 E-commerce (Hiệu quả & Link)
+          🛒 Chi tiết E-commerce (Sales)
         </button>
       </div>
 
       {/* ── Subviews Rendering ── */}
+      {subView === "overview" && (
+        <div className="kt-anim">
+          {/* Executive Overview Stats Grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, marginBottom: 20 }}>
+            <StatCard 
+              title="Tổng ngân sách" 
+              value={fmtVND(metrics.totalSpend)} 
+              subtext={`Booking: ${fmtVND(metrics.totalCost)} | Ads: ${fmtVND(metrics.totalAdSpend)}`} 
+              color="var(--red)" 
+              tooltip="Tổng ngân sách thực tế đã giải ngân (Booking Cost + Ad Spend) của các dự án."
+              onClick={() => setActiveDetail({
+                title: "Phân bổ Tổng Ngân Sách",
+                description: "Danh sách tất cả KOLs sắp xếp theo Tổng chi phí (Booking Cost + Ad Spend) từ cao xuống thấp.",
+                columns: [
+                  { key: "kol", label: "KOL" },
+                  { key: "campaign", label: "Chiến dịch" },
+                  { key: "cost", label: "Booking Cost", render: r => fmtVND(r.cost) },
+                  { key: "adSpend", label: "Ad Spend", render: r => fmtVND(r.adSpend) },
+                  { key: "totalSpend", label: "Tổng chi phí", render: r => <strong>{fmtVND((Number(r.cost) || 0) + (Number(r.adSpend) || 0))}</strong> }
+                ],
+                data: [...activeRows].sort((a,b) => ((Number(b.cost)||0)+(Number(b.adSpend)||0)) - ((Number(a.cost)||0)+(Number(a.adSpend)||0)))
+              })}
+            />
+            <StatCard 
+              title="Tiến độ Lên sóng" 
+              value={`${metrics.airedRate}%`} 
+              subtext={`${metrics.airedCount} / ${metrics.totalKOL} KOL đã hoàn thành`} 
+              color="var(--green)" 
+              tooltip="Tỷ lệ phần trăm video của KOL đã đăng tải chính thức (Aired) trên tổng số KOL đã lên hợp đồng."
+              onClick={() => setActiveDetail({
+                title: "KOL đã Lên Sóng (Aired)",
+                description: `Danh sách các nhà sáng tạo đã nghiệm thu video lên sóng thành công (Tổng cộng: ${metrics.airedCount} KOLs).`,
+                columns: [
+                  { key: "kol", label: "KOL" },
+                  { key: "campaign", label: "Chiến dịch" },
+                  { key: "ngayAir", label: "Ngày lên sóng", render: r => renderUrlOrText(r.ngayAir) },
+                  { key: "airedLink", label: "Đường dẫn video", render: r => renderUrlOrText(r.airedLink) }
+                ],
+                data: activeRows.filter(r => r.statusKey === "aired")
+              })}
+            />
+            <StatCard 
+              title="Độ phủ (Followers)" 
+              value={fmtFollowers(metrics.totalFollowers)} 
+              subtext={`Tổng views: ${metrics.totalViews.toLocaleString()} (${metrics.kpiViewsAchievedRate}% KPI)`} 
+              color="var(--blue)" 
+              tooltip="Tổng lượng followers tích lũy và tổng số lượt xem thực tế đạt được."
+              onClick={() => setActiveDetail({
+                title: "Thống kê Lượt xem thực tế (Views)",
+                description: "Danh sách tất cả KOLs sắp xếp theo lượt xem video thực tế trên TikTok từ cao xuống thấp.",
+                columns: [
+                  { key: "kol", label: "KOL" },
+                  { key: "campaign", label: "Chiến dịch" },
+                  { key: "estView", label: "KPI Views", render: r => Number(r.estView) ? Number(r.estView).toLocaleString() : "—" },
+                  { key: "views", label: "Views thực tế", render: r => <strong>{Number(r.views).toLocaleString()}</strong> },
+                  {
+                    key: "achieved",
+                    label: "% Đạt KPI",
+                    render: r => {
+                      if (!Number(r.estView)) return "—";
+                      const pct = Math.round((Number(r.views) / Number(r.estView)) * 100);
+                      let bg = "var(--green-soft)";
+                      let fg = "var(--green)";
+                      if (pct < 90) {
+                        bg = "#FEE2E2"; // Soft red
+                        fg = "#EF4444";
+                      } else if (pct < 100) {
+                        bg = "var(--amber-soft)";
+                        fg = "var(--amber)";
+                      }
+                      return (
+                        <span className="kt-badge" style={{ background: bg, color: fg, border: `1px solid ${fg}`, fontWeight: 700 }}>
+                          {pct}%
+                        </span>
+                      );
+                    }
+                  }
+                ],
+                data: [...activeRows].sort((a,b) => (Number(b.views)||0) - (Number(a.views)||0))
+              })}
+            />
+            <StatCard 
+              title="Doanh số / GMV" 
+              value={fmtVND(metrics.totalRevenue)} 
+              subtext={`ROAS: ${metrics.roas}x | Đơn hàng: ${metrics.totalConversions}`} 
+              color="var(--amber)" 
+              tooltip="Doanh thu bán hàng trực tiếp được ghi nhận từ mã giảm giá/đường dẫn của KOL."
+              onClick={() => setActiveDetail({
+                title: "Danh sách Hiệu Quả Doanh Số (GMV)",
+                description: "Danh sách KOLs mang lại doanh thu bán hàng thực tế từ cao xuống thấp.",
+                columns: [
+                  { key: "kol", label: "KOL" },
+                  { key: "campaign", label: "Chiến dịch" },
+                  { key: "conversions", label: "Đơn hàng (Conversions)", render: r => Number(r.conversions).toLocaleString() },
+                  { key: "addToCart", label: "Thêm giỏ hàng (ATC)", render: r => Number(r.addToCart).toLocaleString() },
+                  { key: "revenue", label: "Doanh thu / GMV", render: r => <strong>{fmtVND(r.revenue)}</strong> }
+                ],
+                data: [...activeRows].sort((a,b) => (Number(b.revenue)||0) - (Number(a.revenue)||0))
+              })}
+            />
+          </div>
+
+          {/* Double Column grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: 16, marginBottom: 20 }}>
+            {/* Campaign Summary & Progress */}
+            <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16 }}>
+              <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>📈 Tiến độ & Ngân sách các Chiến dịch</h3>
+              <div style={{ overflowX: "auto" }} className="kt-scrollbar">
+                <table className="kt-table" style={{ margin: 0 }}>
+                  <thead>
+                    <tr>
+                      <th>Chiến dịch</th>
+                      <th>KOLs</th>
+                      <th>Tổng chi phí</th>
+                      <th>Đã Aired</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {metrics.campaignList.map(c => {
+                      const progress = c.count ? Math.round((c.airedCount / c.count) * 100) : 0;
+                      return (
+                        <tr key={c.campaign} onClick={() => setActiveDetail({
+                          title: `Chiến dịch: ${c.campaign}`,
+                          description: `Danh sách chi tiết các KOL tham gia trong chiến dịch ${c.campaign} (Tổng số lượng: ${c.count} KOLs).`,
+                          columns: [
+                            { key: "kol", label: "KOL" },
+                            { key: "type", label: "Phân loại", render: r => r.type || "Chưa phân loại" },
+                            { key: "cost", label: "Booking Cost", render: r => fmtVND(r.cost) },
+                            { key: "statusKey", label: "Trạng thái", render: r => <StatusBadge statusKey={r.statusKey} /> }
+                          ],
+                          data: activeRows.filter(r => r.campaign === c.campaign)
+                        })} style={{ cursor: "pointer" }} title="Click để xem chi tiết">
+                          <td><strong>{c.campaign} ↗</strong></td>
+                          <td>{c.count}</td>
+                          <td><strong>{fmtVND(c.totalSpend)}</strong></td>
+                          <td>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                              <span style={{ fontSize: 11, fontWeight: 600, minWidth: 30 }}>{progress}%</span>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Campaign GMV Contribution */}
+            <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16 }}>
+              <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 16px 0", color: "var(--ink)" }}>🛍 Đóng góp GMV & ROAS các Chiến dịch</h3>
+              {metrics.totalRevenue > 0 ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {metrics.campaignList.map(c => {
+                    const gmv = activeRows.filter(r => r.campaign === c.campaign).reduce((sum, r) => sum + (Number(r.revenue) || 0), 0);
+                    const pct = metrics.totalRevenue > 0 ? Math.round((gmv / metrics.totalRevenue) * 100) : 0;
+                    if (gmv === 0) return null;
+                    const campColor = CAMPAIGN_COLOR[c.campaign] || "var(--green)";
+                    return (
+                      <div key={c.campaign} onClick={() => setActiveDetail({
+                        title: `Hiệu quả Doanh Số - Chiến dịch ${c.campaign}`,
+                        description: `Thống kê chi tiết đơn hàng (Conversions) và Doanh thu (GMV) của chiến dịch ${c.campaign}.`,
+                        columns: [
+                          { key: "kol", label: "KOL" },
+                          { key: "conversions", label: "Đơn hàng", render: r => Number(r.conversions).toLocaleString() },
+                          { key: "revenue", label: "Doanh thu", render: r => <strong>{fmtVND(r.revenue)}</strong> }
+                        ],
+                        data: activeRows.filter(r => r.campaign === c.campaign).sort((a,b) => (Number(b.revenue)||0) - (Number(a.revenue)||0))
+                      })} style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }} title="Click để xem chi tiết">
+                        <div style={{ fontSize: 11, fontWeight: 700, width: 70, color: "var(--ink)" }}>{c.campaign} ↗</div>
+                        <div style={{ flex: 1, height: 18, background: "var(--paper)", borderRadius: 6, overflow: "hidden", display: "flex", position: "relative", border: "1px solid var(--line)" }}>
+                          <div style={{ width: `${pct}%`, background: campColor, height: "100%", transition: "all 0.3s ease" }} />
+                          <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 10, fontWeight: 700, color: pct > 15 ? "#fff" : "var(--ink)", textShadow: pct > 15 ? "0 1px 1px rgba(0,0,0,0.5)" : "none" }}>
+                            {fmtVND(gmv)} ({pct}%)
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div style={{ padding: 12, borderRadius: 8, background: "var(--amber-soft)", color: "var(--amber)", fontSize: 12 }}>
+                  ⚠️ Chưa có dữ liệu doanh số ghi nhận.
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Quick AI Summary */}
+          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>📢 Đánh giá nhanh dự án (Executive Highlights)</h3>
+            <ul style={{ margin: 0, paddingLeft: 20, fontSize: 12, color: "var(--ink)", lineHeight: 1.6 }}>
+              {[...accountInsights, ...marketingInsights.slice(0, 2)].map((ins, i) => (
+                <li key={i} dangerouslySetInnerHTML={{ __html: ins }} style={{ marginBottom: 6 }} />
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+
       {subView === "account" && (
         <div className="kt-anim">
           {/* Stats grid */}
@@ -1428,8 +1745,20 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
                   {metrics.campaignList.map(c => {
                     const progress = c.count ? Math.round((c.airedCount / c.count) * 100) : 0;
                     return (
-                      <tr key={c.campaign}>
-                        <td><strong>{c.campaign}</strong></td>
+                      <tr key={c.campaign} onClick={() => setActiveDetail({
+                        title: `Chiến dịch: ${c.campaign}`,
+                        description: `Danh sách chi tiết các KOL tham gia trong chiến dịch ${c.campaign} (Tổng số lượng: ${c.count} KOLs).`,
+                        columns: [
+                          { key: "kol", label: "KOL" },
+                          { key: "type", label: "Phân loại", render: r => r.type || "Chưa phân loại" },
+                          { key: "follower", label: "Followers" },
+                          { key: "cost", label: "Booking Cost", render: r => fmtVND(r.cost) },
+                          { key: "adSpend", label: "Ad Spend", render: r => fmtVND(r.adSpend) },
+                          { key: "statusKey", label: "Trạng thái", render: r => <StatusBadge statusKey={r.statusKey} /> }
+                        ],
+                        data: activeRows.filter(r => r.campaign === c.campaign)
+                      })} style={{ cursor: "pointer" }} title="Click để xem chi tiết danh sách KOL">
+                        <td><strong>{c.campaign} ↗</strong></td>
                         <td>{c.count}</td>
                         <td>{fmtVND(c.cost)}</td>
                         <td>{fmtVND(c.adSpend)}</td>
@@ -1562,7 +1891,28 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
                   { key: "campaign", label: "Chiến dịch" },
                   { key: "estView", label: "KPI Views", render: r => Number(r.estView) ? Number(r.estView).toLocaleString() : "—" },
                   { key: "views", label: "Views thực tế", render: r => <strong>{Number(r.views).toLocaleString()}</strong> },
-                  { key: "achieved", label: "% Đạt KPI", render: r => (Number(r.estView) > 0 ? Math.round((Number(r.views) / Number(r.estView)) * 100) + "%" : "—") }
+                   {
+                    key: "achieved",
+                    label: "% Đạt KPI",
+                    render: r => {
+                      if (!Number(r.estView)) return "—";
+                      const pct = Math.round((Number(r.views) / Number(r.estView)) * 100);
+                      let bg = "var(--green-soft)";
+                      let fg = "var(--green)";
+                      if (pct < 90) {
+                        bg = "#FEE2E2"; // Soft red
+                        fg = "#EF4444";
+                      } else if (pct < 100) {
+                        bg = "var(--amber-soft)";
+                        fg = "var(--amber)";
+                      }
+                      return (
+                        <span className="kt-badge" style={{ background: bg, color: fg, border: `1px solid ${fg}`, fontWeight: 700 }}>
+                          {pct}%
+                        </span>
+                      );
+                    }
+                  }
                 ],
                 data: [...activeRows].sort((a,b) => (Number(b.views)||0) - (Number(a.views)||0))
               })}
@@ -1648,7 +1998,20 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
                   {metrics.tierList.map((t, idx) => {
                     const pct = Math.round((t.count / metrics.totalKOL) * 100);
                     return (
-                      <tr key={t.name}>
+                      <tr key={t.name} onClick={() => setActiveDetail({
+                        title: `Phân khúc KOL: ${t.name}`,
+                        description: t.name === "Chưa phân loại" 
+                          ? "Các dòng dữ liệu trống trường phân khúc (Tier) trong Media Plan gốc. Lý do: KOL nhận tài trợ sản phẩm/quà tặng FOC (chi phí booking 0đ) thường không xếp nhóm quy mô cố định, hoặc kịch bản chạy đại trà diện rộng."
+                          : `Danh sách các nhà sáng tạo nội dung thuộc phân khúc quy mô ${t.name} (Tổng số lượng: ${t.count} KOLs).`,
+                        columns: [
+                          { key: "kol", label: "KOL" },
+                          { key: "campaign", label: "Chiến dịch" },
+                          { key: "follower", label: "Followers" },
+                          { key: "cost", label: "Booking Cost", render: r => fmtVND(r.cost) },
+                          { key: "statusKey", label: "Trạng thái", render: r => <StatusBadge statusKey={r.statusKey} /> }
+                        ],
+                        data: activeRows.filter(r => (r.type || "Chưa phân loại") === t.name)
+                      })} style={{ cursor: "pointer" }}>
                         <td>
                           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                             <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: COLOR_PALETTE[idx % COLOR_PALETTE.length] }} />
@@ -1682,7 +2045,20 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
                 </thead>
                 <tbody>
                   {metrics.locList.slice(0, 5).map(l => (
-                    <tr key={l.name}>
+                    <tr key={l.name} onClick={() => setActiveDetail({
+                      title: `Khu vực/Địa bàn: ${l.name}`,
+                      description: l.name === "Chưa xác định" 
+                        ? "Các nhà sáng tạo chưa cập nhật hoặc trống trường địa điểm (Location). Lý do: Chiến dịch tiếp cận online đa kênh toàn quốc (Nationwide), KOL phân phối nội dung chung hoặc địa chỉ liên hệ/booking không cần thiết cho dự án offline."
+                        : `Danh sách các nhà sáng tạo nội dung đang hoạt động chủ yếu tại khu vực ${l.name} (Tổng số lượng: ${l.count} KOLs).`,
+                      columns: [
+                        { key: "kol", label: "KOL" },
+                        { key: "campaign", label: "Chiến dịch" },
+                        { key: "location", label: "Địa bàn" },
+                        { key: "cost", label: "Booking Cost", render: r => fmtVND(r.cost) },
+                        { key: "statusKey", label: "Trạng thái", render: r => <StatusBadge statusKey={r.statusKey} /> }
+                      ],
+                      data: activeRows.filter(r => (r.location || "Chưa xác định") === l.name)
+                    })} style={{ cursor: "pointer" }}>
                       <td><strong>{l.name}</strong></td>
                       <td>{l.count}</td>
                       <td>{fmtVND(l.cost)}</td>
@@ -1705,7 +2081,20 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
                 </thead>
                 <tbody>
                   {metrics.groupList.slice(0, 5).map(g => (
-                    <tr key={g.name}>
+                    <tr key={g.name} onClick={() => setActiveDetail({
+                      title: `Nhóm khán giả target: ${g.name}`,
+                      description: g.name === "Chưa xác định" 
+                        ? "Các nhà sáng tạo trống trường đối tượng mục tiêu (Target Audience). Lý do: KOL làm nội dung về phong cách sống, nấu ăn gia đình tổng hợp tiếp cận tệp đại chúng diện rộng (Broad/Mass Audience), không định vị phân mảnh ngách."
+                        : `Danh sách các nhà sáng tạo nội dung tập trung phục vụ nhóm khán giả ${g.name} (Tổng số lượng: ${g.count} KOLs).`,
+                      columns: [
+                        { key: "kol", label: "KOL" },
+                        { key: "campaign", label: "Chiến dịch" },
+                        { key: "targetAudience", label: "Target Audience" },
+                        { key: "cost", label: "Booking Cost", render: r => fmtVND(r.cost) },
+                        { key: "statusKey", label: "Trạng thái", render: r => <StatusBadge statusKey={r.statusKey} /> }
+                      ],
+                      data: activeRows.filter(r => (r.targetAudience || "Chưa xác định") === g.name)
+                    })} style={{ cursor: "pointer" }}>
                       <td><strong>{g.name}</strong></td>
                       <td>{g.count}</td>
                       <td>{Math.round((g.count / metrics.totalKOL) * 100)}%</td>
@@ -1745,15 +2134,24 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
                           <td>{r.campaign}</td>
                           <td>{Number(r.estView) ? Number(r.estView).toLocaleString() : "—"}</td>
                           <td><strong style={{ color: "var(--blue)" }}>{Number(r.views).toLocaleString()}</strong></td>
-                          <td>
-                            <span className="kt-badge" style={{
-                              background: parseFloat(kpiPct) >= 100 ? "var(--green-soft)" : "var(--amber-soft)",
-                              color: parseFloat(kpiPct) >= 100 ? "var(--green)" : "var(--amber)",
-                              border: `1px solid ${parseFloat(kpiPct) >= 100 ? "var(--green)" : "var(--amber)"}`
-                            }}>
-                              {kpiPct}
-                            </span>
-                          </td>
+                            {(() => {
+                              if (!Number(r.estView)) return "—";
+                              const pct = Math.round((r.views / r.estView) * 100);
+                              let bg = "var(--green-soft)";
+                              let fg = "var(--green)";
+                              if (pct < 90) {
+                                bg = "#FEE2E2"; // Soft red
+                                fg = "#EF4444";
+                              } else if (pct < 100) {
+                                bg = "var(--amber-soft)";
+                                fg = "var(--amber)";
+                              }
+                              return (
+                                <span className="kt-badge" style={{ background: bg, color: fg, border: `1px solid ${fg}`, fontWeight: 700 }}>
+                                  {pct}%
+                                </span>
+                              );
+                            })()}
                           <td>{er}</td>
                         </tr>
                       );
@@ -1911,8 +2309,18 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
                   if (gmv === 0) return null;
                   const campColor = CAMPAIGN_COLOR[c.campaign] || "var(--green)";
                   return (
-                    <div key={c.campaign} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                      <div style={{ fontSize: 11, fontWeight: 700, width: 70, color: "var(--ink)" }}>{c.campaign}</div>
+                    <div key={c.campaign} onClick={() => setActiveDetail({
+                      title: `Hiệu quả Doanh Số - Chiến dịch ${c.campaign}`,
+                      description: `Thống kê chi tiết đơn hàng (Conversions), lượt thêm giỏ hàng (ATC) và Doanh thu (GMV) của chiến dịch ${c.campaign}.`,
+                      columns: [
+                        { key: "kol", label: "KOL" },
+                        { key: "conversions", label: "Đơn hàng (Conversions)", render: r => Number(r.conversions).toLocaleString() },
+                        { key: "addToCart", label: "Thêm giỏ hàng (ATC)", render: r => Number(r.addToCart).toLocaleString() },
+                        { key: "revenue", label: "Doanh thu / GMV", render: r => <strong>{fmtVND(r.revenue)}</strong> }
+                      ],
+                      data: activeRows.filter(r => r.campaign === c.campaign).sort((a,b) => (Number(b.revenue)||0) - (Number(a.revenue)||0))
+                    })} style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }} title="Click để xem chi tiết danh sách KOL">
+                      <div style={{ fontSize: 11, fontWeight: 700, width: 70, color: "var(--ink)" }}>{c.campaign} ↗</div>
                       <div style={{ flex: 1, height: 18, background: "var(--paper)", borderRadius: 6, overflow: "hidden", display: "flex", position: "relative", border: "1px solid var(--line)" }}>
                         <div style={{ width: `${pct}%`, background: campColor, height: "100%", transition: "all 0.3s ease" }} />
                         <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 10, fontWeight: 700, color: pct > 15 ? "#fff" : "var(--ink)", textShadow: pct > 15 ? "0 1px 1px rgba(0,0,0,0.5)" : "none" }}>
@@ -1950,7 +2358,7 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
                   </thead>
                   <tbody>
                     {metrics.topKOLsByRevenue.map(r => (
-                      <tr key={r.id}>
+                      <tr key={r.id} onClick={() => onOpenKOL(r)} style={{ cursor: "pointer" }} title="Click để chỉnh sửa chi tiết KOL">
                         <td><strong>{r.kol}</strong></td>
                         <td>{r.campaign}</td>
                         <td>{fmtVND(r.adSpend)}</td>
@@ -2334,11 +2742,27 @@ export default function App() {
     XLSX.writeFile(wb, "kol_tracker_template.xlsx");
   };
 
+  const statsRows = useMemo(() => {
+    const q = search.toLowerCase();
+    return data.filter(r => {
+      if (filterCampaign !== "all" && r.campaign !== filterCampaign) return false;
+      if (filterType !== "all" && r.type !== filterType) return false;
+      if (q && !r.kol.toLowerCase().includes(q) && !r.id.toLowerCase().includes(q) && !(r.monAn || "").toLowerCase().includes(q)) return false;
+      return true;
+    });
+  }, [data, filterCampaign, filterType, search]);
+
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
     return data.filter(r => {
       if (filterCampaign !== "all" && r.campaign !== filterCampaign) return false;
-      if (filterStatus !== "all" && r.statusKey !== filterStatus) return false;
+      if (filterStatus !== "all") {
+        if (filterStatus === "in_progress") {
+          if (r.statusKey === "aired") return false;
+        } else {
+          if (r.statusKey !== filterStatus) return false;
+        }
+      }
       if (filterType !== "all" && r.type !== filterType) return false;
       if (q && !r.kol.toLowerCase().includes(q) && !r.id.toLowerCase().includes(q) && !(r.monAn || "").toLowerCase().includes(q)) return false;
       return true;
@@ -2430,10 +2854,11 @@ export default function App() {
             {CAMPAIGNS.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
           </select>
 
-          {/* Status filter */}
+           {/* Status filter */}
           <select className="kt-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
             style={{ width: 190 }}>
             <option value="all">All status</option>
+            <option value="in_progress">Đang xử lý (Chưa lên sóng)</option>
             {STATUS_STAGES.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
           </select>
 
@@ -2446,14 +2871,27 @@ export default function App() {
         </div>
 
         {/* Stats Row */}
-        <StatsBar rows={filtered} />
+        <StatsBar 
+          rows={statsRows} 
+          currentStatus={filterStatus}
+          onCardClick={statusKey => setFilterStatus(statusKey)}
+        />
       </div>
 
       {/* ── BODY ── */}
       <div style={{ padding: "20px" }}>
         <div style={{ background: "var(--card)", borderRadius: 12, border: "1px solid var(--line)", overflow: "visible" }}>
           {view === "table" && <TableView rows={filtered} onOpen={r => setSelected(r)} />}
-          {view === "kanban" && <KanbanView rows={filtered} onOpen={r => setSelected(r)} />}
+          {view === "kanban" && (
+            <KanbanView 
+              rows={filtered} 
+              onOpen={r => setSelected(r)} 
+              onUpdateStatus={(id, newStatus) => {
+                setData(prev => prev.map(item => item.id === id ? { ...item, statusKey: newStatus } : item));
+                showToast(`Đã chuyển trạng thái sang: ${STATUS_MAP[newStatus]?.label || newStatus}`);
+              }}
+            />
+          )}
           {view === "insights" && (
             <InsightsView
               rows={data}
