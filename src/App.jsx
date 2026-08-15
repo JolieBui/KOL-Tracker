@@ -191,7 +191,7 @@ const GlobalStyle = () => (
     /* Table */
     .kt-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
     .kt-table th {
-      background: var(--red-soft);
+      background: var(--card);
       border-bottom: 2px solid var(--line);
       padding: 10px 12px;
       text-align: left;
@@ -217,7 +217,7 @@ const GlobalStyle = () => (
       position: sticky;
       top: 0;
       z-index: 10;
-      background: var(--red-soft) !important;
+      background: var(--card) !important;
       box-shadow: inset 0 -1px 0 var(--line);
     }
     .kt-table td {
@@ -227,7 +227,7 @@ const GlobalStyle = () => (
       line-height: 1.45;
     }
     .kt-table tr:last-child td { border-bottom: none; }
-    .kt-table tr:hover td { background: #F0F9FA; }
+    .kt-table tr:hover td { background: var(--red-soft); }
     .kt-table a { color: var(--blue); text-decoration: none; word-break: break-all; }
     .kt-table a:hover { text-decoration: underline; }
 
