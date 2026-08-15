@@ -1440,51 +1440,111 @@ const GlossaryPanel = () => {
   const [activeTab, setActiveTab] = useState("ecom");
   const activeCat = GLOSSARY_CATEGORIES.find(c => c.id === activeTab);
   return (
-    <div className="kt-anim" style={{ marginTop: 14 }}>
+    <div className="kt-anim" style={{ marginTop: 16 }}>
       {/* Category Tabs */}
-      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16, borderBottom: "2px solid var(--line)", paddingBottom: 12 }}>
         {GLOSSARY_CATEGORIES.map(cat => (
           <button
             key={cat.id}
             onClick={() => setActiveTab(cat.id)}
             style={{
-              padding: "5px 12px",
-              borderRadius: 20,
-              fontSize: 11,
+              padding: "6px 16px",
+              borderRadius: 8,
+              fontSize: 12,
               fontWeight: 700,
-              border: `1.5px solid ${activeTab === cat.id ? cat.color : "var(--line)"}`,
-              background: activeTab === cat.id ? cat.color : "transparent",
-              color: activeTab === cat.id ? "#fff" : "var(--ink-soft)",
+              border: activeTab === cat.id ? `2px solid ${cat.color}` : "2px solid transparent",
+              background: activeTab === cat.id ? `${cat.color}18` : "var(--paper)",
+              color: activeTab === cat.id ? cat.color : "var(--ink-soft)",
               cursor: "pointer",
-              transition: "all 0.18s",
+              transition: "all 0.15s",
               whiteSpace: "nowrap",
+              letterSpacing: "0.01em",
             }}
           >
             {cat.label}
           </button>
         ))}
       </div>
+
       {/* Metrics Grid */}
       {activeCat && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 14 }}>
           {activeCat.metrics.map(m => (
-            <div key={m.name} style={{ padding: "12px 14px", background: "var(--paper)", borderRadius: 10, border: `1.5px solid ${activeCat.color}22`, borderLeft: `3px solid ${activeCat.color}` }}>
-              <strong style={{ color: activeCat.color, fontSize: 11.5, display: "block", marginBottom: 4 }}>{m.name}</strong>
-              <div style={{ fontSize: 10, color: "var(--ink)", background: `${activeCat.color}12`, borderRadius: 4, padding: "2px 6px", display: "inline-block", marginBottom: 6, fontFamily: "monospace", fontWeight: 600 }}>
+            <div
+              key={m.name}
+              style={{
+                padding: "16px 18px",
+                background: "#fff",
+                borderRadius: 10,
+                border: "1.5px solid var(--line)",
+                borderTop: `3px solid ${activeCat.color}`,
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+              }}
+            >
+              {/* Metric Name */}
+              <div style={{ fontSize: 13, fontWeight: 800, color: "var(--ink)", lineHeight: 1.3 }}>
+                {m.name}
+              </div>
+
+              {/* Formula Badge */}
+              <div style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                background: activeCat.color,
+                color: "#fff",
+                borderRadius: 6,
+                padding: "4px 10px",
+                fontSize: 11,
+                fontWeight: 600,
+                fontFamily: "'Courier New', monospace",
+                alignSelf: "flex-start",
+                lineHeight: 1.4,
+                maxWidth: "100%",
+                wordBreak: "break-word",
+              }}>
+                <span style={{ opacity: 0.8, fontSize: 10 }}>∑</span>
                 {m.formula}
               </div>
-              <p style={{ margin: 0, color: "var(--ink-soft)", fontSize: 10.5, lineHeight: 1.5 }}>{m.desc}</p>
+
+              {/* Description */}
+              <p style={{
+                margin: 0,
+                color: "#555",
+                fontSize: 12,
+                lineHeight: 1.6,
+                fontWeight: 400,
+              }}>
+                {m.desc}
+              </p>
             </div>
           ))}
         </div>
       )}
-      {/* Legend note */}
-      <div style={{ marginTop: 12, padding: "8px 12px", background: "var(--paper)", borderRadius: 8, fontSize: 10, color: "var(--ink-soft)", display: "flex", alignItems: "center", gap: 6 }}>
-        💡 Tất cả công thức dựa trên dữ liệu hiện có trong bảng KOL. Benchmark ngành có thể thay đổi theo danh mục sản phẩm và nền tảng.
+
+      {/* Footer Note */}
+      <div style={{
+        marginTop: 14,
+        padding: "10px 14px",
+        background: "var(--paper)",
+        borderRadius: 8,
+        fontSize: 11,
+        color: "var(--ink-soft)",
+        display: "flex",
+        alignItems: "flex-start",
+        gap: 8,
+        lineHeight: 1.5,
+        border: "1px solid var(--line)",
+      }}>
+        <span style={{ fontSize: 14, flexShrink: 0 }}>💡</span>
+        <span>Tất cả công thức dựa trên dữ liệu hiện có trong bảng KOL. Benchmark ngành có thể thay đổi theo danh mục sản phẩm và nền tảng.</span>
       </div>
     </div>
   );
 };
+
 
 const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
 
