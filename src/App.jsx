@@ -7,19 +7,19 @@ const GlobalStyle = () => (
     @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
     .kt-root {
-      --ink: #001C44;
-      --ink-soft: #4C7086;
-      --paper: #F4FBFB;
+      --ink: #432F2E; /* Chestnut Hollow */
+      --ink-soft: #7C6867;
+      --paper: #FAF6E9; /* Warm cream */
       --card: #FFFFFF;
-      --line: #D3E7E9;
-      --red: #0C5776;
-      --red-soft: #DCEEF1;
-      --amber: #C97B58;
-      --amber-soft: #F8DAD0;
-      --green: #2D99AE;
-      --green-soft: #DFF7F6;
-      --blue: #0C5776;
-      --blue-soft: #DCEEF1;
+      --line: #E8DFD7;
+      --red: #432F2E; /* Chestnut Hollow */
+      --red-soft: #F5EFEB;
+      --amber: #B58428;
+      --amber-soft: #FEEFB6; /* Gilded Nectar */
+      --green: #407D53;
+      --green-soft: #EBF5EE;
+      --blue: #2A688C;
+      --blue-soft: #C3DAE8; /* Arctic Whisper */
       font-family: 'Inter', sans-serif;
       color: var(--ink);
       background: var(--paper);
@@ -207,11 +207,11 @@ const GlobalStyle = () => (
 
 /* ---------------- Domain constants ---------------- */
 const CAMPAIGNS = [
-  { key: "AM", label: "AM · Ajimayo", color: "#001C44" },
-  { key: "AX", label: "AX · Aji-Xốt", color: "#2D99AE" },
-  { key: "Vinegar", label: "Vinegar · Giấm", color: "#0C5776" },
-  { key: "MSG", label: "MSG · Bột ngọt", color: "#C97B58" },
-  { key: "Blendy", label: "Blendy", color: "#2D7D46" },
+  { key: "AM", label: "AM · Ajimayo", color: "#432F2E" },
+  { key: "AX", label: "AX · Aji-Xốt", color: "#2A688C" },
+  { key: "Vinegar", label: "Vinegar · Giấm", color: "#6C8542" },
+  { key: "MSG", label: "MSG · Bột ngọt", color: "#B58428" },
+  { key: "Blendy", label: "Blendy", color: "#875545" },
 ];
 const CAMPAIGN_COLOR = Object.fromEntries(CAMPAIGNS.map(c => [c.key, c.color]));
 
