@@ -1370,18 +1370,57 @@ const StatCard = ({ title, value, subtext, color = "var(--ink)", onClick, toolti
 );
 
 // ── METRICS GLOSSARY PANEL ──
+// Chú thích availability:
+//   "tracked"  = tính được ngay từ data hiện có trong tool
+//   "partial"  = cần thêm 1 field phụ chưa có sẵn (ghi chú rõ)
 const GLOSSARY_CATEGORIES = [
   {
     id: "ecom",
     label: "🛒 Ecom",
     color: "#16A34A",
     metrics: [
-      { name: "ROAS (Return on Ad Spend)", formula: "Doanh thu / Chi phí chạy Ads", desc: "Tỷ số sinh lời trên chi phí quảng cáo. Mỗi đồng chi cho Ads đem về bao nhiêu đồng doanh số. ROAS > 3 là hiệu quả tốt với FMCG." },
-      { name: "Revenue per KOL", formula: "Tổng doanh thu / Số KOL tham gia", desc: "Doanh thu trung bình mỗi KOL đóng góp vào campaign. So sánh hiệu quả từng KOL." },
-      { name: "Conversion Rate (CVR)", formula: "(Đơn hàng / Lượt click link) × 100%", desc: "Tỷ lệ chuyển đổi từ traffic KOL sang đơn hàng thực. Phản ánh chất lượng audience và sức thuyết phục content." },
-      { name: "CPA (Cost Per Acquisition)", formula: "Tổng chi phí / Số đơn hàng", desc: "Chi phí để có 1 đơn hàng. CPA càng thấp, hiệu quả ecom càng cao." },
-      { name: "Average Order Value (AOV)", formula: "Tổng doanh thu / Số đơn hàng", desc: "Giá trị trung bình mỗi đơn hàng từ traffic KOL. Giúp tối ưu chiến lược upsell." },
-      { name: "GMV (Gross Merchandise Value)", formula: "Tổng giá trị hàng hóa được bán qua KOL", desc: "Tổng giá trị giao dịch thô trước khi trừ hoàn/hủy. Chỉ số đo quy mô doanh thu KOL." },
+      {
+        name: "ROAS (Return on Ad Spend)",
+        formula: "revenue / adSpend",
+        desc: "Tỷ số sinh lời trên chi phí chạy Ads. Mỗi đồng chi Ads đem về bao nhiêu đồng doanh số. ROAS > 3 là tốt với FMCG.",
+        availability: "tracked",
+        fields: ["revenue", "adSpend"],
+      },
+      {
+        name: "Revenue per KOL",
+        formula: "Σ revenue / Số KOL có revenue > 0",
+        desc: "Doanh thu trung bình mỗi KOL đóng góp. So sánh hiệu quả giữa các KOL trong cùng campaign.",
+        availability: "tracked",
+        fields: ["revenue"],
+      },
+      {
+        name: "CPA (Cost Per Acquisition)",
+        formula: "(cost + adSpend) / conversions",
+        desc: "Chi phí booking + ads để có 1 đơn hàng. CPA càng thấp, ecom càng hiệu quả.",
+        availability: "tracked",
+        fields: ["cost", "adSpend", "conversions"],
+      },
+      {
+        name: "AOV (Average Order Value)",
+        formula: "revenue / conversions",
+        desc: "Giá trị trung bình mỗi đơn hàng từ traffic KOL. Giúp tối ưu chiến lược upsell.",
+        availability: "tracked",
+        fields: ["revenue", "conversions"],
+      },
+      {
+        name: "ATC Rate (Add-to-Cart Rate)",
+        formula: "addToCart / views × 100%",
+        desc: "Tỷ lệ người xem thêm vào giỏ hàng. Phản ánh mức độ quan tâm sản phẩm trước khi mua.",
+        availability: "tracked",
+        fields: ["addToCart", "views"],
+      },
+      {
+        name: "Checkout CVR",
+        formula: "conversions / addToCart × 100%",
+        desc: "Tỷ lệ chốt đơn từ người đã thêm giỏ hàng. Phản ánh mức độ thuyết phục của giá/offer.",
+        availability: "tracked",
+        fields: ["conversions", "addToCart"],
+      },
     ],
   },
   {
@@ -1389,12 +1428,48 @@ const GLOSSARY_CATEGORIES = [
     label: "🚀 Performance",
     color: "#2563EB",
     metrics: [
-      { name: "CPV (Cost Per View)", formula: "Chi phí Ads / Tổng Views", desc: "Chi phí trung bình cho 1 lượt xem video. Đánh giá hiệu suất phân phối nội dung qua paid media." },
-      { name: "CPM (Cost Per Mille)", formula: "(Chi phí Booking / Followers) × 1000", desc: "Chi phí để tiếp cận 1.000 followers. Dùng để so sánh giá booking giữa các KOL." },
-      { name: "CTR (Click-Through Rate)", formula: "(Clicks / Impressions) × 100%", desc: "Tỷ lệ nhấp vào link trong content KOL. CTR cao cho thấy CTA hiệu quả và audience quan tâm đến sản phẩm." },
-      { name: "ER (Engagement Rate)", formula: "(Likes + Comments + Saves + Shares) / Views × 100%", desc: "Tỷ lệ tương tác trên tổng lượt xem. Đo sức hút và chất lượng nội dung KOL tạo ra." },
-      { name: "View Rate", formula: "(Views / Impressions) × 100%", desc: "Tỷ lệ người xem video sau khi thấy bài đăng. View Rate cao tức thumbnail/hook đủ hấp dẫn." },
-      { name: "Completion Rate", formula: "(Lượt xem hết video / Tổng views) × 100%", desc: "Tỷ lệ xem hết video. Phản ánh độ giữ chân người xem – quan trọng với algorithm TikTok/Reels." },
+      {
+        name: "CPV (Cost Per View)",
+        formula: "adSpend / views",
+        desc: "Chi phí trung bình cho 1 lượt xem. Đánh giá hiệu suất phân phối nội dung qua paid media.",
+        availability: "tracked",
+        fields: ["adSpend", "views"],
+      },
+      {
+        name: "CPM (Cost Per Mille)",
+        formula: "(cost / follower) × 1000",
+        desc: "Chi phí để tiếp cận 1.000 followers. Dùng so sánh độ đắt/rẻ giá booking giữa các KOL.",
+        availability: "tracked",
+        fields: ["cost", "follower"],
+      },
+      {
+        name: "ER (Engagement Rate)",
+        formula: "(likes + comments + saves + shares) / views × 100%",
+        desc: "Tỷ lệ tương tác trên tổng lượt xem. Đo sức hút và chất lượng nội dung KOL.",
+        availability: "tracked",
+        fields: ["likes", "comments", "saves", "shares", "views"],
+      },
+      {
+        name: "KPI Đạt Rate",
+        formula: "views (thực tế) / estView (KPI) × 100%",
+        desc: "Tỷ lệ hoàn thành KPI views đã cam kết. ≥ 100% là KOL deliver đúng hẹn.",
+        availability: "tracked",
+        fields: ["views", "estView"],
+      },
+      {
+        name: "Share Rate",
+        formula: "shares / views × 100%",
+        desc: "Tỷ lệ chia sẻ. Share Rate cao cho thấy content viral tốt — đặc biệt quan trọng với TikTok.",
+        availability: "tracked",
+        fields: ["shares", "views"],
+      },
+      {
+        name: "Save Rate",
+        formula: "saves / views × 100%",
+        desc: "Tỷ lệ lưu video. Save Rate cao = content có giá trị tham khảo lâu dài, tốt cho sản phẩm F&B/Beauty.",
+        availability: "tracked",
+        fields: ["saves", "views"],
+      },
     ],
   },
   {
@@ -1402,11 +1477,41 @@ const GLOSSARY_CATEGORIES = [
     label: "📋 Booking",
     color: "#7C3AED",
     metrics: [
-      { name: "CPF (Cost Per Follower)", formula: "Chi phí booking / Followers", desc: "Chi phí để tiếp cận 1 follower. CPF thấp = KOL hiệu quả chi phí hơn. So sánh giữa micro vs macro KOL." },
-      { name: "Booking Efficiency Score", formula: "Views thực tế / (Chi phí booking / 1000)", desc: "Đo lường hiệu quả booking: bao nhiêu views thực tế trên mỗi 1.000đ chi booking. Càng cao càng tốt." },
-      { name: "Content Quality Index (CQI)", formula: "(ER × Views) / Chi phí booking", desc: "Chỉ số tổng hợp đánh giá chất lượng nội dung so với chi phí đầu tư booking." },
-      { name: "Booking ROI", formula: "(Doanh thu từ KOL – Chi phí booking) / Chi phí booking × 100%", desc: "Lợi nhuận ròng từ chi phí booking KOL. Phân biệt với ROAS (tính cả ads spend)." },
-      { name: "Reach per Budget", formula: "Tổng Reach / Tổng ngân sách", desc: "Số người tiếp cận được trên mỗi đồng chi. So sánh hiệu quả giữa các loại hình booking." },
+      {
+        name: "CPF (Cost Per Follower)",
+        formula: "cost / follower",
+        desc: "Chi phí booking để tiếp cận 1 follower. CPF thấp = KOL hiệu quả chi phí. So sánh micro vs macro KOL.",
+        availability: "tracked",
+        fields: ["cost", "follower"],
+      },
+      {
+        name: "Views / 1tr₫ Booking",
+        formula: "views / (cost / 1.000.000)",
+        desc: "Số views thực tế trên mỗi 1 triệu đồng chi booking. Đo hiệu suất đầu tư booking thuần.",
+        availability: "tracked",
+        fields: ["views", "cost"],
+      },
+      {
+        name: "Booking ROI",
+        formula: "(revenue – cost) / cost × 100%",
+        desc: "Lợi nhuận ròng từ booking fee. Khác ROAS ở chỗ không tính adSpend — đánh giá riêng hiệu quả booking.",
+        availability: "tracked",
+        fields: ["revenue", "cost"],
+      },
+      {
+        name: "Total Cost per KOL",
+        formula: "cost + adSpend",
+        desc: "Tổng chi phí thực tế (booking + ads) cho một KOL. Cơ sở tính ROI tổng thể.",
+        availability: "tracked",
+        fields: ["cost", "adSpend"],
+      },
+      {
+        name: "ER × Cost Efficiency",
+        formula: "(ER × views) / cost",
+        desc: "Chỉ số chất lượng nội dung theo chi phí: càng cao càng tốt. So sánh KOL cùng tier.",
+        availability: "tracked",
+        fields: ["likes", "comments", "saves", "shares", "views", "cost"],
+      },
     ],
   },
   {
@@ -1414,11 +1519,43 @@ const GLOSSARY_CATEGORIES = [
     label: "🔗 Affiliate",
     color: "#D97706",
     metrics: [
-      { name: "Commission Rate", formula: "Hoa hồng / Doanh thu × 100%", desc: "Tỷ lệ % hoa hồng KOL nhận trên mỗi đơn hàng. Thường 5-15% tùy ngành FMCG/Beauty/F&B." },
-      { name: "EPC (Earnings Per Click)", formula: "Tổng hoa hồng / Tổng clicks", desc: "Thu nhập affiliate trung bình mỗi click. KOL có EPC cao = audience có intent mua hàng tốt." },
-      { name: "Affiliate CVR", formula: "(Đơn hàng affiliate / Clicks affiliate) × 100%", desc: "Conversion rate riêng cho kênh affiliate. Đánh giá chất lượng traffic KOL mang về." },
-      { name: "Net Affiliate Cost", formula: "Tổng hoa hồng trả KOL – Booking fee tiết kiệm được", desc: "Chi phí thực sự của mô hình affiliate so với booking cố định. Affiliate tốt khi sale cao." },
-      { name: "Affiliate Contribution %", formula: "Doanh thu affiliate / Tổng doanh thu campaign × 100%", desc: "Tỷ trọng doanh thu đến từ kênh affiliate trong tổng campaign. Đo sức mạnh của KOL affiliate." },
+      {
+        name: "Affiliate CVR",
+        formula: "conversions / views × 100%",
+        desc: "Tỷ lệ chuyển đổi đơn hàng trên views — proxy tốt nhất cho affiliate khi không có click data riêng.",
+        availability: "tracked",
+        fields: ["conversions", "views"],
+      },
+      {
+        name: "Revenue per View",
+        formula: "revenue / views",
+        desc: "Doanh thu trung bình mỗi lượt xem. Chỉ số tổng hợp so sánh hiệu suất affiliate giữa các KOL.",
+        availability: "tracked",
+        fields: ["revenue", "views"],
+      },
+      {
+        name: "Affiliate ROAS",
+        formula: "revenue / cost",
+        desc: "Doanh thu trên booking fee — phiên bản ROAS dành riêng cho KOL affiliate không chạy ads.",
+        availability: "tracked",
+        fields: ["revenue", "cost"],
+      },
+      {
+        name: "Commission Rate",
+        formula: "Hoa hồng KOL / revenue × 100%",
+        desc: "Tỷ lệ % hoa hồng KOL nhận. Thường 5–15% theo ngành. ⚠️ Cần nhập thêm field hoa hồng.",
+        availability: "partial",
+        fields: ["revenue"],
+        missing: "Chi phí hoa hồng",
+      },
+      {
+        name: "EPC (Earnings Per Click)",
+        formula: "Hoa hồng / Clicks",
+        desc: "Thu nhập affiliate trung bình mỗi click. ⚠️ Cần data clicks và hoa hồng từ platform affiliate.",
+        availability: "partial",
+        fields: [],
+        missing: "Clicks & Hoa hồng",
+      },
     ],
   },
   {
@@ -1426,12 +1563,43 @@ const GLOSSARY_CATEGORIES = [
     label: "📣 Marketing",
     color: "#DC2626",
     metrics: [
-      { name: "Share of Voice (SOV)", formula: "Mentions brand / Tổng mentions ngành × 100%", desc: "Tỷ lệ nhắc đến thương hiệu so với tổng ngành. Campaign KOL tốt tăng SOV đáng kể." },
-      { name: "Brand Sentiment Score", formula: "% positive comments / (% positive + % negative)", desc: "Tỷ lệ cảm xúc tích cực trong comment. Phản ánh hình ảnh thương hiệu sau campaign." },
-      { name: "CPE (Cost Per Engagement)", formula: "Chi phí campaign / Tổng engagements", desc: "Chi phí để tạo ra 1 tương tác (like/cmt/share). Đánh giá hiệu quả xây dựng cộng đồng." },
-      { name: "Earned Media Value (EMV)", formula: "Tổng impressions × Giá CPM tham chiếu", desc: "Giá trị truyền thông tự nhiên do KOL tạo ra, quy đổi sang giá trị paid media tương đương." },
-      { name: "KOL ROI Index", formula: "(EMV + Doanh thu) / Tổng chi phí KOL", desc: "Chỉ số ROI toàn diện kết hợp giá trị truyền thông lẫn doanh thu thực tế. Đánh giá tổng thể campaign." },
-      { name: "Audience Overlap Rate", formula: "Shared followers / Tổng unique followers × 100%", desc: "Tỷ lệ audience trùng nhau giữa các KOL trong cùng campaign. Thấp = tiếp cận đa dạng hơn." },
+      {
+        name: "CPE (Cost Per Engagement)",
+        formula: "(cost + adSpend) / (likes + comments + saves + shares)",
+        desc: "Chi phí để tạo ra 1 tương tác. Đánh giá hiệu quả xây dựng cộng đồng và độ lan tỏa của brand.",
+        availability: "tracked",
+        fields: ["cost", "adSpend", "likes", "comments", "saves", "shares"],
+      },
+      {
+        name: "Total Reach ước tính",
+        formula: "views × 1.2 (buffer organic reach)",
+        desc: "Ước tính tổng reach thực tế bao gồm organic reach ngoài views trực tiếp. Chỉ mang tính tham khảo.",
+        availability: "tracked",
+        fields: ["views"],
+      },
+      {
+        name: "KOL ROI Index",
+        formula: "revenue / (cost + adSpend)",
+        desc: "ROI tổng thể: doanh thu trên tổng chi phí KOL. Benchmark tốt để rank KOL theo hiệu quả đầu tư.",
+        availability: "tracked",
+        fields: ["revenue", "cost", "adSpend"],
+      },
+      {
+        name: "Earned Media Value (EMV)",
+        formula: "views × CPM tham chiếu / 1000",
+        desc: "Giá trị truyền thông quy đổi theo CPM paid media. ⚠️ Cần CPM benchmark ngành để tính chính xác.",
+        availability: "partial",
+        fields: ["views"],
+        missing: "CPM tham chiếu ngành",
+      },
+      {
+        name: "Brand Sentiment Score",
+        formula: "% positive / (% positive + % negative) trong comments",
+        desc: "Tỷ lệ cảm xúc tích cực. ⚠️ Cần phân tích comment thủ công hoặc qua tool AI/sentiment analysis.",
+        availability: "partial",
+        fields: [],
+        missing: "Phân tích comment thủ công",
+      },
     ],
   },
 ];
@@ -2849,8 +3017,14 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
             {metrics.airedMissingLink.length > 0 ? (
               <div>
                 <p style={{ fontSize: 11, color: "var(--ink-soft)", margin: "0 0 8px 0" }}>Phát hiện <strong>{metrics.airedMissingLink.length} bài</strong> đã lên sóng nhưng chưa có đường dẫn video để đối soát:</p>
-                <div style={{ maxHeight: 200, overflowY: "auto", border: "1px solid var(--line)", borderRadius: 8 }} className="kt-scrollbar">
-                  <table className="kt-table" style={{ margin: 0 }}>
+                <div style={{ maxHeight: 220, overflowY: "auto", border: "1px solid var(--line)", borderRadius: 8, isolation: "isolate" }} className="kt-scrollbar">
+                  <table className="kt-table kt-table-sticky" style={{ margin: 0, tableLayout: "fixed", width: "100%" }}>
+                    <colgroup>
+                      <col style={{ width: "22%" }} />
+                      <col style={{ width: "10%" }} />
+                      <col style={{ width: "48%" }} />
+                      <col style={{ width: "20%" }} />
+                    </colgroup>
                     <thead>
                       <tr>
                         <th>Tên KOL</th>
@@ -2864,8 +3038,8 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
                         <tr key={r.id}>
                           <td><strong>{r.kol}</strong></td>
                           <td>{r.campaign}</td>
-                          <td>{r.monAn || "—"}</td>
-                          <td>{r.ngayAir || "—"}</td>
+                          <td style={{ maxWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={r.monAn || ""}>{r.monAn || "—"}</td>
+                          <td style={{ maxWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={r.ngayAir || ""}>{r.ngayAir || "—"}</td>
                         </tr>
                       ))}
                     </tbody>
