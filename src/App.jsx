@@ -139,7 +139,7 @@ const GlobalStyle = () => (
     }
 
     /* Table */
-    .kt-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .kt-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
     .kt-table th {
       background: var(--red-soft);
       border-bottom: 2px solid var(--line);
@@ -157,12 +157,24 @@ const GlobalStyle = () => (
       top: 184px;
       z-index: 10;
     }
+    .kt-table-sticky th:first-child {
+      border-top-left-radius: 11px;
+    }
+    .kt-table-sticky th:last-child {
+      border-top-right-radius: 11px;
+    }
     .kt-table-sticky-modal th {
       position: sticky;
       top: 0;
       z-index: 10;
       background: var(--red-soft) !important;
       box-shadow: inset 0 -1px 0 var(--line);
+    }
+    .kt-table-sticky-modal th:first-child {
+      border-top-left-radius: 11px;
+    }
+    .kt-table-sticky-modal th:last-child {
+      border-top-right-radius: 11px;
     }
     .kt-table td {
       padding: 10px 12px;
