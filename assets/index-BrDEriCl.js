@@ -114,17 +114,17 @@ Error generating stack: `+e.message+`
 
     /* ── DESIGN TOKENS: Analog Studio ── */
     .kt-root {
-      --ink:        #1C0A09;
-      --ink-mid:    #5C2B28;
-      --ink-soft:   #9E6B68;
-      --ink-faint:  #C9A8A5;
-      --paper:      #FDF3F0;
+      --ink:        #0F172A;
+      --ink-mid:    #475569;
+      --ink-soft:   #64748B;
+      --ink-faint:  #94A3B8;
+      --paper:      #F8FAFC;
       --card:       #FFFFFF;
-      --line:       #ECD8D4;
-      --rule:       #ECD8D4;
-      --accent:     #E8566A;
-      --accent-dim: #F5BDC4;
-      --accent-bg:  #FFF0F2;
+      --line:       #E2E8F0;
+      --rule:       #E2E8F0;
+      --accent:     #1B4F8A;
+      --accent-dim: #BFDBFE;
+      --accent-bg:  #EBF2FB;
       
       /* Single Color Palette overrides */
       --ok:         var(--accent);
