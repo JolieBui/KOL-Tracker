@@ -191,8 +191,21 @@ const CAMPAIGNS = [
   { key: "AM", label: "AM · Ajimayo", color: "#001C44" },
   { key: "AX", label: "AX · Aji-Xốt", color: "#2D99AE" },
   { key: "Vinegar", label: "Vinegar · Giấm", color: "#0C5776" },
+  { key: "MSG", label: "MSG · Bột ngọt", color: "#C97B58" },
+  { key: "Blendy", label: "Blendy", color: "#2D7D46" },
 ];
 const CAMPAIGN_COLOR = Object.fromEntries(CAMPAIGNS.map(c => [c.key, c.color]));
+
+const normalizeCampaignKey = (sheetName) => {
+  if (!sheetName) return "";
+  const name = sheetName.toString().toLowerCase().trim();
+  if (name.includes("mayo") || name === "am") return "AM";
+  if (name.includes("xốt") || name === "ax") return "AX";
+  if (name.includes("giấm") || name.includes("vinegar") || name === "giấm_fy25") return "Vinegar";
+  if (name.includes("msg") || name.includes("bột ngọt") || name.includes("mì chính")) return "MSG";
+  if (name.includes("blendy")) return "Blendy";
+  return sheetName;
+};
 
 const STATUS_STAGES = [
   { key: "waiting_food",   label: "Chờ duyệt món ăn",   color: "#C97B58", soft: "#F8DAD0" },
@@ -232,23 +245,23 @@ const STATUS_LABEL_TO_KEY = Object.fromEntries([
 const COL_ALIASES = {
   // Skip columns — will never be auto-mapped
   // __sheet__ and __no__ are internal, handled separately in applyMapping
-  kol:           ["kol", "tên kol", "ten kol", "name", "influencer"],
+  kol:           ["kol", "tên kol", "ten kol", "name", "influencer", "kol/koc", "koc"],
   follower:      ["follower", "followers", "số follower", "so follower"],
   type:          ["type", "loại", "loai", "tier"],
   location:      ["location", "địa điểm", "dia diem", "khu vực", "khu vuc"],
   group:         ["group", "nhóm", "nhom", "target", "camp."],
-  addonFee:      ["addonFee", "addon fee", "add-on fee", "add-on", "deliverable", "deliverables", "addonfee", "addon"],
-  cost:          ["cost", "chi phí", "chi phi", "giá", "gia", "ext. cost", "ext cost"],
+  addonFee:      ["addonFee", "addon fee", "add-on fee", "add-on", "deliverable", "deliverables", "addonfee", "addon", "brand reup"],
+  cost:          ["cost", "chi phí", "chi phi", "giá", "gia", "ext. cost", "ext cost", "budget"],
   status:        ["status", "trạng thái", "trang thai"],
   statusKey:     ["statusKey", "status key", "status_key"],
   monAn:         ["monản", "món ăn", "mon an", "food", "dish", "thực đơn", "thuc don"],
   ngayGuiScript: ["ngay gui script", "ngày gửi script", "script link"],
   ngayGuiDemo:   ["ngay gui demo", "ngày gửi demo", "ngày gửi 1st demo", "ngay gui 1st demo", "demo link"],
-  ngayAir:       ["ngay air", "ngày air", "air date", "ngày lên sóng"],
-  airedLink:     ["airedLink", "aired link", "link aired", "aired tiktok"],
-  airedFb:       ["airedFb", "aired fb", "fb/ig", "reup", "social", "facebook", "instagram"],
+  ngayAir:       ["ngay air", "ngày air", "air date", "ngày lên sóng", "date aired", "date air", "est. start date", "est start date"],
+  airedLink:     ["airedLink", "aired link", "link aired", "aired tiktok", "link vdo", "link video", "video link", "link_vdo", "vdo link"],
+  airedFb:       ["airedFb", "aired fb", "fb/ig", "reup", "social", "facebook", "instagram", "reup link"],
   giftSent:      ["giftSent", "gift", "quà tặng", "qua tang", "gift sent", "gửi sản phẩm"],
-  link:          ["link tiktok", "tiktok link", "tiktok url", "profile link", "url", "link"],
+  link:          ["link tiktok", "tiktok link", "tiktok url", "profile link", "url", "link", "link"],
   campaign:      ["campaign", "chiến dịch", "chien dich"],
   id:            ["id"],
 };
@@ -358,8 +371,8 @@ const applyMapping = (rawRows, mapping) => {
     const sheetName = row.__sheet__ || "";
     const rowNo    = row.__no__    || (idx + 1);
     if (sheetName) {
-      out.campaign = sheetName;
-      out.id = `${sheetName}-${rowNo}`;
+      out.campaign = normalizeCampaignKey(sheetName);
+      out.id = `${out.campaign}-${rowNo}`;
     } else {
       out.id = `import-${Date.now()}-${idx}`;
     }
