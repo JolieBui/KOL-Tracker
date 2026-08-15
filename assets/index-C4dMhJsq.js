@@ -476,9 +476,9 @@ Error generating stack: `+e.message+`
       background: var(--card);
     }
     .kt-table th {
-      background: linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%);
+      background: #3B82F6;
       border-bottom: 2px solid #2563EB;
-      border-right: 1px solid rgba(255, 255, 255, 0.15);
+      border-right: 1px solid rgba(255, 255, 255, 0.18);
       padding: 11px 14px;
       text-align: left;
       font-size: 11px;
@@ -495,10 +495,10 @@ Error generating stack: `+e.message+`
       position: sticky;
       top: 0;
       z-index: 10;
-      background: linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%);
+      background: #3B82F6;
       color: #FFFFFF;
       border-bottom: 2px solid #2563EB !important;
-      border-right: 1px solid rgba(255, 255, 255, 0.15);
+      border-right: 1px solid rgba(255, 255, 255, 0.18);
     }
     .kt-table-sticky th:last-child {
       border-right: none;
@@ -507,9 +507,10 @@ Error generating stack: `+e.message+`
       position: sticky;
       top: 0;
       z-index: 10;
-      background: #F5F5F7;
-      box-shadow: inset 0 -1.5px 0 var(--rule);
-      border-right: 1px solid var(--rule);
+      background: #3B82F6;
+      color: #FFFFFF;
+      box-shadow: inset 0 -2px 0 #2563EB;
+      border-right: 1px solid rgba(255, 255, 255, 0.18);
     }
     .kt-table td {
       padding: 10px 14px;
