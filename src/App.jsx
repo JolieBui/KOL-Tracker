@@ -864,27 +864,48 @@ const fmtFollowers = (num) => {
   return num.toString();
 };
 
-const StatCard = ({ title, value, subtext, color = "var(--ink)" }) => (
-  <div style={{
-    background: "var(--card)",
-    border: "1px solid var(--line)",
-    borderRadius: 12,
-    padding: "16px 20px",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.02)"
-  }}>
-    <span style={{ fontSize: 11, fontWeight: 600, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em" }}>{title}</span>
-    <span style={{ fontSize: 20, fontWeight: 700, color: color, margin: "6px 0", wordBreak: "break-all" }}>{value}</span>
-    <span style={{ fontSize: 11, color: "var(--ink-soft)", lineHeight: 1.3 }}>{subtext}</span>
+const StatCard = ({ title, value, subtext, color = "var(--ink)", onClick }) => (
+  <div 
+    onClick={onClick}
+    className={onClick ? "kt-anim" : ""}
+    style={{
+      background: "var(--card)",
+      border: "1px solid var(--line)",
+      borderRadius: 12,
+      padding: "14px 18px",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.02)",
+      cursor: onClick ? "pointer" : "default",
+      transition: "all 0.2s ease",
+      userSelect: "none",
+    }}
+    onMouseEnter={onClick ? (e => {
+      e.currentTarget.style.borderColor = "var(--blue)";
+      e.currentTarget.style.boxShadow = "0 4px 12px rgba(59,130,246,0.08)";
+      e.currentTarget.style.transform = "translateY(-2px)";
+    }) : undefined}
+    onMouseLeave={onClick ? (e => {
+      e.currentTarget.style.borderColor = "var(--line)";
+      e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.02)";
+      e.currentTarget.style.transform = "translateY(0)";
+    }) : undefined}
+  >
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+      <span style={{ fontSize: 9, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em" }}>{title}</span>
+      {onClick && <span style={{ fontSize: 9, color: "var(--blue)", fontWeight: 700 }}>Chi tiết ↗</span>}
+    </div>
+    <span style={{ fontSize: 18, fontWeight: 800, color: color, margin: "4px 0", wordBreak: "break-all" }}>{value}</span>
+    <span style={{ fontSize: 10, color: "var(--ink-soft)", lineHeight: 1.3 }}>{subtext}</span>
   </div>
 );
 
-const InsightsView = ({ rows, insightsNotes, onSaveNote }) => {
+const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
   const [subView, setSubView] = useState("account");
   const [selectedCampaign, setSelectedCampaign] = useState("all");
   const [noteText, setNoteText] = useState("");
+  const [activeDetail, setActiveDetail] = useState(null);
 
   useEffect(() => {
     setNoteText(insightsNotes[selectedCampaign] || "");
@@ -1211,10 +1232,75 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote }) => {
         <div className="kt-anim">
           {/* Stats grid */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, marginBottom: 20 }}>
-            <StatCard title="Tổng ngân sách" value={fmtVND(metrics.totalSpend)} subtext={`Booking: ${fmtVND(metrics.totalCost)} | Ads: ${fmtVND(metrics.totalAdSpend)}`} color="var(--red)" />
-            <StatCard title="Chi phí trung bình" value={fmtVND(metrics.totalSpend / metrics.totalKOL)} subtext="Tổng chi phí trên mỗi KOL" />
-            <StatCard title="Tỷ lệ lên sóng" value={`${metrics.airedRate}%`} subtext={`${metrics.airedCount} / ${metrics.totalKOL} KOL đã hoàn thành`} color="var(--green)" />
-            <StatCard title="KOL đổi quà (0đ)" value={`${metrics.zeroCostCount} KOL`} subtext="Không tính phí booking" color="var(--amber)" />
+            <StatCard 
+              title="Tổng ngân sách" 
+              value={fmtVND(metrics.totalSpend)} 
+              subtext={`Booking: ${fmtVND(metrics.totalCost)} | Ads: ${fmtVND(metrics.totalAdSpend)}`} 
+              color="var(--red)" 
+              onClick={() => setActiveDetail({
+                title: "Phân bổ Tổng Ngân Sách",
+                description: "Danh sách tất cả KOLs sắp xếp theo Tổng chi phí (Booking Cost + Ad Spend) từ cao xuống thấp.",
+                columns: [
+                  { key: "kol", label: "KOL" },
+                  { key: "campaign", label: "Chiến dịch" },
+                  { key: "cost", label: "Booking Cost", render: r => fmtVND(r.cost) },
+                  { key: "adSpend", label: "Ad Spend", render: r => fmtVND(r.adSpend) },
+                  { key: "totalSpend", label: "Tổng chi phí", render: r => <strong>{fmtVND((Number(r.cost) || 0) + (Number(r.adSpend) || 0))}</strong> }
+                ],
+                data: [...activeRows].sort((a,b) => ((Number(b.cost)||0)+(Number(b.adSpend)||0)) - ((Number(a.cost)||0)+(Number(a.adSpend)||0)))
+              })}
+            />
+            <StatCard 
+              title="Chi phí trung bình" 
+              value={fmtVND(metrics.totalSpend / metrics.totalKOL)} 
+              subtext="Tổng chi phí trên mỗi KOL" 
+              onClick={() => setActiveDetail({
+                title: "Chi phí phân bổ theo KOL",
+                description: "Danh sách tất cả KOLs kèm theo chi tiết chi phí booking và ads chạy chiến dịch.",
+                columns: [
+                  { key: "kol", label: "KOL" },
+                  { key: "campaign", label: "Chiến dịch" },
+                  { key: "cost", label: "Booking Cost", render: r => fmtVND(r.cost) },
+                  { key: "adSpend", label: "Ad Spend", render: r => fmtVND(r.adSpend) },
+                  { key: "totalSpend", label: "Tổng chi phí", render: r => <strong>{fmtVND((Number(r.cost) || 0) + (Number(r.adSpend) || 0))}</strong> }
+                ],
+                data: [...activeRows].sort((a,b) => ((Number(b.cost)||0)+(Number(b.adSpend)||0)) - ((Number(a.cost)||0)+(Number(a.adSpend)||0)))
+              })}
+            />
+            <StatCard 
+              title="Tỷ lệ lên sóng" 
+              value={`${metrics.airedRate}%`} 
+              subtext={`${metrics.airedCount} / ${metrics.totalKOL} KOL đã hoàn thành`} 
+              color="var(--green)" 
+              onClick={() => setActiveDetail({
+                title: "KOL đã Lên Sóng (Aired)",
+                description: `Danh sách các nhà sáng tạo đã nghiệm thu video lên sóng thành công (Tổng cộng: ${metrics.airedCount} KOLs).`,
+                columns: [
+                  { key: "kol", label: "KOL" },
+                  { key: "campaign", label: "Chiến dịch" },
+                  { key: "ngayAir", label: "Ngày lên sóng" },
+                  { key: "airedLink", label: "Đường dẫn video", render: r => r.airedLink ? <a href={r.airedLink} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>{r.airedLink}</a> : "—" }
+                ],
+                data: activeRows.filter(r => r.statusKey === "aired")
+              })}
+            />
+            <StatCard 
+              title="KOL đổi quà (0đ)" 
+              value={`${metrics.zeroCostCount} KOL`} 
+              subtext="Không tính phí booking" 
+              color="var(--amber)" 
+              onClick={() => setActiveDetail({
+                title: "KOL đổi quà / FOC",
+                description: "Các nhà sáng tạo tham gia chiến dịch với chi phí booking 0đ (Nhận quà/FOC tài trợ sản phẩm).",
+                columns: [
+                  { key: "kol", label: "KOL" },
+                  { key: "campaign", label: "Chiến dịch" },
+                  { key: "follower", label: "Followers" },
+                  { key: "giftSent", label: "Quà tặng", render: r => r.giftSent || "Chưa bàn giao" }
+                ],
+                data: activeRows.filter(r => (Number(r.cost) || 0) === 0)
+              })}
+            />
           </div>
 
           {/* Campaign breakdown table */}
@@ -1297,10 +1383,82 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote }) => {
         <div className="kt-anim">
           {/* Stats grid */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, marginBottom: 20 }}>
-            <StatCard title="Tổng số người theo dõi" value={fmtFollowers(metrics.totalFollowers)} subtext="Tích lũy tệp truyền thông" color="var(--red)" />
-            <StatCard title="Tổng lượt xem (Views)" value={metrics.totalViews.toLocaleString()} subtext={`Đạt ${metrics.kpiViewsAchievedRate}% KPI (${metrics.totalEstViews.toLocaleString()} views)`} color="var(--blue)" />
-            <StatCard title="Tổng tương tác" value={metrics.totalEngagement.toLocaleString()} subtext={`Tỷ lệ tương tác/views: ${metrics.avgEngRate}%`} color="var(--green)" />
-            <StatCard title="Phân khúc chủ đạo" value={metrics.tierList[0]?.name || "N/A"} subtext="Loại KOL chiếm số đông" />
+            <StatCard 
+              title="Tổng số người theo dõi" 
+              value={fmtFollowers(metrics.totalFollowers)} 
+              subtext="Tích lũy tệp truyền thông" 
+              color="var(--red)" 
+              onClick={() => setActiveDetail({
+                title: "Độ phủ truyền thông (Followers)",
+                description: "Danh sách tất cả KOLs sắp xếp theo lượng người theo dõi (Followers) giảm dần.",
+                columns: [
+                  { key: "kol", label: "KOL" },
+                  { key: "campaign", label: "Chiến dịch" },
+                  { key: "follower", label: "Followers" },
+                  { key: "type", label: "Phân khúc" }
+                ],
+                data: [...activeRows].sort((a,b) => parseFollowers(b.follower) - parseFollowers(a.follower))
+              })}
+            />
+            <StatCard 
+              title="Tổng lượt xem (Views)" 
+              value={metrics.totalViews.toLocaleString()} 
+              subtext={`Đạt ${metrics.kpiViewsAchievedRate}% KPI (${metrics.totalEstViews.toLocaleString()} views)`} 
+              color="var(--blue)" 
+              onClick={() => setActiveDetail({
+                title: "Thống kê Lượt xem thực tế (Views)",
+                description: "Danh sách tất cả KOLs sắp xếp theo lượt xem video thực tế trên TikTok từ cao xuống thấp.",
+                columns: [
+                  { key: "kol", label: "KOL" },
+                  { key: "campaign", label: "Chiến dịch" },
+                  { key: "estView", label: "KPI Views", render: r => Number(r.estView) ? Number(r.estView).toLocaleString() : "—" },
+                  { key: "views", label: "Views thực tế", render: r => <strong>{Number(r.views).toLocaleString()}</strong> },
+                  { key: "achieved", label: "% Đạt KPI", render: r => (Number(r.estView) > 0 ? Math.round((Number(r.views) / Number(r.estView)) * 100) + "%" : "—") }
+                ],
+                data: [...activeRows].sort((a,b) => (Number(b.views)||0) - (Number(a.views)||0))
+              })}
+            />
+            <StatCard 
+              title="Tổng tương tác" 
+              value={metrics.totalEngagement.toLocaleString()} 
+              subtext={`Tỷ lệ tương tác/views: ${metrics.avgEngRate}%`} 
+              color="var(--green)" 
+              onClick={() => setActiveDetail({
+                title: "Thống kê Tương tác (Likes, Comments, Saves, Shares)",
+                description: "Danh sách tất cả KOLs sắp xếp theo tổng lượng tương tác thực tế của video bài đăng.",
+                columns: [
+                  { key: "kol", label: "KOL" },
+                  { key: "views", label: "Views", render: r => Number(r.views).toLocaleString() },
+                  { key: "likes", label: "Likes", render: r => Number(r.likes).toLocaleString() },
+                  { key: "comments", label: "Comments", render: r => Number(r.comments).toLocaleString() },
+                  { key: "saves", label: "Saves", render: r => Number(r.saves).toLocaleString() },
+                  { key: "shares", label: "Shares", render: r => Number(r.shares).toLocaleString() },
+                  { key: "er", label: "Tỷ lệ ER", render: r => (Number(r.views) > 0 ? (((Number(r.likes) + Number(r.comments) + Number(r.saves) + Number(r.shares)) / r.views) * 100).toFixed(2) + "%" : "0%") }
+                ],
+                data: [...activeRows].sort((a,b) => {
+                  const engA = (Number(a.likes)||0)+(Number(a.comments)||0)+(Number(a.saves)||0)+(Number(a.shares)||0);
+                  const engB = (Number(b.likes)||0)+(Number(b.comments)||0)+(Number(b.saves)||0)+(Number(b.shares)||0);
+                  return engB - engA;
+                })
+              })}
+            />
+            <StatCard 
+              title="Phân khúc chủ đạo" 
+              value={metrics.tierList[0]?.name || "N/A"} 
+              subtext="Loại KOL chiếm số đông" 
+              onClick={() => setActiveDetail({
+                title: "Phân loại KOL theo Tiers",
+                description: "Danh sách tất cả KOLs kèm theo chi phí và phân nhóm quy mô sáng tạo (Micro, Mid-tier, Macro...).",
+                columns: [
+                  { key: "kol", label: "KOL" },
+                  { key: "campaign", label: "Chiến dịch" },
+                  { key: "type", label: "Phân khúc" },
+                  { key: "follower", label: "Followers" },
+                  { key: "cost", label: "Booking Cost", render: r => fmtVND(r.cost) }
+                ],
+                data: [...activeRows].sort((a,b) => (b.type || "").localeCompare(a.type || ""))
+              })}
+            />
           </div>
 
           {/* Tiers Segmented Bar Chart */}
@@ -1475,10 +1633,85 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote }) => {
         <div className="kt-anim">
           {/* Stats grid */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, marginBottom: 20 }}>
-            <StatCard title="Tổng doanh số (GMV)" value={fmtVND(metrics.totalRevenue)} subtext={`Chỉ số sinh lời ROAS: ${metrics.roas}x`} color="var(--red)" />
-            <StatCard title="Chi phí chạy Ads" value={fmtVND(metrics.totalAdSpend)} subtext={`CPV trung bình: ${metrics.cpv}đ / view`} color="var(--blue)" />
-            <StatCard title="Đơn hàng (Conversions)" value={`${metrics.totalConversions.toLocaleString()} đơn`} subtext={`Thêm giỏ hàng: ${metrics.totalAddToCart.toLocaleString()} lượt`} color="var(--green)" />
-            <StatCard title="CPM toàn chiến dịch" value={metrics.cpmEst ? `${fmtVND(metrics.cpmEst)}` : "N/A"} subtext="CPM trên 1000 followers tiếp cận" color="var(--amber)" />
+            <StatCard 
+              title="Tổng doanh số (GMV)" 
+              value={fmtVND(metrics.totalRevenue)} 
+              subtext={`Chỉ số sinh lời ROAS: ${metrics.roas}x`} 
+              color="var(--red)" 
+              onClick={() => setActiveDetail({
+                title: "Danh sách Hiệu Quả Doanh Số (GMV)",
+                description: "Danh sách KOLs mang lại doanh thu bán hàng thực tế từ cao xuống thấp.",
+                columns: [
+                  { key: "kol", label: "KOL" },
+                  { key: "campaign", label: "Chiến dịch" },
+                  { key: "conversions", label: "Đơn hàng (Conversions)", render: r => Number(r.conversions).toLocaleString() },
+                  { key: "addToCart", label: "Thêm giỏ hàng (ATC)", render: r => Number(r.addToCart).toLocaleString() },
+                  { key: "revenue", label: "Doanh thu / GMV", render: r => <strong>{fmtVND(r.revenue)}</strong> }
+                ],
+                data: [...activeRows].sort((a,b) => (Number(b.revenue)||0) - (Number(a.revenue)||0))
+              })}
+            />
+            <StatCard 
+              title="Chi phí chạy Ads" 
+              value={fmtVND(metrics.totalAdSpend)} 
+              subtext={`CPV trung bình: ${metrics.cpv}đ / view`} 
+              color="var(--blue)" 
+              onClick={() => setActiveDetail({
+                title: "Chi tiết Ngân sách quảng cáo (Ad Spend)",
+                description: "Thống kê ngân sách chạy Ads và giá lượt xem (CPV) trung bình của từng KOL.",
+                columns: [
+                  { key: "kol", label: "KOL" },
+                  { key: "campaign", label: "Chiến dịch" },
+                  { key: "adSpend", label: "Ad Spend", render: r => fmtVND(r.adSpend) },
+                  { key: "views", label: "Views thực tế", render: r => Number(r.views).toLocaleString() },
+                  { key: "cpv", label: "CPV thực tế", render: r => (Number(r.views) > 0 ? Math.round(Number(r.adSpend)/Number(r.views)) + "đ" : "—") }
+                ],
+                data: [...activeRows].sort((a,b) => (Number(b.adSpend)||0) - (Number(a.adSpend)||0))
+              })}
+            />
+            <StatCard 
+              title="Đơn hàng (Conversions)" 
+              value={`${metrics.totalConversions.toLocaleString()} đơn`} 
+              subtext={`Thêm giỏ hàng: ${metrics.totalAddToCart.toLocaleString()} lượt`} 
+              color="var(--green)" 
+              onClick={() => setActiveDetail({
+                title: "Hiệu quả đơn hàng & Giỏ hàng",
+                description: "Danh sách KOLs mang lại lượt đặt hàng thành công và tương tác sản phẩm.",
+                columns: [
+                  { key: "kol", label: "KOL" },
+                  { key: "campaign", label: "Chiến dịch" },
+                  { key: "conversions", label: "Đơn hàng (Conversions)", render: r => <strong>{Number(r.conversions).toLocaleString()}</strong> },
+                  { key: "addToCart", label: "Thêm giỏ hàng (ATC)", render: r => Number(r.addToCart).toLocaleString() },
+                  { key: "revenue", label: "Doanh thu / GMV", render: r => fmtVND(r.revenue) }
+                ],
+                data: [...activeRows].sort((a,b) => (Number(b.conversions)||0) - (Number(a.conversions)||0))
+              })}
+            />
+            <StatCard 
+              title="CPM toàn chiến dịch" 
+              value={metrics.cpmEst ? `${fmtVND(metrics.cpmEst)}` : "N/A"} 
+              subtext="CPM trên 1000 followers tiếp cận" 
+              color="var(--amber)" 
+              onClick={() => setActiveDetail({
+                title: "Chỉ số chi phí / 1,000 Follower tiếp cận (CPM)",
+                description: "Đo lường hiệu quả booking dựa trên quy mô người theo dõi.",
+                columns: [
+                  { key: "kol", label: "KOL" },
+                  { key: "campaign", label: "Chiến dịch" },
+                  { key: "follower", label: "Followers" },
+                  { key: "cost", label: "Booking Cost", render: r => fmtVND(r.cost) },
+                  { key: "cpm", label: "CPM ước tính", render: r => {
+                    const fl = parseFollowers(r.follower);
+                    return fl > 0 ? <strong>{fmtVND(Math.round((Number(r.cost) || 0) / fl * 1000))}</strong> : "—";
+                  }}
+                ],
+                data: [...activeRows].filter(r => parseFollowers(r.follower) > 0).sort((a,b) => {
+                  const flA = parseFollowers(a.follower);
+                  const flB = parseFollowers(b.follower);
+                  return ((Number(a.cost)||0)/flA) - ((Number(b.cost)||0)/flB);
+                })
+              })}
+            />
           </div>
 
           {/* Top 5 cost-effective KOLs */}
@@ -1628,6 +1861,82 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote }) => {
           </button>
         </div>
       </div>
+
+      {/* ── STAT CARD DETAIL MODAL ── */}
+      {activeDetail && (
+        <div className="kt-overlay" onClick={e => e.target === e.currentTarget && setActiveDetail(null)} style={{ display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
+          <div className="kt-modal kt-anim" style={{ maxWidth: 800, width: "90%", maxHeight: "85vh", display: "flex", flexDirection: "column" }}>
+            {/* Header */}
+            <div style={{ padding: "18px 22px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "var(--blue)", textTransform: "uppercase", letterSpacing: "0.04em" }}>Thống kê chi tiết</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)", marginTop: 2 }}>{activeDetail.title}</div>
+              </div>
+              <button className="kt-btn kt-btn-ghost" onClick={() => setActiveDetail(null)} style={{ padding: "6px 10px", fontSize: 16 }}>✕</button>
+            </div>
+
+            {/* Body */}
+            <div style={{ padding: "18px 22px", overflowY: "auto", flex: 1 }} className="kt-scrollbar">
+              {activeDetail.description && <p style={{ fontSize: 12, color: "var(--ink-soft)", margin: "0 0 16px 0", lineHeight: 1.4 }}>{activeDetail.description}</p>}
+              <div style={{ border: "1px solid var(--line)", borderRadius: 8, overflow: "hidden" }}>
+                <table className="kt-table" style={{ margin: 0 }}>
+                  <thead>
+                    <tr>
+                      {activeDetail.columns.map(col => <th key={col.key}>{col.label}</th>)}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {activeDetail.data.map((row, idx) => (
+                      <tr key={row.id || idx}>
+                        {activeDetail.columns.map(col => {
+                          const val = col.render ? col.render(row) : row[col.key];
+                          return (
+                            <td key={col.key}>
+                              {col.key === "kol" ? (
+                                <button
+                                  className="kt-btn-link"
+                                  onClick={() => {
+                                    onOpenKOL(row);
+                                    setActiveDetail(null);
+                                  }}
+                                  style={{
+                                    background: "none",
+                                    border: "none",
+                                    padding: 0,
+                                    color: "var(--blue)",
+                                    fontWeight: 700,
+                                    cursor: "pointer",
+                                    textDecoration: "underline",
+                                    textAlign: "left"
+                                  }}
+                                >
+                                  {val}
+                                </button>
+                              ) : (
+                                val
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                    {activeDetail.data.length === 0 && (
+                      <tr>
+                        <td colSpan={activeDetail.columns.length} style={{ textAlign: "center", color: "var(--ink-soft)", padding: 20 }}>Không có dữ liệu phù hợp.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div style={{ padding: "14px 22px", borderTop: "1px solid var(--line)", display: "flex", justifyContent: "flex-end" }}>
+              <button className="kt-btn kt-btn-primary" onClick={() => setActiveDetail(null)}>Đóng</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -1886,6 +2195,7 @@ export default function App() {
             <InsightsView
               rows={data}
               insightsNotes={insightsNotes}
+              onOpenKOL={r => setSelected(r)}
               onSaveNote={(campaign, text) => {
                 setInsightsNotes(prev => ({ ...prev, [campaign]: text }));
                 showToast("Đã lưu nhận xét thành công!");
@@ -1920,10 +2230,82 @@ export default function App() {
         <ImportWizard
           {...wizardData}
           onClose={() => setWizardData(null)}
-          onConfirm={(rows) => {
-            setData(rows);
+          onConfirm={(importedRows) => {
+            let mergedCount = 0;
+            let addedCount = 0;
+            
+            const CUSTOM_INITIALS = {
+              "bbkbh": ["babykopo home", "baby kopo home"],
+              "bbk": ["babykopo home", "baby kopo home"],
+              "agt": ["ăn gì thương ơi", "an gi thuong oi"],
+              "agto": ["ăn gì thương ơi", "an gi thuong oi"],
+              "ttmt": ["thi thi miền tây", "thi thi mien tay"],
+              "mc": ["min cookie", "mincookie"],
+              "pha": ["pít ham ăn", "pit ham an"],
+              "ln": ["linh nấu", "linh nau"]
+            };
+
+            const getInitials = (name) => {
+              if (!name) return "";
+              const n = name.toString().toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+              const words = n.split(/\s+/).filter(Boolean);
+              return words.map(w => w[0]).join("");
+            };
+
+            const isMatch = (importedName, kolName) => {
+              if (!importedName || !kolName) return false;
+              const impClean = importedName.toString().toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+              const kolClean = kolName.toString().toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+              // 1. Direct match or substring
+              if (impClean === kolClean || kolClean.includes(impClean) || impClean.includes(kolClean)) return true;
+
+              // 2. Custom initials match
+              if (CUSTOM_INITIALS[impClean]) {
+                if (CUSTOM_INITIALS[impClean].some(alias => kolClean.includes(alias))) return true;
+              }
+
+              // 3. Dynamic initials match
+              const kolInitials = getInitials(kolName);
+              if (impClean === kolInitials) return true;
+
+              return false;
+            };
+
+            const updatedData = [...data];
+            
+            importedRows.forEach(imp => {
+              const matchIdx = updatedData.findIndex(existing => isMatch(imp.kol, existing.kol));
+              if (matchIdx !== -1) {
+                const existing = updatedData[matchIdx];
+                const merged = { ...existing };
+                
+                const fieldsToMerge = [
+                  "link", "follower", "type", "location", "group", "cost", "addonFee", 
+                  "statusKey", "monAn", "ngayGuiScript", "ngayGuiDemo", "ngayAir", 
+                  "airedLink", "airedFb", "giftSent",
+                  "estView", "estEng", "views", "likes", "comments", "saves", "shares",
+                  "adSpend", "conversions", "addToCart", "revenue"
+                ];
+
+                fieldsToMerge.forEach(field => {
+                  if (imp[field] !== undefined && imp[field] !== "" && imp[field] !== 0) {
+                    merged[field] = imp[field];
+                  }
+                });
+
+                updatedData[matchIdx] = merged;
+                mergedCount++;
+              } else {
+                updatedData.push(imp);
+                addedCount++;
+              }
+            });
+
+            setData(updatedData);
             setWizardData(null);
-            showToast(`✅ Đã import ${rows.length} KOLs thành công!`, true);
+            showToast(`✅ Đã nhập thành công! Gộp thông tin: ${mergedCount} KOLs, Thêm mới: ${addedCount} KOLs`, true);
           }}
         />
       )}
