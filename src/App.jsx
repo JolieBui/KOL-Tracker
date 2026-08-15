@@ -7,22 +7,24 @@ const GlobalStyle = () => (
     @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
     .kt-root {
-      --ink: #432F2E; /* Chestnut Hollow */
-      --ink-soft: #7C6867;
-      --paper: #FAF6E9; /* Warm cream */
-      --card: #FFFFFF;
-      --line: #E8DFD7;
-      --red: #432F2E; /* Chestnut Hollow */
-      --red-soft: #F5EFEB;
-      --amber: #B58428;
-      --amber-soft: #FEEFB6; /* Gilded Nectar */
-      --green: #407D53;
-      --green-soft: #EBF5EE;
-      --blue: #2A688C;
-      --blue-soft: #C3DAE8; /* Arctic Whisper */
+      --ink: #2D2A26;
+      --ink-soft: #7A726B;
+      --paper: linear-gradient(135deg, #F0EDE8 0%, #E8E4F0 50%, #E4EDF0 100%);
+      --paper-bg: #EEE9F4;
+      --card: rgba(255,255,255,0.62);
+      --card-border: rgba(255,255,255,0.85);
+      --line: rgba(180,170,200,0.28);
+      --red: #C0392B;
+      --red-soft: rgba(255,180,180,0.18);
+      --amber: #B07D2A;
+      --amber-soft: rgba(255,213,120,0.22);
+      --green: #2E7D5A;
+      --green-soft: rgba(120,210,160,0.18);
+      --blue: #2563A8;
+      --blue-soft: rgba(120,170,255,0.18);
       font-family: 'Be Vietnam Pro', sans-serif;
       color: var(--ink);
-      background: var(--paper);
+      background: var(--paper-bg);
       display: flex;
       flex-direction: column;
       height: 100vh;
@@ -34,15 +36,27 @@ const GlobalStyle = () => (
     .kt-display { font-family: 'Be Vietnam Pro', sans-serif; letter-spacing: 0.02em; text-transform: uppercase; }
     .kt-mono { font-family: 'IBM Plex Mono', monospace; }
 
+    /* Glass card utility */
+    .kt-glass {
+      background: rgba(255,255,255,0.58);
+      backdrop-filter: blur(16px) saturate(1.6);
+      -webkit-backdrop-filter: blur(16px) saturate(1.6);
+      border: 1px solid rgba(255,255,255,0.82);
+      box-shadow: 0 2px 16px rgba(120,100,180,0.08), inset 0 1px 0 rgba(255,255,255,0.7);
+    }
+
     .kt-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
-    .kt-scrollbar::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+    .kt-scrollbar::-webkit-scrollbar-thumb { background: rgba(160,130,200,0.25); border-radius: 4px; }
     .kt-scrollbar::-webkit-scrollbar-track { background: transparent; }
 
     .kt-ticket {
       position: relative;
       background: var(--card);
-      border: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
       border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(100,80,160,0.07);
     }
     .kt-ticket .kt-perf {
       position: relative;
@@ -124,26 +138,41 @@ const GlobalStyle = () => (
     }
 
     .kt-btn {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Be Vietnam Pro', sans-serif;
       font-weight: 600;
-      border-radius: 8px;
+      border-radius: 10px;
       padding: 8px 14px;
       font-size: 13px;
       cursor: pointer;
       border: 1px solid transparent;
-      transition: all 0.15s ease;
+      transition: all 0.18s ease;
       display: inline-flex;
       align-items: center;
       gap: 6px;
       white-space: nowrap;
     }
-    .kt-btn-primary { background: var(--red); color: #FFFFFF; }
-    .kt-btn-primary:hover { background: #001C44; }
-    .kt-btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
-    .kt-btn-ghost:hover { background: #E7F5F5; }
-    .kt-btn-ghost.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-    .kt-btn-danger { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
-    .kt-btn-danger:hover { background: #fca5a5; }
+    .kt-btn-primary {
+      background: linear-gradient(135deg, #C0392B, #9B1D1D);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(192,57,43,0.25);
+    }
+    .kt-btn-primary:hover { background: linear-gradient(135deg, #A93226, #7B1111); transform: translateY(-1px); }
+    .kt-btn-ghost {
+      background: rgba(255,255,255,0.45);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: var(--ink);
+      border-color: rgba(200,190,220,0.45);
+    }
+    .kt-btn-ghost:hover { background: rgba(255,255,255,0.72); border-color: rgba(160,120,200,0.4); }
+    .kt-btn-ghost.active {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+      box-shadow: 0 2px 8px rgba(45,42,38,0.18);
+    }
+    .kt-btn-danger { background: rgba(255,180,180,0.22); color: #991b1b; border-color: rgba(252,165,165,0.5); }
+    .kt-btn-danger:hover { background: rgba(252,165,165,0.35); }
 
     .kt-stats-card-hover {
       cursor: pointer;
@@ -151,27 +180,31 @@ const GlobalStyle = () => (
       user-select: none;
     }
     .kt-stats-card-hover:hover {
-      border-color: var(--blue) !important;
-      box-shadow: 0 4px 12px rgba(42,104,140,0.08) !important;
-      transform: translateY(-1px);
+      border-color: rgba(160,122,201,0.5) !important;
+      box-shadow: 0 6px 24px rgba(120,100,180,0.13) !important;
+      transform: translateY(-2px);
     }
     .kt-stats-card-hover:active {
       transform: translateY(0);
-      background: var(--paper) !important;
     }
 
     .kt-input, .kt-select, .kt-textarea {
-      font-family: 'Inter', sans-serif;
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 7px;
+      font-family: 'Be Vietnam Pro', sans-serif;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(200,190,220,0.45);
+      border-radius: 8px;
       padding: 7px 10px;
       font-size: 13px;
       color: var(--ink);
       width: 100%;
       outline: none;
     }
-    .kt-input:focus, .kt-select:focus, .kt-textarea:focus { border-color: var(--red); box-shadow: 0 0 0 3px var(--red-soft); }
+    .kt-input:focus, .kt-select:focus, .kt-textarea:focus {
+      border-color: rgba(160,122,201,0.7);
+      box-shadow: 0 0 0 3px rgba(160,122,201,0.15);
+    }
     .kt-label { font-size: 11px; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; display: block; }
 
     .kt-badge { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 999px; white-space: nowrap; display: inline-block; }
@@ -190,8 +223,8 @@ const GlobalStyle = () => (
     /* Modal overlay */
     .kt-overlay {
       position: fixed; inset: 0;
-      background: rgba(0,28,68,0.35);
-      backdrop-filter: blur(3px);
+      background: rgba(40,30,60,0.38);
+      backdrop-filter: blur(6px);
       z-index: 100;
       display: flex; align-items: center; justify-content: center;
       padding: 16px;
@@ -830,74 +863,129 @@ const StatsBar = ({ rows, currentStatus = "all", onCardClick }) => {
 /* ================================================================
    TABLE VIEW
 ================================================================ */
-const TableView = ({ rows, onOpen }) => (
-  <div className="kt-scrollbar" style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
-    <table className="kt-table kt-table-sticky">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>KOL</th>
-          <th>Campaign</th>
-          <th>Type</th>
-          <th>Followers</th>
-          <th>Chi phí</th>
-          <th>Status</th>
-          <th>Ngày air</th>
-          <th>Script</th>
-          <th>Demo</th>
-          <th>Aired</th>
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map(r => (
-          <tr key={r.id} onClick={() => onOpen(r)} style={{ cursor: "pointer" }}>
-            <td><span className="kt-mono" style={{ fontSize: 11, color: "var(--ink-soft)" }}>{r.id}</span></td>
-            <td title={r.kol} style={{ maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              <div style={{ fontWeight: 600, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis" }}>{r.kol}</div>
-              {r.link && <a href={r.link} target="_blank" rel="noopener noreferrer"
-                onClick={e => e.stopPropagation()}
-                style={{ fontSize: 11, color: "var(--ink-soft)" }}>TikTok ↗</a>}
-            </td>
-            <td><CampaignDot campaign={r.campaign} /></td>
-            <td>{r.type && <span className="kt-badge" style={{ background: "var(--paper)", color: "var(--ink-soft)", border: "1px solid var(--line)" }}>{r.type}</span>}</td>
-            <td><span className="kt-mono" style={{ fontSize: 12 }}>{r.follower || "—"}</span></td>
-            <td><span className="kt-mono" style={{ fontSize: 12, color: "var(--ink)" }}>{fmtVND(r.cost)}</span></td>
-            <td><StatusBadge statusKey={r.statusKey} /></td>
-            <td title={r.ngayAir} style={{ fontSize: 12, color: "var(--ink-soft)", maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {r.ngayAir && r.ngayAir.startsWith("http") ? (
-                <a href={r.ngayAir} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>
-                  Link ↗
-                </a>
-              ) : (
-                r.ngayAir || "—"
-              )}
-            </td>
-            <td title={r.ngayGuiScript} style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {r.ngayGuiScript && r.ngayGuiScript.startsWith("http") ? (
-                <a href={r.ngayGuiScript} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>Script ↗</a>
-              ) : <span style={{ fontSize: 12, color: "var(--ink-soft)" }}>{r.ngayGuiScript || "—"}</span>}
-            </td>
-            <td title={r.ngayGuiDemo} style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {r.ngayGuiDemo && r.ngayGuiDemo.startsWith("http") ? (
-                <a href={r.ngayGuiDemo} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>Demo ↗</a>
-              ) : <span style={{ fontSize: 12, color: "var(--ink-soft)" }}>{r.ngayGuiDemo || "—"}</span>}
-            </td>
-            <td>{r.airedLink ? (
-              <a href={r.airedLink} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>
-                <span className="kt-stamp">AIRED</span>
-              </a>
-            ) : "—"}</td>
+const TableView = ({ rows, onOpen }) => {
+  const [sortKey, setSortKey] = useState(null);
+  const [sortDir, setSortDir] = useState("asc");
+
+  const handleSort = (key) => {
+    if (sortKey === key) {
+      setSortDir(d => d === "asc" ? "desc" : "asc");
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+  };
+
+  const sortedRows = useMemo(() => {
+    if (!sortKey) return rows;
+    return [...rows].sort((a, b) => {
+      let va, vb;
+      if (sortKey === "cost" || sortKey === "adSpend" || sortKey === "revenue" || sortKey === "conversions" || sortKey === "views") {
+        va = Number(a[sortKey]) || 0;
+        vb = Number(b[sortKey]) || 0;
+      } else if (sortKey === "follower") {
+        va = parseFollowers(a.follower);
+        vb = parseFollowers(b.follower);
+      } else {
+        va = (a[sortKey] || "").toLowerCase();
+        vb = (b[sortKey] || "").toLowerCase();
+      }
+      if (va < vb) return sortDir === "asc" ? -1 : 1;
+      if (va > vb) return sortDir === "asc" ? 1 : -1;
+      return 0;
+    });
+  }, [rows, sortKey, sortDir]);
+
+  const SortTh = ({ label, field, style: thStyle }) => {
+    const active = sortKey === field;
+    const icon = !active ? "↕" : sortDir === "asc" ? "▲" : "▼";
+    return (
+      <th
+        onClick={() => handleSort(field)}
+        title={`Sắp xếp theo ${label}`}
+        style={{
+          cursor: "pointer",
+          userSelect: "none",
+          whiteSpace: "nowrap",
+          background: active ? "rgba(160,122,201,0.12)" : undefined,
+          color: active ? "#6B46A8" : undefined,
+          ...thStyle,
+        }}
+      >
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+          {label}
+          <span style={{ fontSize: 9, opacity: active ? 1 : 0.4, letterSpacing: 0 }}>{icon}</span>
+        </span>
+      </th>
+    );
+  };
+
+  return (
+    <div className="kt-scrollbar" style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
+      <table className="kt-table kt-table-sticky">
+        <thead>
+          <tr>
+            <SortTh label="ID" field="id" />
+            <SortTh label="KOL" field="kol" />
+            <SortTh label="Campaign" field="campaign" />
+            <SortTh label="Type" field="type" />
+            <SortTh label="Followers" field="follower" />
+            <SortTh label="Chi phí" field="cost" />
+            <SortTh label="Status" field="statusKey" />
+            <SortTh label="Ngày air" field="ngayAir" />
+            <th>Script</th>
+            <th>Demo</th>
+            <th>Aired</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
-    {rows.length === 0 && (
-      <div style={{ textAlign: "center", padding: "48px 0", color: "var(--ink-soft)" }}>
-        Không có KOL nào phù hợp với bộ lọc.
-      </div>
-    )}
-  </div>
-);
+        </thead>
+        <tbody>
+          {sortedRows.map(r => (
+            <tr key={r.id} onClick={() => onOpen(r)} style={{ cursor: "pointer" }}>
+              <td><span className="kt-mono" style={{ fontSize: 11, color: "var(--ink-soft)" }}>{r.id}</span></td>
+              <td title={r.kol} style={{ maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <div style={{ fontWeight: 600, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis" }}>{r.kol}</div>
+                {r.link && <a href={r.link} target="_blank" rel="noopener noreferrer"
+                  onClick={e => e.stopPropagation()}
+                  style={{ fontSize: 11, color: "var(--ink-soft)" }}>TikTok ↗</a>}
+              </td>
+              <td><CampaignDot campaign={r.campaign} /></td>
+              <td>{r.type && <span className="kt-badge" style={{ background: "var(--paper-bg)", color: "var(--ink-soft)", border: "1px solid var(--line)" }}>{r.type}</span>}</td>
+              <td><span className="kt-mono" style={{ fontSize: 12 }}>{r.follower || "—"}</span></td>
+              <td><span className="kt-mono" style={{ fontSize: 12, color: "var(--ink)" }}>{fmtVND(r.cost)}</span></td>
+              <td><StatusBadge statusKey={r.statusKey} /></td>
+              <td title={r.ngayAir} style={{ fontSize: 12, color: "var(--ink-soft)", maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {r.ngayAir && r.ngayAir.startsWith("http") ? (
+                  <a href={r.ngayAir} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>Link ↗</a>
+                ) : (r.ngayAir || "—")}
+              </td>
+              <td title={r.ngayGuiScript} style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {r.ngayGuiScript && r.ngayGuiScript.startsWith("http") ? (
+                  <a href={r.ngayGuiScript} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>Script ↗</a>
+                ) : <span style={{ fontSize: 12, color: "var(--ink-soft)" }}>{r.ngayGuiScript || "—"}</span>}
+              </td>
+              <td title={r.ngayGuiDemo} style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {r.ngayGuiDemo && r.ngayGuiDemo.startsWith("http") ? (
+                  <a href={r.ngayGuiDemo} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>Demo ↗</a>
+                ) : <span style={{ fontSize: 12, color: "var(--ink-soft)" }}>{r.ngayGuiDemo || "—"}</span>}
+              </td>
+              <td>{r.airedLink ? (
+                <a href={r.airedLink} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>
+                  <span className="kt-stamp">AIRED</span>
+                </a>
+              ) : "—"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {rows.length === 0 && (
+        <div style={{ textAlign: "center", padding: "48px 0", color: "var(--ink-soft)" }}>
+          Không có KOL nào phù hợp với bộ lọc.
+        </div>
+      )}
+    </div>
+  );
+};
+
 
 const KanbanColumn = ({ stage, cards, onOpen, onUpdateStatus }) => {
   const [isOver, setIsOver] = useState(false);
@@ -1905,7 +1993,16 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
   if (!metrics) return null;
 
   // Helper colors for charts
-  const COLOR_PALETTE = ["#FF6B6B", "#4ECDC4", "#45B7D1", "#FFA07A", "#98D8C8", "#F7DC6F", "#BB8FCE"];
+  const COLOR_PALETTE = [
+    "#E07A9A", // Rose petal
+    "#7ABDE0", // Sky blue
+    "#82C98A", // Sage mint
+    "#C9A87A", // Warm sand
+    "#A07AC9", // Lavender
+    "#E0AD62", // Honey gold
+    "#62C4BF", // Teal glass
+    "#E08C7A", // Terracotta
+  ];
 
   // Smart Insights Texts
   const accountInsights = [];
@@ -2763,29 +2860,26 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
                       const er = (Number(r.views) || 0) > 0 ? ((totalEng / r.views) * 100).toFixed(2) + "%" : "0%";
                       const kpiPct = (Number(r.estView) || 0) > 0 ? Math.round((r.views / r.estView) * 100) + "%" : "—";
                       return (
-                        <tr key={r.id}>
+                        <tr key={r.id} onClick={() => onOpenKOL(r)} style={{ cursor: "pointer" }} title="Click để xem chi tiết KOL">
                           <td><strong>{r.kol}</strong></td>
                           <td>{r.campaign}</td>
                           <td>{Number(r.estView) ? Number(r.estView).toLocaleString() : "—"}</td>
                           <td><strong style={{ color: "var(--blue)" }}>{Number(r.views).toLocaleString()}</strong></td>
+                          <td>
                             {(() => {
-                              if (!Number(r.estView)) return "—";
+                              if (!Number(r.estView)) return <span style={{ color: "var(--ink-soft)" }}>—</span>;
                               const pct = Math.round((r.views / r.estView) * 100);
                               let bg = "var(--green-soft)";
                               let fg = "var(--green)";
-                              if (pct < 90) {
-                                bg = "#FEE2E2"; // Soft red
-                                fg = "#EF4444";
-                              } else if (pct < 100) {
-                                bg = "var(--amber-soft)";
-                                fg = "var(--amber)";
-                              }
+                              if (pct < 90) { bg = "#FEE2E2"; fg = "#EF4444"; }
+                              else if (pct < 100) { bg = "var(--amber-soft)"; fg = "var(--amber)"; }
                               return (
                                 <span className="kt-badge" style={{ background: bg, color: fg, border: `1px solid ${fg}`, fontWeight: 700 }}>
                                   {pct}%
                                 </span>
                               );
                             })()}
+                          </td>
                           <td>{er}</td>
                         </tr>
                       );
