@@ -1830,7 +1830,31 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
             {metrics.bottlenecks.length > 0 ? (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
                 {metrics.bottlenecks.map(b => (
-                  <div key={b.key} style={{ padding: 12, borderRadius: 8, background: "var(--amber-soft)", border: "1px solid var(--line)" }}>
+                  <div 
+                    key={b.key} 
+                    onClick={() => setActiveDetail({
+                      title: `KOL đang kẹt ở trạng thái: ${b.label}`,
+                      description: `Danh sách chi tiết các nhà sáng tạo nội dung đang ở bước "${b.label}" cần được kiểm tra hoặc thúc đẩy duyệt kịch bản/demo.`,
+                      columns: [
+                        { key: "kol", label: "KOL" },
+                        { key: "campaign", label: "Chiến dịch" },
+                        { key: "type", label: "Phân loại", render: r => r.type || "Chưa phân loại" },
+                        { key: "cost", label: "Booking Cost", render: r => fmtVND(r.cost) },
+                        { key: "statusKey", label: "Trạng thái", render: r => <StatusBadge statusKey={r.statusKey} /> }
+                      ],
+                      data: activeRows.filter(r => r.statusKey === b.key)
+                    })}
+                    style={{ 
+                      padding: 12, 
+                      borderRadius: 8, 
+                      background: "var(--amber-soft)", 
+                      border: "1px solid var(--line)",
+                      cursor: "pointer",
+                      transition: "all 0.15s ease"
+                    }}
+                    className="kt-stats-card-hover"
+                    title="Click để xem chi tiết"
+                  >
                     <div style={{ fontSize: 10, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>{b.label}</div>
                     <div style={{ fontSize: 18, fontWeight: 700, color: b.color, marginTop: 4 }}>{b.count} KOL đang kẹt</div>
                   </div>
