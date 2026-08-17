@@ -112,26 +112,29 @@ Error generating stack: `+e.message+`
 `;var n=Oy(e,t);return P===void 0||t.type==`string`?n:`ÿþ`+P.utils.encode(1200,n,`str`)}function Ay(e){var t=``,n,r=``;if(e==null||e[`!ref`]==null)return[];var i=ei(e[`!ref`]),a=``,o=[],s,c=[],l=Array.isArray(e);for(s=i.s.c;s<=i.e.c;++s)o[s]=Jr(s);for(var u=i.s.r;u<=i.e.r;++u)for(a=Wr(u),s=i.s.c;s<=i.e.c;++s)if(t=o[s]+a,n=l?(e[u]||[])[s]:e[t],r=``,n!==void 0){if(n.F!=null){if(t=n.F,!n.f)continue;r=n.f,t.indexOf(`:`)==-1&&(t=t+`:`+t)}if(n.f!=null)r=n.f;else if(n.t==`z`)continue;else if(n.t==`n`&&n.v!=null)r=``+n.v;else if(n.t==`b`)r=n.v?`TRUE`:`FALSE`;else if(n.w!==void 0)r=`'`+n.w;else if(n.v===void 0)continue;else r=n.t==`s`?`'`+n.v:``+n.v;c[c.length]=t+`=`+r}return c}function jy(e,t,n){var r=n||{},i=+!r.skipHeader,a=e||{},o=0,s=0;if(a&&r.origin!=null){if(typeof r.origin==`number`)o=r.origin;else{var c=typeof r.origin==`string`?Qr(r.origin):r.origin;o=c.r,s=c.c}}var l,u={s:{c:0,r:0},e:{c:s,r:o+t.length-1+i}};if(a[`!ref`]){var d=ei(a[`!ref`]);u.e.c=Math.max(u.e.c,d.e.c),u.e.r=Math.max(u.e.r,d.e.r),o==-1&&(o=d.e.r+1,u.e.r=o+t.length-1+i)}else o==-1&&(o=0,u.e.r=t.length-1+i);var f=r.header||[],p=0;t.forEach(function(e,t){kt(e).forEach(function(n){(p=f.indexOf(n))==-1&&(f[p=f.length]=n);var c=e[n],u=`z`,d=``,m=J({c:s+p,r:o+t+i});l=Ny(a,m),c&&typeof c==`object`&&!(c instanceof Date)?a[m]=c:(typeof c==`number`?u=`n`:typeof c==`boolean`?u=`b`:typeof c==`string`?u=`s`:c instanceof Date?(u=`d`,r.cellDates||(u=`n`,c=Ft(c)),d=r.dateNF||V[14]):c===null&&r.nullError&&(u=`e`,c=0),l?(l.t=u,l.v=c,delete l.w,delete l.R,d&&(l.z=d)):a[m]=l={t:u,v:c},d&&(l.z=d))})}),u.e.c=Math.max(u.e.c,s+f.length-1);var m=Wr(o);if(i)for(p=0;p<f.length;++p)a[Jr(p+s)+m]={t:`s`,v:f[p]};return a[`!ref`]=Y(u),a}function My(e,t){return jy(null,e,t)}function Ny(e,t,n){if(typeof t==`string`){if(Array.isArray(e)){var r=Qr(t);return e[r.r]||(e[r.r]=[]),e[r.r][r.c]||(e[r.r][r.c]={t:`z`})}return e[t]||(e[t]={t:`z`})}return typeof t==`number`?Ny(e,J({r:t,c:n||0})):Ny(e,J(t))}function Py(e,t){if(typeof t==`number`){if(t>=0&&e.SheetNames.length>t)return t;throw Error(`Cannot find sheet # `+t)}if(typeof t==`string`){var n=e.SheetNames.indexOf(t);if(n>-1)return n;throw Error(`Cannot find sheet name |`+t+`|`)}throw Error(`Cannot find sheet |`+t+`|`)}function Fy(){return{SheetNames:[],Sheets:{}}}function Iy(e,t,n,r){var i=1;if(!n)for(;i<=65535&&e.SheetNames.indexOf(n=`Sheet`+i)!=-1;++i,n=void 0);if(!n||e.SheetNames.length>=65535)throw Error(`Too many worksheets`);if(r&&e.SheetNames.indexOf(n)>=0){var a=n.match(/(^.*?)(\d+)$/);i=a&&+a[2]||0;var o=a&&a[1]||n;for(++i;i<=65535&&e.SheetNames.indexOf(n=o+i)!=-1;++i);}if(sg(n),e.SheetNames.indexOf(n)>=0)throw Error(`Worksheet with name |`+n+`| already exists!`);return e.SheetNames.push(n),e.Sheets[n]=t,n}function Ly(e,t,n){e.Workbook||={},e.Workbook.Sheets||(e.Workbook.Sheets=[]);var r=Py(e,t);switch(e.Workbook.Sheets[r]||(e.Workbook.Sheets[r]={}),n){case 0:case 1:case 2:break;default:throw Error(`Bad sheet visibility setting `+n)}e.Workbook.Sheets[r].Hidden=n}function Ry(e,t){return e.z=t,e}function zy(e,t,n){return t?(e.l={Target:t},n&&(e.l.Tooltip=n)):delete e.l,e}function By(e,t,n){return zy(e,`#`+t,n)}function Vy(e,t,n){e.c||=[],e.c.push({t,a:n||`SheetJS`})}function Hy(e,t,n,r){for(var i=typeof t==`string`?ei(t):t,a=typeof t==`string`?t:Y(t),o=i.s.r;o<=i.e.r;++o)for(var s=i.s.c;s<=i.e.c;++s){var c=Ny(e,o,s);c.t=`n`,c.F=a,delete c.v,o==i.s.r&&s==i.s.c&&(c.f=n,r&&(c.D=!0))}return e}var Uy={encode_col:Jr,encode_row:Wr,encode_cell:J,encode_range:Y,decode_col:qr,decode_row:Ur,split_cell:Zr,decode_cell:Qr,decode_range:$r,format_cell:ni,sheet_add_aoa:ii,sheet_add_json:jy,sheet_add_dom:$_,aoa_to_sheet:ai,json_to_sheet:My,table_to_sheet:ev,table_to_book:tv,sheet_to_csv:Oy,sheet_to_txt:ky,sheet_to_json:Ty,sheet_to_html:Q_,sheet_to_formulae:Ay,sheet_to_row_object_array:Ty,sheet_get_cell:Ny,book_new:Fy,book_append_sheet:Iy,book_set_sheet_visibility:Ly,cell_set_number_format:Ry,cell_set_hyperlink:zy,cell_set_internal_link:By,cell_add_comment:Vy,sheet_set_array_formula:Hy,consts:{SHEET_VISIBLE:0,SHEET_HIDDEN:1,SHEET_VERY_HIDDEN:2}};y.version;var Wy=o((e=>{var t=Symbol.for(`react.transitional.element`);function n(e,n,r){var i=null;if(r!==void 0&&(i=``+r),n.key!==void 0&&(i=``+n.key),`key`in n)for(var a in r={},n)a!==`key`&&(r[a]=n[a]);else r=n;return n=r.ref,{$$typeof:t,type:e,key:i,ref:n===void 0?null:n,props:r}}e.jsx=n,e.jsxs=n})),Z=o(((e,t)=>{t.exports=Wy()}))(),Gy=()=>(0,Z.jsx)(`style`,{children:`
     @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
 
-    /* ── DESIGN TOKENS: Analog Studio ── */
+    /* ── DESIGN TOKENS: Bubbly Mint Pastel ── */
     .kt-root {
-      --ink:        #1C0A09;
-      --ink-mid:    #5C2B28;
-      --ink-soft:   #9E6B68;
-      --ink-faint:  #C9A8A5;
-      --paper:      #FDF3F0;
+      --ink:        #1A332E;
+      --ink-mid:    #2E5048;
+      --ink-soft:   #4B6E66;
+      --ink-faint:  #92B0A9;
+      --paper:      #F0F7F5;
       --card:       #FFFFFF;
-      --rule:       #ECD8D4;
-      --accent:     #E8566A;
-      --accent-dim: #F5BDC4;
-      --accent-bg:  #FFF0F2;
-      --ok:         #2A6B45;
-      --ok-bg:      #EBF7F1;
-      --warn:       #956B00;
-      --warn-bg:    #FEF8E7;
-      --danger:     #B52B1C;
-      --danger-bg:  #FEF0EE;
-      --blue:       #1B4F8A;
-      --blue-bg:    #EBF2FB;
+      --rule:       #D3E6E1;
+      --accent:     #3DBA9C;
+      --accent-dim: #A8E4D5;
+      --accent-bg:  #EAFCF8;
+      --red-soft:   #EAFCF8;
+      --pink:       #EA6B7E;
+      --pink-soft:  #FFDBED;
+      --ok:         #15803D;
+      --ok-bg:      #DCFCE7;
+      --warn:       #D97706;
+      --warn-bg:    #FEF3C7;
+      --danger:     #DC2626;
+      --danger-bg:  #FEE2E2;
+      --blue:       #2563EB;
+      --blue-bg:    #DBEAFE;
 
       font-family: 'Be Vietnam Pro', sans-serif;
       font-size: 14px;
@@ -156,25 +159,67 @@ Error generating stack: `+e.message+`
 
     /* ── SCROLLBAR ── */
     .kt-scrollbar::-webkit-scrollbar       { height: 5px; width: 5px; }
-    .kt-scrollbar::-webkit-scrollbar-thumb { background: var(--accent-dim); border-radius: 0; }
+    .kt-scrollbar::-webkit-scrollbar-thumb { background: var(--accent-dim); border-radius: 10px; }
     .kt-scrollbar::-webkit-scrollbar-track { background: transparent; }
 
-    /* ── CARDS: flat, left-accent, sharp corners ── */
+    /* ── BACKGROUND BLOBS ── */
+    .kt-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      z-index: 0;
+      opacity: 0.15;
+      pointer-events: none;
+      animation: kt-blob-move 20s infinite alternate ease-in-out;
+    }
+    .kt-blob-1 {
+      width: 400px;
+      height: 400px;
+      background: var(--accent);
+      top: -100px;
+      left: -100px;
+    }
+    .kt-blob-2 {
+      width: 500px;
+      height: 500px;
+      background: var(--blue);
+      bottom: -150px;
+      right: -150px;
+      animation-delay: -5s;
+      animation-duration: 25s;
+    }
+    .kt-blob-3 {
+      width: 300px;
+      height: 300px;
+      background: var(--warn);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation-delay: -10s;
+      animation-duration: 30s;
+    }
+    @keyframes kt-blob-move {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(80px, -50px) scale(1.1); }
+      100% { transform: translate(-40px, 60px) scale(0.9); }
+    }
+
+    /* ── CARDS: bubbly ── */
     .kt-card {
       background: var(--card);
       border: 1px solid var(--rule);
-      border-radius: 0;
+      border-radius: 20px;
       border-left: 3px solid var(--accent);
     }
     .kt-card-neutral {
       background: var(--card);
       border: 1px solid var(--rule);
-      border-radius: 0;
+      border-radius: 20px;
     }
     .kt-glass {
       background: var(--card);
       border: 1px solid var(--rule);
-      border-radius: 0;
+      border-radius: 20px;
     }
 
     /* ── TICKET (kanban card) ── */
@@ -183,7 +228,7 @@ Error generating stack: `+e.message+`
       background: var(--card);
       border: 1px solid var(--rule);
       border-left: 3px solid var(--accent);
-      border-radius: 0;
+      border-radius: 12px;
       box-shadow: none;
     }
     .kt-ticket .kt-perf {
@@ -213,7 +258,7 @@ Error generating stack: `+e.message+`
       font-weight: 600;
       letter-spacing: 0.1em;
       padding: 1px 7px;
-      border-radius: 2px;
+      border-radius: 12px;
       font-size: 10px;
       text-transform: uppercase;
     }
@@ -223,7 +268,7 @@ Error generating stack: `+e.message+`
     .kt-tooltip {
       visibility: hidden; width: 240px;
       background: var(--ink); color: #fff;
-      text-align: left; border-radius: 3px;
+      text-align: left; border-radius: 12px;
       padding: 10px 12px; position: absolute;
       z-index: 1000; bottom: 125%; left: 50%;
       transform: translateX(-50%);
@@ -244,7 +289,7 @@ Error generating stack: `+e.message+`
     /* ── BUTTONS ── */
     .kt-btn {
       font-family: 'Be Vietnam Pro', sans-serif;
-      font-weight: 600; border-radius: 2px;
+      font-weight: 600; border-radius: 24px;
       padding: 7px 14px; font-size: 12px;
       cursor: pointer; border: 1px solid transparent;
       transition: all 0.14s ease;
@@ -254,12 +299,12 @@ Error generating stack: `+e.message+`
     .kt-btn-primary {
       background: var(--accent); color: #fff;
       border-color: var(--accent);
-      box-shadow: 3px 3px 0 var(--ink-mid);
+      box-shadow: 0 4px 12px rgba(61, 186, 156, 0.2);
     }
     .kt-btn-primary:hover {
-      background: #D0455A; border-color: #D0455A;
-      box-shadow: 1px 1px 0 var(--ink-mid);
-      transform: translate(2px,2px);
+      background: #2b9d82; border-color: #2b9d82;
+      box-shadow: 0 6px 20px rgba(61, 186, 156, 0.3);
+      transform: translateY(-1px);
     }
     .kt-btn-ghost {
       background: transparent; color: var(--ink);
@@ -290,7 +335,7 @@ Error generating stack: `+e.message+`
       background: var(--card);
       border: 1px solid var(--rule);
       border-bottom: 2px solid var(--ink-faint);
-      border-radius: 0;
+      border-radius: 12px;
       padding: 7px 10px;
       font-size: 13px;
       color: var(--ink);
@@ -309,7 +354,7 @@ Error generating stack: `+e.message+`
     }
     .kt-badge {
       font-size: 10px; font-weight: 700;
-      padding: 2px 7px; border-radius: 1px;
+      padding: 2px 7px; border-radius: 12px;
       white-space: nowrap; display: inline-block;
       letter-spacing: 0.03em;
     }
@@ -369,7 +414,7 @@ Error generating stack: `+e.message+`
     /* ── MODAL ── */
     .kt-overlay {
       position: fixed; inset: 0;
-      background: rgba(28,10,9,0.55);
+      background: rgba(26,51,46,0.55);
       backdrop-filter: blur(2px);
       z-index: 100;
       display: flex; align-items: center; justify-content: center;
@@ -378,18 +423,18 @@ Error generating stack: `+e.message+`
 
     .kt-modal {
       background: var(--card);
-      border-radius: 14px;
+      border-radius: 24px;
       width: 100%;
       max-width: 700px;
       max-height: 90vh;
       overflow-y: auto;
-      box-shadow: 0 24px 64px rgba(0,28,68,0.18);
+      box-shadow: 0 24px 64px rgba(26,51,46,0.18);
     }
 
     /* Table */
     .kt-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
     .kt-table th {
-      background: #F5E6E3;
+      background: var(--accent-bg);
       border-bottom: 2px solid var(--ink-mid);
       padding: 10px 12px;
       text-align: left;
@@ -404,20 +449,20 @@ Error generating stack: `+e.message+`
       position: sticky;
       top: 0;
       z-index: 10;
-      background: #F5E6E3;
+      background: var(--accent-bg);
       border-bottom: 2px solid var(--ink-mid) !important;
     }
     .kt-table-sticky th:first-child {
-      border-top-left-radius: 2px;
+      border-top-left-radius: 12px;
     }
     .kt-table-sticky th:last-child {
-      border-top-right-radius: 2px;
+      border-top-right-radius: 12px;
     }
     .kt-table-sticky-modal th {
       position: sticky;
       top: 0;
       z-index: 10;
-      background: #F5E6E3;
+      background: var(--accent-bg);
       box-shadow: inset 0 -2px 0 var(--ink-mid);
     }
     .kt-table td {
@@ -435,12 +480,12 @@ Error generating stack: `+e.message+`
     .kt-kanban-card {
       background: var(--card);
       border: 1px solid var(--line);
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 12px 14px;
       cursor: pointer;
       transition: box-shadow 0.15s, transform 0.15s;
     }
-    .kt-kanban-card:hover { box-shadow: 0 4px 16px rgba(0,28,68,0.10); transform: translateY(-2px); }
+    .kt-kanban-card:hover { box-shadow: 0 4px 16px rgba(61,186,156,0.15); transform: translateY(-2px); }
 
     @media (prefers-reduced-motion: reduce) {
       .kt-anim { animation: none; }
