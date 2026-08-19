@@ -4,36 +4,38 @@ import * as XLSX from "xlsx";
 /* ---------------- Design tokens (injected via <style>) ---------------- */
 const GlobalStyle = () => (
   <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
-    /* ── DESIGN TOKENS: Analog Studio ── */
+    /* ── DESIGN TOKENS: Serene Lavender & Linen Minimalism ── */
     .kt-root {
-      --ink:        #1C0A09;
-      --ink-mid:    #5C2B28;
-      --ink-soft:   #9E6B68;
-      --ink-faint:  #C9A8A5;
-      --paper:      #FDF3F0;
-      --card:       #FFFFFF;
-      --rule:       #ECD8D4;
-      --accent:     #E8566A;
-      --accent-dim: #F5BDC4;
-      --accent-bg:  #FFF0F2;
-      --ok:         #2A6B45;
-      --ok-bg:      #EBF7F1;
-      --warn:       #956B00;
-      --warn-bg:    #FEF8E7;
-      --danger:     #B52B1C;
-      --danger-bg:  #FEF0EE;
-      --blue:       #1B4F8A;
-      --blue-bg:    #EBF2FB;
+      --ink:        #231F34; /* Deep charcoal lavender */
+      --ink-mid:    #544D76; /* Dusky violet */
+      --ink-soft:   #8B84B2; /* Muted lavender grey */
+      --ink-faint:  #CDC9DC; /* Soft grey wash */
+      --paper:      #F5F3FA; /* Pearled cream/lilac linen background */
+      --card:       #FFFFFF; /* Pure white cards */
+      --rule:       #E4E1EE; /* Delicate border rule */
+      --line:       #E4E1EE;
+      --accent:     #8A7BFF; /* Serene Lavender Lilac */
+      --accent-dim: #CDCAFF; /* Soft Lavender purple */
+      --accent-bg:  #F4F2FF; /* Serene light lilac wash */
+      
+      --ok:         #34A885; /* Soft mint green */
+      --ok-bg:      #EEF8F5; /* Thin mint wash */
+      --warn:       #D97706; /* Soft apricot amber */
+      --warn-bg:    #FFFBEB; /* Thin amber wash */
+      --danger:     #E15252; /* Soft pastel red */
+      --danger-bg:  #FFF5F5; /* Thin red wash */
+      --blue:       #4F83E1; /* Soft periwinkle blue */
+      --blue-bg:    #F0F4FF; /* Thin blue wash */
 
-      font-family: 'Be Vietnam Pro', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       font-size: 14px;
       color: var(--ink);
       background-color: var(--paper);
 
-      /* CSS noise texture — no external image */
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+      /* Subtly textured background grain */
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E");
       background-size: 180px 180px;
 
       display: flex;
@@ -42,43 +44,49 @@ const GlobalStyle = () => (
       overflow: hidden;
     }
     .kt-root input, .kt-root select, .kt-root button, .kt-root textarea {
-      font-family: 'Be Vietnam Pro', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
     }
-    .kt-serif  { font-family: 'Playfair Display', Georgia, serif; }
+    .kt-serif  { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; letter-spacing: -0.02em; }
     .kt-mono   { font-family: 'IBM Plex Mono', monospace; }
-    .kt-caps   { text-transform: uppercase; letter-spacing: 0.09em; font-size: 0.72em; font-weight: 700; }
+    .kt-caps   { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.72em; font-weight: 700; }
 
     /* ── SCROLLBAR ── */
-    .kt-scrollbar::-webkit-scrollbar       { height: 5px; width: 5px; }
-    .kt-scrollbar::-webkit-scrollbar-thumb { background: var(--accent-dim); border-radius: 0; }
+    .kt-scrollbar::-webkit-scrollbar       { height: 6px; width: 6px; }
+    .kt-scrollbar::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 4px; }
     .kt-scrollbar::-webkit-scrollbar-track { background: transparent; }
 
-    /* ── CARDS: flat, left-accent, sharp corners ── */
+    /* ── CARDS: Soft rounded corners, clean border, no heavy outline ── */
     .kt-card {
       background: var(--card);
       border: 1px solid var(--rule);
-      border-radius: 0;
-      border-left: 3px solid var(--accent);
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(72, 67, 92, 0.015);
     }
     .kt-card-neutral {
       background: var(--card);
       border: 1px solid var(--rule);
-      border-radius: 0;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(72, 67, 92, 0.015);
     }
     .kt-glass {
       background: var(--card);
       border: 1px solid var(--rule);
-      border-radius: 0;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(72, 67, 92, 0.015);
     }
 
-    /* ── TICKET (kanban card) ── */
+    /* ── KANBAN TICKET ── */
     .kt-ticket {
       position: relative;
       background: var(--card);
       border: 1px solid var(--rule);
-      border-left: 3px solid var(--accent);
-      border-radius: 0;
-      box-shadow: none;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(72, 67, 92, 0.01);
+      transition: all 0.2s ease;
+    }
+    .kt-ticket:hover {
+      border-color: var(--accent-dim);
+      box-shadow: 0 6px 16px rgba(138, 123, 255, 0.06);
     }
     .kt-ticket .kt-perf {
       position: relative;
@@ -100,16 +108,17 @@ const GlobalStyle = () => (
     /* ── STAMP ── */
     .kt-stamp {
       display: inline-block;
-      transform: rotate(-4deg);
+      transform: rotate(-3deg);
       border: 1.5px solid var(--ok);
       color: var(--ok);
       font-family: 'IBM Plex Mono', monospace;
       font-weight: 600;
-      letter-spacing: 0.1em;
-      padding: 1px 7px;
-      border-radius: 2px;
+      letter-spacing: 0.08em;
+      padding: 2px 8px;
+      border-radius: 6px;
       font-size: 10px;
       text-transform: uppercase;
+      background: var(--ok-bg);
     }
 
     /* ── TOOLTIP ── */
@@ -117,13 +126,13 @@ const GlobalStyle = () => (
     .kt-tooltip {
       visibility: hidden; width: 240px;
       background: var(--ink); color: #fff;
-      text-align: left; border-radius: 3px;
+      text-align: left; border-radius: 8px;
       padding: 10px 12px; position: absolute;
       z-index: 1000; bottom: 125%; left: 50%;
       transform: translateX(-50%);
       opacity: 0; transition: opacity 0.15s ease;
       font-size: 11px; line-height: 1.5; font-weight: 400;
-      box-shadow: 4px 4px 0 rgba(0,0,0,0.12);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
       border: 1px solid var(--ink-mid); pointer-events: none;
       white-space: normal; text-transform: none; letter-spacing: normal;
     }
@@ -137,23 +146,22 @@ const GlobalStyle = () => (
 
     /* ── BUTTONS ── */
     .kt-btn {
-      font-family: 'Be Vietnam Pro', sans-serif;
-      font-weight: 600; border-radius: 2px;
-      padding: 7px 14px; font-size: 12px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700; border-radius: 12px;
+      padding: 8px 16px; font-size: 12px;
       cursor: pointer; border: 1px solid transparent;
-      transition: all 0.14s ease;
+      transition: all 0.2s ease;
       display: inline-flex; align-items: center; gap: 6px;
-      white-space: nowrap; letter-spacing: 0.01em;
+      white-space: nowrap; letter-spacing: -0.01em;
     }
     .kt-btn-primary {
       background: var(--accent); color: #fff;
       border-color: var(--accent);
-      box-shadow: 3px 3px 0 var(--ink-mid);
     }
     .kt-btn-primary:hover {
-      background: #D0455A; border-color: #D0455A;
-      box-shadow: 1px 1px 0 var(--ink-mid);
-      transform: translate(2px,2px);
+      background: #7362E3; border-color: #7362E3;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(138, 123, 255, 0.25);
     }
     .kt-btn-ghost {
       background: transparent; color: var(--ink);
@@ -161,135 +169,89 @@ const GlobalStyle = () => (
     }
     .kt-btn-ghost:hover { background: var(--accent-bg); border-color: var(--accent-dim); }
     .kt-btn-ghost.active {
-      background: var(--ink); color: #fff; border-color: var(--ink);
+      background: var(--accent); color: #fff; border-color: var(--accent);
     }
-    .kt-btn-danger { background: var(--danger-bg); color: var(--danger); border-color: var(--accent-dim); }
-    .kt-btn-danger:hover { background: #FDDAD6; }
-
-    /* ── STAT CARD HOVER ── */
-    .kt-stats-card-hover {
-      cursor: pointer;
-      transition: all 0.16s ease;
-      user-select: none;
-    }
-    .kt-stats-card-hover:hover {
-      border-left-color: var(--accent) !important;
-      background: var(--accent-bg) !important;
-    }
-    .kt-stats-card-hover:active { transform: translateY(1px); }
+    .kt-btn-danger { background: var(--danger-bg); color: var(--danger); border-color: var(--danger-bg); }
+    .kt-btn-danger:hover { background: #FCDEDE; }
 
     /* ── FORM ELEMENTS ── */
     .kt-input, .kt-select, .kt-textarea {
-      font-family: 'Be Vietnam Pro', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       background: var(--card);
       border: 1px solid var(--rule);
-      border-bottom: 2px solid var(--ink-faint);
-      border-radius: 0;
-      padding: 7px 10px;
+      border-radius: 10px;
+      padding: 8px 12px;
       font-size: 13px;
       color: var(--ink);
       width: 100%;
       outline: none;
-      transition: border-color 0.15s;
+      transition: all 0.2s;
     }
     .kt-input:focus, .kt-select:focus, .kt-textarea:focus {
-      border-bottom-color: var(--accent);
-      background: var(--accent-bg);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-bg);
+      background: var(--card);
     }
     .kt-label {
       font-size: 10px; font-weight: 700; color: var(--ink-soft);
-      text-transform: uppercase; letter-spacing: 0.09em;
+      text-transform: uppercase; letter-spacing: 0.08em;
       margin-bottom: 4px; display: block;
     }
     .kt-badge {
       font-size: 10px; font-weight: 700;
-      padding: 2px 7px; border-radius: 1px;
+      padding: 3px 8px; border-radius: 6px;
       white-space: nowrap; display: inline-block;
-      letter-spacing: 0.03em;
+      letter-spacing: 0.02em;
     }
 
-    /* ── ANIMATIONS ── */
-
-    /* Curtain reveal — slides in from left edge */
-    @keyframes kt-curtain {
-      from { clip-path: inset(0 100% 0 0); }
-      to   { clip-path: inset(0 0% 0 0); }
-    }
-    .kt-anim { animation: kt-curtain 0.38s cubic-bezier(0.77,0,0.18,1) both; }
-
-    /* Slot machine roll-up for numbers */
-    @keyframes kt-roll {
-      0%   { transform: translateY(60%); opacity: 0; }
-      60%  { transform: translateY(-6%);  opacity: 1; }
-      100% { transform: translateY(0);    opacity: 1; }
-    }
-    .kt-slide-up { animation: kt-roll 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
-
-    /* Ruled line scan — horizontal sweep on table rows */
-    @keyframes kt-scan {
-      from { opacity: 0; transform: translateY(4px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .kt-table tbody tr { animation: kt-scan 0.22s ease both; }
-    .kt-table tbody tr:nth-child(1)    { animation-delay: 0.00s; }
-    .kt-table tbody tr:nth-child(2)    { animation-delay: 0.03s; }
-    .kt-table tbody tr:nth-child(3)    { animation-delay: 0.06s; }
-    .kt-table tbody tr:nth-child(4)    { animation-delay: 0.09s; }
-    .kt-table tbody tr:nth-child(5)    { animation-delay: 0.12s; }
-    .kt-table tbody tr:nth-child(6)    { animation-delay: 0.15s; }
-    .kt-table tbody tr:nth-child(7)    { animation-delay: 0.18s; }
-    .kt-table tbody tr:nth-child(8)    { animation-delay: 0.21s; }
-    .kt-table tbody tr:nth-child(9)    { animation-delay: 0.24s; }
-    .kt-table tbody tr:nth-child(10)   { animation-delay: 0.27s; }
-    .kt-table tbody tr:nth-child(n+11) { animation-delay: 0.30s; }
-
-    /* Thin underline indicator for active nav */
-    @keyframes kt-underline {
-      from { transform: scaleX(0); }
-      to   { transform: scaleX(1); }
-    }
-
-    /* Bar chart grow */
-    @keyframes kt-bar-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-    .kt-bar-anim { transform-origin: left; animation: kt-bar-grow 0.65s cubic-bezier(0.77,0,0.18,1) both; }
-
-    /* ── KANBAN ── */
+    /* ── KANBAN & INTERACTIVE TRANSITIONS ── */
     .kt-kanban-col {
-      min-width: 260px; max-width: 260px;
+      min-width: 280px; max-width: 280px;
       display: flex; flex-direction: column;
       max-height: calc(100vh - 280px);
     }
 
-    /* ── MODAL ── */
+    /* ── OVERLAY & MODAL ── */
     .kt-overlay {
       position: fixed; inset: 0;
-      background: rgba(28,10,9,0.55);
-      backdrop-filter: blur(2px);
+      background: rgba(35, 31, 52, 0.4);
+      backdrop-filter: blur(4px);
       z-index: 100;
       display: flex; align-items: center; justify-content: center;
       padding: 16px;
+      animation: kt-fade-in 0.25s ease;
+    }
+    @keyframes kt-fade-in {
+      from { opacity: 0; }
+      to   { opacity: 1; }
     }
 
     .kt-modal {
       background: var(--card);
-      border-radius: 14px;
+      border-radius: 20px;
       width: 100%;
       max-width: 700px;
       max-height: 90vh;
       overflow-y: auto;
-      box-shadow: 0 24px 64px rgba(0,28,68,0.18);
+      box-shadow: 0 20px 50px rgba(26, 22, 37, 0.05);
+      border: 1px solid var(--rule);
+      animation: kt-modal-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes kt-modal-pop {
+      from { transform: scale(0.95); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
     }
 
-    /* Table */
+    /* Table styling */
     .kt-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
     .kt-table th {
-      background: #F5E6E3;
-      border-bottom: 2px solid var(--ink-mid);
-      padding: 10px 12px;
+      background: var(--paper);
+      border-bottom: 1px solid var(--rule);
+      padding: 12px 14px;
       text-align: left;
       font-size: 11px;
       font-weight: 700;
-      color: var(--ink);
+      color: var(--ink-soft);
       text-transform: uppercase;
       letter-spacing: 0.04em;
       white-space: nowrap;
@@ -298,43 +260,48 @@ const GlobalStyle = () => (
       position: sticky;
       top: 0;
       z-index: 10;
-      background: #F5E6E3;
-      border-bottom: 2px solid var(--ink-mid) !important;
+      background: var(--paper);
+      border-bottom: 1px solid var(--rule) !important;
     }
     .kt-table-sticky th:first-child {
-      border-top-left-radius: 2px;
+      border-top-left-radius: 12px;
     }
     .kt-table-sticky th:last-child {
-      border-top-right-radius: 2px;
+      border-top-right-radius: 12px;
     }
     .kt-table-sticky-modal th {
       position: sticky;
       top: 0;
       z-index: 10;
-      background: #F5E6E3;
-      box-shadow: inset 0 -2px 0 var(--ink-mid);
+      background: var(--paper);
+      box-shadow: inset 0 -1px 0 var(--rule);
     }
     .kt-table td {
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--line);
-      vertical-align: top;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--rule);
+      vertical-align: middle;
       line-height: 1.45;
     }
     .kt-table tr:last-child td { border-bottom: none; }
-    .kt-table tr:hover td { background: var(--red-soft); }
-    .kt-table a { color: var(--blue); text-decoration: none; word-break: break-all; }
+    .kt-table tr:hover td { background: var(--accent-bg); }
+    .kt-table a { color: var(--accent); text-decoration: none; word-break: break-all; }
     .kt-table a:hover { text-decoration: underline; }
 
-    /* Kanban */
+    /* Kanban Card */
     .kt-kanban-card {
       background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 12px 14px;
+      border: 1px solid var(--rule);
+      border-radius: 12px;
+      padding: 14px;
       cursor: pointer;
-      transition: box-shadow 0.15s, transform 0.15s;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(72, 67, 92, 0.01);
     }
-    .kt-kanban-card:hover { box-shadow: 0 4px 16px rgba(0,28,68,0.10); transform: translateY(-2px); }
+    .kt-kanban-card:hover {
+      box-shadow: 0 6px 20px rgba(138, 123, 255, 0.08);
+      border-color: var(--accent-dim);
+      transform: translateY(-2px);
+    }
 
     @media (prefers-reduced-motion: reduce) {
       .kt-anim { animation: none; }
@@ -342,59 +309,106 @@ const GlobalStyle = () => (
     }
   `}</style>
 );
-
 /* ---------------- Domain constants ---------------- */
 const CAMPAIGNS = [
-  { key: "AM", label: "AM · Ajimayo", color: "#432F2E" },
-  { key: "AX", label: "AX · Aji-Xốt", color: "#2A688C" },
-  { key: "Vinegar", label: "Vinegar · Giấm", color: "#6C8542" },
-  { key: "MSG", label: "MSG · Bột ngọt", color: "#B58428" },
-  { key: "Blendy", label: "Blendy", color: "#875545" },
+  { key: "AM", label: "Campaign A", color: "#FFAFA3" },
+  { key: "AX", label: "Campaign B", color: "#A2C2E8" },
+  { key: "Vinegar", label: "Campaign C", color: "#A8C3A0" },
+  { key: "MSG", label: "Campaign D", color: "#FFD175" },
+  { key: "Blendy", label: "Campaign E", color: "#C7B1E6" },
 ];
 const CAMPAIGN_COLOR = Object.fromEntries(CAMPAIGNS.map(c => [c.key, c.color]));
+const CAMPAIGN_LABELS = Object.fromEntries(CAMPAIGNS.map(c => [c.key, c.label]));
 
 const normalizeCampaignKey = (sheetName) => {
   if (!sheetName) return "";
   const name = sheetName.toString().toLowerCase().trim();
-  if (name.includes("mayo") || name === "am") return "AM";
-  if (name.includes("xốt") || name === "ax") return "AX";
-  if (name.includes("giấm") || name.includes("vinegar") || name === "giấm_fy25") return "Vinegar";
-  if (name.includes("msg") || name.includes("bột ngọt") || name.includes("mì chính")) return "MSG";
-  if (name.includes("blendy")) return "Blendy";
+  if (name.includes("mayo") || name === "am" || name.includes("campaign a") || name.includes("campaign_a")) return "AM";
+  if (name.includes("xốt") || name === "ax" || name.includes("campaign b") || name.includes("campaign_b")) return "AX";
+  if (name.includes("giấm") || name.includes("vinegar") || name === "giấm_fy25" || name.includes("campaign c") || name.includes("campaign_c")) return "Vinegar";
+  if (name.includes("msg") || name.includes("bột ngọt") || name.includes("mì chính") || name.includes("campaign d") || name.includes("campaign_d")) return "MSG";
+  if (name.includes("blendy") || name.includes("campaign e") || name.includes("campaign_e")) return "Blendy";
   return sheetName;
 };
 
+const resolveCampaignKey = (row) => {
+  if (!row) return "";
+  if (row.campaign) return normalizeCampaignKey(row.campaign);
+  if (row.__sheet__) return normalizeCampaignKey(row.__sheet__);
+  return "";
+};
+
 const STATUS_STAGES = [
-  { key: "waiting_food",   label: "Chờ duyệt món ăn",   color: "#C97B58", soft: "#F8DAD0" },
-  { key: "waiting_script", label: "Chờ duyệt script",   color: "#7C5C74", soft: "#EDE0E7" },
-  { key: "doing_demo",     label: "Đang làm demo",       color: "#0C5776", soft: "#DCEEF1" },
-  { key: "waiting_demo",   label: "Chờ duyệt demo",      color: "#C97B58", soft: "#F8DAD0" },
-  { key: "revised_demo",   label: "Demo đã chỉnh sửa",   color: "#7C5C74", soft: "#EDE0E7" },
-  { key: "confirmed_demo", label: "Demo đã duyệt",       color: "#2D7D46", soft: "#DCFCE7" },
-  { key: "aired",          label: "Đã lên sóng",         color: "#2D99AE", soft: "#DFF7F6" },
+  { key: "waiting_food",   label: "Chờ duyệt món ăn",   color: "#E28B65", soft: "#FAF0EB" },
+  { key: "waiting_script", label: "Chờ duyệt script",   color: "#B284A3", soft: "#FAF0F6" },
+  { key: "doing_demo",     label: "Đang làm demo",       color: "#5E9BE2", soft: "#EBF3FC" },
+  { key: "waiting_demo",   label: "Chờ duyệt demo",      color: "#E28B65", soft: "#FAF0EB" },
+  { key: "revised_demo",   label: "Demo đã chỉnh sửa",   color: "#B284A3", soft: "#FAF0F6" },
+  { key: "confirmed_demo", label: "Demo đã duyệt",       color: "#47B39C", soft: "#EBF8F5" },
+  { key: "aired",          label: "Đã lên sóng",         color: "#8A7BFF", soft: "#F4F2FF" },
 ];
 const STATUS_MAP = Object.fromEntries(STATUS_STAGES.map(s => [s.key, s]));
 // reverse: label → key  (also accept key directly)
 const STATUS_LABEL_TO_KEY = Object.fromEntries([
   ...STATUS_STAGES.map(s => [s.label.toLowerCase(), s.key]),
   ...STATUS_STAGES.map(s => [s.key.toLowerCase(), s.key]),
-  // common aliases
+  // common aliases for aired (đã lên sóng)
   ["aired", "aired"],
   ["đã lên sóng", "aired"],
+  ["da len song", "aired"],
+  ["lên sóng", "aired"],
+  ["len song", "aired"],
+  ["air", "aired"],
+  ["đã đăng", "aired"],
+  ["da dang", "aired"],
+  ["đã air", "aired"],
+  ["da air", "aired"],
+  ["done", "aired"],
+  ["hoàn thành", "aired"],
+  ["hoan thanh", "aired"],
+  // common aliases for waiting_script (chờ duyệt script)
   ["chờ duyệt script", "waiting_script"],
+  ["cho duyet script", "waiting_script"],
   ["waiting script", "waiting_script"],
-  ["waiting feedback script", "waiting_script"],
+  ["script", "waiting_script"],
+  ["duyệt script", "waiting_script"],
+  ["duyet script", "waiting_script"],
+  // common aliases for doing_demo (đang làm demo)
   ["đang làm demo", "doing_demo"],
+  ["dang lam demo", "doing_demo"],
   ["doing demo", "doing_demo"],
+  ["làm demo", "doing_demo"],
+  ["lam demo", "doing_demo"],
+  ["quay clip", "doing_demo"],
+  ["quay video", "doing_demo"],
+  ["làm clip", "doing_demo"],
+  // common aliases for waiting_demo (chờ duyệt demo)
   ["chờ duyệt demo", "waiting_demo"],
+  ["cho duyet demo", "waiting_demo"],
   ["waiting demo", "waiting_demo"],
-  ["waiting feedback demo", "waiting_demo"],
+  ["duyệt demo", "waiting_demo"],
+  ["duyet demo", "waiting_demo"],
+  ["feedback demo", "waiting_demo"],
+  // common aliases for revised_demo (demo đã chỉnh sửa)
   ["demo đã chỉnh sửa", "revised_demo"],
+  ["demo da chinh sua", "revised_demo"],
   ["revised demo", "revised_demo"],
+  ["sửa demo", "revised_demo"],
+  ["sua demo", "revised_demo"],
+  // common aliases for confirmed_demo (demo đã duyệt)
   ["demo đã duyệt", "confirmed_demo"],
+  ["demo da duyet", "confirmed_demo"],
   ["confirmed demo", "confirmed_demo"],
+  ["demo ok", "confirmed_demo"],
+  ["duyệt demo ok", "confirmed_demo"],
+  // common aliases for waiting_food (chờ duyệt món ăn)
   ["chờ duyệt món ăn", "waiting_food"],
+  ["cho duyet mon an", "waiting_food"],
   ["waiting food", "waiting_food"],
+  ["món ăn", "waiting_food"],
+  ["mon an", "waiting_food"],
+  ["duyệt món", "waiting_food"],
+  ["duyet mon", "waiting_food"],
 ]);
 
 // ── Column auto-mapping: raw header (lowercase) → internal field key
@@ -409,7 +423,7 @@ const COL_ALIASES = {
   group:         ["group", "nhóm", "nhom", "target", "camp."],
   addonFee:      ["addonFee", "addon fee", "add-on fee", "add-on", "deliverable", "deliverables", "addonfee", "addon", "brand reup"],
   cost:          ["cost", "chi phí", "chi phi", "giá", "gia", "ext. cost", "ext cost", "budget"],
-  status:        ["status", "trạng thái", "trang thai"],
+  status:        ["status", "trạng thái", "trang thai", "tiến độ", "tien do", "tình trạng", "tinh trang"],
   statusKey:     ["statusKey", "status key", "status_key"],
   monAn:         ["monản", "món ăn", "mon an", "food", "dish", "thực đơn", "thuc don"],
   ngayGuiScript: ["ngay gui script", "ngày gửi script", "script link"],
@@ -476,23 +490,13 @@ const autoMapColumns = (rawHeaders) => {
 };
 
 const TYPES = ["Nano", "Micro", "Mid-tier", "Macro", "Mega"];
-const LOCATIONS = ["Urban", "Rural", "TP HCM", "HCM", "HN", "Hà Nội", "Hải Phòng", "Thái Nguyên", "Thanh Hóa", "Hưng Yên", "Đăk Lăk", "Quảng Ninh", "Lào Cai / Hà Nội"];
+
 
 const fmtVND = (n) => {
   if (!n && n !== 0) return "—";
   return new Intl.NumberFormat("vi-VN").format(Math.round(Number(n))) + "đ";
 };
 
-const urlify = (text) => {
-  if (!text) return null;
-  const urlRx = /(https?:\/\/[^\s]+)/g;
-  const parts = text.split(urlRx);
-  return parts.map((p, i) =>
-    urlRx.test(p)
-      ? <a key={i} href={p} target="_blank" rel="noopener noreferrer">{p}</a>
-      : p
-  );
-};
 
 const emptyKOL = () => ({
   id: "new-" + Date.now(),
@@ -529,6 +533,7 @@ const emptyKOL = () => ({
 
 const SEED_DATA = [
   {"id":"AM-1","campaign":"AM","kol":"Demo KOL A","link":"https://www.tiktok.com","follower":"100K","type":"Micro","location":"Urban","group":"Female without kid","cost":5000000,"addonFee":"- Code ads","statusKey":"waiting_food","monAn":"Salad rau củ","ngayGuiScript":"","ngayGuiDemo":"","ngayAir":"","airedLink":"","airedFb":"","giftSent":""},
+  {"id":"AX-2","campaign":"AX","kol":"Demo KOL A","link":"https://www.tiktok.com","follower":"100K","type":"Micro","location":"Urban","group":"Female without kid","cost":8000000,"addonFee":"- Link showcase","statusKey":"doing_demo","monAn":"Mì xào","ngayGuiScript":"","ngayGuiDemo":"","ngayAir":"","airedLink":"","airedFb":"","giftSent":""},
   {"id":"AX-1","campaign":"AX","kol":"Demo KOL B","link":"https://www.tiktok.com","follower":"500K","type":"Mid-tier","location":"Urban","group":"Female without kid","cost":15000000,"addonFee":"- Link showcase","statusKey":"aired","monAn":"Cơm nắm rong biển","ngayGuiScript":"","ngayGuiDemo":"","ngayAir":"15/8","airedLink":"https://www.tiktok.com","airedFb":"","giftSent":""}
 ];
 
@@ -563,6 +568,7 @@ const applyMapping = (rawRows, mapping) => {
     if (sheetName) {
       out.campaign = normalizeCampaignKey(sheetName);
       out.id = `${out.campaign}-${rowNo}`;
+      out.__sheet__ = sheetName;
     } else {
       out.id = `import-${Date.now()}-${idx}`;
     }
@@ -573,7 +579,6 @@ const applyMapping = (rawRows, mapping) => {
       // Convert Excel serial date numbers to string
       let val = "";
       if (typeof raw === "number" && raw > 40000 && raw < 60000) {
-        // Likely an Excel date serial
         const date = XLSX.SSF.parse_date_code(raw);
         val = `${date.d}/${date.m}/${date.y}`;
       } else {
@@ -584,18 +589,28 @@ const applyMapping = (rawRows, mapping) => {
       if (numericFields.includes(field)) {
         out[field] = parseFloat(val.replace(/[^0-9.-]/g, "")) || 0;
       } else if (field === "status") {
-        out.statusKey = STATUS_LABEL_TO_KEY[val.toLowerCase()] || "waiting_food";
+        out.statusKey = STATUS_LABEL_TO_KEY[val.toLowerCase().trim()] || "waiting_food";
       } else if (field === "statusKey") {
-        out.statusKey = STATUS_LABEL_TO_KEY[val.toLowerCase()] || val || "waiting_food";
+        out.statusKey = STATUS_LABEL_TO_KEY[val.toLowerCase().trim()] || val || "waiting_food";
       } else {
         out[field] = val;
       }
     }
+
+    // Auto-infer status to "aired" (Đã lên sóng) if they have a post link or air date, but status is empty/waiting_food
+    if (!out.statusKey || out.statusKey === "waiting_food") {
+      const hasAiredLink = out.airedLink && /^https?:\/\//i.test(out.airedLink);
+      const hasAiredDate = out.ngayAir && out.ngayAir.trim() !== "" && out.ngayAir.trim() !== "—";
+      if (hasAiredLink || hasAiredDate) {
+        out.statusKey = "aired";
+      }
+    }
+
     return out;
   });
 };
 
-const ImportWizard = ({ rawHeaders, rawRows, sheetInfo, fileName, onConfirm, onClose }) => {
+const ImportWizard = ({ rawHeaders, rawRows, sheetInfo, fileName, onConfirm, onClose, campaignLabels }) => {
   const visibleHeaders = rawHeaders.filter(h => !h.startsWith("__"));
   const [mapping, setMapping] = useState(() => autoMapColumns(visibleHeaders));
   const previewRows = rawRows.slice(0, 3);
@@ -678,10 +693,10 @@ const ImportWizard = ({ rawHeaders, rawRows, sheetInfo, fileName, onConfirm, onC
               {preview.map((r, i) => (
                 <div key={i} style={{ display: "flex", gap: 12, marginBottom: 8, flexWrap: "wrap", fontSize: 12 }}>
                   <span style={{ fontWeight: 700, minWidth: 60 }}>{r.kol || `Row ${i+1}`}</span>
-                  <span style={{ color: CAMPAIGN_COLOR[r.campaign] || "var(--ink-soft)" }}>{r.campaign}</span>
+                  <span style={{ color: CAMPAIGN_COLOR[r.campaign] || "var(--ink-soft)" }}>{campaignLabels[r.campaign] || r.campaign}</span>
                   <span className="kt-mono">{r.follower || "?"}</span>
                   <StatusBadge statusKey={r.statusKey} />
-                  <span className="kt-mono" style={{ color: "var(--red)" }}>{fmtVND(r.cost)}</span>
+                  <span className="kt-mono" style={{ color: "var(--accent)" }}>{fmtVND(r.cost)}</span>
                   {r.monAn && <span style={{ color: "var(--ink-soft)" }}>{r.monAn.slice(0, 40)}{r.monAn.length > 40 ? "…" : ""}</span>}
                 </div>
               ))}
@@ -720,7 +735,7 @@ const StatusBadge = ({ statusKey }) => {
 /* ================================================================
    CAMPAIGN BADGE
 ================================================================ */
-const CampaignDot = ({ campaign }) => (
+const CampaignDot = ({ campaign, labels }) => (
   <span style={{
     display: "inline-flex", alignItems: "center", gap: 5,
     fontSize: 12, fontWeight: 600, color: CAMPAIGN_COLOR[campaign] || "#888"
@@ -729,7 +744,7 @@ const CampaignDot = ({ campaign }) => (
       width: 8, height: 8, borderRadius: "50%",
       background: CAMPAIGN_COLOR[campaign] || "#888", display: "inline-block"
     }} />
-    {campaign}
+    {(labels && labels[campaign]) || CAMPAIGN_LABELS[campaign] || campaign}
   </span>
 );
 
@@ -854,7 +869,7 @@ const StatsBar = ({ rows, currentStatus = "all", onCardClick }) => {
         { label: "Tổng KOL", value: rows.length, color: "var(--ink)", key: "all" },
         { label: "Đã lên sóng", value: aired, color: "var(--green)", key: "aired" },
         { label: "Đang xử lý", value: inProgress, color: "var(--amber)", key: "in_progress" },
-        { label: "Tổng chi phí", value: fmtVND(total), color: "var(--red)", key: "cost" },
+        { label: "Tổng chi phí", value: fmtVND(total), color: "var(--accent)", key: "cost" },
       ].map(({ label, value, color, key }) => {
         const isClickable = key !== "cost";
         const isActive = isClickable && currentStatus === key;
@@ -905,7 +920,7 @@ const StatsBar = ({ rows, currentStatus = "all", onCardClick }) => {
 /* ================================================================
    TABLE VIEW
 ================================================================ */
-const TableView = ({ rows, onOpen }) => {
+const TableView = ({ rows, onOpen, campaignLabels }) => {
   const [sortKey, setSortKey] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
 
@@ -990,7 +1005,7 @@ const TableView = ({ rows, onOpen }) => {
                   onClick={e => e.stopPropagation()}
                   style={{ fontSize: 11, color: "var(--ink-soft)" }}>TikTok ↗</a>}
               </td>
-              <td><CampaignDot campaign={r.campaign} /></td>
+              <td><CampaignDot campaign={r.campaign} labels={campaignLabels} /></td>
               <td>{r.type && <span className="kt-badge" style={{ background: "var(--paper-bg)", color: "var(--ink-soft)", border: "1px solid var(--line)" }}>{r.type}</span>}</td>
               <td><span className="kt-mono" style={{ fontSize: 12 }}>{r.follower || "—"}</span></td>
               <td><span className="kt-mono" style={{ fontSize: 12, color: "var(--ink)" }}>{fmtVND(r.cost)}</span></td>
@@ -1010,11 +1025,17 @@ const TableView = ({ rows, onOpen }) => {
                   <a href={r.ngayGuiDemo} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>Demo ↗</a>
                 ) : <span style={{ fontSize: 12, color: "var(--ink-soft)" }}>{r.ngayGuiDemo || "—"}</span>}
               </td>
-              <td>{r.airedLink ? (
-                <a href={r.airedLink} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>
-                  <span className="kt-stamp">AIRED</span>
-                </a>
-              ) : "—"}</td>
+              <td>{(() => {
+                const link = r.airedLink ? r.airedLink.toString().trim() : "";
+                if (!link || ["air", "aired", "—", "-"].includes(link.toLowerCase())) return "—";
+                const href = /^https?:\/\//i.test(link) ? link : (link.includes(".") && !link.includes(" ") ? "https://" + link : "");
+                if (!href) return "—";
+                return (
+                  <a href={href} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>
+                    <span className="kt-stamp">AIRED</span>
+                  </a>
+                );
+              })()}</td>
             </tr>
           ))}
         </tbody>
@@ -1029,7 +1050,7 @@ const TableView = ({ rows, onOpen }) => {
 };
 
 
-const KanbanColumn = ({ stage, cards, onOpen, onUpdateStatus }) => {
+const KanbanColumn = ({ stage, cards, onOpen, onUpdateStatus, campaignLabels }) => {
   const [isOver, setIsOver] = useState(false);
 
   const handleDragOver = (e) => {
@@ -1062,12 +1083,12 @@ const KanbanColumn = ({ stage, cards, onOpen, onUpdateStatus }) => {
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       style={{
-        background: isOver ? "var(--red-soft)" : "transparent",
+        background: isOver ? "var(--accent-bg)" : "transparent",
         borderRadius: 12,
         padding: "4px 8px 12px 8px",
         transition: "all 0.2s ease",
         transform: isOver ? "scale(1.01)" : "scale(1)",
-        border: isOver ? "1px dashed var(--red)" : "1px solid transparent",
+        border: isOver ? "1px dashed var(--accent)" : "1px solid transparent",
         minWidth: 260,
         maxWidth: 260,
         display: "flex",
@@ -1103,7 +1124,7 @@ const KanbanColumn = ({ stage, cards, onOpen, onUpdateStatus }) => {
             style={{ cursor: "grab" }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-              <CampaignDot campaign={r.campaign} />
+               <CampaignDot campaign={r.campaign} labels={campaignLabels} />
               <span className="kt-mono" style={{ fontSize: 10, color: "var(--ink-soft)" }}>{r.id}</span>
             </div>
             <div style={{ fontWeight: 600, fontSize: 13, color: "var(--ink)", marginBottom: 4, lineHeight: 1.3 }}>{r.kol}</div>
@@ -1112,7 +1133,7 @@ const KanbanColumn = ({ stage, cards, onOpen, onUpdateStatus }) => {
               🍽 {r.monAn.split("\n")[0]}
             </div>}
             <div style={{ marginTop: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span className="kt-mono" style={{ fontSize: 11, color: "var(--red)", fontWeight: 600 }}>{fmtVND(r.cost)}</span>
+              <span className="kt-mono" style={{ fontSize: 11, color: "var(--accent)", fontWeight: 600 }}>{fmtVND(r.cost)}</span>
               {r.ngayAir && (
                 /^https?:\/\//.test(r.ngayAir) ? (
                   <a href={r.ngayAir} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
@@ -1136,7 +1157,7 @@ const KanbanColumn = ({ stage, cards, onOpen, onUpdateStatus }) => {
   );
 };
 
-const KanbanView = ({ rows, onOpen, onUpdateStatus }) => (
+const KanbanView = ({ rows, onOpen, onUpdateStatus, campaignLabels }) => (
   <div style={{ display: "flex", gap: 14, overflowX: "auto", padding: 16, alignItems: "stretch", flex: 1, height: "100%" }}
     className="kt-scrollbar">
     {STATUS_STAGES.map(stage => {
@@ -1148,6 +1169,7 @@ const KanbanView = ({ rows, onOpen, onUpdateStatus }) => (
           cards={cards}
           onOpen={onOpen}
           onUpdateStatus={onUpdateStatus}
+          campaignLabels={campaignLabels}
         />
       );
     })}
@@ -1157,7 +1179,7 @@ const KanbanView = ({ rows, onOpen, onUpdateStatus }) => (
 /* ================================================================
    CALENDAR VIEW
 ================================================================ */
-const CalendarView = ({ rows, onOpen, onUpdateRow }) => {
+const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date(2026, 7, 15)); // August 2026 by default
   const [draggedOverDay, setDraggedOverDay] = useState(null); // String identifier of day cell 'YYYY-MM-DD'
 
@@ -1179,7 +1201,7 @@ const CalendarView = ({ rows, onOpen, onUpdateRow }) => {
     if (!str) return null;
     const s = str.toString().trim();
     if (!s || s.startsWith("http")) return null;
-    const match = s.match(/^(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?$/);
+    const match = s.match(/^(\d{1,2})[/-](\d{1,2})(?:[/-](\d{2,4}))?$/);
     if (match) {
       const day = parseInt(match[1], 10);
       const m = parseInt(match[2], 10) - 1;
@@ -1296,8 +1318,8 @@ const CalendarView = ({ rows, onOpen, onUpdateRow }) => {
                 onDragLeave={() => setDraggedOverDay(null)}
                 onDrop={(e) => handleDrop(e, cell)}
                 style={{
-                  background: isDragOver ? "var(--red-soft)" : (cell.isCurrentMonth ? "var(--paper)" : "#FAF9F5"),
-                  border: isDragOver ? "1px dashed var(--red)" : `1px solid ${isToday ? "var(--blue)" : "var(--line)"}`,
+                  background: isDragOver ? "var(--accent-bg)" : (cell.isCurrentMonth ? "var(--paper)" : "#FAF9F5"),
+                  border: isDragOver ? "1px dashed var(--accent)" : `1px solid ${isToday ? "var(--blue)" : "var(--line)"}`,
                   borderRadius: 8,
                   padding: 4,
                   display: "flex",
@@ -1345,7 +1367,7 @@ const CalendarView = ({ rows, onOpen, onUpdateRow }) => {
                         textOverflow: "ellipsis",
                         boxShadow: "0 1px 2px rgba(0,0,0,0.02)"
                       }}
-                      title={`${r.kol} (${r.campaign}) - ${r.monAn || "Chưa có món ăn"}`}
+                      title={`${r.kol} (${campaignLabels[r.campaign] || r.campaign}) - ${r.monAn || "Chưa có món ăn"}`}
                     >
                       {r.kol}
                     </div>
@@ -1361,7 +1383,7 @@ const CalendarView = ({ rows, onOpen, onUpdateRow }) => {
       <div style={{ width: 220, display: "flex", flexDirection: "column", background: "var(--card)", borderRadius: 12, border: "1px solid var(--line)", padding: 14 }}>
         <h3 style={{ fontSize: 12, fontWeight: 700, margin: "0 0 10px 0", color: "var(--ink)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span>📅 Chưa lên lịch</span>
-          <span className="kt-badge" style={{ background: "var(--red-soft)", color: "var(--red)", fontSize: 10 }}>{unscheduled.length}</span>
+          <span className="kt-badge" style={{ background: "var(--accent-bg)", color: "var(--accent)", fontSize: 10 }}>{unscheduled.length}</span>
         </h3>
         <div style={{ fontSize: 10, color: "var(--ink-soft)", marginBottom: 12, lineHeight: 1.4 }}>
           Kéo thả KOL vào lịch tháng bên cạnh để sắp xếp ngày lên sóng (Air date).
@@ -1389,7 +1411,7 @@ const CalendarView = ({ rows, onOpen, onUpdateRow }) => {
               className="kt-kanban-card"
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                <CampaignDot campaign={r.campaign} />
+                <CampaignDot campaign={r.campaign} labels={campaignLabels} />
                 <span className="kt-mono" style={{ fontSize: 8, color: "var(--ink-soft)" }}>{r.id}</span>
               </div>
               <div style={{ fontWeight: 600, fontSize: 11, color: "var(--ink)" }}>{r.kol}</div>
@@ -1420,1951 +1442,282 @@ const parseFollowers = (str) => {
   return isNaN(n) ? 0 : n;
 };
 
-const fmtFollowers = (num) => {
-  if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
-  if (num >= 1000) return (num / 1000).toFixed(0) + "K";
-  return num.toString();
-};
-
-const renderUrlOrText = (val) => {
-  if (!val) return "—";
-  const s = val.toString().trim();
-  if (s.startsWith("http://") || s.startsWith("https://")) {
-    return (
-      <a 
-        href={s} 
-        target="_blank" 
-        rel="noopener noreferrer" 
-        onClick={e => { e.stopPropagation(); }} 
-        style={{ color: "var(--blue)", fontWeight: 700, whiteSpace: "nowrap", textDecoration: "underline" }}
-      >
-        Xem Link ↗
-      </a>
-    );
-  }
-  if (s.length > 50) {
-    return <span title={s}>{s.substring(0, 50)}...</span>;
-  }
-  return s;
-};
-
-const MetricTooltip = ({ text, tooltip, style }) => {
-  if (!tooltip) return <span style={style}>{text}</span>;
-  return (
-    <span className="kt-tooltip-wrapper" style={{ borderBottom: "1px dashed var(--ink-soft)", display: "inline-block", ...style }}>
-      {text}
-      <span className="kt-tooltip">{tooltip}</span>
-    </span>
-  );
-};
-
-const useCountUp = (target, duration = 900) => {
-  const [val, setVal] = useState(0);
-  const numTarget = parseFloat(String(target).replace(/[^0-9.]/g, "")) || 0;
-  useEffect(() => {
-    if (numTarget === 0) { setVal(0); return; }
-    let start = null;
-    const step = (ts) => {
-      if (!start) start = ts;
-      const p = Math.min((ts - start) / duration, 1);
-      const ease = 1 - Math.pow(1 - p, 3);
-      setVal(Math.round(ease * numTarget));
-      if (p < 1) requestAnimationFrame(step);
-    };
-    const raf = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(raf);
-  }, [numTarget, duration]);
-  return val;
-};
-
-const StatCard = ({ title, value, subtext, color = "var(--ink)", onClick, tooltip }) => {
-  // Extract numeric part and suffix for counter animation
-  const strVal = String(value);
-  const numMatch = strVal.match(/^([\d,.]+)/);
-  const suffix = numMatch ? strVal.slice(numMatch[0].length) : "";
-  const rawNum = numMatch ? parseFloat(numMatch[1].replace(/,/g, "")) : null;
-  const counted = useCountUp(rawNum ?? 0, 800);
-  const displayValue = rawNum !== null
-    ? (rawNum >= 1000000
-        ? (counted / 1000000).toFixed(counted % 1000000 === 0 ? 0 : 1) + "M" + suffix
-        : rawNum >= 1000
-        ? counted.toLocaleString() + suffix
-        : counted + suffix)
-    : value;
-
-  return (
-    <div
-      onClick={onClick}
-      className="kt-slide-up"
-      style={{
-        background: "var(--card)",
-        border: "1px solid var(--line)",
-        borderRadius: 14,
-        padding: "14px 18px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        boxShadow: "0 2px 8px rgba(234,107,126,0.06)",
-        cursor: onClick ? "pointer" : "default",
-        transition: "all 0.22s cubic-bezier(0.16,1,0.3,1)",
-        userSelect: "none",
-        position: "relative",
-        overflow: "hidden",
-      }}
-      onMouseEnter={onClick ? (e => {
-        e.currentTarget.style.borderColor = "var(--pink)";
-        e.currentTarget.style.boxShadow = "0 6px 20px rgba(234,107,126,0.15)";
-        e.currentTarget.style.transform = "translateY(-3px)";
-      }) : undefined}
-      onMouseLeave={onClick ? (e => {
-        e.currentTarget.style.borderColor = "var(--line)";
-        e.currentTarget.style.boxShadow = "0 2px 8px rgba(234,107,126,0.06)";
-        e.currentTarget.style.transform = "translateY(0)";
-      }) : undefined}
-    >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-        <MetricTooltip
-          text={title}
-          tooltip={tooltip}
-          style={{ fontSize: 9, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em" }}
-        />
-        {onClick && <span style={{ fontSize: 9, color: "var(--pink)", fontWeight: 700 }}>Chi tiết ↗</span>}
-      </div>
-      <span style={{ fontSize: 20, fontWeight: 800, color: color, margin: "4px 0", wordBreak: "break-all", fontVariantNumeric: "tabular-nums" }}>
-        {displayValue}
-      </span>
-      <span style={{ fontSize: 10, color: "var(--ink-soft)", lineHeight: 1.3 }}>{subtext}</span>
-      {/* subtle corner accent */}
-      <span style={{
-        position: "absolute", top: 0, right: 0,
-        width: 40, height: 40,
-        background: `linear-gradient(135deg, transparent 60%, ${color}22 100%)`,
-        borderBottomLeftRadius: 40,
-        pointerEvents: "none",
-      }} />
-    </div>
-  );
-};
 
 
-// ── METRICS GLOSSARY PANEL ──
-// Chú thích availability:
-//   "tracked"  = tính được ngay từ data hiện có trong tool
-//   "partial"  = cần thêm 1 field phụ chưa có sẵn (ghi chú rõ)
-const GLOSSARY_CATEGORIES = [
-  {
-    id: "ecom",
-    label: "🛒 Ecom",
-    color: "#16A34A",
-    metrics: [
-      {
-        name: "ROAS (Return on Ad Spend)",
-        formula: "revenue / adSpend",
-        desc: "Tỷ số sinh lời trên chi phí chạy Ads. Mỗi đồng chi Ads đem về bao nhiêu đồng doanh số. ROAS > 3 là tốt với FMCG.",
-        availability: "tracked",
-        fields: ["revenue", "adSpend"],
-      },
-      {
-        name: "Revenue per KOL",
-        formula: "Σ revenue / Số KOL có revenue > 0",
-        desc: "Doanh thu trung bình mỗi KOL đóng góp. So sánh hiệu quả giữa các KOL trong cùng campaign.",
-        availability: "tracked",
-        fields: ["revenue"],
-      },
-      {
-        name: "CPA (Cost Per Acquisition)",
-        formula: "(cost + adSpend) / conversions",
-        desc: "Chi phí booking + ads để có 1 đơn hàng. CPA càng thấp, ecom càng hiệu quả.",
-        availability: "tracked",
-        fields: ["cost", "adSpend", "conversions"],
-      },
-      {
-        name: "AOV (Average Order Value)",
-        formula: "revenue / conversions",
-        desc: "Giá trị trung bình mỗi đơn hàng từ traffic KOL. Giúp tối ưu chiến lược upsell.",
-        availability: "tracked",
-        fields: ["revenue", "conversions"],
-      },
-      {
-        name: "ATC Rate (Add-to-Cart Rate)",
-        formula: "addToCart / views × 100%",
-        desc: "Tỷ lệ người xem thêm vào giỏ hàng. Phản ánh mức độ quan tâm sản phẩm trước khi mua.",
-        availability: "tracked",
-        fields: ["addToCart", "views"],
-      },
-      {
-        name: "Checkout CVR",
-        formula: "conversions / addToCart × 100%",
-        desc: "Tỷ lệ chốt đơn từ người đã thêm giỏ hàng. Phản ánh mức độ thuyết phục của giá/offer.",
-        availability: "tracked",
-        fields: ["conversions", "addToCart"],
-      },
-    ],
-  },
-  {
-    id: "performance",
-    label: "🚀 Performance",
-    color: "#2563EB",
-    metrics: [
-      {
-        name: "CPV (Cost Per View)",
-        formula: "adSpend / views",
-        desc: "Chi phí trung bình cho 1 lượt xem. Đánh giá hiệu suất phân phối nội dung qua paid media.",
-        availability: "tracked",
-        fields: ["adSpend", "views"],
-      },
-      {
-        name: "CPM (Cost Per Mille)",
-        formula: "(cost / follower) × 1000",
-        desc: "Chi phí để tiếp cận 1.000 followers. Dùng so sánh độ đắt/rẻ giá booking giữa các KOL.",
-        availability: "tracked",
-        fields: ["cost", "follower"],
-      },
-      {
-        name: "ER (Engagement Rate)",
-        formula: "(likes + comments + saves + shares) / views × 100%",
-        desc: "Tỷ lệ tương tác trên tổng lượt xem. Đo sức hút và chất lượng nội dung KOL.",
-        availability: "tracked",
-        fields: ["likes", "comments", "saves", "shares", "views"],
-      },
-      {
-        name: "KPI Đạt Rate",
-        formula: "views (thực tế) / estView (KPI) × 100%",
-        desc: "Tỷ lệ hoàn thành KPI views đã cam kết. ≥ 100% là KOL deliver đúng hẹn.",
-        availability: "tracked",
-        fields: ["views", "estView"],
-      },
-      {
-        name: "Share Rate",
-        formula: "shares / views × 100%",
-        desc: "Tỷ lệ chia sẻ. Share Rate cao cho thấy content viral tốt — đặc biệt quan trọng với TikTok.",
-        availability: "tracked",
-        fields: ["shares", "views"],
-      },
-      {
-        name: "Save Rate",
-        formula: "saves / views × 100%",
-        desc: "Tỷ lệ lưu video. Save Rate cao = content có giá trị tham khảo lâu dài, tốt cho sản phẩm F&B/Beauty.",
-        availability: "tracked",
-        fields: ["saves", "views"],
-      },
-    ],
-  },
-  {
-    id: "booking",
-    label: "📋 Booking",
-    color: "#7C3AED",
-    metrics: [
-      {
-        name: "CPF (Cost Per Follower)",
-        formula: "cost / follower",
-        desc: "Chi phí booking để tiếp cận 1 follower. CPF thấp = KOL hiệu quả chi phí. So sánh micro vs macro KOL.",
-        availability: "tracked",
-        fields: ["cost", "follower"],
-      },
-      {
-        name: "Views / 1tr₫ Booking",
-        formula: "views / (cost / 1.000.000)",
-        desc: "Số views thực tế trên mỗi 1 triệu đồng chi booking. Đo hiệu suất đầu tư booking thuần.",
-        availability: "tracked",
-        fields: ["views", "cost"],
-      },
-      {
-        name: "Booking ROI",
-        formula: "(revenue – cost) / cost × 100%",
-        desc: "Lợi nhuận ròng từ booking fee. Khác ROAS ở chỗ không tính adSpend — đánh giá riêng hiệu quả booking.",
-        availability: "tracked",
-        fields: ["revenue", "cost"],
-      },
-      {
-        name: "Total Cost per KOL",
-        formula: "cost + adSpend",
-        desc: "Tổng chi phí thực tế (booking + ads) cho một KOL. Cơ sở tính ROI tổng thể.",
-        availability: "tracked",
-        fields: ["cost", "adSpend"],
-      },
-      {
-        name: "ER × Cost Efficiency",
-        formula: "(ER × views) / cost",
-        desc: "Chỉ số chất lượng nội dung theo chi phí: càng cao càng tốt. So sánh KOL cùng tier.",
-        availability: "tracked",
-        fields: ["likes", "comments", "saves", "shares", "views", "cost"],
-      },
-    ],
-  },
-  {
-    id: "affiliate",
-    label: "🔗 Affiliate",
-    color: "#D97706",
-    metrics: [
-      {
-        name: "Affiliate CVR",
-        formula: "conversions / views × 100%",
-        desc: "Tỷ lệ chuyển đổi đơn hàng trên views — proxy tốt nhất cho affiliate khi không có click data riêng.",
-        availability: "tracked",
-        fields: ["conversions", "views"],
-      },
-      {
-        name: "Revenue per View",
-        formula: "revenue / views",
-        desc: "Doanh thu trung bình mỗi lượt xem. Chỉ số tổng hợp so sánh hiệu suất affiliate giữa các KOL.",
-        availability: "tracked",
-        fields: ["revenue", "views"],
-      },
-      {
-        name: "Affiliate ROAS",
-        formula: "revenue / cost",
-        desc: "Doanh thu trên booking fee — phiên bản ROAS dành riêng cho KOL affiliate không chạy ads.",
-        availability: "tracked",
-        fields: ["revenue", "cost"],
-      },
-      {
-        name: "Commission Rate",
-        formula: "Hoa hồng KOL / revenue × 100%",
-        desc: "Tỷ lệ % hoa hồng KOL nhận. Thường 5–15% theo ngành. ⚠️ Cần nhập thêm field hoa hồng.",
-        availability: "partial",
-        fields: ["revenue"],
-        missing: "Chi phí hoa hồng",
-      },
-      {
-        name: "EPC (Earnings Per Click)",
-        formula: "Hoa hồng / Clicks",
-        desc: "Thu nhập affiliate trung bình mỗi click. ⚠️ Cần data clicks và hoa hồng từ platform affiliate.",
-        availability: "partial",
-        fields: [],
-        missing: "Clicks & Hoa hồng",
-      },
-    ],
-  },
-  {
-    id: "mkt",
-    label: "📣 Marketing",
-    color: "#DC2626",
-    metrics: [
-      {
-        name: "CPE (Cost Per Engagement)",
-        formula: "(cost + adSpend) / (likes + comments + saves + shares)",
-        desc: "Chi phí để tạo ra 1 tương tác. Đánh giá hiệu quả xây dựng cộng đồng và độ lan tỏa của brand.",
-        availability: "tracked",
-        fields: ["cost", "adSpend", "likes", "comments", "saves", "shares"],
-      },
-      {
-        name: "Total Reach ước tính",
-        formula: "views × 1.2 (buffer organic reach)",
-        desc: "Ước tính tổng reach thực tế bao gồm organic reach ngoài views trực tiếp. Chỉ mang tính tham khảo.",
-        availability: "tracked",
-        fields: ["views"],
-      },
-      {
-        name: "KOL ROI Index",
-        formula: "revenue / (cost + adSpend)",
-        desc: "ROI tổng thể: doanh thu trên tổng chi phí KOL. Benchmark tốt để rank KOL theo hiệu quả đầu tư.",
-        availability: "tracked",
-        fields: ["revenue", "cost", "adSpend"],
-      },
-      {
-        name: "Earned Media Value (EMV)",
-        formula: "views × CPM tham chiếu / 1000",
-        desc: "Giá trị truyền thông quy đổi theo CPM paid media. ⚠️ Cần CPM benchmark ngành để tính chính xác.",
-        availability: "partial",
-        fields: ["views"],
-        missing: "CPM tham chiếu ngành",
-      },
-      {
-        name: "Brand Sentiment Score",
-        formula: "% positive / (% positive + % negative) trong comments",
-        desc: "Tỷ lệ cảm xúc tích cực. ⚠️ Cần phân tích comment thủ công hoặc qua tool AI/sentiment analysis.",
-        availability: "partial",
-        fields: [],
-        missing: "Phân tích comment thủ công",
-      },
-    ],
-  },
-];
 
-const GlossaryPanel = () => {
-  const [activeTab, setActiveTab] = useState("ecom");
-  const activeCat = GLOSSARY_CATEGORIES.find(c => c.id === activeTab);
-  return (
-    <div className="kt-anim" style={{ marginTop: 16 }}>
-      {/* Category Tabs */}
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16, borderBottom: "2px solid var(--line)", paddingBottom: 12 }}>
-        {GLOSSARY_CATEGORIES.map(cat => (
-          <button
-            key={cat.id}
-            onClick={() => setActiveTab(cat.id)}
-            style={{
-              padding: "6px 16px",
-              borderRadius: 8,
-              fontSize: 12,
-              fontWeight: 700,
-              border: activeTab === cat.id ? `2px solid ${cat.color}` : "2px solid transparent",
-              background: activeTab === cat.id ? `${cat.color}18` : "var(--paper)",
-              color: activeTab === cat.id ? cat.color : "var(--ink-soft)",
-              cursor: "pointer",
-              transition: "all 0.15s",
-              whiteSpace: "nowrap",
-              letterSpacing: "0.01em",
-            }}
-          >
-            {cat.label}
-          </button>
-        ))}
-      </div>
+// (Insights components removed)
 
-      {/* Metrics Grid */}
-      {activeCat && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 14 }}>
-          {activeCat.metrics.map(m => (
-            <div
-              key={m.name}
-              style={{
-                padding: "16px 18px",
-                background: "#fff",
-                borderRadius: 10,
-                border: "1.5px solid var(--line)",
-                borderTop: `3px solid ${activeCat.color}`,
-                display: "flex",
-                flexDirection: "column",
-                gap: 8,
-              }}
-            >
-              {/* Metric Name */}
-              <div style={{ fontSize: 13, fontWeight: 800, color: "var(--ink)", lineHeight: 1.3 }}>
-                {m.name}
-              </div>
+/* ================================================================
+   KOL PROFILE VIEW & DETAIL MODAL
+================================================================ */
+const ProfileView = ({ rows, onOpenProfile, campaignLabels }) => {
+  const [search, setSearch] = useState("");
 
-              {/* Formula Badge */}
-              <div style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                background: activeCat.color,
-                color: "#fff",
-                borderRadius: 6,
-                padding: "4px 10px",
-                fontSize: 11,
-                fontWeight: 600,
-                fontFamily: "'Courier New', monospace",
-                alignSelf: "flex-start",
-                lineHeight: 1.4,
-                maxWidth: "100%",
-                wordBreak: "break-word",
-              }}>
-                <span style={{ opacity: 0.8, fontSize: 10 }}>∑</span>
-                {m.formula}
-              </div>
+  const uniqueKols = useMemo(() => {
+    const map = {};
+    rows.forEach(r => {
+      if (!r.kol || !r.kol.trim()) return;
+      const name = r.kol.trim();
+      const key = name.toLowerCase();
 
-              {/* Description */}
-              <p style={{
-                margin: 0,
-                color: "#555",
-                fontSize: 12,
-                lineHeight: 1.6,
-                fontWeight: 400,
-              }}>
-                {m.desc}
-              </p>
-            </div>
-          ))}
-        </div>
-      )}
+      let phase1 = false;
+      let phase2 = false;
+      const airDate = r.ngayAir ? r.ngayAir.toString().toLowerCase() : "";
+      
+      if (airDate.includes("july") || airDate.includes("aug") || airDate.includes("/7") || airDate.includes("/07") || airDate.includes("/8") || airDate.includes("/08")) {
+        phase1 = true;
+      }
+      if (airDate.includes("dec") || airDate.includes("jan") || airDate.includes("/12") || airDate.includes("/1") || airDate.includes("/01")) {
+        phase2 = true;
+      }
 
-      {/* Footer Note */}
-      <div style={{
-        marginTop: 14,
-        padding: "10px 14px",
-        background: "var(--paper)",
-        borderRadius: 8,
-        fontSize: 11,
-        color: "var(--ink-soft)",
-        display: "flex",
-        alignItems: "flex-start",
-        gap: 8,
-        lineHeight: 1.5,
-        border: "1px solid var(--line)",
-      }}>
-        <span style={{ fontSize: 14, flexShrink: 0 }}>💡</span>
-        <span>Tất cả công thức dựa trên dữ liệu hiện có trong bảng KOL. Benchmark ngành có thể thay đổi theo danh mục sản phẩm và nền tảng.</span>
-      </div>
-    </div>
-  );
-};
+      if (!map[key]) {
+        map[key] = {
+          kol: name,
+          follower: r.follower || "",
+          type: r.type || "",
+          location: r.location || "",
+          group: r.group || "",
+          link: r.link || "",
+          campaigns: new Set(),
+          totalCost: 0,
+          totalViews: 0,
+          totalLikes: 0,
+          totalComments: 0,
+          totalSaves: 0,
+          totalShares: 0,
+          totalConversions: 0,
+          totalRevenue: 0,
+          phases: new Set(),
+          campaignDetails: []
+        };
+      }
 
+      const entry = map[key];
+      const campaignKey = resolveCampaignKey(r);
+      if (campaignKey) {
+        entry.campaigns.add(campaignKey);
+      }
+      entry.totalCost += Number(r.cost) || 0;
+      entry.totalViews += Number(r.views) || 0;
+      entry.totalLikes += Number(r.likes) || 0;
+      entry.totalComments += Number(r.comments) || 0;
+      entry.totalSaves += Number(r.saves) || 0;
+      entry.totalShares += Number(r.shares) || 0;
+      entry.totalConversions += Number(r.conversions) || 0;
+      entry.totalRevenue += Number(r.revenue) || 0;
 
-const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
+      if (phase1) entry.phases.add("Phase 1");
+      if (phase2) entry.phases.add("Phase 2");
 
-  const [subView, setSubView] = useState("overview");
-  const [selectedCampaign, setSelectedCampaign] = useState("all");
-  const [noteText, setNoteText] = useState("");
-  const [activeDetail, setActiveDetail] = useState(null);
-  const [showGlossary, setShowGlossary] = useState(false);
+      entry.campaignDetails.push(r);
 
-  useEffect(() => {
-    setNoteText(insightsNotes[selectedCampaign] || "");
-  }, [selectedCampaign, insightsNotes]);
+      if (!entry.follower && r.follower) entry.follower = r.follower;
+      if (!entry.type && r.type) entry.type = r.type;
+      if (!entry.location && r.location) entry.location = r.location;
+      if (!entry.group && r.group) entry.group = r.group;
+      if (!entry.link && r.link) entry.link = r.link;
+    });
 
-  const campaigns = useMemo(() => {
-    const list = Array.from(new Set(rows.map(r => r.campaign).filter(Boolean)));
-    return ["all", ...list];
+    return Object.values(map);
   }, [rows]);
 
-  const activeRows = useMemo(() => {
-    if (selectedCampaign === "all") return rows;
-    return rows.filter(r => r.campaign === selectedCampaign);
-  }, [rows, selectedCampaign]);
-
-  const metrics = useMemo(() => {
-    if (activeRows.length === 0) return null;
-
-    const totalKOL = activeRows.length;
-    const totalCost = activeRows.reduce((sum, r) => sum + (Number(r.cost) || 0), 0);
-    const avgCost = totalCost / totalKOL;
-    const airedKOLs = activeRows.filter(r => r.statusKey === "aired");
-    const airedCount = airedKOLs.length;
-    const airedRate = Math.round((airedCount / totalKOL) * 100);
-    const zeroCostCount = activeRows.filter(r => (Number(r.cost) || 0) === 0).length;
-
-    // Phase 2 performance & Ecom metrics
-    const totalViews = activeRows.reduce((sum, r) => sum + (Number(r.views) || 0), 0);
-    const totalEstViews = activeRows.reduce((sum, r) => sum + (Number(r.estView) || 0), 0);
-    const kpiViewsAchievedRate = totalEstViews > 0 ? Math.round((totalViews / totalEstViews) * 100) : 0;
-
-    const totalLikes = activeRows.reduce((sum, r) => sum + (Number(r.likes) || 0), 0);
-    const totalComments = activeRows.reduce((sum, r) => sum + (Number(r.comments) || 0), 0);
-    const totalSaves = activeRows.reduce((sum, r) => sum + (Number(r.saves) || 0), 0);
-    const totalShares = activeRows.reduce((sum, r) => sum + (Number(r.shares) || 0), 0);
-    const totalEngagement = totalLikes + totalComments + totalSaves + totalShares;
-    const avgEngRate = totalViews > 0 ? parseFloat(((totalEngagement / totalViews) * 100).toFixed(2)) : 0;
-
-    const totalAdSpend = activeRows.reduce((sum, r) => sum + (Number(r.adSpend) || 0), 0);
-    const totalSpend = totalCost + totalAdSpend;
-
-    const totalConversions = activeRows.reduce((sum, r) => sum + (Number(r.conversions) || 0), 0);
-    const totalAddToCart = activeRows.reduce((sum, r) => sum + (Number(r.addToCart) || 0), 0);
-    const totalRevenue = activeRows.reduce((sum, r) => sum + (Number(r.revenue) || 0), 0);
-
-    const roas = totalAdSpend > 0 ? parseFloat((totalRevenue / totalAdSpend).toFixed(2)) : 0;
-    const cpv = totalViews > 0 ? Math.round(totalAdSpend / totalViews) : 0;
-
-    // Top 5 viral and Top 5 sales creators
-    const topKOLsByViews = [...activeRows]
-      .filter(r => (Number(r.views) || 0) > 0)
-      .sort((a, b) => (Number(b.views) || 0) - (Number(a.views) || 0))
-      .slice(0, 5);
-
-    const topKOLsByRevenue = [...activeRows]
-      .filter(r => (Number(r.revenue) || 0) > 0)
-      .sort((a, b) => (Number(b.revenue) || 0) - (Number(a.revenue) || 0))
-      .slice(0, 5);
-
-    // 1. Account: Campaign Analysis
-    const campaignMap = {};
-    activeRows.forEach(r => {
-      const c = r.campaign || "Unknown";
-      if (!campaignMap[c]) {
-        campaignMap[c] = { campaign: c, count: 0, cost: 0, adSpend: 0, totalSpend: 0, airedCount: 0 };
-      }
-      campaignMap[c].count += 1;
-      campaignMap[c].cost += (Number(r.cost) || 0);
-      campaignMap[c].adSpend += (Number(r.adSpend) || 0);
-      campaignMap[c].totalSpend += ((Number(r.cost) || 0) + (Number(r.adSpend) || 0));
-      if (r.statusKey === "aired") campaignMap[c].airedCount += 1;
+  const filteredKols = useMemo(() => {
+    return uniqueKols.filter(k => {
+      const matchSearch = k.kol.toLowerCase().includes(search.toLowerCase()) || 
+                          (k.location && k.location.toLowerCase().includes(search.toLowerCase())) ||
+                          (k.group && k.group.toLowerCase().includes(search.toLowerCase()));
+      return matchSearch;
     });
-    const campaignList = Object.values(campaignMap).sort((a, b) => b.totalSpend - a.totalSpend);
-
-    // Account: Bottlenecks (stages where statusKey !== 'aired')
-    const statusMap = {};
-    activeRows.forEach(r => {
-      if (r.statusKey !== "aired") {
-        const s = r.statusKey || "waiting_food";
-        statusMap[s] = (statusMap[s] || 0) + 1;
-      }
-    });
-    const bottlenecks = Object.entries(statusMap)
-      .map(([key, count]) => {
-        const stage = STATUS_MAP[key] || { label: key, color: "#666" };
-        return { key, count, label: stage.label, color: stage.color };
-      })
-      .sort((a, b) => b.count - a.count);
-
-    // 2. Marketing: Tiers
-    const tierMap = {};
-    activeRows.forEach(r => {
-      const t = r.type || "Chưa phân loại";
-      if (!tierMap[t]) {
-        tierMap[t] = { name: t, count: 0, cost: 0, followers: 0 };
-      }
-      tierMap[t].count += 1;
-      tierMap[t].cost += (Number(r.cost) || 0);
-      tierMap[t].followers += parseFollowers(r.follower);
-    });
-    const tierList = Object.values(tierMap).sort((a, b) => b.count - a.count);
-
-    // Marketing: Locations
-    const locMap = {};
-    activeRows.forEach(r => {
-      const l = r.location || "Chưa xác định";
-      if (!locMap[l]) {
-        locMap[l] = { name: l, count: 0, cost: 0 };
-      }
-      locMap[l].count += 1;
-      locMap[l].cost += (Number(r.cost) || 0);
-    });
-    const locList = Object.values(locMap).sort((a, b) => b.count - a.count);
-
-    // Marketing: Audience Groups
-    const groupMap = {};
-    activeRows.forEach(r => {
-      const g = r.group || "Chưa xác định";
-      if (!groupMap[g]) {
-        groupMap[g] = { name: g, count: 0 };
-      }
-      groupMap[g].count += 1;
-    });
-    const groupList = Object.values(groupMap).sort((a, b) => b.count - a.count);
-
-    // Total followers
-    const totalFollowers = activeRows.reduce((sum, r) => sum + parseFollowers(r.follower), 0);
-
-    // 3. Ecom: Cost efficiency
-    const ecomList = activeRows
-      .map(r => {
-        const fl = parseFollowers(r.follower);
-        const cost = Number(r.cost) || 0;
-        return {
-          ...r,
-          followersNum: fl,
-          cpf: fl > 0 ? cost / fl : null,
-        };
-      })
-      .filter(r => r.followersNum > 0);
-    const sortedEcom = [...ecomList]
-      .filter(r => r.cpf !== null)
-      .sort((a, b) => a.cpf - b.cpf);
-
-    // Ecom: Aired link status
-    const airedKOLsCount = activeRows.filter(r => r.statusKey === "aired").length;
-    const airedWithLink = activeRows.filter(r => r.statusKey === "aired" && r.airedLink && r.airedLink.trim().startsWith("http")).length;
-    const linkAiredRate = airedKOLsCount ? Math.round((airedWithLink / airedKOLsCount) * 100) : 0;
-    const airedMissingLink = activeRows.filter(r => r.statusKey === "aired" && (!r.airedLink || !r.airedLink.trim().startsWith("http")));
-
-    // Ecom: Dish analysis
-    const dishMap = {};
-    activeRows.forEach(r => {
-      if (r.monAn) {
-        const firstLine = r.monAn.split("\n")[0].trim();
-        if (firstLine) {
-          dishMap[firstLine] = (dishMap[firstLine] || 0) + 1;
-        }
-      }
-    });
-    const dishList = Object.entries(dishMap)
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count);
-
-    // CPM Est
-    const totalFollowersOfEcom = ecomList.reduce((sum, r) => sum + r.followersNum, 0);
-    const totalCostOfEcom = ecomList.reduce((sum, r) => sum + (Number(r.cost) || 0), 0);
-    const cpmEst = totalFollowersOfEcom > 0 ? (totalCostOfEcom / totalFollowersOfEcom) * 1000 : 0;
-
-    return {
-      totalKOL, totalCost, avgCost, airedCount, airedRate, zeroCostCount,
-      campaignList, bottlenecks,
-      tierList, locList, groupList, totalFollowers,
-      sortedEcom, linkAiredRate, airedMissingLink, dishList, cpmEst,
-      totalViews, totalEstViews, kpiViewsAchievedRate,
-      totalLikes, totalComments, totalSaves, totalShares, totalEngagement, avgEngRate,
-      totalAdSpend, totalSpend, totalConversions, totalAddToCart, totalRevenue, roas, cpv,
-      topKOLsByViews, topKOLsByRevenue
-    };
-  }, [activeRows]);
-
-  if (!metrics) return null;
-
-  // Helper colors for charts
-  const COLOR_PALETTE = [
-    "#E07A9A", // Rose petal
-    "#7ABDE0", // Sky blue
-    "#82C98A", // Sage mint
-    "#C9A87A", // Warm sand
-    "#A07AC9", // Lavender
-    "#E0AD62", // Honey gold
-    "#62C4BF", // Teal glass
-    "#E08C7A", // Terracotta
-  ];
-
-  // Smart Insights Texts
-  const accountInsights = [];
-  const topCampaign = metrics.campaignList[0];
-  if (topCampaign) {
-    const pct = Math.round((topCampaign.totalSpend / metrics.totalSpend) * 100);
-    accountInsights.push(`Chiến dịch <strong>${topCampaign.campaign}</strong> đang dẫn đầu về tổng ngân sách đầu tư (Booking + Ads) với <strong>${fmtVND(topCampaign.totalSpend)}</strong> (chiếm <strong>${pct}%</strong> tổng ngân sách).`);
-  }
-  const topBottleneck = metrics.bottlenecks[0];
-  if (topBottleneck && topBottleneck.count > 0) {
-    accountInsights.push(`Trạng thái <strong>"${topBottleneck.label}"</strong> hiện là nút thắt cổ chai lớn nhất với <strong>${topBottleneck.count} KOL</strong> đang chờ xử lý/phê duyệt.`);
-  }
-  if (metrics.zeroCostCount > 0) {
-    accountInsights.push(`Có <strong>${metrics.zeroCostCount} KOL</strong> chạy hình thức đổi quà/miễn phí booking trực tiếp, giúp tiết kiệm chi phí.`);
-  }
-  if (metrics.airedRate > 70) {
-    accountInsights.push(`Tỷ lệ hoàn thành lên sóng đạt mức cao (<strong>${metrics.airedRate}%</strong>), dự án đang nghiệm thu tốt.`);
-  } else if (metrics.airedRate < 35) {
-    accountInsights.push(`Tỷ lệ lên sóng hiện tại khá thấp (<strong>${metrics.airedRate}%</strong>), team Account cần đôn đốc duyệt kịch bản & demo.`);
-  }
-
-  const marketingInsights = [];
-  const topTier = metrics.tierList[0];
-  if (topTier) {
-    const pct = Math.round((topTier.count / metrics.totalKOL) * 100);
-    marketingInsights.push(`Phân khúc <strong>${topTier.name}</strong> chiếm đa số với <strong>${topTier.count} KOLs</strong> (tỷ lệ <strong>${pct}%</strong>).`);
-  }
-  const topLoc = metrics.locList[0];
-  if (topLoc) {
-    marketingInsights.push(`Điểm nóng địa lý tập trung cao nhất tại <strong>${topLoc.name}</strong> với <strong>${topLoc.count} KOLs</strong>.`);
-  }
-  const topGroup = metrics.groupList[0];
-  if (topGroup) {
-    marketingInsights.push(`Nhóm đối tượng độc giả <strong>"${topGroup.name}"</strong> đang được phủ sóng nhiều nhất.`);
-  }
-  if (metrics.totalViews > 0) {
-    marketingInsights.push(`Tổng lượt xem thực tế đạt <strong>${metrics.totalViews.toLocaleString()} views</strong>, hoàn thành <strong>${metrics.kpiViewsAchievedRate}%</strong> so với KPI dự kiến.`);
-  }
-  if (metrics.totalEngagement > 0) {
-    marketingInsights.push(`Tệp nội dung tạo ra <strong>${metrics.totalEngagement.toLocaleString()} tương tác</strong> (Likes, Comments, Saves, Shares), đạt tỷ lệ tương tác bình quân <strong>${metrics.avgEngRate}%</strong> trên lượt xem.`);
-  }
-  if (metrics.totalFollowers > 0) {
-    marketingInsights.push(`Tổng độ phủ truyền thông (followers) tích lũy của tệp KOL đạt khoảng <strong>${fmtFollowers(metrics.totalFollowers)}</strong>.`);
-  }
-
-  const ecomInsights = [];
-  const bestKOL = metrics.sortedEcom[0];
-  if (bestKOL) {
-    ecomInsights.push(`KOL <strong>${bestKOL.kol}</strong> (${bestKOL.follower}) đạt hiệu số tiếp cận tối ưu nhất với chi phí chỉ <strong>${Math.round(bestKOL.cpf).toLocaleString()}đ</strong> / follower.`);
-  }
-  if (metrics.totalRevenue > 0) {
-    ecomInsights.push(`Tổng doanh thu / GMV ghi nhận đạt <strong>${fmtVND(metrics.totalRevenue)}</strong>. Tỷ lệ doanh số trên chi phí chạy ads (ROAS) đạt <strong>${metrics.roas}x</strong>.`);
-  }
-  if (metrics.totalAdSpend > 0) {
-    ecomInsights.push(`Tổng ngân sách chạy quảng cáo ads đã giải ngân là <strong>${fmtVND(metrics.totalAdSpend)}</strong>, với chi phí bình quân trên mỗi lượt xem (CPV) là <strong>${metrics.cpv}đ/view</strong>.`);
-  }
-  if (metrics.linkAiredRate < 100 && metrics.airedCount > 0) {
-    const missingCount = metrics.airedMissingLink.length;
-    ecomInsights.push(`Còn <strong>${missingCount} KOL</strong> đã lên sóng nhưng chưa cập nhật Link Video. Cần bổ sinh link video để chạy ads / đo lường giỏ hàng.`);
-  }
-  const topDish = metrics.dishList[0];
-  if (topDish) {
-    ecomInsights.push(`Sản phẩm/Món ăn được quảng bá chủ đạo là <strong>"${topDish.name}"</strong> (${topDish.count} bài kịch bản).`);
-  }
-  if (metrics.cpmEst > 0) {
-    ecomInsights.push(`Chỉ số CPM trung bình dự kiến của chiến dịch là <strong>${fmtVND(metrics.cpmEst)}</strong> / 1,000 followers tiếp cận.`);
-  }
+  }, [uniqueKols, search]);
 
   return (
-    <div className="kt-scrollbar" style={{ flex: 1, overflowY: "auto", padding: 20, minHeight: 0 }}>
-      {/* ── Campaign Selector ── */}
-      <div style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 12,
-        marginBottom: 20,
-        flexWrap: "wrap",
-        background: "var(--red-soft)",
-        padding: "10px 16px",
-        borderRadius: 10,
-        border: "1px solid var(--line)"
-      }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: "var(--ink)", whiteSpace: "nowrap" }}>Chọn Báo cáo Dự án:</span>
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-          <button
-            className={`kt-btn ${selectedCampaign === "all" ? "kt-btn-primary" : "kt-btn-ghost"}`}
-            onClick={() => setSelectedCampaign("all")}
-            style={{ fontSize: 11, padding: "4px 10px", borderRadius: 6 }}
-          >
-            Tổng cộng (Tất cả)
-          </button>
-          {campaigns.filter(c => c !== "all").map(c => (
-            <button
-              key={c}
-              className={`kt-btn ${selectedCampaign === c ? "kt-btn-primary" : "kt-btn-ghost"}`}
-              onClick={() => setSelectedCampaign(c)}
-              style={{ fontSize: 11, padding: "4px 10px", borderRadius: 6 }}
-            >
-              {c}
-            </button>
-          ))}
-        </div>
+    <div className="kt-scrollbar" style={{ padding: "20px", display: "flex", flexDirection: "column", height: "100%", overflowY: "auto" }}>
+      <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap", alignItems: "center" }}>
+        <input 
+          className="kt-input" 
+          placeholder="🔍 Tìm tên KOL, địa điểm, nhóm..." 
+          value={search} 
+          onChange={e => setSearch(e.target.value)} 
+          style={{ width: 280 }} 
+        />
+        <span style={{ fontSize: 13, color: "var(--ink-soft)", marginLeft: "auto" }}>
+          Đang hiển thị: <strong>{filteredKols.length}</strong> hồ sơ KOL
+        </span>
       </div>
 
-      {/* ── Role perspective selector tabs ── */}
-      <div style={{
-        display: "flex",
-        gap: 8,
-        borderBottom: "1px solid var(--line)",
-        paddingBottom: 12,
-        marginBottom: 20,
-        flexWrap: "wrap"
-      }}>
-        <button
-          className={`kt-btn ${subView === "overview" ? "kt-btn-primary" : "kt-btn-ghost"}`}
-          onClick={() => setSubView("overview")}
-          style={{ fontSize: 12, padding: "6px 14px", borderRadius: 8 }}
-        >
-          Tổng quan (Overview)
-        </button>
-        <button
-          className={`kt-btn ${subView === "account" ? "kt-btn-primary" : "kt-btn-ghost"}`}
-          onClick={() => setSubView("account")}
-          style={{ fontSize: 12, padding: "6px 14px", borderRadius: 8 }}
-        >
-          Chi tiết Account (Finance)
-        </button>
-        <button
-          className={`kt-btn ${subView === "marketing" ? "kt-btn-primary" : "kt-btn-ghost"}`}
-          onClick={() => setSubView("marketing")}
-          style={{ fontSize: 12, padding: "6px 14px", borderRadius: 8 }}
-        >
-          Chi tiết Marketing (Reach)
-        </button>
-        <button
-          className={`kt-btn ${subView === "ecom" ? "kt-btn-primary" : "kt-btn-ghost"}`}
-          onClick={() => setSubView("ecom")}
-          style={{ fontSize: 12, padding: "6px 14px", borderRadius: 8 }}
-        >
-          Chi tiết E-commerce (Sales)
-        </button>
-      </div>
-
-      {/* ── Subviews Rendering ── */}
-      {subView === "overview" && (
-        <div className="kt-anim">
-          {/* Executive Overview Stats Grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, marginBottom: 20 }}>
-            <StatCard 
-              title="Tổng ngân sách" 
-              value={fmtVND(metrics.totalSpend)} 
-              subtext={`Booking: ${fmtVND(metrics.totalCost)} | Ads: ${fmtVND(metrics.totalAdSpend)}`} 
-              color="var(--red)" 
-              tooltip="Tổng ngân sách thực tế đã giải ngân (Booking Cost + Ad Spend) của các dự án."
-              onClick={() => setActiveDetail({
-                title: "Phân bổ Tổng Ngân Sách",
-                description: "Danh sách tất cả KOLs sắp xếp theo Tổng chi phí (Booking Cost + Ad Spend) từ cao xuống thấp.",
-                columns: [
-                  { key: "kol", label: "KOL" },
-                  { key: "campaign", label: "Chiến dịch" },
-                  { key: "cost", label: "Booking Cost", render: r => fmtVND(r.cost) },
-                  { key: "adSpend", label: "Ad Spend", render: r => fmtVND(r.adSpend) },
-                  { key: "totalSpend", label: "Tổng chi phí", render: r => <strong>{fmtVND((Number(r.cost) || 0) + (Number(r.adSpend) || 0))}</strong> }
-                ],
-                data: [...activeRows].sort((a,b) => ((Number(b.cost)||0)+(Number(b.adSpend)||0)) - ((Number(a.cost)||0)+(Number(a.adSpend)||0)))
-              })}
-            />
-            <StatCard 
-              title="Tiến độ Lên sóng" 
-              value={`${metrics.airedRate}%`} 
-              subtext={`${metrics.airedCount} / ${metrics.totalKOL} KOL đã hoàn thành`} 
-              color="var(--green)" 
-              tooltip="Tỷ lệ phần trăm video của KOL đã đăng tải chính thức (Aired) trên tổng số KOL đã lên hợp đồng."
-              onClick={() => setActiveDetail({
-                title: "KOL đã Lên Sóng (Aired)",
-                description: `Danh sách các nhà sáng tạo đã nghiệm thu video lên sóng thành công (Tổng cộng: ${metrics.airedCount} KOLs).`,
-                columns: [
-                  { key: "kol", label: "KOL" },
-                  { key: "campaign", label: "Chiến dịch" },
-                  { key: "ngayAir", label: "Ngày lên sóng", render: r => renderUrlOrText(r.ngayAir) },
-                  { key: "airedLink", label: "Đường dẫn video", render: r => renderUrlOrText(r.airedLink) }
-                ],
-                data: activeRows.filter(r => r.statusKey === "aired")
-              })}
-            />
-            <StatCard 
-              title="Độ phủ (Followers)" 
-              value={fmtFollowers(metrics.totalFollowers)} 
-              subtext={`Tổng views: ${metrics.totalViews.toLocaleString()} (${metrics.kpiViewsAchievedRate}% KPI)`} 
-              color="var(--blue)" 
-              tooltip="Tổng lượng followers tích lũy và tổng số lượt xem thực tế đạt được."
-              onClick={() => setActiveDetail({
-                title: "Thống kê Lượt xem thực tế (Views)",
-                description: "Danh sách tất cả KOLs sắp xếp theo lượt xem video thực tế trên TikTok từ cao xuống thấp.",
-                columns: [
-                  { key: "kol", label: "KOL" },
-                  { key: "campaign", label: "Chiến dịch" },
-                  { key: "estView", label: "KPI Views", render: r => Number(r.estView) ? Number(r.estView).toLocaleString() : "—" },
-                  { key: "views", label: "Views thực tế", render: r => <strong>{Number(r.views).toLocaleString()}</strong> },
-                  {
-                    key: "achieved",
-                    label: "% Đạt KPI",
-                    render: r => {
-                      if (!Number(r.estView)) return "—";
-                      const pct = Math.round((Number(r.views) / Number(r.estView)) * 100);
-                      let bg = "var(--green-soft)";
-                      let fg = "var(--green)";
-                      if (pct < 90) {
-                        bg = "#FEE2E2"; // Soft red
-                        fg = "#EF4444";
-                      } else if (pct < 100) {
-                        bg = "var(--amber-soft)";
-                        fg = "var(--amber)";
-                      }
-                      return (
-                        <span className="kt-badge" style={{ background: bg, color: fg, border: `1px solid ${fg}`, fontWeight: 700 }}>
-                          {pct}%
-                        </span>
-                      );
-                    }
-                  }
-                ],
-                data: [...activeRows].sort((a,b) => (Number(b.views)||0) - (Number(a.views)||0))
-              })}
-            />
-            <StatCard 
-              title="Doanh số / GMV" 
-              value={fmtVND(metrics.totalRevenue)} 
-              subtext={`ROAS: ${metrics.roas}x | Đơn hàng: ${metrics.totalConversions}`} 
-              color="var(--amber)" 
-              tooltip="Doanh thu bán hàng trực tiếp được ghi nhận từ mã giảm giá/đường dẫn của KOL."
-              onClick={() => setActiveDetail({
-                title: "Danh sách Hiệu Quả Doanh Số (GMV)",
-                description: "Danh sách KOLs mang lại doanh thu bán hàng thực tế từ cao xuống thấp.",
-                columns: [
-                  { key: "kol", label: "KOL" },
-                  { key: "campaign", label: "Chiến dịch" },
-                  { key: "conversions", label: "Đơn hàng (Conversions)", render: r => Number(r.conversions).toLocaleString() },
-                  { key: "addToCart", label: "Thêm giỏ hàng (ATC)", render: r => Number(r.addToCart).toLocaleString() },
-                  { key: "revenue", label: "Doanh thu / GMV", render: r => <strong>{fmtVND(r.revenue)}</strong> }
-                ],
-                data: [...activeRows].sort((a,b) => (Number(b.revenue)||0) - (Number(a.revenue)||0))
-              })}
-            />
-          </div>
-
-          {/* Double Column grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: 16, marginBottom: 20 }}>
-            {/* Campaign Summary & Progress */}
-            <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16 }}>
-              <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>Tiến độ & Ngân sách các Chiến dịch</h3>
-              <div style={{ overflowX: "auto" }} className="kt-scrollbar">
-                <table className="kt-table" style={{ margin: 0 }}>
-                  <thead>
-                    <tr>
-                      <th>Chiến dịch</th>
-                      <th>KOLs</th>
-                      <th>Tổng chi phí</th>
-                      <th>Đã Aired</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {metrics.campaignList.map(c => {
-                      const progress = c.count ? Math.round((c.airedCount / c.count) * 100) : 0;
-                      return (
-                        <tr key={c.campaign} onClick={() => setActiveDetail({
-                          title: `Chiến dịch: ${c.campaign}`,
-                          description: `Danh sách chi tiết các KOL tham gia trong chiến dịch ${c.campaign} (Tổng số lượng: ${c.count} KOLs).`,
-                          columns: [
-                            { key: "kol", label: "KOL" },
-                            { key: "type", label: "Phân loại", render: r => r.type || "Chưa phân loại" },
-                            { key: "cost", label: "Booking Cost", render: r => fmtVND(r.cost) },
-                            { key: "statusKey", label: "Trạng thái", render: r => <StatusBadge statusKey={r.statusKey} /> }
-                          ],
-                          data: activeRows.filter(r => r.campaign === c.campaign)
-                        })} style={{ cursor: "pointer" }} title="Click để xem chi tiết">
-                          <td><strong>{c.campaign} ↗</strong></td>
-                          <td>{c.count}</td>
-                          <td><strong>{fmtVND(c.totalSpend)}</strong></td>
-                          <td>
-                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                              <span style={{ fontSize: 11, fontWeight: 600, minWidth: 30 }}>{progress}%</span>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))", gap: 16 }}>
+        {filteredKols.map(k => {
+          const campaignsArr = Array.from(k.campaigns);
+          const phasesArr = Array.from(k.phases);
+          return (
+            <div key={k.kol} className="kt-card kt-anim" style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 12, border: "1px solid var(--line)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
+                <div>
+                  <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--ink)", margin: 0 }}>{k.kol}</h3>
+                  {k.link && (
+                    <a href={k.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: "var(--accent)", textDecoration: "none" }}>
+                      TikTok Profile ↗
+                    </a>
+                  )}
+                </div>
+                {k.type && (
+                  <span className="kt-badge" style={{ background: "var(--accent-bg)", color: "var(--accent)", border: "1px solid var(--accent-dim)" }}>
+                    {k.type}
+                  </span>
+                )}
               </div>
-            </div>
 
-            {/* Campaign GMV Contribution */}
-            <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16 }}>
-              <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 16px 0", color: "var(--ink)" }}>Đóng góp GMV & ROAS các Chiến dịch</h3>
-              {metrics.totalRevenue > 0 ? (
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                  {metrics.campaignList.map(c => {
-                    const gmv = activeRows.filter(r => r.campaign === c.campaign).reduce((sum, r) => sum + (Number(r.revenue) || 0), 0);
-                    const pct = metrics.totalRevenue > 0 ? Math.round((gmv / metrics.totalRevenue) * 100) : 0;
-                    if (gmv === 0) return null;
-                    const campColor = CAMPAIGN_COLOR[c.campaign] || "var(--green)";
-                    return (
-                      <div key={c.campaign} onClick={() => setActiveDetail({
-                        title: `Hiệu quả Doanh Số - Chiến dịch ${c.campaign}`,
-                        description: `Thống kê chi tiết đơn hàng (Conversions) và Doanh thu (GMV) của chiến dịch ${c.campaign}.`,
-                        columns: [
-                          { key: "kol", label: "KOL" },
-                          { key: "conversions", label: "Đơn hàng", render: r => Number(r.conversions).toLocaleString() },
-                          { key: "revenue", label: "Doanh thu", render: r => <strong>{fmtVND(r.revenue)}</strong> }
-                        ],
-                        data: activeRows.filter(r => r.campaign === c.campaign).sort((a,b) => (Number(b.revenue)||0) - (Number(a.revenue)||0))
-                      })} style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }} title="Click để xem chi tiết">
-                        <div style={{ fontSize: 11, fontWeight: 700, width: 70, color: "var(--ink)" }}>{c.campaign} ↗</div>
-                        <div style={{ flex: 1, height: 18, background: "var(--paper)", borderRadius: 2, overflow: "hidden", display: "flex", position: "relative", border: "1px solid var(--line)" }}>
-                          <div style={{ width: `${pct}%`, background: campColor, height: "100%", transition: "all 0.3s ease" }} />
-                          <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 10, fontWeight: 700, color: pct > 15 ? "#fff" : "var(--ink)" }}>
-                            {fmtVND(gmv)} ({pct}%)
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 12px", fontSize: 12, color: "var(--ink-soft)" }}>
+                <div>👥 Followers: <strong style={{ color: "var(--ink)" }}>{k.follower || "—"}</strong></div>
+                <div>📍 Địa điểm: <strong style={{ color: "var(--ink)" }}>{k.location || "—"}</strong></div>
+                <div>🏷 Nhóm: <strong style={{ color: "var(--ink)" }}>{k.group || "—"}</strong></div>
+                <div>📁 Dự án hợp tác: <strong style={{ color: "var(--ink)" }}>{campaignsArr.length} dự án</strong></div>
+              </div>
+
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", fontSize: 11 }}>
+                <span style={{ fontWeight: 600 }}>Thời điểm hợp tác:</span>
+                {phasesArr.length > 0 ? (
+                  phasesArr.map(p => (
+                    <span key={p} className="kt-badge" style={{ background: p === "Phase 1" ? "#FFAFA322" : "#A2C2E822", color: p === "Phase 1" ? "#D4826A" : "#4F83E1", border: `1px solid ${p === "Phase 1" ? "#FFAFA355" : "#4F83E155"}`, fontSize: 10 }}>
+                      {p === "Phase 1" ? "Phase 1 (T7-T8)" : "Phase 2 (T12-T1)"}
+                    </span>
+                  ))
+                ) : (
+                  <span style={{ color: "var(--ink-soft)" }}>Chưa rõ Phase</span>
+                )}
+              </div>
+
+              {campaignsArr.length > 0 && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 6, borderTop: "1px dashed var(--line)", paddingTop: 10 }}>
+                  <span style={{ fontWeight: 600, fontSize: 11, color: "var(--ink-soft)" }}>
+                    Dự án: {campaignsArr.map(c => campaignLabels[c] || CAMPAIGN_LABELS[c] || c).join(" · ")}
+                  </span>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    {campaignsArr.map(c => (
+                      <CampaignDot key={c} campaign={c} labels={campaignLabels} />
+                    ))}
+                  </div>
                 </div>
+              )}
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, borderTop: "1px dashed var(--line)", paddingTop: 10, fontSize: 11, textAlign: "center" }}>
+                <div>
+                  <div style={{ color: "var(--ink-soft)" }}>Chi phí</div>
+                  <strong style={{ color: "var(--accent)" }}>{fmtVND(k.totalCost)}</strong>
+                </div>
+                <div>
+                  <div style={{ color: "var(--ink-soft)" }}>Views</div>
+                  <strong style={{ color: "var(--ink)" }}>{k.totalViews ? k.totalViews.toLocaleString() : "—"}</strong>
+                </div>
+                <div>
+                  <div style={{ color: "var(--ink-soft)" }}>Đơn hàng</div>
+                  <strong style={{ color: "var(--ok)" }}>{k.totalConversions ? k.totalConversions.toLocaleString() : "—"}</strong>
+                </div>
+              </div>
+
+              <button 
+                className="kt-btn kt-btn-ghost" 
+                onClick={() => onOpenProfile(k)} 
+                style={{ width: "100%", justifyContent: "center", padding: "6px", marginTop: 4 }}
+              >
+                🔎 Xem chiến dịch chi tiết
+              </button>
+            </div>
+          );
+        })}
+        {filteredKols.length === 0 && (
+          <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "80px 0", color: "var(--ink-soft)" }}>
+            Không tìm thấy hồ sơ KOL nào phù hợp.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const ProfileDetailModal = ({ kol, onClose, campaignLabels }) => {
+  return (
+    <div className="kt-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="kt-modal kt-anim" style={{ maxWidth: 860, borderRadius: 2 }}>
+        <div style={{ padding: "18px 22px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+              HỒ SƠ CHI TIẾT KOL
+            </div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: "var(--ink)" }}>{kol.kol}</div>
+          </div>
+          <button className="kt-btn kt-btn-ghost" onClick={onClose} style={{ padding: "6px 10px" }}>✕</button>
+        </div>
+
+        <div style={{ padding: "20px 22px", display: "flex", flexDirection: "column", gap: 18 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, background: "var(--paper)", padding: "12px 16px", borderRadius: 10 }}>
+            <div>
+              <div style={{ fontSize: 11, color: "var(--ink-soft)", marginBottom: 2 }}>Followers</div>
+              <strong style={{ fontSize: 14, color: "var(--ink)" }}>{kol.follower || "—"}</strong>
+            </div>
+            <div>
+              <div style={{ fontSize: 11, color: "var(--ink-soft)", marginBottom: 2 }}>Phân hạng Tier</div>
+              <strong style={{ fontSize: 14, color: "var(--ink)" }}>{kol.type || "—"}</strong>
+            </div>
+            <div>
+              <div style={{ fontSize: 11, color: "var(--ink-soft)", marginBottom: 2 }}>Khu vực</div>
+              <strong style={{ fontSize: 14, color: "var(--ink)" }}>{kol.location || "—"}</strong>
+            </div>
+            <div>
+              <div style={{ fontSize: 11, color: "var(--ink-soft)", marginBottom: 2 }}>TikTok Profile</div>
+              {kol.link ? (
+                <a href={kol.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>
+                  TikTok Link ↗
+                </a>
               ) : (
-                <div style={{ padding: 12, borderRadius: 2, background: "var(--warn-bg)", color: "var(--warn)", fontSize: 12 }}>
-                  Chưa có dữ liệu doanh số ghi nhận.
-                </div>
+                <strong style={{ fontSize: 13, color: "var(--ink-soft)" }}>—</strong>
               )}
             </div>
           </div>
 
-          {/* Quick AI Summary */}
-          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16, marginBottom: 20 }}>
-            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>Đánh giá nhanh dự án (Executive Highlights)</h3>
-            <ul style={{ margin: 0, paddingLeft: 20, fontSize: 12, color: "var(--ink)", lineHeight: 1.6 }}>
-              {[...accountInsights, ...marketingInsights.slice(0, 2)].map((ins, i) => (
-                <li key={i} dangerouslySetInnerHTML={{ __html: ins }} style={{ marginBottom: 6 }} />
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
 
-      {subView === "account" && (
-        <div className="kt-anim">
-          {/* Stats grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, marginBottom: 20 }}>
-            <StatCard 
-              title="Tổng ngân sách" 
-              value={fmtVND(metrics.totalSpend)} 
-              subtext={`Booking: ${fmtVND(metrics.totalCost)} | Ads: ${fmtVND(metrics.totalAdSpend)}`} 
-              color="var(--red)" 
-              tooltip="Tổng ngân sách thực tế đã giải ngân (Booking Cost + Ad Spend) của các dự án."
-              onClick={() => setActiveDetail({
-                title: "Phân bổ Tổng Ngân Sách",
-                description: "Danh sách tất cả KOLs sắp xếp theo Tổng chi phí (Booking Cost + Ad Spend) từ cao xuống thấp.",
-                columns: [
-                  { key: "kol", label: "KOL" },
-                  { key: "campaign", label: "Chiến dịch" },
-                  { key: "cost", label: "Booking Cost", render: r => fmtVND(r.cost) },
-                  { key: "adSpend", label: "Ad Spend", render: r => fmtVND(r.adSpend) },
-                  { key: "totalSpend", label: "Tổng chi phí", render: r => <strong>{fmtVND((Number(r.cost) || 0) + (Number(r.adSpend) || 0))}</strong> }
-                ],
-                data: [...activeRows].sort((a,b) => ((Number(b.cost)||0)+(Number(b.adSpend)||0)) - ((Number(a.cost)||0)+(Number(a.adSpend)||0)))
-              })}
-            />
-            <StatCard 
-              title="Chi phí trung bình" 
-              value={fmtVND(metrics.totalSpend / metrics.totalKOL)} 
-              subtext="Tổng chi phí trên mỗi KOL" 
-              tooltip="Chi phí trung bình trên một người ảnh hưởng (bao gồm booking và chi phí đẩy quảng cáo)."
-              onClick={() => setActiveDetail({
-                title: "Chi phí phân bổ theo KOL",
-                description: "Danh sách tất cả KOLs kèm theo chi tiết chi phí booking và ads chạy chiến dịch.",
-                columns: [
-                  { key: "kol", label: "KOL" },
-                  { key: "campaign", label: "Chiến dịch" },
-                  { key: "cost", label: "Booking Cost", render: r => fmtVND(r.cost) },
-                  { key: "adSpend", label: "Ad Spend", render: r => fmtVND(r.adSpend) },
-                  { key: "totalSpend", label: "Tổng chi phí", render: r => <strong>{fmtVND((Number(r.cost) || 0) + (Number(r.adSpend) || 0))}</strong> }
-                ],
-                data: [...activeRows].sort((a,b) => ((Number(b.cost)||0)+(Number(b.adSpend)||0)) - ((Number(a.cost)||0)+(Number(a.adSpend)||0)))
-              })}
-            />
-            <StatCard 
-              title="Tỷ lệ lên sóng" 
-              value={`${metrics.airedRate}%`} 
-              subtext={`${metrics.airedCount} / ${metrics.totalKOL} KOL đã hoàn thành`} 
-              color="var(--green)" 
-              tooltip="Tỷ lệ phần trăm video của KOL đã đăng tải chính thức (Aired) trên tổng số KOL đã lên hợp đồng."
-              onClick={() => setActiveDetail({
-                title: "KOL đã Lên Sóng (Aired)",
-                description: `Danh sách các nhà sáng tạo đã nghiệm thu video lên sóng thành công (Tổng cộng: ${metrics.airedCount} KOLs).`,
-                columns: [
-                  { key: "kol", label: "KOL" },
-                  { key: "campaign", label: "Chiến dịch" },
-                  { key: "ngayAir", label: "Ngày lên sóng", render: r => renderUrlOrText(r.ngayAir) },
-                  { key: "airedLink", label: "Đường dẫn video", render: r => renderUrlOrText(r.airedLink) }
-                ],
-                data: activeRows.filter(r => r.statusKey === "aired")
-              })}
-            />
-            <StatCard 
-              title="KOL đổi quà (0đ)" 
-              value={`${metrics.zeroCostCount} KOL`} 
-              subtext="Không tính phí booking" 
-              color="var(--amber)" 
-              tooltip="Số lượng nhà sáng tạo tham gia hợp tác với chi phí booking 0đ (nhận tài trợ sản phẩm/quà tặng FOC)."
-              onClick={() => setActiveDetail({
-                title: "KOL đổi quà / FOC",
-                description: "Các nhà sáng tạo tham gia chiến dịch với chi phí booking 0đ (Nhận quà/FOC tài trợ sản phẩm).",
-                columns: [
-                  { key: "kol", label: "KOL" },
-                  { key: "campaign", label: "Chiến dịch" },
-                  { key: "follower", label: "Followers" },
-                  { key: "giftSent", label: "Quà tặng", render: r => renderUrlOrText(r.giftSent) }
-                ],
-                data: activeRows.filter(r => (Number(r.cost) || 0) === 0)
-              })}
-            />
-          </div>
-
-          {/* Campaign breakdown table */}
-          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
-            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>Phân bổ ngân sách theo Chiến dịch</h3>
-            <div style={{ overflowX: "auto" }} className="kt-scrollbar">
-              <table className="kt-table" style={{ margin: 0, minWidth: 600 }}>
+          <div>
+            <div className="kt-label" style={{ marginBottom: 8, fontSize: 12 }}>Lịch sử Chiến dịch & Hiệu suất chi tiết</div>
+            <div style={{ overflowX: "auto", border: "1px solid var(--line)", borderRadius: 10 }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                 <thead>
-                  <tr>
-                    <th>Chiến dịch</th>
-                    <th>Số lượng KOL</th>
-                    <th>Booking Cost</th>
-                    <th>Ad Spend</th>
-                    <th>Tổng Chi Phí</th>
-                    <th>Chi phí TB/KOL</th>
-                    <th>Tiến độ đã Aired</th>
+                  <tr style={{ background: "var(--paper)", borderBottom: "1px solid var(--line)" }}>
+                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>Chiến dịch</th>
+                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>Món ăn</th>
+                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>Ngân sách</th>
+                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>Trạng thái</th>
+                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>Views thực tế</th>
+                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>Đơn hàng</th>
+                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>Doanh thu</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {metrics.campaignList.map(c => {
-                    const progress = c.count ? Math.round((c.airedCount / c.count) * 100) : 0;
-                    return (
-                      <tr key={c.campaign} onClick={() => setActiveDetail({
-                        title: `Chiến dịch: ${c.campaign}`,
-                        description: `Danh sách chi tiết các KOL tham gia trong chiến dịch ${c.campaign} (Tổng số lượng: ${c.count} KOLs).`,
-                        columns: [
-                          { key: "kol", label: "KOL" },
-                          { key: "type", label: "Phân loại", render: r => r.type || "Chưa phân loại" },
-                          { key: "follower", label: "Followers" },
-                          { key: "cost", label: "Booking Cost", render: r => fmtVND(r.cost) },
-                          { key: "adSpend", label: "Ad Spend", render: r => fmtVND(r.adSpend) },
-                          { key: "statusKey", label: "Trạng thái", render: r => <StatusBadge statusKey={r.statusKey} /> }
-                        ],
-                        data: activeRows.filter(r => r.campaign === c.campaign)
-                      })} style={{ cursor: "pointer" }} title="Click để xem chi tiết danh sách KOL">
-                        <td><strong>{c.campaign} ↗</strong></td>
-                        <td>{c.count}</td>
-                        <td>{fmtVND(c.cost)}</td>
-                        <td>{fmtVND(c.adSpend)}</td>
-                        <td><strong>{fmtVND(c.totalSpend)}</strong></td>
-                        <td>{fmtVND(c.totalSpend / c.count)}</td>
-                        <td>
-                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <div style={{ flex: 1, height: 6, borderRadius: 3, background: "var(--line)", overflow: "hidden", minWidth: 80 }}>
-                              <div style={{ width: `${progress}%`, background: "var(--green)", height: "100%" }} />
-                            </div>
-                            <span style={{ fontSize: 11, fontWeight: 600, minWidth: 30 }}>{progress}%</span>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Campaign Budget Comparison Chart */}
-          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16, marginBottom: 20 }}>
-            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 16px 0", color: "var(--ink)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span>Biểu đồ So sánh Chi phí giữa các Chiến dịch</span>
-              <div style={{ display: "flex", gap: 14, fontSize: 10, color: "var(--ink-soft)" }}>
-                <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                  <span style={{ display: "inline-block", width: 12, height: 10, borderRadius: 1, background: "var(--ink)" }} /> 
-                  <strong>Booking Cost</strong> (Tông màu đậm)
-                </span>
-                <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                  <span style={{ display: "inline-block", width: 12, height: 10, borderRadius: 1, background: "var(--line)" }} /> 
-                  <strong>Ad Spend</strong> (Tông màu nhạt)
-                </span>
-              </div>
-            </h3>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {metrics.campaignList.map(c => {
-                const maxSpend = Math.max(...metrics.campaignList.map(item => item.totalSpend)) || 1;
-                const pct = Math.round((c.totalSpend / maxSpend) * 100);
-                const bookingPct = c.totalSpend > 0 ? (c.cost / c.totalSpend) : 0;
-                const adsPct = 1 - bookingPct;
-                const campColor = CAMPAIGN_COLOR[c.campaign] || "var(--blue)";
-                return (
-                  <div key={c.campaign} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, width: 70, color: "var(--ink)" }}>{c.campaign}</div>
-                    <div style={{ flex: 1, height: 22, background: "var(--paper)", borderRadius: 2, overflow: "hidden", display: "flex", position: "relative", border: "1px solid var(--line)" }}>
-                      {bookingPct > 0 && (
-                        <div 
-                           style={{ width: `${pct * bookingPct}%`, background: campColor, height: "100%", transition: "all 0.3s ease" }} 
-                          title={`Booking: ${fmtVND(c.cost)}`} 
-                        />
-                      )}
-                      {adsPct > 0 && (
-                        <div 
-                          style={{ width: `${pct * adsPct}%`, background: `${campColor}88`, height: "100%", transition: "all 0.3s ease" }} 
-                          title={`Chạy Ads: ${fmtVND(c.adSpend)}`} 
-                        />
-                      )}
-                      <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 10, fontWeight: 700, color: "#fff" }}>
-                        {fmtVND(c.totalSpend)}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Bottlenecks */}
-          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16, marginBottom: 20 }}>
-            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)", display: "flex", alignItems: "center", gap: 6 }}>
-              Cảnh báo điểm nghẽn duyệt kịch bản / demo
-            </h3>
-            {metrics.bottlenecks.length > 0 ? (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
-                {metrics.bottlenecks.map(b => (
-                  <div 
-                    key={b.key} 
-                    onClick={() => setActiveDetail({
-                      title: `KOL đang kẹt ở trạng thái: ${b.label}`,
-                      description: `Danh sách chi tiết các nhà sáng tạo nội dung đang ở bước "${b.label}" cần được kiểm tra hoặc thúc đẩy duyệt kịch bản/demo.`,
-                      columns: [
-                        { key: "kol", label: "KOL" },
-                        { key: "campaign", label: "Chiến dịch" },
-                        { key: "type", label: "Phân loại", render: r => r.type || "Chưa phân loại" },
-                        { key: "cost", label: "Booking Cost", render: r => fmtVND(r.cost) },
-                        { key: "statusKey", label: "Trạng thái", render: r => <StatusBadge statusKey={r.statusKey} /> }
-                      ],
-                      data: activeRows.filter(r => r.statusKey === b.key)
-                    })}
-                    style={{ 
-                      padding: 12, 
-                      borderRadius: 2, 
-                      background: "var(--warn-bg)", 
-                      border: "1px solid var(--line)",
-                      cursor: "pointer",
-                      transition: "all 0.15s ease"
-                    }}
-                    className="kt-stats-card-hover"
-                    title="Click để xem chi tiết"
-                  >
-                    <div style={{ fontSize: 10, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>{b.label}</div>
-                    <div style={{ fontSize: 18, fontWeight: 700, color: b.color, marginTop: 4 }}>{b.count} KOL đang kẹt</div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div style={{ padding: 12, borderRadius: 2, background: "var(--green-soft)", color: "var(--green)", fontSize: 12, fontWeight: 600 }}>
-                Không có KOL nào đang bị nghẽn ở các bước duyệt trung gian.
-              </div>
-            )}
-          </div>
-
-          {/* Insights statements */}
-          <div style={{ background: "var(--red-soft)", borderRadius: 2, padding: 16, border: "1px solid var(--line)" }}>
-            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 10px 0", color: "var(--ink)" }}>Insight cho Account</h3>
-            <ul style={{ margin: 0, paddingLeft: 20, display: "flex", flexDirection: "column", gap: 8, fontSize: 12, color: "var(--ink)" }}>
-              {accountInsights.map((ins, i) => (
-                <li key={i} dangerouslySetInnerHTML={{ __html: ins }} />
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
-
-      {subView === "marketing" && (
-        <div className="kt-anim">
-          {/* Stats grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, marginBottom: 20 }}>
-            <StatCard 
-              title="Tổng số người theo dõi" 
-              value={fmtFollowers(metrics.totalFollowers)} 
-              subtext="Tích lũy tệp truyền thông" 
-              color="var(--red)" 
-              tooltip="Độ phủ truyền thông cộng dồn (Tổng lượng người theo dõi) của toàn bộ tệp KOL tham gia dự án."
-              onClick={() => setActiveDetail({
-                title: "Độ phủ truyền thông (Followers)",
-                description: "Danh sách tất cả KOLs sắp xếp theo lượng người theo dõi (Followers) giảm dần.",
-                columns: [
-                  { key: "kol", label: "KOL" },
-                  { key: "campaign", label: "Chiến dịch" },
-                  { key: "follower", label: "Followers" },
-                  { key: "type", label: "Phân khúc" }
-                ],
-                data: [...activeRows].sort((a,b) => parseFollowers(b.follower) - parseFollowers(a.follower))
-              })}
-            />
-            <StatCard 
-              title="Tổng lượt xem (Views)" 
-              value={metrics.totalViews.toLocaleString()} 
-              subtext={`Đạt ${metrics.kpiViewsAchievedRate}% KPI (${metrics.totalEstViews.toLocaleString()} views)`} 
-              color="var(--blue)" 
-              tooltip="Tổng số lượt xem video thực tế tích lũy. Thể hiện tiến độ hoàn thành so với mục tiêu KPI views dự kiến."
-              onClick={() => setActiveDetail({
-                title: "Thống kê Lượt xem thực tế (Views)",
-                description: "Danh sách tất cả KOLs sắp xếp theo lượt xem video thực tế trên TikTok từ cao xuống thấp.",
-                columns: [
-                  { key: "kol", label: "KOL" },
-                  { key: "campaign", label: "Chiến dịch" },
-                  { key: "estView", label: "KPI Views", render: r => Number(r.estView) ? Number(r.estView).toLocaleString() : "—" },
-                  { key: "views", label: "Views thực tế", render: r => <strong>{Number(r.views).toLocaleString()}</strong> },
-                   {
-                    key: "achieved",
-                    label: "% Đạt KPI",
-                    render: r => {
-                      if (!Number(r.estView)) return "—";
-                      const pct = Math.round((Number(r.views) / Number(r.estView)) * 100);
-                      let bg = "var(--green-soft)";
-                      let fg = "var(--green)";
-                      if (pct < 90) {
-                        bg = "#FEE2E2"; // Soft red
-                        fg = "#EF4444";
-                      } else if (pct < 100) {
-                        bg = "var(--amber-soft)";
-                        fg = "var(--amber)";
-                      }
-                      return (
-                        <span className="kt-badge" style={{ background: bg, color: fg, border: `1px solid ${fg}`, fontWeight: 700 }}>
-                          {pct}%
-                        </span>
-                      );
-                    }
-                  }
-                ],
-                data: [...activeRows].sort((a,b) => (Number(b.views)||0) - (Number(a.views)||0))
-              })}
-            />
-            <StatCard 
-              title="Tổng tương tác" 
-              value={metrics.totalEngagement.toLocaleString()} 
-              subtext={`Tỷ lệ tương tác/views: ${metrics.avgEngRate}%`} 
-              color="var(--green)" 
-              tooltip="Tổng tương tác thực tế (Likes + Comments + Saves + Shares). Tỷ lệ ER = Tổng tương tác / Lượt xem * 100%."
-              onClick={() => setActiveDetail({
-                title: "Thống kê Tương tác (Likes, Comments, Saves, Shares)",
-                description: "Danh sách tất cả KOLs sắp xếp theo tổng lượng tương tác thực tế của video bài đăng.",
-                columns: [
-                  { key: "kol", label: "KOL" },
-                  { key: "views", label: "Views", render: r => Number(r.views).toLocaleString() },
-                  { key: "likes", label: "Likes", render: r => Number(r.likes).toLocaleString() },
-                  { key: "comments", label: "Comments", render: r => Number(r.comments).toLocaleString() },
-                  { key: "saves", label: "Saves", render: r => Number(r.saves).toLocaleString() },
-                  { key: "shares", label: "Shares", render: r => Number(r.shares).toLocaleString() },
-                  { key: "er", label: "Tỷ lệ ER", render: r => (Number(r.views) > 0 ? (((Number(r.likes) + Number(r.comments) + Number(r.saves) + Number(r.shares)) / r.views) * 100).toFixed(2) + "%" : "0%") }
-                ],
-                data: [...activeRows].sort((a,b) => {
-                  const engA = (Number(a.likes)||0)+(Number(a.comments)||0)+(Number(a.saves)||0)+(Number(a.shares)||0);
-                  const engB = (Number(b.likes)||0)+(Number(b.comments)||0)+(Number(b.saves)||0)+(Number(b.shares)||0);
-                  return engB - engA;
-                })
-              })}
-            />
-            <StatCard 
-              title="Phân khúc chủ đạo" 
-              value={metrics.tierList[0]?.name || "N/A"} 
-              subtext="Loại KOL chiếm số đông" 
-              tooltip="Phân nhóm quy mô sáng tạo (Micro, Mid-tier, Macro...) chiếm tỷ trọng cao nhất trong tổng số KOLs tham gia."
-              onClick={() => setActiveDetail({
-                title: "Phân loại KOL theo Tiers",
-                description: "Danh sách tất cả KOLs kèm theo chi phí và phân nhóm quy mô sáng tạo (Micro, Mid-tier, Macro...).",
-                columns: [
-                  { key: "kol", label: "KOL" },
-                  { key: "campaign", label: "Chiến dịch" },
-                  { key: "type", label: "Phân khúc" },
-                  { key: "follower", label: "Followers" },
-                  { key: "cost", label: "Booking Cost", render: r => fmtVND(r.cost) }
-                ],
-                data: [...activeRows].sort((a,b) => (b.type || "").localeCompare(a.type || ""))
-              })}
-            />
-          </div>
-
-          {/* Tiers Segmented Bar Chart */}
-          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
-            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>Phân bố loại KOL (Tiers) & Độ phủ</h3>
-            
-            {/* Visual Bar Chart */}
-            <div style={{ display: "flex", height: 16, borderRadius: 8, overflow: "hidden", background: "var(--line)", marginBottom: 16 }}>
-              {metrics.tierList.map((t, idx) => {
-                const pct = Math.round((t.count / metrics.totalKOL) * 100);
-                if (pct === 0) return null;
-                const color = COLOR_PALETTE[idx % COLOR_PALETTE.length];
-                return (
-                  <div
-                    key={t.name}
-                    style={{ width: `${pct}%`, background: color, height: "100%" }}
-                    title={`${t.name}: ${t.count} KOL (${pct}%)`}
-                  />
-                );
-              })}
-            </div>
-
-            {/* Breakdown details */}
-            <div style={{ overflowX: "auto" }} className="kt-scrollbar">
-              <table className="kt-table" style={{ margin: 0, minWidth: 400 }}>
-                <thead>
-                  <tr>
-                    <th>Loại KOL</th>
-                    <th>Số lượng</th>
-                    <th>Tỷ lệ</th>
-                    <th>Tổng ngân sách</th>
-                    <th>Tổng Followers</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {metrics.tierList.map((t, idx) => {
-                    const pct = Math.round((t.count / metrics.totalKOL) * 100);
-                    return (
-                      <tr key={t.name} onClick={() => setActiveDetail({
-                        title: `Phân khúc KOL: ${t.name}`,
-                        description: t.name === "Chưa phân loại" 
-                          ? "Các dòng dữ liệu trống trường phân khúc (Tier) trong Media Plan gốc. Lý do: KOL nhận tài trợ sản phẩm/quà tặng FOC (chi phí booking 0đ) thường không xếp nhóm quy mô cố định, hoặc kịch bản chạy đại trà diện rộng."
-                          : `Danh sách các nhà sáng tạo nội dung thuộc phân khúc quy mô ${t.name} (Tổng số lượng: ${t.count} KOLs).`,
-                        columns: [
-                          { key: "kol", label: "KOL" },
-                          { key: "campaign", label: "Chiến dịch" },
-                          { key: "follower", label: "Followers" },
-                          { key: "cost", label: "Booking Cost", render: r => fmtVND(r.cost) },
-                          { key: "statusKey", label: "Trạng thái", render: r => <StatusBadge statusKey={r.statusKey} /> }
-                        ],
-                        data: activeRows.filter(r => (r.type || "Chưa phân loại") === t.name)
-                      })} style={{ cursor: "pointer" }}>
-                        <td>
-                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: COLOR_PALETTE[idx % COLOR_PALETTE.length] }} />
-                            <strong>{t.name}</strong>
-                          </div>
-                        </td>
-                        <td>{t.count}</td>
-                        <td>{pct}%</td>
-                        <td>{fmtVND(t.cost)}</td>
-                        <td>{fmtFollowers(t.followers)}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Locations & Groups grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16, marginBottom: 20 }}>
-            {/* Locations */}
-            <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16 }}>
-              <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>Địa bàn của KOL</h3>
-              <table className="kt-table" style={{ margin: 0 }}>
-                <thead>
-                  <tr>
-                    <th>Khu vực</th>
-                    <th>Số KOL</th>
-                    <th>Chi phí</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {metrics.locList.slice(0, 5).map(l => (
-                    <tr key={l.name} onClick={() => setActiveDetail({
-                      title: `Khu vực/Địa bàn: ${l.name}`,
-                      description: l.name === "Chưa xác định" 
-                        ? "Các nhà sáng tạo chưa cập nhật hoặc trống trường địa điểm (Location). Lý do: Chiến dịch tiếp cận online đa kênh toàn quốc (Nationwide), KOL phân phối nội dung chung hoặc địa chỉ liên hệ/booking không cần thiết cho dự án offline."
-                        : `Danh sách các nhà sáng tạo nội dung đang hoạt động chủ yếu tại khu vực ${l.name} (Tổng số lượng: ${l.count} KOLs).`,
-                      columns: [
-                        { key: "kol", label: "KOL" },
-                        { key: "campaign", label: "Chiến dịch" },
-                        { key: "location", label: "Địa bàn" },
-                        { key: "cost", label: "Booking Cost", render: r => fmtVND(r.cost) },
-                        { key: "statusKey", label: "Trạng thái", render: r => <StatusBadge statusKey={r.statusKey} /> }
-                      ],
-                      data: activeRows.filter(r => (r.location || "Chưa xác định") === l.name)
-                    })} style={{ cursor: "pointer" }}>
-                      <td><strong>{l.name}</strong></td>
-                      <td>{l.count}</td>
-                      <td>{fmtVND(l.cost)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Audience Groups */}
-            <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16 }}>
-              <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>Nhóm target của KOL</h3>
-              <table className="kt-table" style={{ margin: 0 }}>
-                <thead>
-                  <tr>
-                    <th>Nhóm khán giả</th>
-                    <th>Số KOL</th>
-                    <th>Tỷ lệ</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {metrics.groupList.slice(0, 5).map(g => (
-                    <tr key={g.name} onClick={() => setActiveDetail({
-                      title: `Nhóm khán giả target: ${g.name}`,
-                      description: g.name === "Chưa xác định" 
-                        ? "Các nhà sáng tạo trống trường đối tượng mục tiêu (Target Audience). Lý do: KOL làm nội dung về phong cách sống, nấu ăn gia đình tổng hợp tiếp cận tệp đại chúng diện rộng (Broad/Mass Audience), không định vị phân mảnh ngách."
-                        : `Danh sách các nhà sáng tạo nội dung tập trung phục vụ nhóm khán giả ${g.name} (Tổng số lượng: ${g.count} KOLs).`,
-                      columns: [
-                        { key: "kol", label: "KOL" },
-                        { key: "campaign", label: "Chiến dịch" },
-                        { key: "targetAudience", label: "Target Audience" },
-                        { key: "cost", label: "Booking Cost", render: r => fmtVND(r.cost) },
-                        { key: "statusKey", label: "Trạng thái", render: r => <StatusBadge statusKey={r.statusKey} /> }
-                      ],
-                      data: activeRows.filter(r => (r.targetAudience || "Chưa xác định") === g.name)
-                    })} style={{ cursor: "pointer" }}>
-                      <td><strong>{g.name}</strong></td>
-                      <td>{g.count}</td>
-                      <td>{Math.round((g.count / metrics.totalKOL) * 100)}%</td>
+                  {kol.campaignDetails.map((c, i) => (
+                    <tr key={i} style={{ borderBottom: "1px solid var(--line)" }}>
+                      <td style={{ padding: "10px 12px", fontWeight: 600 }}>
+                        <CampaignDot campaign={c.campaign} labels={campaignLabels} />
+                      </td>
+                      <td style={{ padding: "10px 12px", color: "var(--ink-soft)" }}>{c.monAn || "—"}</td>
+                      <td style={{ padding: "10px 12px", fontWeight: 600, color: "var(--accent)" }}>{fmtVND(c.cost)}</td>
+                      <td style={{ padding: "10px 12px" }}>
+                        <StatusBadge statusKey={c.statusKey} />
+                      </td>
+                      <td style={{ padding: "10px 12px" }}>{c.views ? c.views.toLocaleString() : "—"}</td>
+                      <td style={{ padding: "10px 12px" }}>{c.conversions ? c.conversions.toLocaleString() : "—"}</td>
+                      <td style={{ padding: "10px 12px", fontWeight: 600, color: "var(--ok)" }}>{fmtVND(c.revenue)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           </div>
-
-          {/* Top Viral KOLs */}
-          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16, marginBottom: 20 }}>
-            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)", display: "flex", alignItems: "center", gap: 6 }}>
-              Top 5 KOLs Đạt Lượt Xem (Views) Cao Nhất
-            </h3>
-            {metrics.topKOLsByViews.length > 0 ? (
-              <div style={{ overflowX: "auto" }} className="kt-scrollbar">
-                <table className="kt-table" style={{ margin: 0, minWidth: 500 }}>
-                  <thead>
-                    <tr>
-                      <th>KOL</th>
-                      <th>Chiến dịch</th>
-                      <th>KPI Views</th>
-                      <th>Views thực tế</th>
-                      <th>Đạt KPI</th>
-                      <th>Tỷ lệ Tương tác (ER)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {metrics.topKOLsByViews.map(r => {
-                      const totalEng = (Number(r.likes) || 0) + (Number(r.comments) || 0) + (Number(r.saves) || 0) + (Number(r.shares) || 0);
-                      const er = (Number(r.views) || 0) > 0 ? ((totalEng / r.views) * 100).toFixed(2) + "%" : "0%";
-                      const kpiPct = (Number(r.estView) || 0) > 0 ? Math.round((r.views / r.estView) * 100) + "%" : "—";
-                      return (
-                        <tr key={r.id} onClick={() => onOpenKOL(r)} style={{ cursor: "pointer" }} title="Click để xem chi tiết KOL">
-                          <td><strong>{r.kol}</strong></td>
-                          <td>{r.campaign}</td>
-                          <td>{Number(r.estView) ? Number(r.estView).toLocaleString() : "—"}</td>
-                          <td><strong style={{ color: "var(--blue)" }}>{Number(r.views).toLocaleString()}</strong></td>
-                          <td>
-                            {(() => {
-                              if (!Number(r.estView)) return <span style={{ color: "var(--ink-soft)" }}>—</span>;
-                              const pct = Math.round((r.views / r.estView) * 100);
-                              let bg = "var(--green-soft)";
-                              let fg = "var(--green)";
-                              if (pct < 90) { bg = "#FEE2E2"; fg = "#EF4444"; }
-                              else if (pct < 100) { bg = "var(--amber-soft)"; fg = "var(--amber)"; }
-                              return (
-                                <span className="kt-badge" style={{ background: bg, color: fg, border: `1px solid ${fg}`, fontWeight: 700 }}>
-                                  {pct}%
-                                </span>
-                              );
-                            })()}
-                          </td>
-                          <td>{er}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <div style={{ padding: 12, borderRadius: 2, background: "var(--warn-bg)", color: "var(--warn)", fontSize: 12 }}>
-                Chưa có dữ liệu Lượt Xem thực tế được nhập.
-              </div>
-            )}
-          </div>
-
-          {/* Insights statements */}
-          <div style={{ background: "var(--red-soft)", borderRadius: 2, padding: 16, border: "1px solid var(--line)" }}>
-            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 10px 0", color: "var(--ink)" }}>Insight cho Marketing</h3>
-            <ul style={{ margin: 0, paddingLeft: 20, display: "flex", flexDirection: "column", gap: 8, fontSize: 12, color: "var(--ink)" }}>
-              {marketingInsights.map((ins, i) => (
-                <li key={i} dangerouslySetInnerHTML={{ __html: ins }} />
-              ))}
-            </ul>
-          </div>
         </div>
-      )}
 
-      {subView === "ecom" && (
-        <div className="kt-anim">
-          {/* Stats grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, marginBottom: 20 }}>
-            <StatCard 
-              title="Tổng doanh số (GMV)" 
-              value={fmtVND(metrics.totalRevenue)} 
-              subtext={`Chỉ số sinh lời ROAS: ${metrics.roas}x`} 
-              color="var(--red)" 
-              onClick={() => setActiveDetail({
-                title: "Danh sách Hiệu Quả Doanh Số (GMV)",
-                description: "Danh sách KOLs mang lại doanh thu bán hàng thực tế từ cao xuống thấp.",
-                columns: [
-                  { key: "kol", label: "KOL" },
-                  { key: "campaign", label: "Chiến dịch" },
-                  { key: "conversions", label: "Đơn hàng (Conversions)", render: r => Number(r.conversions).toLocaleString() },
-                  { key: "addToCart", label: "Thêm giỏ hàng (ATC)", render: r => Number(r.addToCart).toLocaleString() },
-                  { key: "revenue", label: "Doanh thu / GMV", render: r => <strong>{fmtVND(r.revenue)}</strong> }
-                ],
-                data: [...activeRows].sort((a,b) => (Number(b.revenue)||0) - (Number(a.revenue)||0))
-              })}
-            />
-            <StatCard 
-              title="Chi phí chạy Ads" 
-              value={fmtVND(metrics.totalAdSpend)} 
-              subtext={`CPV trung bình: ${metrics.cpv}đ / view`} 
-              color="var(--blue)" 
-              onClick={() => setActiveDetail({
-                title: "Chi tiết Ngân sách quảng cáo (Ad Spend)",
-                description: "Thống kê ngân sách chạy Ads và giá lượt xem (CPV) trung bình của từng KOL.",
-                columns: [
-                  { key: "kol", label: "KOL" },
-                  { key: "campaign", label: "Chiến dịch" },
-                  { key: "adSpend", label: "Ad Spend", render: r => fmtVND(r.adSpend) },
-                  { key: "views", label: "Views thực tế", render: r => Number(r.views).toLocaleString() },
-                  { key: "cpv", label: "CPV thực tế", render: r => (Number(r.views) > 0 ? Math.round(Number(r.adSpend)/Number(r.views)) + "đ" : "—") }
-                ],
-                data: [...activeRows].sort((a,b) => (Number(b.adSpend)||0) - (Number(a.adSpend)||0))
-              })}
-            />
-            <StatCard 
-              title="Đơn hàng (Conversions)" 
-              value={`${metrics.totalConversions.toLocaleString()} đơn`} 
-              subtext={`Thêm giỏ hàng: ${metrics.totalAddToCart.toLocaleString()} lượt`} 
-              color="var(--green)" 
-              onClick={() => setActiveDetail({
-                title: "Hiệu quả đơn hàng & Giỏ hàng",
-                description: "Danh sách KOLs mang lại lượt đặt hàng thành công và tương tác sản phẩm.",
-                columns: [
-                  { key: "kol", label: "KOL" },
-                  { key: "campaign", label: "Chiến dịch" },
-                  { key: "conversions", label: "Đơn hàng (Conversions)", render: r => <strong>{Number(r.conversions).toLocaleString()}</strong> },
-                  { key: "addToCart", label: "Thêm giỏ hàng (ATC)", render: r => Number(r.addToCart).toLocaleString() },
-                  { key: "revenue", label: "Doanh thu / GMV", render: r => fmtVND(r.revenue) }
-                ],
-                data: [...activeRows].sort((a,b) => (Number(b.conversions)||0) - (Number(a.conversions)||0))
-              })}
-            />
-            <StatCard 
-              title="CPM toàn chiến dịch" 
-              value={metrics.cpmEst ? `${fmtVND(metrics.cpmEst)}` : "N/A"} 
-              subtext="CPM trên 1000 followers tiếp cận" 
-              color="var(--amber)" 
-              onClick={() => setActiveDetail({
-                title: "Chỉ số chi phí / 1,000 Follower tiếp cận (CPM)",
-                description: "Đo lường hiệu quả booking dựa trên quy mô người theo dõi.",
-                columns: [
-                  { key: "kol", label: "KOL" },
-                  { key: "campaign", label: "Chiến dịch" },
-                  { key: "follower", label: "Followers" },
-                  { key: "cost", label: "Booking Cost", render: r => fmtVND(r.cost) },
-                  { key: "cpm", label: "CPM ước tính", render: r => {
-                    const fl = parseFollowers(r.follower);
-                    return fl > 0 ? <strong>{fmtVND(Math.round((Number(r.cost) || 0) / fl * 1000))}</strong> : "—";
-                  }}
-                ],
-                data: [...activeRows].filter(r => parseFollowers(r.follower) > 0).sort((a,b) => {
-                  const flA = parseFollowers(a.follower);
-                  const flB = parseFollowers(b.follower);
-                  return ((Number(a.cost)||0)/flA) - ((Number(b.cost)||0)/flB);
-                })
-              })}
-            />
-          </div>
-
-          {/* Top 5 cost-effective KOLs */}
-          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16, marginBottom: 20 }}>
-            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>Top 5 KOL có hiệu suất chi phí tiếp cận tối ưu nhất (CPF)</h3>
-            {metrics.sortedEcom.length > 0 ? (
-              <div style={{ overflowX: "auto" }} className="kt-scrollbar">
-                <table className="kt-table" style={{ margin: 0, minWidth: 400 }}>
-                  <thead>
-                    <tr>
-                      <th>KOL</th>
-                      <th>Chiến dịch</th>
-                      <th>Followers</th>
-                      <th>Chi phí</th>
-                      <th>Chi phí / 1 Follower</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {metrics.sortedEcom.slice(0, 5).map(r => (
-                      <tr key={r.id}>
-                        <td><strong>{r.kol}</strong></td>
-                        <td>{r.campaign}</td>
-                        <td>{r.follower}</td>
-                        <td>{fmtVND(r.cost)}</td>
-                        <td style={{ color: "var(--green)", fontWeight: 600 }}>{fmtVND(r.cpf)} / follow</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <div style={{ padding: 12, borderRadius: 2, background: "var(--warn-bg)", color: "var(--warn)", fontSize: 12, fontWeight: 600 }}>
-                Không tìm thấy KOL nào có ghi nhận thông tin Followers để tính chỉ số hiệu suất.
-              </div>
-            )}
-          </div>
-
-          {/* GMV Contribution Chart */}
-          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16, marginBottom: 20 }}>
-            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 16px 0", color: "var(--ink)" }}>Đóng góp Doanh số (GMV) của các Chiến dịch</h3>
-            {metrics.totalRevenue > 0 ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {metrics.campaignList.map(c => {
-                  const gmv = activeRows.filter(r => r.campaign === c.campaign).reduce((sum, r) => sum + (Number(r.revenue) || 0), 0);
-                  const pct = metrics.totalRevenue > 0 ? Math.round((gmv / metrics.totalRevenue) * 100) : 0;
-                  if (gmv === 0) return null;
-                  const campColor = CAMPAIGN_COLOR[c.campaign] || "var(--green)";
-                  return (
-                    <div key={c.campaign} onClick={() => setActiveDetail({
-                      title: `Hiệu quả Doanh Số - Chiến dịch ${c.campaign}`,
-                      description: `Thống kê chi tiết đơn hàng (Conversions), lượt thêm giỏ hàng (ATC) và Doanh thu (GMV) của chiến dịch ${c.campaign}.`,
-                      columns: [
-                        { key: "kol", label: "KOL" },
-                        { key: "conversions", label: "Đơn hàng (Conversions)", render: r => Number(r.conversions).toLocaleString() },
-                        { key: "addToCart", label: "Thêm giỏ hàng (ATC)", render: r => Number(r.addToCart).toLocaleString() },
-                        { key: "revenue", label: "Doanh thu / GMV", render: r => <strong>{fmtVND(r.revenue)}</strong> }
-                      ],
-                      data: activeRows.filter(r => r.campaign === c.campaign).sort((a,b) => (Number(b.revenue)||0) - (Number(a.revenue)||0))
-                    })} style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }} title="Click để xem chi tiết danh sách KOL">
-                      <div style={{ fontSize: 11, fontWeight: 700, width: 70, color: "var(--ink)" }}>{c.campaign} ↗</div>
-                      <div style={{ flex: 1, height: 18, background: "var(--paper)", borderRadius: 2, overflow: "hidden", display: "flex", position: "relative", border: "1px solid var(--line)" }}>
-                        <div style={{ width: `${pct}%`, background: campColor, height: "100%", transition: "all 0.3s ease" }} />
-                        <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 10, fontWeight: 700, color: pct > 15 ? "#fff" : "var(--ink)" }}>
-                          {fmtVND(gmv)} ({pct}%)
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div style={{ padding: 12, borderRadius: 2, background: "var(--warn-bg)", color: "var(--warn)", fontSize: 12 }}>
-                Chưa có dữ liệu doanh số để thống kê tỷ lệ đóng góp.
-              </div>
-            )}
-          </div>
-
-          {/* Top Sales KOLs */}
-          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16, marginBottom: 20 }}>
-            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)", display: "flex", alignItems: "center", gap: 6 }}>
-              Top 5 KOLs Mang Lại Doanh Số / GMV Cao Nhất
-            </h3>
-            {metrics.topKOLsByRevenue.length > 0 ? (
-              <div style={{ overflowX: "auto" }} className="kt-scrollbar">
-                <table className="kt-table" style={{ margin: 0, minWidth: 500 }}>
-                  <thead>
-                    <tr>
-                      <th>KOL</th>
-                      <th>Chiến dịch</th>
-                      <th>Chi phí Ads</th>
-                      <th>Đơn hàng</th>
-                      <th>Lượt thêm giỏ</th>
-                      <th>Doanh thu (GMV)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {metrics.topKOLsByRevenue.map(r => (
-                      <tr key={r.id} onClick={() => onOpenKOL(r)} style={{ cursor: "pointer" }} title="Click để chỉnh sửa chi tiết KOL">
-                        <td><strong>{r.kol}</strong></td>
-                        <td>{r.campaign}</td>
-                        <td>{fmtVND(r.adSpend)}</td>
-                        <td>{Number(r.conversions).toLocaleString()}</td>
-                        <td>{Number(r.addToCart).toLocaleString()}</td>
-                        <td><strong style={{ color: "var(--green)" }}>{fmtVND(r.revenue)}</strong></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <div style={{ padding: 12, borderRadius: 2, background: "var(--warn-bg)", color: "var(--warn)", fontSize: 12 }}>
-                Chưa có dữ liệu doanh số/GMV được ghi nhận.
-              </div>
-            )}
-          </div>
-
-          {/* Ecom actions: Aired missing link checklist */}
-          <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16, marginBottom: 20 }}>
-            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)" }}>Checklist việc cần làm: Thu thập Video Link các bài đã lên sóng (Aired)</h3>
-            {metrics.airedMissingLink.length > 0 ? (
-              <div>
-                <p style={{ fontSize: 11, color: "var(--ink-soft)", margin: "0 0 8px 0" }}>Phát hiện <strong>{metrics.airedMissingLink.length} bài</strong> đã lên sóng nhưng chưa có đường dẫn video để đối soát:</p>
-                <div style={{ maxHeight: 220, overflowY: "auto", border: "1px solid var(--line)", borderRadius: 2, isolation: "isolate" }} className="kt-scrollbar">
-                  <table className="kt-table kt-table-sticky" style={{ margin: 0, tableLayout: "fixed", width: "100%" }}>
-                    <colgroup>
-                      <col style={{ width: "22%" }} />
-                      <col style={{ width: "10%" }} />
-                      <col style={{ width: "48%" }} />
-                      <col style={{ width: "20%" }} />
-                    </colgroup>
-                    <thead>
-                      <tr>
-                        <th>Tên KOL</th>
-                        <th>Chiến dịch</th>
-                        <th>Món ăn</th>
-                        <th>Ngày lên sóng</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {metrics.airedMissingLink.map(r => (
-                        <tr key={r.id}>
-                          <td><strong>{r.kol}</strong></td>
-                          <td>{r.campaign}</td>
-                          <td style={{ maxWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={r.monAn || ""}>{r.monAn || "—"}</td>
-                          <td style={{ maxWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={r.ngayAir || ""}>{r.ngayAir || "—"}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            ) : (
-              <div style={{ padding: 12, borderRadius: 2, background: "var(--green-soft)", color: "var(--green)", fontSize: 12, fontWeight: 600 }}>
-                Toàn bộ KOL đã lên sóng (Aired) đều đã được gắn link video đầy đủ.
-              </div>
-            )}
-          </div>
-
-          {/* Insights statements */}
-          <div style={{ background: "var(--red-soft)", borderRadius: 2, padding: 16, border: "1px solid var(--line)" }}>
-            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 10px 0", color: "var(--ink)" }}>Insight cho E-commerce</h3>
-            <ul style={{ margin: 0, paddingLeft: 20, display: "flex", flexDirection: "column", gap: 8, fontSize: 12, color: "var(--ink)" }}>
-              {ecomInsights.map((ins, i) => (
-                <li key={i} dangerouslySetInnerHTML={{ __html: ins }} />
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
-
-      {/* ── Custom Notes Card ── */}
-      <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16, marginTop: 20 }}>
-        <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 8px 0", color: "var(--ink)", display: "flex", alignItems: "center", gap: 6 }}>
-          Nhận xét & Đánh giá của tôi
-        </h3>
-        <p style={{ fontSize: 11, color: "var(--ink-soft)", margin: "0 0 12px 0" }}>
-          Ghi chú này sẽ được lưu riêng cho chiến dịch <strong>{selectedCampaign === "all" ? "Tổng cộng (Tất cả)" : selectedCampaign}</strong>.
-        </p>
-        <textarea
-          className="kt-textarea"
-          value={noteText}
-          onChange={e => setNoteText(e.target.value)}
-          placeholder="Nhập đánh giá hiệu quả, đề xuất tối ưu hoặc lưu ý quan trọng cho dự án tại đây..."
-          style={{ width: "100%", height: 100, resize: "vertical", fontSize: 13, padding: 10, borderRadius: 2, border: "1px solid var(--line)", outline: "none", marginBottom: 12 }}
-        />
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <button
-            className="kt-btn kt-btn-primary"
-            onClick={() => onSaveNote(selectedCampaign, noteText)}
-            style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, padding: "8px 16px" }}
-          >
-            Lưu Nhận xét & Đánh giá
-          </button>
+        <div style={{ padding: "14px 22px", borderTop: "1px solid var(--line)", display: "flex", justifyContent: "flex-end" }}>
+          <button className="kt-btn kt-btn-ghost" onClick={onClose}>Đóng hồ sơ</button>
         </div>
       </div>
-
-      {/* ── Collapsible Glossary Card ── */}
-      <div style={{ background: "var(--card)", border: "1px solid var(--line)", borderRadius: 2, padding: 16, marginTop: 20 }}>
-        <h3 
-          style={{ fontSize: 13, fontWeight: 700, margin: 0, color: "var(--ink)", display: "flex", alignItems: "center", justifySpace: "space-between", cursor: "pointer", userSelect: "none" }} 
-          onClick={() => setShowGlossary(!showGlossary)}
-        >
-          <span style={{ display: "flex", alignItems: "center", gap: 6 }}>Giải thích định nghĩa & công thức các chỉ số (Metrics Glossary)</span>
-          <span style={{ fontSize: 10, color: "var(--ink-soft)" }}>{showGlossary ? "Thu gọn ▲" : "Mở rộng ▼"}</span>
-        </h3>
-        {showGlossary && (
-          <GlossaryPanel />
-        )}
-      </div>
-
-
-      {/* ── STAT CARD DETAIL MODAL ── */}
-      {activeDetail && (
-        <div className="kt-overlay" onClick={e => e.target === e.currentTarget && setActiveDetail(null)} style={{ display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
-          <div className="kt-modal kt-anim" style={{ maxWidth: 800, width: "90%", maxHeight: "85vh", display: "flex", flexDirection: "column" }}>
-            {/* Header */}
-            <div style={{ padding: "18px 22px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <div>
-                <div style={{ fontSize: 10, fontWeight: 700, color: "var(--blue)", textTransform: "uppercase", letterSpacing: "0.04em" }}>Thống kê chi tiết</div>
-                <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)", marginTop: 2 }}>{activeDetail.title}</div>
-              </div>
-              <button className="kt-btn kt-btn-ghost" onClick={() => setActiveDetail(null)} style={{ padding: "6px 10px", fontSize: 16 }}>✕</button>
-            </div>
-
-            {/* Body */}
-            <div style={{ padding: "18px 22px", display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
-              {activeDetail.description && <p style={{ fontSize: 12, color: "var(--ink-soft)", margin: "0 0 12px 0", lineHeight: 1.4 }}>{activeDetail.description}</p>}
-              <div style={{ border: "1px solid var(--line)", borderRadius: 8, overflowY: "auto", flex: 1, maxHeight: 380, isolation: "isolate", position: "relative" }} className="kt-scrollbar">
-                <table className="kt-table kt-table-sticky-modal" style={{ margin: 0 }}>
-                  <thead>
-                    <tr>
-                      {activeDetail.columns.map(col => <th key={col.key}>{col.label}</th>)}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {activeDetail.data.map((row, idx) => (
-                      <tr key={row.id || idx}>
-                        {activeDetail.columns.map(col => {
-                          const val = col.render ? col.render(row) : row[col.key];
-                          return (
-                            <td key={col.key}>
-                              {col.key === "kol" ? (
-                                <button
-                                  className="kt-btn-link"
-                                  onClick={() => {
-                                    onOpenKOL(row);
-                                    setActiveDetail(null);
-                                  }}
-                                  style={{
-                                    background: "none",
-                                    border: "none",
-                                    padding: 0,
-                                    color: "var(--blue)",
-                                    fontWeight: 700,
-                                    cursor: "pointer",
-                                    textDecoration: "underline",
-                                    textAlign: "left"
-                                  }}
-                                >
-                                  {val}
-                                </button>
-                              ) : (
-                                val
-                              )}
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    ))}
-                    {activeDetail.data.length === 0 && (
-                      <tr>
-                        <td colSpan={activeDetail.columns.length} style={{ textAlign: "center", color: "var(--ink-soft)", padding: 20 }}>Không có dữ liệu phù hợp.</td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div style={{ padding: "14px 22px", borderTop: "1px solid var(--line)", display: "flex", justifyContent: "flex-end" }}>
-              <button className="kt-btn kt-btn-primary" onClick={() => setActiveDetail(null)}>Đóng</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
@@ -3372,7 +1725,7 @@ const InsightsView = ({ rows, insightsNotes, onSaveNote, onOpenKOL }) => {
 /* ================================================================
    MAIN APP
 ================================================================ */
-const LS_KEY = "kol_tracker_v1";
+const LS_KEY = "kol_tracking_v5";
 
 export default function App() {
   const [data, rawSetData] = useState(() => {
@@ -3402,7 +1755,22 @@ export default function App() {
       return SEED_DATA;
     }
   });
-  const [view, setView] = useState("table"); // "table" | "kanban"
+    const [campaignLabels, setCampaignLabels] = useState(() => {
+    try {
+      const s = localStorage.getItem("kol_campaign_labels");
+      if (s) return JSON.parse(s);
+    } catch {}
+    return {
+      AM: "Campaign A",
+      AX: "Campaign B",
+      Vinegar: "Campaign C",
+      MSG: "Campaign D",
+      Blendy: "Campaign E"
+    };
+  });
+
+const [view, setView] = useState("table");
+  const [selectedProfile, setSelectedProfile] = useState(null); // "table" | "kanban"
   const [search, setSearch] = useState("");
   const [filterCampaign, setFilterCampaign] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -3419,18 +1787,7 @@ export default function App() {
 
 
 
-  const [insightsNotes, setInsightsNotes] = useState(() => {
-    try {
-      const s = localStorage.getItem("kol_tracker_insights_notes_v1");
-      return s ? JSON.parse(s) : {};
-    } catch {
-      return {};
-    }
-  });
 
-  useEffect(() => {
-    localStorage.setItem("kol_tracker_insights_notes_v1", JSON.stringify(insightsNotes));
-  }, [insightsNotes]);
 
   const [wizardData, setWizardData] = useState(null); // { rawHeaders, rawRows, fileName }
 
@@ -3514,6 +1871,7 @@ export default function App() {
     const file = e.target.files[0];
     if (!file) return;
     const isExcel = /\.(xlsx|xls)$/i.test(file.name);
+    const isCsv = /\.csv$/i.test(file.name);
     const isJson = /\.json$/i.test(file.name);
 
     const reader = new FileReader();
@@ -3522,21 +1880,80 @@ export default function App() {
         let rawHeaders = [];
         let rawRows = [];
 
-        if (isExcel) {
-          const wb = XLSX.read(ev.target.result, { type: "array" });
+        if (isExcel || isCsv) {
+          const readData = ev.target.result;
+          const wb = isCsv
+            ? XLSX.read(readData, { type: "string" })
+            : XLSX.read(readData, { type: "array" });
 
-          // Read ALL sheets and combine
+          // Helper to identify KOL name column values robustly (KOL, KOC, Creator, Tên Kênh, Account, etc)
+          const isKolHeaderValue = (val) => {
+            if (val == null) return false;
+            const kl = val.toString().toLowerCase().trim();
+            const kolAliases = [
+              "kol", "tên kol", "ten kol", "name", "influencer", "kol/koc", "koc", "creator", "kol name",
+              "account", "tài khoản", "tai khoan", "channel", "user", "username", "kênh", "kenh", "tên kênh", "ten kenh"
+            ];
+            
+            // Pass 1: Exact alias match
+            if (kolAliases.includes(kl)) return true;
+
+            // Pass 2: Primary contains match
+            if (kl.includes("kol") || kl.includes("koc") || kl.includes("influencer") || kl.includes("creator") || kl.includes("account") || kl.includes("username")) return true;
+
+            // Pass 3: Secondary contains match (excluding non-kol columns like món ăn, chi phí)
+            const isExclude = kl.includes("món") || kl.includes("food") || kl.includes("nhóm") || kl.includes("chi phí") || kl.includes("link") || kl.includes("giá") || kl.includes("cost") || kl.includes("tiến độ");
+            if ((kl.includes("tên") || kl.includes("ten") || kl.includes("name") || kl.includes("kênh") || kl.includes("kenh")) && !isExclude) return true;
+
+            return false;
+          };
+
+          // Read ALL sheets and combine dynamically
           const allSheets = wb.SheetNames
             .map(shName => {
               const ws = wb.Sheets[shName];
-              const json = XLSX.utils.sheet_to_json(ws, { defval: "" });
-              // Skip rows where KOL is empty (summary rows, totals, etc)
-              const real = json.filter(r => r["KOL"] && String(r["KOL"]).trim());
+              
+              // 1. Convert to 2D array to search for the header row index (up to first 25 rows)
+              const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
+              
+              let headerIdx = 0;
+              for (let r = 0; r < Math.min(aoa.length, 25); r++) {
+                const row = aoa[r];
+                if (Array.isArray(row)) {
+                  const hasKolColumn = row.some(isKolHeaderValue);
+                  if (hasKolColumn) {
+                    headerIdx = r;
+                    break;
+                  }
+                }
+              }
+
+              // 2. Parse sheet JSON starting from the detected header row
+              const json = XLSX.utils.sheet_to_json(ws, { range: headerIdx, defval: "" });
+              
+              // 3. Skip rows where KOL name column is empty
+              const real = json.filter(r => {
+                const keys = Object.keys(r);
+                const matchedKey = keys.find(isKolHeaderValue);
+                const val = matchedKey ? r[matchedKey] : null;
+                return val && String(val).trim();
+              });
+
               return { name: shName, rows: real };
             })
             .filter(s => s.rows.length > 0);
 
-          if (!allSheets.length) throw new Error("Không tìm thấy dữ liệu KOL trong file");
+          if (!allSheets.length) {
+            const sheetsInfo = wb.SheetNames.slice(0, 3).map(name => {
+              const ws = wb.Sheets[name];
+              const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
+              // Grab the first non-empty row to see what headers or title text exists
+              const firstNonEmpty = aoa.find(row => Array.isArray(row) && row.some(cell => cell != null && cell.toString().trim() !== "")) || [];
+              const rowStr = firstNonEmpty.length ? firstNonEmpty.slice(0, 5).map(c => String(c).trim()).join(", ") : "empty";
+              return `[${name}: ${rowStr.substring(0, 80)}]`;
+            }).join(" ");
+            throw new Error("Không tìm thấy cột KOL. Chi tiết file: " + sheetsInfo);
+          }
 
           // Stamp each row with sheet name + row index
           const combined = [];
@@ -3556,26 +1973,35 @@ export default function App() {
 
           const sheetInfo = allSheets.map(s => ({ name: s.name, count: s.rows.length }));
           setWizardData({ rawHeaders, rawRows, fileName: file.name, sheetInfo });
+
         } else if (isJson) {
-          const parsed = JSON.parse(new TextDecoder().decode(ev.target.result));
-          const arr = Array.isArray(parsed) ? parsed : parsed.data || parsed.kols || null;
-          if (!arr || !Array.isArray(arr)) throw new Error("Không tìm thấy mảng dữ liệu trong JSON");
-          if (!arr.length) throw new Error("File không có dữ liệu");
-          rawHeaders = Object.keys(arr[0]);
-          rawRows = arr;
-          setWizardData({ rawHeaders, rawRows, fileName: file.name, sheetInfo: null });
+          const parsed = JSON.parse(ev.target.result);
+          const rows = Array.isArray(parsed) ? parsed : [parsed];
+          rawRows = rows;
+          const headerSet = new Set();
+          rows.forEach(r => Object.keys(r).forEach(k => {
+            if (!k.startsWith("__") && k !== "No.") headerSet.add(k);
+          }));
+          rawHeaders = [...headerSet];
+          setWizardData({ rawHeaders, rawRows, fileName: file.name, sheetInfo: [{ name: "JSON", count: rows.length }] });
         } else {
-          throw new Error("Chỉ hỗ trợ file .xlsx, .xls hoặc .json");
+          throw new Error("Chỉ hỗ trợ file .xlsx, .xls, .csv hoặc .json");
         }
       } catch (err) {
-        showToast(`❌ Lỗi: ${err.message}`, false);
+        console.error(err);
+        showToast("❌ Lỗi: " + err.message, false);
       } finally {
         e.target.value = "";
       }
     };
 
-    if (isExcel) reader.readAsArrayBuffer(file);
-    else reader.readAsArrayBuffer(file);
+    if (isCsv) {
+      reader.readAsText(file, "UTF-8");
+    } else if (isJson) {
+      reader.readAsText(file);
+    } else {
+      reader.readAsArrayBuffer(file);
+    }
   }, []);
 
   const handleDownloadTemplate = () => {
@@ -3639,9 +2065,15 @@ export default function App() {
     );
     if (clearAll) {
       setData([]);
+      const defLabels = { AM: "Campaign A", AX: "Campaign B", Vinegar: "Campaign C", MSG: "Campaign D", Blendy: "Campaign E" };
+      setCampaignLabels(defLabels);
+      localStorage.setItem("kol_campaign_labels", JSON.stringify(defLabels));
     } else {
       if (window.confirm("Bạn có chắc chắn muốn khôi phục lại 66 dòng dữ liệu mẫu ban đầu? Mọi chỉnh sửa hiện tại sẽ bị mất.")) {
         setData(SEED_DATA);
+        const defLabels = { AM: "Campaign A", AX: "Campaign B", Vinegar: "Campaign C", MSG: "Campaign D", Blendy: "Campaign E" };
+        setCampaignLabels(defLabels);
+        localStorage.setItem("kol_campaign_labels", JSON.stringify(defLabels));
       }
     }
   };
@@ -3650,102 +2082,135 @@ export default function App() {
     <div className="kt-root">
       <GlobalStyle />
 
-      {/* Animated background blobs */}
-      <div className="kt-blob kt-blob-1" />
-      <div className="kt-blob kt-blob-2" />
-      <div className="kt-blob kt-blob-3" />
-
       {/* ── HEADER ── */}
       <div style={{
         background: "var(--card)",
         borderBottom: "1px solid var(--line)",
-        padding: "14px 20px",
+        padding: "16px 24px",
         display: "flex",
         flexDirection: "column",
-        gap: 12,
-        flexShrink: 0
+        gap: 14,
+        flexShrink: 0,
+        zIndex: 10,
+        boxShadow: "0 4px 20px rgba(72, 67, 92, 0.015)"
       }}>
-        {/* Top Row: Title + Main Actions */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
-          <h1 className="kt-display" style={{ fontSize: 22, color: "var(--ink)", margin: 0 }}>KOL Tracker</h1>
-          
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-            {/* View toggle */}
-            <div style={{ display: "flex", gap: 4, marginRight: 8 }}>
-              <button className={`kt-btn kt-btn-ghost${view === "table" ? " active" : ""}`}
-                onClick={() => setView("table")}>Bảng</button>
-              <button className={`kt-btn kt-btn-ghost${view === "kanban" ? " active" : ""}`}
-                onClick={() => setView("kanban")}>Kanban</button>
-              <button className={`kt-btn kt-btn-ghost${view === "insights" ? " active" : ""}`}
-                onClick={() => setView("insights")}>Insights</button>
-              <button className={`kt-btn kt-btn-ghost${view === "calendar" ? " active" : ""}`}
-                onClick={() => setView("calendar")}>Lịch</button>
+        {/* Top Row: Brand Title + View Toggles + Action Buttons */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 14 }}>
+          {/* Group 1: Logo/Brand & View Toggles (Left aligned together) */}
+          <div style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }}>
+            {/* Logo & Brand Name */}
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: 10,
+                background: "linear-gradient(135deg, var(--accent) 0%, #6858E0 100%)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                boxShadow: "0 4px 14px rgba(138, 123, 255, 0.2)",
+              }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                </svg>
+              </div>
+              <h1 style={{ 
+                fontSize: 22, 
+                color: "var(--ink)", 
+                margin: 0, 
+                fontWeight: 800, 
+                letterSpacing: "-0.03em",
+                fontFamily: "'Plus Jakarta Sans', sans-serif"
+              }}>
+                KOL <span style={{ color: "var(--accent)" }}>Tracking</span>
+              </h1>
             </div>
+            
+            {/* View Toggle (Bảng, Kanban, Lịch) */}
+            <div style={{ display: "flex", gap: 4, background: "var(--paper)", padding: 4, borderRadius: 24 }}>
+              <button className={`kt-btn ${view === "table" ? "kt-btn-primary" : "kt-btn-ghost"}`}
+                style={{ padding: "6px 16px", fontSize: 12, borderRadius: 20 }}
+                onClick={() => setView("table")}>Bảng</button>
+              <button className={`kt-btn ${view === "kanban" ? "kt-btn-primary" : "kt-btn-ghost"}`}
+                style={{ padding: "6px 16px", fontSize: 12, borderRadius: 20 }}
+                onClick={() => setView("kanban")}>Kanban</button>
+              <button className={`kt-btn ${view === "calendar" ? "kt-btn-primary" : "kt-btn-ghost"}`}
+                style={{ padding: "6px 16px", fontSize: 12, borderRadius: 20 }}
+                onClick={() => setView("calendar")}>Lịch</button>
+              <button className={`kt-btn ${view === "profile" ? "kt-btn-primary" : "kt-btn-ghost"}`}
+                style={{ padding: "6px 16px", fontSize: 12, borderRadius: 20 }}
+                onClick={() => setView("profile")}>Hồ sơ KOL</button>
+            </div>
+          </div>
 
-            {/* Excel / JSON Actions */}
-            <input ref={importRef} type="file" accept=".xlsx,.xls,.json,application/json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          {/* Quick Actions (Add, Import, Undo/Redo) */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            {/* Template / Import hidden file loader */}
+            <input ref={importRef} type="file" multiple accept=".xlsx,.xls,.json,application/json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
               style={{ display: "none" }} onChange={handleImport} />
+            
             <button className="kt-btn kt-btn-ghost" onClick={handleDownloadTemplate}
-              title="Tải file Excel mẫu đúng định dạng" style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              Template
+              title="Tải file Excel mẫu đúng định dạng" style={{ padding: "8px 14px" }}>
+              📄 Mẫu
             </button>
             <button className="kt-btn kt-btn-ghost" onClick={() => importRef.current?.click()}
-              title="Import file Excel (.xlsx) hoặc JSON" style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              Import
+              title="Import file Excel (.xlsx) hoặc JSON" style={{ padding: "8px 14px" }}>
+              📥 Nhập
             </button>
 
-            {/* Add & Reset */}
-            <button className="kt-btn kt-btn-primary" onClick={() => setShowNew(true)}>+ Thêm KOL</button>
             {/* Undo / Redo */}
-            <button 
-              className="kt-btn kt-btn-ghost" 
-              onClick={handleUndo} 
-              disabled={history.length === 0}
-              title="Hoàn tác (Ctrl+Z)" 
-              style={{ padding: "8px 12px", opacity: history.length === 0 ? 0.4 : 1, cursor: history.length === 0 ? "not-allowed" : "pointer" }}
-            >
-              Undo
-            </button>
-            <button 
-              className="kt-btn kt-btn-ghost" 
-              onClick={handleRedo} 
-              disabled={redoHistory.length === 0}
-              title="Làm lại (Ctrl+Y)" 
-              style={{ padding: "8px 12px", opacity: redoHistory.length === 0 ? 0.4 : 1, cursor: redoHistory.length === 0 ? "not-allowed" : "pointer" }}
-            >
-              Redo
-            </button>
-            <button className="kt-btn kt-btn-ghost" onClick={handleReset} title="Reset data" style={{ padding: "8px 12px" }}>Reset</button>
+            <div style={{ display: "flex", gap: 2, border: "1px solid var(--line)", borderRadius: 24, overflow: "hidden", padding: 2, background: "var(--card)" }}>
+              <button 
+                className="kt-btn kt-btn-ghost" 
+                onClick={handleUndo} 
+                disabled={history.length === 0}
+                title="Hoàn tác (Ctrl+Z)" 
+                style={{ padding: "6px 12px", border: "none", borderRadius: 20, opacity: history.length === 0 ? 0.35 : 1, cursor: history.length === 0 ? "not-allowed" : "pointer" }}
+              >
+                ↩️
+              </button>
+              <button 
+                className="kt-btn kt-btn-ghost" 
+                onClick={handleRedo} 
+                disabled={redoHistory.length === 0}
+                title="Làm lại (Ctrl+Y)" 
+                style={{ padding: "6px 12px", border: "none", borderRadius: 20, opacity: redoHistory.length === 0 ? 0.35 : 1, cursor: redoHistory.length === 0 ? "not-allowed" : "pointer" }}
+              >
+                ↪️
+              </button>
+            </div>
+
+            {/* Reset */}
+            <button className="kt-btn kt-btn-ghost" onClick={handleReset} title="Khôi phục gốc" style={{ padding: "8px 14px" }}>Reset</button>
+
+            {/* Main Add Button */}
+            <button className="kt-btn kt-btn-primary" onClick={() => setShowNew(true)}>+ Thêm KOL</button>
           </div>
         </div>
 
-        {/* Bottom Row: Filters (Only visible for table, kanban, calendar) */}
-        {view !== "insights" && (
-          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+        {/* Bottom Row: Filters (hidden on Hồ sơ KOL — ProfileView has its own) */}
+        {view !== "profile" && (
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", borderTop: "1px dashed var(--line)", paddingTop: 12 }}>
             {/* Search */}
-            <input className="kt-input" placeholder="Tìm tên KOL, món ăn…"
+            <input className="kt-input" placeholder="🔍 Tìm tên KOL, món ăn…"
               value={search} onChange={e => setSearch(e.target.value)}
-              style={{ width: 220 }} />
+              style={{ width: 240 }} />
 
             {/* Campaign filter */}
             <select className="kt-select" value={filterCampaign} onChange={e => setFilterCampaign(e.target.value)}
-              style={{ width: 160 }}>
-              <option value="all">All campaigns</option>
-              {CAMPAIGNS.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
+              style={{ width: 180 }}>
+              <option value="all">📁 Tất cả Chiến dịch</option>
+              {CAMPAIGNS.map(c => <option key={c.key} value={c.key}>{campaignLabels[c.key] || c.label}</option>)}
             </select>
 
              {/* Status filter */}
             <select className="kt-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
-              style={{ width: 190 }}>
-              <option value="all">All status</option>
-              <option value="in_progress">Đang xử lý (Chưa lên sóng)</option>
+              style={{ width: 210 }}>
+              <option value="all">⚡ Tất cả Trạng thái</option>
+              <option value="in_progress">⚙️ Đang xử lý (Chưa lên sóng)</option>
               {STATUS_STAGES.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
             </select>
 
             {/* Type filter */}
             <select className="kt-select" value={filterType} onChange={e => setFilterType(e.target.value)}
-              style={{ width: 130 }}>
-              <option value="all">All types</option>
+              style={{ width: 150 }}>
+              <option value="all">👥 Tất cả Tiers</option>
               {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
           </div>
@@ -3762,18 +2227,20 @@ export default function App() {
       </div>
 
       {/* ── BODY ── */}
-      <div style={{ padding: "20px", flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minHeight: 0 }}>
+      <div style={{ padding: "20px 24px", flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minHeight: 0, position: "relative", zIndex: 1 }}>
+        {/* Main Content Card Container */}
         <div style={{ 
           background: "var(--card)", 
-          borderRadius: 12, 
+          borderRadius: 24, 
           border: "1px solid var(--line)", 
           overflow: "hidden", 
           flex: 1, 
           display: "flex", 
           flexDirection: "column", 
-          minHeight: 0 
+          minHeight: 0,
+          boxShadow: "0 8px 30px rgba(72, 67, 92, 0.015)"
         }}>
-          {view === "table" && <TableView rows={filtered} onOpen={r => setSelected(r)} />}
+          {view === "table" && <TableView rows={filtered} onOpen={r => setSelected(r)} campaignLabels={campaignLabels} />}
           {view === "kanban" && (
             <KanbanView 
               rows={filtered} 
@@ -3782,27 +2249,25 @@ export default function App() {
                 setData(prev => prev.map(item => item.id === id ? { ...item, statusKey: newStatus } : item));
                 showToast(`Đã chuyển trạng thái sang: ${STATUS_MAP[newStatus]?.label || newStatus}`);
               }}
+              campaignLabels={campaignLabels}
             />
           )}
           {view === "calendar" && (
             <CalendarView 
               rows={filtered} 
-              onOpen={r => setSelected(r)} 
+              onOpen={r => setSelected(r)}
               onUpdateRow={(id, updatedFields) => {
                 setData(prev => prev.map(item => item.id === id ? { ...item, ...updatedFields } : item));
                 showToast(`Đã xếp lịch lên sóng cho KOL!`);
               }}
+              campaignLabels={campaignLabels}
             />
           )}
-          {view === "insights" && (
-            <InsightsView
-              rows={data}
-              insightsNotes={insightsNotes}
-              onOpenKOL={r => setSelected(r)}
-              onSaveNote={(campaign, text) => {
-                setInsightsNotes(prev => ({ ...prev, [campaign]: text }));
-                showToast("Đã lưu nhận xét thành công!");
-              }}
+          {view === "profile" && (
+            <ProfileView 
+              rows={data} 
+              onOpenProfile={k => setSelectedProfile(k)} 
+              campaignLabels={campaignLabels} 
             />
           )}
         </div>
@@ -3833,10 +2298,21 @@ export default function App() {
         <ImportWizard
           {...wizardData}
           onClose={() => setWizardData(null)}
+          campaignLabels={campaignLabels}
           onConfirm={(importedRows) => {
             let mergedCount = 0;
             let addedCount = 0;
             
+            const cleanName = (str) => {
+              if (!str) return "";
+              return str.toString().toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/đ/g, "d")
+                .replace(/Đ/g, "d")
+                .replace(/[^a-z0-9]/g, "");
+            };
+
             const CUSTOM_INITIALS = {
               "bbkbh": ["babykopo home", "baby kopo home"],
               "bbk": ["babykopo home", "baby kopo home"],
@@ -3858,8 +2334,8 @@ export default function App() {
 
             const isMatch = (importedName, kolName) => {
               if (!importedName || !kolName) return false;
-              const impClean = importedName.toString().toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-              const kolClean = kolName.toString().toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+              const impClean = cleanName(importedName);
+              const kolClean = cleanName(kolName);
 
               // 1. Direct match or substring
               if (impClean === kolClean || kolClean.includes(impClean) || impClean.includes(kolClean)) return true;
@@ -3876,10 +2352,36 @@ export default function App() {
               return false;
             };
 
+                        // Collect dynamic campaign labels from imported rows
+            const newLabels = { ...campaignLabels };
+            let hasNewLabel = false;
+            importedRows.forEach(imp => {
+              if (imp.campaign && imp.__sheet__) {
+                const sheetClean = imp.__sheet__.trim();
+                // Skip generic sheet index labels
+                const isGeneric = /^(sheet\s*\d+|trang\s*\d+|table|data|kho|database)/i.test(sheetClean);
+                if (sheetClean && !isGeneric && newLabels[imp.campaign] !== sheetClean) {
+                  newLabels[imp.campaign] = sheetClean;
+                  hasNewLabel = true;
+                }
+              }
+            });
+            if (hasNewLabel) {
+              setCampaignLabels(newLabels);
+              localStorage.setItem("kol_campaign_labels", JSON.stringify(newLabels));
+            }
+
             const updatedData = [...data];
             
             importedRows.forEach(imp => {
-              const matchIdx = updatedData.findIndex(existing => isMatch(imp.kol, existing.kol));
+              const impCampaign = resolveCampaignKey(imp);
+              const matchIdx = updatedData.findIndex(existing => {
+                if (imp.id && existing.id === imp.id) return true;
+                if (!isMatch(imp.kol, existing.kol)) return false;
+                const existingCampaign = resolveCampaignKey(existing);
+                if (!impCampaign || !existingCampaign) return false;
+                return existingCampaign === impCampaign;
+              });
               if (matchIdx !== -1) {
                 const existing = updatedData[matchIdx];
                 const merged = { ...existing };
@@ -3926,6 +2428,40 @@ export default function App() {
           {toast.msg}
         </div>
       )}
+
+      {/* ── PROFILE DETAIL MODAL ── */}
+      {selectedProfile && (
+        <ProfileDetailModal
+          kol={selectedProfile}
+          onClose={() => setSelectedProfile(null)}
+          campaignLabels={campaignLabels}
+        />
+      )}
+
+      {/* ── FOOTER ── */}
+      <div style={{
+        background: "var(--card)",
+        borderTop: "1px solid var(--line)",
+        padding: "12px 24px",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        flexShrink: 0,
+        zIndex: 10,
+        fontSize: 12,
+        color: "var(--ink-soft)"
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <span>© 2026 TCV x Brand. All rights reserved.</span>
+          <span style={{ color: "var(--line)" }}>|</span>
+          <span>Dữ liệu chiến dịch: <strong>FY26</strong></span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <span>Trạng thái hệ thống: <span style={{ color: "var(--ok)", fontWeight: 700 }}>● Online</span></span>
+          <span style={{ color: "var(--line)" }}>|</span>
+          <span>Hệ thống quản lý KOL Tracking</span>
+        </div>
+      </div>
     </div>
   );
 }
