@@ -1452,6 +1452,7 @@ const parseFollowers = (str) => {
 ================================================================ */
 const ProfileView = ({ rows, onOpenProfile, campaignLabels }) => {
   const [search, setSearch] = useState("");
+  const [selectedKol, setSelectedKol] = useState("all");
 
   const uniqueKols = useMemo(() => {
     const map = {};
@@ -1519,17 +1520,18 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels }) => {
       if (!entry.link && r.link) entry.link = r.link;
     });
 
-    return Object.values(map);
+    return Object.values(map).sort((a, b) => a.kol.localeCompare(b.kol, "vi"));
   }, [rows]);
 
   const filteredKols = useMemo(() => {
     return uniqueKols.filter(k => {
+      const matchKol = selectedKol === "all" || k.kol === selectedKol;
       const matchSearch = k.kol.toLowerCase().includes(search.toLowerCase()) || 
                           (k.location && k.location.toLowerCase().includes(search.toLowerCase())) ||
                           (k.group && k.group.toLowerCase().includes(search.toLowerCase()));
-      return matchSearch;
+      return matchKol && matchSearch;
     });
-  }, [uniqueKols, search]);
+  }, [uniqueKols, selectedKol, search]);
 
   return (
     <div className="kt-scrollbar" style={{ padding: "20px", display: "flex", flexDirection: "column", height: "100%", overflowY: "auto" }}>
@@ -1541,6 +1543,17 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels }) => {
           onChange={e => setSearch(e.target.value)} 
           style={{ width: 280 }} 
         />
+        <select
+          className="kt-select"
+          value={selectedKol}
+          onChange={e => setSelectedKol(e.target.value)}
+          style={{ width: 220 }}
+        >
+          <option value="all">👤 Tất cả KOL</option>
+          {uniqueKols.map(k => (
+            <option key={k.kol} value={k.kol}>{k.kol}</option>
+          ))}
+        </select>
         <span style={{ fontSize: 13, color: "var(--ink-soft)", marginLeft: "auto" }}>
           Đang hiển thị: <strong>{filteredKols.length}</strong> hồ sơ KOL
         </span>
