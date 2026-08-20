@@ -2034,6 +2034,30 @@ const [view, setView] = useState("table");
     XLSX.writeFile(wb, "kol_tracker_template.xlsx");
   };
 
+  // Export/backup the current live data (everything shown on screen right now)
+  // as a downloadable .xlsx file. Purely additive — does not touch localStorage,
+  // does not alter any existing data or feature.
+  const handleExportData = () => {
+    const fieldKeys = Object.keys(FIELD_LABELS).filter(k => k !== "status");
+    const headers = fieldKeys.map(k => FIELD_LABELS[k] || k);
+    const rows = data.map(row => fieldKeys.map(k => row[k] ?? ""));
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "KOL Tracker");
+
+    // Second sheet: campaign label mapping, so the backup is fully self-contained
+    const labelRows = Object.entries(campaignLabels || {});
+    if (labelRows.length) {
+      const wsLabels = XLSX.utils.aoa_to_sheet([["campaign_key", "campaign_label"], ...labelRows]);
+      XLSX.utils.book_append_sheet(wb, wsLabels, "Campaign Labels");
+    }
+
+    const now = new Date();
+    const pad = n => String(n).padStart(2, "0");
+    const stamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}`;
+    XLSX.writeFile(wb, `kol_tracker_backup_${stamp}.xlsx`);
+  };
+
   const statsRows = useMemo(() => {
     const q = search.toLowerCase();
     return data.filter(r => {
@@ -2165,6 +2189,10 @@ const [view, setView] = useState("table");
             <button className="kt-btn kt-btn-ghost" onClick={() => importRef.current?.click()}
               title="Import file Excel (.xlsx) hoặc JSON" style={{ padding: "8px 14px" }}>
               📥 Nhập
+            </button>
+            <button className="kt-btn kt-btn-ghost" onClick={handleExportData}
+              title="Tải toàn bộ dữ liệu hiện tại trên web về máy (.xlsx)" style={{ padding: "8px 14px" }}>
+              💾 Lưu về máy
             </button>
 
             {/* Undo / Redo */}
