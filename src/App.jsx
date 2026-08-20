@@ -1089,8 +1089,8 @@ const KanbanColumn = ({ stage, cards, onOpen, onUpdateStatus, campaignLabels }) 
         transition: "all 0.2s ease",
         transform: isOver ? "scale(1.01)" : "scale(1)",
         border: isOver ? "1px dashed var(--accent)" : "1px solid transparent",
-        minWidth: 260,
-        maxWidth: 260,
+        minWidth: 0,
+        width: "100%",
         display: "flex",
         flexDirection: "column",
         height: "100%"
@@ -1158,8 +1158,7 @@ const KanbanColumn = ({ stage, cards, onOpen, onUpdateStatus, campaignLabels }) 
 };
 
 const KanbanView = ({ rows, onOpen, onUpdateStatus, campaignLabels }) => (
-  <div style={{ display: "flex", gap: 14, overflowX: "auto", padding: 16, alignItems: "stretch", flex: 1, height: "100%" }}
-    className="kt-scrollbar">
+  <div style={{ display: "grid", gridTemplateColumns: `repeat(${STATUS_STAGES.length}, minmax(0, 1fr))`, gap: 10, padding: 16, alignItems: "stretch", flex: 1, height: "100%", overflow: "hidden" }}>
     {STATUS_STAGES.map(stage => {
       const cards = rows.filter(r => r.statusKey === stage.key);
       return (
