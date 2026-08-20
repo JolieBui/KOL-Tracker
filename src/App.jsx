@@ -1450,9 +1450,27 @@ const parseFollowers = (str) => {
 /* ================================================================
    KOL PROFILE VIEW & DETAIL MODAL
 ================================================================ */
+const COST_BUCKETS = [
+  { key: "under10", label: "Dưới 10tr", test: c => c < 10000000 },
+  { key: "10to20",  label: "10 – 20tr", test: c => c >= 10000000 && c < 20000000 },
+  { key: "20to50",  label: "20 – 50tr", test: c => c >= 20000000 && c < 50000000 },
+  { key: "over50",  label: "Trên 50tr", test: c => c >= 50000000 },
+];
+const VIEWS_BUCKETS = [
+  { key: "under10k",  label: "Dưới 10K",     test: v => v < 10000 },
+  { key: "10to50k",   label: "10K – 50K",    test: v => v >= 10000 && v < 50000 },
+  { key: "50to200k",  label: "50K – 200K",   test: v => v >= 50000 && v < 200000 },
+  { key: "over200k",  label: "Trên 200K",    test: v => v >= 200000 },
+];
+
 const ProfileView = ({ rows, onOpenProfile, campaignLabels }) => {
   const [search, setSearch] = useState("");
-  const [selectedKol, setSelectedKol] = useState("all");
+  const [filterCampaign, setFilterCampaign] = useState("all");
+  const [filterTier, setFilterTier] = useState("all");
+  const [filterLocation, setFilterLocation] = useState("all");
+  const [filterPhase, setFilterPhase] = useState("all");
+  const [filterCost, setFilterCost] = useState("all");
+  const [filterViews, setFilterViews] = useState("all");
 
   const uniqueKols = useMemo(() => {
     const map = {};
@@ -1523,39 +1541,107 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels }) => {
     return Object.values(map).sort((a, b) => a.kol.localeCompare(b.kol, "vi"));
   }, [rows]);
 
+  const uniqueLocations = useMemo(() => {
+    const set = new Set();
+    uniqueKols.forEach(k => { if (k.location && k.location.trim()) set.add(k.location.trim()); });
+    return Array.from(set).sort((a, b) => a.localeCompare(b, "vi"));
+  }, [uniqueKols]);
+
   const filteredKols = useMemo(() => {
+    const q = search.trim().toLowerCase();
     return uniqueKols.filter(k => {
-      const matchKol = selectedKol === "all" || k.kol === selectedKol;
-      const matchSearch = k.kol.toLowerCase().includes(search.toLowerCase()) || 
-                          (k.location && k.location.toLowerCase().includes(search.toLowerCase())) ||
-                          (k.group && k.group.toLowerCase().includes(search.toLowerCase()));
-      return matchKol && matchSearch;
+      if (q && !k.kol.toLowerCase().includes(q)) return false;
+      if (filterCampaign !== "all" && !k.campaigns.has(filterCampaign)) return false;
+      if (filterTier !== "all" && k.type !== filterTier) return false;
+      if (filterLocation !== "all" && k.location !== filterLocation) return false;
+      if (filterPhase !== "all" && !k.phases.has(filterPhase)) return false;
+      if (filterCost !== "all") {
+        const bucket = COST_BUCKETS.find(b => b.key === filterCost);
+        if (bucket && !bucket.test(k.totalCost)) return false;
+      }
+      if (filterViews !== "all") {
+        const bucket = VIEWS_BUCKETS.find(b => b.key === filterViews);
+        if (bucket && !bucket.test(k.totalViews)) return false;
+      }
+      return true;
     });
-  }, [uniqueKols, selectedKol, search]);
+  }, [uniqueKols, search, filterCampaign, filterTier, filterLocation, filterPhase, filterCost, filterViews]);
+
+  const hasActiveFilters = !!search.trim() || filterCampaign !== "all" || filterTier !== "all" ||
+    filterLocation !== "all" || filterPhase !== "all" || filterCost !== "all" || filterViews !== "all";
+
+  const clearFilters = () => {
+    setSearch(""); setFilterCampaign("all"); setFilterTier("all");
+    setFilterLocation("all"); setFilterPhase("all"); setFilterCost("all"); setFilterViews("all");
+  };
+
+  const summary = useMemo(() => ({
+    count: filteredKols.length,
+    totalCost: filteredKols.reduce((s, k) => s + k.totalCost, 0),
+    totalViews: filteredKols.reduce((s, k) => s + k.totalViews, 0),
+    totalConversions: filteredKols.reduce((s, k) => s + k.totalConversions, 0),
+  }), [filteredKols]);
 
   return (
     <div className="kt-scrollbar" style={{ padding: "20px", display: "flex", flexDirection: "column", height: "100%", overflowY: "auto" }}>
-      <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap", alignItems: "center" }}>
-        <input 
-          className="kt-input" 
-          placeholder="🔍 Tìm tên KOL, địa điểm, nhóm..." 
-          value={search} 
-          onChange={e => setSearch(e.target.value)} 
-          style={{ width: 280 }} 
+      {/* ── Dashboard summary (reacts live to filters below) ── */}
+      <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
+        {[
+          { label: "Hồ sơ KOL", value: summary.count, color: "var(--ink)" },
+          { label: "Tổng chi phí", value: fmtVND(summary.totalCost), color: "var(--accent)" },
+          { label: "Tổng Views", value: summary.totalViews.toLocaleString(), color: "var(--blue)" },
+          { label: "Tổng đơn hàng", value: summary.totalConversions.toLocaleString(), color: "var(--ok)" },
+        ].map(s => (
+          <div key={s.label} className="kt-card" style={{ padding: "10px 16px", flex: "1 1 160px", minWidth: 160, boxSizing: "border-box" }}>
+            <div style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap" }}>
+              {s.label}
+            </div>
+            <div className="kt-display" style={{ fontSize: 20, color: s.color, marginTop: 2 }}>{s.value}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Filter bar: mỗi field lọc theo đúng 1 chiều dữ liệu, không chồng chéo với ô tìm tên ── */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap", alignItems: "center" }}>
+        <input
+          className="kt-input"
+          placeholder="🔍 Tìm tên KOL..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ width: 200 }}
         />
-        <select
-          className="kt-select"
-          value={selectedKol}
-          onChange={e => setSelectedKol(e.target.value)}
-          style={{ width: 220 }}
-        >
-          <option value="all">👤 Tất cả KOL</option>
-          {uniqueKols.map(k => (
-            <option key={k.kol} value={k.kol}>{k.kol}</option>
-          ))}
+        <select className="kt-select" value={filterCampaign} onChange={e => setFilterCampaign(e.target.value)} style={{ width: 160 }}>
+          <option value="all">📁 Tất cả Dự án</option>
+          {CAMPAIGNS.map(c => <option key={c.key} value={c.key}>{campaignLabels[c.key] || c.label}</option>)}
         </select>
+        <select className="kt-select" value={filterTier} onChange={e => setFilterTier(e.target.value)} style={{ width: 140 }}>
+          <option value="all">👥 Tất cả Tier</option>
+          {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+        </select>
+        <select className="kt-select" value={filterLocation} onChange={e => setFilterLocation(e.target.value)} style={{ width: 150 }}>
+          <option value="all">📍 Tất cả Địa điểm</option>
+          {uniqueLocations.map(l => <option key={l} value={l}>{l}</option>)}
+        </select>
+        <select className="kt-select" value={filterPhase} onChange={e => setFilterPhase(e.target.value)} style={{ width: 170 }}>
+          <option value="all">🗓 Tất cả Thời điểm</option>
+          <option value="Phase 1">Phase 1 (T7–T8)</option>
+          <option value="Phase 2">Phase 2 (T12–T1)</option>
+        </select>
+        <select className="kt-select" value={filterCost} onChange={e => setFilterCost(e.target.value)} style={{ width: 150 }}>
+          <option value="all">💰 Tất cả Chi phí</option>
+          {COST_BUCKETS.map(b => <option key={b.key} value={b.key}>{b.label}</option>)}
+        </select>
+        <select className="kt-select" value={filterViews} onChange={e => setFilterViews(e.target.value)} style={{ width: 150 }}>
+          <option value="all">👁 Tất cả Views</option>
+          {VIEWS_BUCKETS.map(b => <option key={b.key} value={b.key}>{b.label}</option>)}
+        </select>
+        {hasActiveFilters && (
+          <button className="kt-btn kt-btn-ghost" onClick={clearFilters} style={{ padding: "8px 14px" }}>
+            ✕ Xoá lọc
+          </button>
+        )}
         <span style={{ fontSize: 13, color: "var(--ink-soft)", marginLeft: "auto" }}>
-          Đang hiển thị: <strong>{filteredKols.length}</strong> hồ sơ KOL
+          Đang hiển thị: <strong>{filteredKols.length}</strong> / {uniqueKols.length} hồ sơ KOL
         </span>
       </div>
 
