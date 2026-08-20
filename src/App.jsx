@@ -1735,45 +1735,104 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels }) => {
   );
 };
 
-const ProfileDetailModal = ({ kol, onClose, campaignLabels }) => {
+const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile }) => {
+  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState({
+    kol: kol.kol || "", follower: kol.follower || "", type: kol.type || "",
+    location: kol.location || "", group: kol.group || "", link: kol.link || "",
+  });
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const handleSaveClick = () => {
+    if (!form.kol.trim()) {
+      window.alert("Tên KOL không được để trống.");
+      return;
+    }
+    onSaveProfile(kol.kol, {
+      kol: form.kol.trim(), follower: form.follower.trim(), type: form.type,
+      location: form.location.trim(), group: form.group.trim(), link: form.link.trim(),
+    });
+    onClose();
+  };
+
   return (
     <div className="kt-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="kt-modal kt-anim" style={{ maxWidth: 860, borderRadius: 2 }}>
         <div style={{ padding: "18px 22px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 11, fontWeight: 600, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
-              HỒ SƠ CHI TIẾT KOL
+              {editing ? "CHỈNH SỬA HỒ SƠ KOL" : "HỒ SƠ CHI TIẾT KOL"}
             </div>
-            <div style={{ fontSize: 20, fontWeight: 800, color: "var(--ink)" }}>{kol.kol}</div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: "var(--ink)" }}>{editing ? form.kol || "—" : kol.kol}</div>
           </div>
+          {!editing && (
+            <button className="kt-btn kt-btn-ghost" onClick={() => setEditing(true)} style={{ padding: "6px 14px" }}>
+              ✏️ Chỉnh sửa hồ sơ
+            </button>
+          )}
           <button className="kt-btn kt-btn-ghost" onClick={onClose} style={{ padding: "6px 10px" }}>✕</button>
         </div>
 
         <div style={{ padding: "20px 22px", display: "flex", flexDirection: "column", gap: 18 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, background: "var(--paper)", padding: "12px 16px", borderRadius: 10 }}>
-            <div>
-              <div style={{ fontSize: 11, color: "var(--ink-soft)", marginBottom: 2 }}>Followers</div>
-              <strong style={{ fontSize: 14, color: "var(--ink)" }}>{kol.follower || "—"}</strong>
+          {editing ? (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "0 16px", background: "var(--paper)", padding: "16px 16px 2px", borderRadius: 10 }}>
+              <div style={{ marginBottom: 14 }}>
+                <label className="kt-label">Tên KOL</label>
+                <input className="kt-input" value={form.kol} onChange={e => set("kol", e.target.value)} />
+              </div>
+              <div style={{ marginBottom: 14 }}>
+                <label className="kt-label">Followers</label>
+                <input className="kt-input" value={form.follower} onChange={e => set("follower", e.target.value)} placeholder="VD: 100K" />
+              </div>
+              <div style={{ marginBottom: 14 }}>
+                <label className="kt-label">Phân hạng Tier</label>
+                <select className="kt-select" value={form.type} onChange={e => set("type", e.target.value)}>
+                  <option value="">—</option>
+                  {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
+              <div style={{ marginBottom: 14 }}>
+                <label className="kt-label">Khu vực</label>
+                <input className="kt-input" value={form.location} onChange={e => set("location", e.target.value)} />
+              </div>
+              <div style={{ marginBottom: 14 }}>
+                <label className="kt-label">Nhóm</label>
+                <input className="kt-input" value={form.group} onChange={e => set("group", e.target.value)} />
+              </div>
+              <div style={{ marginBottom: 14 }}>
+                <label className="kt-label">Link TikTok</label>
+                <input className="kt-input" value={form.link} onChange={e => set("link", e.target.value)} />
+              </div>
+              <div style={{ gridColumn: "1 / -1", fontSize: 11, color: "var(--ink-soft)", marginTop: -8, marginBottom: 14 }}>
+                ⚠️ Thay đổi sẽ áp dụng cho tất cả {kol.campaignDetails.length} dòng chiến dịch của KOL này.
+              </div>
             </div>
-            <div>
-              <div style={{ fontSize: 11, color: "var(--ink-soft)", marginBottom: 2 }}>Phân hạng Tier</div>
-              <strong style={{ fontSize: 14, color: "var(--ink)" }}>{kol.type || "—"}</strong>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, background: "var(--paper)", padding: "12px 16px", borderRadius: 10 }}>
+              <div>
+                <div style={{ fontSize: 11, color: "var(--ink-soft)", marginBottom: 2 }}>Followers</div>
+                <strong style={{ fontSize: 14, color: "var(--ink)" }}>{kol.follower || "—"}</strong>
+              </div>
+              <div>
+                <div style={{ fontSize: 11, color: "var(--ink-soft)", marginBottom: 2 }}>Phân hạng Tier</div>
+                <strong style={{ fontSize: 14, color: "var(--ink)" }}>{kol.type || "—"}</strong>
+              </div>
+              <div>
+                <div style={{ fontSize: 11, color: "var(--ink-soft)", marginBottom: 2 }}>Khu vực</div>
+                <strong style={{ fontSize: 14, color: "var(--ink)" }}>{kol.location || "—"}</strong>
+              </div>
+              <div>
+                <div style={{ fontSize: 11, color: "var(--ink-soft)", marginBottom: 2 }}>TikTok Profile</div>
+                {kol.link ? (
+                  <a href={kol.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>
+                    TikTok Link ↗
+                  </a>
+                ) : (
+                  <strong style={{ fontSize: 13, color: "var(--ink-soft)" }}>—</strong>
+                )}
+              </div>
             </div>
-            <div>
-              <div style={{ fontSize: 11, color: "var(--ink-soft)", marginBottom: 2 }}>Khu vực</div>
-              <strong style={{ fontSize: 14, color: "var(--ink)" }}>{kol.location || "—"}</strong>
-            </div>
-            <div>
-              <div style={{ fontSize: 11, color: "var(--ink-soft)", marginBottom: 2 }}>TikTok Profile</div>
-              {kol.link ? (
-                <a href={kol.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>
-                  TikTok Link ↗
-                </a>
-              ) : (
-                <strong style={{ fontSize: 13, color: "var(--ink-soft)" }}>—</strong>
-              )}
-            </div>
-          </div>
+          )}
 
 
           <div>
@@ -1813,8 +1872,15 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels }) => {
           </div>
         </div>
 
-        <div style={{ padding: "14px 22px", borderTop: "1px solid var(--line)", display: "flex", justifyContent: "flex-end" }}>
-          <button className="kt-btn kt-btn-ghost" onClick={onClose}>Đóng hồ sơ</button>
+        <div style={{ padding: "14px 22px", borderTop: "1px solid var(--line)", display: "flex", justifyContent: "flex-end", gap: 8 }}>
+          {editing ? (
+            <>
+              <button className="kt-btn kt-btn-ghost" onClick={() => setEditing(false)}>Huỷ</button>
+              <button className="kt-btn kt-btn-primary" onClick={handleSaveClick}>💾 Lưu hồ sơ</button>
+            </>
+          ) : (
+            <button className="kt-btn kt-btn-ghost" onClick={onClose}>Đóng hồ sơ</button>
+          )}
         </div>
       </div>
     </div>
@@ -2179,6 +2245,18 @@ const [view, setView] = useState("table");
   };
   const handleAdd = (newRow) => {
     setData(d => [...d, newRow]);
+  };
+  // Editing a KOL "profile" (Hồ sơ KOL) means editing shared fields — name, follower,
+  // tier, location, group, TikTok link — that are duplicated across every campaign
+  // row for that KOL. We match rows by the original (pre-edit) name and apply the
+  // new values to all of them, so table/kanban/profile views all stay consistent.
+  const handleUpdateProfile = (originalName, updates) => {
+    const key = (originalName || "").trim().toLowerCase();
+    setData(d => d.map(r => {
+      if ((r.kol || "").trim().toLowerCase() !== key) return r;
+      return { ...r, ...updates };
+    }));
+    showToast("✅ Đã cập nhật hồ sơ KOL");
   };
   const handleReset = () => {
     const clearAll = window.confirm(
@@ -2562,6 +2640,7 @@ const [view, setView] = useState("table");
           kol={selectedProfile}
           onClose={() => setSelectedProfile(null)}
           campaignLabels={campaignLabels}
+          onSaveProfile={handleUpdateProfile}
         />
       )}
 
