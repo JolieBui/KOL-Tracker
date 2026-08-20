@@ -1479,17 +1479,6 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels }) => {
       const name = r.kol.trim();
       const key = name.toLowerCase();
 
-      let phase1 = false;
-      let phase2 = false;
-      const airDate = r.ngayAir ? r.ngayAir.toString().toLowerCase() : "";
-      
-      if (airDate.includes("july") || airDate.includes("aug") || airDate.includes("/7") || airDate.includes("/07") || airDate.includes("/8") || airDate.includes("/08")) {
-        phase1 = true;
-      }
-      if (airDate.includes("dec") || airDate.includes("jan") || airDate.includes("/12") || airDate.includes("/1") || airDate.includes("/01")) {
-        phase2 = true;
-      }
-
       if (!map[key]) {
         map[key] = {
           kol: name,
@@ -1526,8 +1515,10 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels }) => {
       entry.totalConversions += Number(r.conversions) || 0;
       entry.totalRevenue += Number(r.revenue) || 0;
 
-      if (phase1) entry.phases.add("Phase 1");
-      if (phase2) entry.phases.add("Phase 2");
+      // Thời điểm hợp tác is a manually-picked profile field (see edit form),
+      // stored as a comma-joined string on every row of this KOL — no more
+      // guessing the phase from the air date.
+      (r.phaseTags || "").split(",").map(s => s.trim()).filter(Boolean).forEach(p => entry.phases.add(p));
 
       entry.campaignDetails.push(r);
 
@@ -1667,38 +1658,31 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels }) => {
                 )}
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 12px", fontSize: 12, color: "var(--ink-soft)" }}>
-                <div>👥 Followers: <strong style={{ color: "var(--ink)" }}>{k.follower || "—"}</strong></div>
-                <div>📍 Địa điểm: <strong style={{ color: "var(--ink)" }}>{k.location || "—"}</strong></div>
-                <div>🏷 Nhóm: <strong style={{ color: "var(--ink)" }}>{k.group || "—"}</strong></div>
-                <div>📁 Dự án hợp tác: <strong style={{ color: "var(--ink)" }}>{campaignsArr.length} dự án</strong></div>
-              </div>
-
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", fontSize: 11 }}>
-                <span style={{ fontWeight: 600 }}>Thời điểm hợp tác:</span>
-                {phasesArr.length > 0 ? (
-                  phasesArr.map(p => (
-                    <span key={p} className="kt-badge" style={{ background: p === "Phase 1" ? "#FFAFA322" : "#A2C2E822", color: p === "Phase 1" ? "#D4826A" : "#4F83E1", border: `1px solid ${p === "Phase 1" ? "#FFAFA355" : "#4F83E155"}`, fontSize: 10 }}>
-                      {p === "Phase 1" ? "Phase 1 (T7-T8)" : "Phase 2 (T12-T1)"}
-                    </span>
-                  ))
-                ) : (
-                  <span style={{ color: "var(--ink-soft)" }}>Chưa rõ Phase</span>
-                )}
+              <div style={{ display: "flex", flexWrap: "wrap", columnGap: 16, rowGap: 4, fontSize: 12, color: "var(--ink-soft)" }}>
+                <span>Followers <strong style={{ color: "var(--ink)" }}>{k.follower || "—"}</strong></span>
+                <span>Địa điểm <strong style={{ color: "var(--ink)" }}>{k.location || "—"}</strong></span>
+                <span>Nhóm <strong style={{ color: "var(--ink)" }}>{k.group || "—"}</strong></span>
               </div>
 
               {campaignsArr.length > 0 && (
-                <div style={{ display: "flex", flexDirection: "column", gap: 6, borderTop: "1px dashed var(--line)", paddingTop: 10 }}>
-                  <span style={{ fontWeight: 600, fontSize: 11, color: "var(--ink-soft)" }}>
-                    Dự án: {campaignsArr.map(c => campaignLabels[c] || CAMPAIGN_LABELS[c] || c).join(" · ")}
-                  </span>
-                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                    {campaignsArr.map(c => (
-                      <CampaignDot key={c} campaign={c} labels={campaignLabels} />
-                    ))}
-                  </div>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", borderTop: "1px dashed var(--line)", paddingTop: 10 }}>
+                  {campaignsArr.map(c => (
+                    <CampaignDot key={c} campaign={c} labels={campaignLabels} />
+                  ))}
                 </div>
               )}
+
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", fontSize: 11 }}>
+                {phasesArr.length > 0 ? (
+                  phasesArr.map(p => (
+                    <span key={p} className="kt-badge" style={{ background: p === "Phase 1" ? "#FFAFA322" : "#A2C2E822", color: p === "Phase 1" ? "#D4826A" : "#4F83E1", border: `1px solid ${p === "Phase 1" ? "#FFAFA355" : "#4F83E155"}`, fontSize: 10 }}>
+                      {p === "Phase 1" ? "Phase 1 (T7–T8)" : "Phase 2 (T12–T1)"}
+                    </span>
+                  ))
+                ) : (
+                  <span style={{ color: "var(--ink-faint)" }}>Chưa chọn thời điểm hợp tác</span>
+                )}
+              </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, borderTop: "1px dashed var(--line)", paddingTop: 10, fontSize: 11, textAlign: "center" }}>
                 <div>
@@ -1740,8 +1724,12 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile }) => 
   const [form, setForm] = useState({
     kol: kol.kol || "", follower: kol.follower || "", type: kol.type || "",
     location: kol.location || "", group: kol.group || "", link: kol.link || "",
+    phase: Array.from(kol.phases || []),
   });
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const togglePhase = (p) => setForm(f => ({
+    ...f, phase: f.phase.includes(p) ? f.phase.filter(x => x !== p) : [...f.phase, p]
+  }));
 
   const handleSaveClick = () => {
     if (!form.kol.trim()) {
@@ -1751,6 +1739,7 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile }) => 
     onSaveProfile(kol.kol, {
       kol: form.kol.trim(), follower: form.follower.trim(), type: form.type,
       location: form.location.trim(), group: form.group.trim(), link: form.link.trim(),
+      phaseTags: form.phase.join(","),
     });
     onClose();
   };
@@ -1803,6 +1792,36 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile }) => 
                 <label className="kt-label">Link TikTok</label>
                 <input className="kt-input" value={form.link} onChange={e => set("link", e.target.value)} />
               </div>
+              <div style={{ gridColumn: "1 / -1", marginBottom: 14 }}>
+                <label className="kt-label">Thời điểm hợp tác</label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  {[
+                    { key: "Phase 1", label: "Phase 1 (T7–T8)", color: "#D4826A", bg: "#FFAFA3" },
+                    { key: "Phase 2", label: "Phase 2 (T12–T1)", color: "#4F83E1", bg: "#A2C2E8" },
+                  ].map(p => {
+                    const active = form.phase.includes(p.key);
+                    return (
+                      <button
+                        key={p.key}
+                        type="button"
+                        onClick={() => togglePhase(p.key)}
+                        className="kt-btn"
+                        style={{
+                          padding: "7px 14px", fontSize: 12, fontWeight: 600,
+                          border: `1px solid ${active ? p.color : "var(--line)"}`,
+                          background: active ? `${p.bg}22` : "var(--card)",
+                          color: active ? p.color : "var(--ink-soft)",
+                        }}
+                      >
+                        {active ? "✓ " : ""}{p.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div style={{ fontSize: 11, color: "var(--ink-faint)", marginTop: 4 }}>
+                  Có thể chọn 1, cả 2, hoặc bỏ chọn hết nếu chưa xác định.
+                </div>
+              </div>
               <div style={{ gridColumn: "1 / -1", fontSize: 11, color: "var(--ink-soft)", marginTop: -8, marginBottom: 14 }}>
                 ⚠️ Thay đổi sẽ áp dụng cho tất cả {kol.campaignDetails.length} dòng chiến dịch của KOL này.
               </div>
@@ -1829,6 +1848,20 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile }) => 
                   </a>
                 ) : (
                   <strong style={{ fontSize: 13, color: "var(--ink-soft)" }}>—</strong>
+                )}
+              </div>
+              <div style={{ gridColumn: "1 / -1", marginTop: 4 }}>
+                <div style={{ fontSize: 11, color: "var(--ink-soft)", marginBottom: 4 }}>Thời điểm hợp tác</div>
+                {kol.phases && kol.phases.size > 0 ? (
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    {Array.from(kol.phases).map(p => (
+                      <span key={p} className="kt-badge" style={{ background: p === "Phase 1" ? "#FFAFA322" : "#A2C2E822", color: p === "Phase 1" ? "#D4826A" : "#4F83E1", border: `1px solid ${p === "Phase 1" ? "#FFAFA355" : "#4F83E155"}`, fontSize: 11 }}>
+                        {p === "Phase 1" ? "Phase 1 (T7–T8)" : "Phase 2 (T12–T1)"}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <strong style={{ fontSize: 13, color: "var(--ink-soft)" }}>Chưa chọn</strong>
                 )}
               </div>
             </div>
