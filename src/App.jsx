@@ -2132,69 +2132,71 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels }) => {
   }), [filteredKols]);
 
   return (
-    <div className="kt-scrollbar" style={{ padding: "20px", display: "flex", flexDirection: "column", height: "100%", overflowY: "auto" }}>
-      {/* ── Dashboard summary (reacts live to filters below) ── */}
-      <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
-        {[
-          { label: "Hồ sơ KOL", value: summary.count, color: "var(--ink)" },
-          { label: "Tổng chi phí", value: fmtVND(summary.totalCost), color: "var(--accent)" },
-          { label: "Tổng Views", value: summary.totalViews.toLocaleString(), color: "var(--blue)" },
-          { label: "Tổng đơn hàng", value: summary.totalConversions.toLocaleString(), color: "var(--ok)" },
-        ].map(s => (
-          <div key={s.label} className="kt-card" style={{ padding: "10px 16px", flex: "1 1 160px", minWidth: 160, boxSizing: "border-box" }}>
-            <div style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap" }}>
-              {s.label}
+    <div className="kt-scrollbar" style={{ display: "flex", flexDirection: "column", height: "100%", overflowY: "auto" }}>
+      {/* ── PINNED: Dashboard summary + filter bar stay visible while the card grid scrolls ── */}
+      <div style={{ position: "sticky", top: 0, zIndex: 5, background: "var(--card)", padding: "20px 20px 16px", borderBottom: "1px solid var(--line)" }}>
+        <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
+          {[
+            { label: "Hồ sơ KOL", value: summary.count, color: "var(--ink)" },
+            { label: "Tổng chi phí", value: fmtVND(summary.totalCost), color: "var(--accent)" },
+            { label: "Tổng Views", value: summary.totalViews.toLocaleString(), color: "var(--blue)" },
+            { label: "Tổng đơn hàng", value: summary.totalConversions.toLocaleString(), color: "var(--ok)" },
+          ].map(s => (
+            <div key={s.label} className="kt-card" style={{ padding: "10px 16px", flex: "1 1 160px", minWidth: 160, boxSizing: "border-box" }}>
+              <div style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap" }}>
+                {s.label}
+              </div>
+              <div className="kt-display" style={{ fontSize: 20, color: s.color, marginTop: 2 }}>{s.value}</div>
             </div>
-            <div className="kt-display" style={{ fontSize: 20, color: s.color, marginTop: 2 }}>{s.value}</div>
-          </div>
-        ))}
+          ))}
+        </div>
+
+        {/* Filter bar: mỗi field lọc theo đúng 1 chiều dữ liệu, không chồng chéo với ô tìm tên */}
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+          <input
+            className="kt-input"
+            placeholder="🔍 Tìm tên KOL..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{ flex: "1 1 160px", minWidth: 140, maxWidth: 220 }}
+          />
+          <select className="kt-select" value={filterCampaign} onChange={e => setFilterCampaign(e.target.value)} style={{ flex: "1 1 130px", minWidth: 120, maxWidth: 180 }}>
+            <option value="all">📁 Tất cả Dự án</option>
+            {CAMPAIGNS.map(c => <option key={c.key} value={c.key}>{campaignLabels[c.key] || c.label}</option>)}
+          </select>
+          <select className="kt-select" value={filterTier} onChange={e => setFilterTier(e.target.value)} style={{ flex: "1 1 120px", minWidth: 110, maxWidth: 160 }}>
+            <option value="all">👥 Tất cả Tier</option>
+            {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+          </select>
+          <select className="kt-select" value={filterLocation} onChange={e => setFilterLocation(e.target.value)} style={{ flex: "1 1 130px", minWidth: 120, maxWidth: 180 }}>
+            <option value="all">📍 Tất cả Địa điểm</option>
+            {uniqueLocations.map(l => <option key={l} value={l}>{l}</option>)}
+          </select>
+          <select className="kt-select" value={filterPhase} onChange={e => setFilterPhase(e.target.value)} style={{ flex: "1 1 140px", minWidth: 130, maxWidth: 190 }}>
+            <option value="all">🗓 Tất cả Thời điểm</option>
+            <option value="Phase 1">Phase 1</option>
+            <option value="Phase 2">Phase 2</option>
+          </select>
+          <select className="kt-select" value={filterCost} onChange={e => setFilterCost(e.target.value)} style={{ flex: "1 1 130px", minWidth: 120, maxWidth: 170 }}>
+            <option value="all">💰 Tất cả Chi phí</option>
+            {COST_BUCKETS.map(b => <option key={b.key} value={b.key}>{b.label}</option>)}
+          </select>
+          <select className="kt-select" value={filterViews} onChange={e => setFilterViews(e.target.value)} style={{ flex: "1 1 130px", minWidth: 120, maxWidth: 170 }}>
+            <option value="all">👁 Tất cả Views</option>
+            {VIEWS_BUCKETS.map(b => <option key={b.key} value={b.key}>{b.label}</option>)}
+          </select>
+          {hasActiveFilters && (
+            <button className="kt-btn kt-btn-ghost" onClick={clearFilters} style={{ padding: "8px 14px", whiteSpace: "nowrap" }}>
+              ✕ Xoá lọc
+            </button>
+          )}
+          <span style={{ fontSize: 13, color: "var(--ink-soft)", marginLeft: "auto", whiteSpace: "nowrap" }}>
+            Đang hiển thị: <strong>{filteredKols.length}</strong> / {uniqueKols.length} hồ sơ KOL
+          </span>
+        </div>
       </div>
 
-      {/* ── Filter bar: mỗi field lọc theo đúng 1 chiều dữ liệu, không chồng chéo với ô tìm tên ── */}
-      <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap", alignItems: "center" }}>
-        <input
-          className="kt-input"
-          placeholder="🔍 Tìm tên KOL..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          style={{ width: 200 }}
-        />
-        <select className="kt-select" value={filterCampaign} onChange={e => setFilterCampaign(e.target.value)} style={{ width: 160 }}>
-          <option value="all">📁 Tất cả Dự án</option>
-          {CAMPAIGNS.map(c => <option key={c.key} value={c.key}>{campaignLabels[c.key] || c.label}</option>)}
-        </select>
-        <select className="kt-select" value={filterTier} onChange={e => setFilterTier(e.target.value)} style={{ width: 140 }}>
-          <option value="all">👥 Tất cả Tier</option>
-          {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-        </select>
-        <select className="kt-select" value={filterLocation} onChange={e => setFilterLocation(e.target.value)} style={{ width: 150 }}>
-          <option value="all">📍 Tất cả Địa điểm</option>
-          {uniqueLocations.map(l => <option key={l} value={l}>{l}</option>)}
-        </select>
-        <select className="kt-select" value={filterPhase} onChange={e => setFilterPhase(e.target.value)} style={{ width: 170 }}>
-          <option value="all">🗓 Tất cả Thời điểm</option>
-          <option value="Phase 1">Phase 1</option>
-          <option value="Phase 2">Phase 2</option>
-        </select>
-        <select className="kt-select" value={filterCost} onChange={e => setFilterCost(e.target.value)} style={{ width: 150 }}>
-          <option value="all">💰 Tất cả Chi phí</option>
-          {COST_BUCKETS.map(b => <option key={b.key} value={b.key}>{b.label}</option>)}
-        </select>
-        <select className="kt-select" value={filterViews} onChange={e => setFilterViews(e.target.value)} style={{ width: 150 }}>
-          <option value="all">👁 Tất cả Views</option>
-          {VIEWS_BUCKETS.map(b => <option key={b.key} value={b.key}>{b.label}</option>)}
-        </select>
-        {hasActiveFilters && (
-          <button className="kt-btn kt-btn-ghost" onClick={clearFilters} style={{ padding: "8px 14px" }}>
-            ✕ Xoá lọc
-          </button>
-        )}
-        <span style={{ fontSize: 13, color: "var(--ink-soft)", marginLeft: "auto" }}>
-          Đang hiển thị: <strong>{filteredKols.length}</strong> / {uniqueKols.length} hồ sơ KOL
-        </span>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))", gap: 16 }}>
+      <div style={{ padding: "16px 20px 20px", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))", gap: 16 }}>
         {filteredKols.map(k => {
           const campaignsArr = Array.from(k.campaigns);
           const phasesArr = Array.from(k.phases);
@@ -2426,29 +2428,31 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile }) => 
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                 <thead>
                   <tr style={{ background: "var(--paper)", borderBottom: "1px solid var(--line)" }}>
-                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>Chiến dịch</th>
-                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>Món ăn</th>
-                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>Ngân sách</th>
-                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>Trạng thái</th>
-                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>Views thực tế</th>
-                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>Đơn hàng</th>
-                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>Doanh thu</th>
+                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Chiến dịch</th>
+                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Món ăn</th>
+                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Ngân sách</th>
+                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Trạng thái</th>
+                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Views</th>
+                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Đơn hàng</th>
+                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Doanh thu</th>
                   </tr>
                 </thead>
                 <tbody>
                   {kol.campaignDetails.map((c, i) => (
                     <tr key={i} style={{ borderBottom: "1px solid var(--line)" }}>
-                      <td style={{ padding: "10px 12px", fontWeight: 600 }}>
+                      <td style={{ padding: "10px 12px", fontWeight: 600, whiteSpace: "nowrap" }}>
                         <CampaignDot campaign={c.campaign} labels={campaignLabels} />
                       </td>
-                      <td style={{ padding: "10px 12px", color: "var(--ink-soft)" }}>{c.monAn || "—"}</td>
-                      <td style={{ padding: "10px 12px", fontWeight: 600, color: "var(--accent)" }}>{fmtVND(c.cost)}</td>
-                      <td style={{ padding: "10px 12px" }}>
+                      <td title={c.monAn} style={{ padding: "10px 12px", color: "var(--ink-soft)", maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {c.monAn || "—"}
+                      </td>
+                      <td style={{ padding: "10px 12px", fontWeight: 600, color: "var(--accent)", whiteSpace: "nowrap" }}>{fmtVND(c.cost)}</td>
+                      <td style={{ padding: "10px 12px", whiteSpace: "nowrap" }}>
                         <StatusBadge statusKey={c.statusKey} />
                       </td>
-                      <td style={{ padding: "10px 12px" }}>{c.views ? c.views.toLocaleString() : "—"}</td>
-                      <td style={{ padding: "10px 12px" }}>{c.conversions ? c.conversions.toLocaleString() : "—"}</td>
-                      <td style={{ padding: "10px 12px", fontWeight: 600, color: "var(--ok)" }}>{fmtVND(c.revenue)}</td>
+                      <td style={{ padding: "10px 12px", whiteSpace: "nowrap" }}>{c.views ? c.views.toLocaleString() : "—"}</td>
+                      <td style={{ padding: "10px 12px", whiteSpace: "nowrap" }}>{c.conversions ? c.conversions.toLocaleString() : "—"}</td>
+                      <td style={{ padding: "10px 12px", fontWeight: 600, color: "var(--ok)", whiteSpace: "nowrap" }}>{fmtVND(c.revenue)}</td>
                     </tr>
                   ))}
                 </tbody>
