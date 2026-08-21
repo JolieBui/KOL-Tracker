@@ -421,7 +421,7 @@ const COL_ALIASES = {
   type:          ["type", "loại", "loai", "tier"],
   location:      ["location", "địa điểm", "dia diem", "khu vực", "khu vuc"],
   group:         ["group", "nhóm", "nhom", "target", "camp."],
-  addonFee:      ["addonFee", "addon fee", "add-on fee", "add-on", "deliverable", "deliverables", "addonfee", "addon", "brand reup"],
+  addonFee:      ["addonFee", "addon fee", "add-on fee", "add-on", "deliverable", "deliverables", "addonfee", "addon"],
   cost:          ["cost", "chi phí", "chi phi", "giá", "gia", "ext. cost", "ext cost", "budget"],
   status:        ["status", "trạng thái", "trang thai", "tiến độ", "tien do", "tình trạng", "tinh trang"],
   statusKey:     ["statusKey", "status key", "status_key"],
@@ -430,7 +430,7 @@ const COL_ALIASES = {
   ngayGuiDemo:   ["ngay gui demo", "ngày gửi demo", "ngày gửi 1st demo", "ngay gui 1st demo", "demo link"],
   ngayAir:       ["ngay air", "ngày air", "air date", "ngày lên sóng", "date aired", "date air", "est. start date", "est start date"],
   airedLink:     ["airedLink", "aired link", "link aired", "aired tiktok", "link vdo", "link video", "video link", "link_vdo", "vdo link"],
-  airedFb:       ["airedFb", "aired fb", "fb/ig", "reup", "social", "facebook", "instagram", "reup link"],
+  airedFb:       ["airedFb", "aired fb", "fb/ig", "reup", "social", "facebook", "instagram"],
   giftSent:      ["giftSent", "gift", "quà tặng", "qua tang", "gift sent", "gửi sản phẩm"],
   link:          ["link tiktok", "tiktok link", "tiktok url", "profile link", "url", "link", "link"],
   campaign:      ["campaign", "chiến dịch", "chien dich"],
@@ -446,6 +446,19 @@ const COL_ALIASES = {
   conversions:   ["conversions", "conversion", "chuyển đổi", "chuyen doi", "results", "orders"],
   addToCart:     ["addtocart", "adds to cart", "add to cart", "thêm giỏ hàng", "them gio hang", "adds to cart (shop)"],
   revenue:       ["revenue", "gross revenue", "gross revenue (shop)", "revenue", "gmv", "doanh thu", "sales"],
+  reupViews:     ["reup view", "reup views"],
+  reupEngagement:["reup eng", "reup engagement"],
+  totalViewCombined: ["total view\n(tt + reup)", "total view (tt + reup)", "total view tt+reup"],
+  totalEngCombined:  ["total eng.\n(tt + reup)", "total eng. (tt + reup)", "total eng tt+reup"],
+  pctViewAchieved:      ["% view achieved"],
+  pctEngAchieved:       ["% eng achieved (like, cmt, share)", "% eng achieved"],
+  pctViewAchievedTotal: ["% view achieved (kèm reup)"],
+  pctEngAchievedTotal:  ["% eng. achieved", "% eng achieved (kèm reup)"],
+  paidAvgView:          ["paid avg. view", "paid avg view"],
+  paidPctCompletedView: ["paid % completed view"],
+  codeAds:              ["code ads"],
+  reupLink:              ["reup link"],
+  brandReup:             ["brand reup"],
 };
 
 const INTERNAL_FIELDS = Object.keys(COL_ALIASES);
@@ -528,6 +541,20 @@ const emptyKOL = () => ({
   conversions: 0,
   addToCart: 0,
   revenue: 0,
+  // ── Social Outreach metrics (added for [AVNxTCV] Social Outreach Campaign file) ──
+  reupViews: 0,
+  reupEngagement: 0,
+  totalViewCombined: 0,      // Total View (TikTok + Reup)
+  totalEngCombined: 0,       // Total Engagement (TikTok + Reup)
+  pctViewAchieved: null,     // % View Achieved (TikTok only, so sánh Est View)
+  pctEngAchieved: null,      // % Eng Achieved (TikTok only)
+  pctViewAchievedTotal: null,// % View achieved (kèm Reup)
+  pctEngAchievedTotal: null, // % Eng. achieved (kèm Reup)
+  paidAvgView: null,         // Paid Avg. View
+  paidPctCompletedView: null,// Paid % Completed View
+  codeAds: "",               // Code ads (Có/Không/mô tả)
+  reupLink: "",              // Reup Link
+  brandReup: "",             // Brand Reup
   updatedAt: new Date().toISOString().slice(0, 10),
 });
 
@@ -558,6 +585,19 @@ const FIELD_LABELS = {
   conversions: "Đơn hàng (Conversions)",
   addToCart: "Thêm giỏ hàng (ATC)",
   revenue: "Doanh thu / GMV (VNĐ)",
+  reupViews: "Reup Views",
+  reupEngagement: "Reup Engagement",
+  totalViewCombined: "Tổng View (TikTok + Reup)",
+  totalEngCombined: "Tổng Engagement (TikTok + Reup)",
+  pctViewAchieved: "% View đạt KPI",
+  pctEngAchieved: "% Engagement đạt KPI",
+  pctViewAchievedTotal: "% View đạt KPI (kèm Reup)",
+  pctEngAchievedTotal: "% Engagement đạt KPI (kèm Reup)",
+  paidAvgView: "Paid Avg. View",
+  paidPctCompletedView: "Paid % Completed View",
+  codeAds: "Code Ads",
+  reupLink: "Link Reup",
+  brandReup: "Brand Reup",
 };
 
 const applyMapping = (rawRows, mapping) => {
@@ -585,7 +625,9 @@ const applyMapping = (rawRows, mapping) => {
         val = raw == null ? "" : String(raw).trim();
       }
 
-      const numericFields = ["cost", "estView", "estEng", "views", "likes", "comments", "saves", "shares", "adSpend", "conversions", "addToCart", "revenue"];
+      const numericFields = ["cost", "estView", "estEng", "views", "likes", "comments", "saves", "shares", "adSpend", "conversions", "addToCart", "revenue",
+        "reupViews", "reupEngagement", "totalViewCombined", "totalEngCombined", "pctViewAchieved", "pctEngAchieved",
+        "pctViewAchievedTotal", "pctEngAchievedTotal", "paidAvgView", "paidPctCompletedView"];
       if (numericFields.includes(field)) {
         out[field] = parseFloat(val.replace(/[^0-9.-]/g, "")) || 0;
       } else if (field === "status") {
@@ -721,6 +763,483 @@ const ImportWizard = ({ rawHeaders, rawRows, sheetInfo, fileName, onConfirm, onC
 };
 
 /* ================================================================
+   DUAL-FILE AUTO-MERGE (INTERNAL execution file + Social Outreach file)
+   Kéo thả 2 file, tự nhận diện vai trò từng file theo cấu trúc cột,
+   ghép theo Campaign (tên sheet) + Tên KOL, rồi merge không đè dữ liệu trống.
+================================================================ */
+
+// Helpers shared by the dual-file parser ---------------------------------
+const excelCellToStr = (raw) => {
+  if (raw === null || raw === undefined) return "";
+  if (raw instanceof Date) {
+    return `${raw.getDate()}/${raw.getMonth() + 1}`;
+  }
+  if (typeof raw === "number" && raw > 40000 && raw < 60000) {
+    const d = XLSX.SSF.parse_date_code(raw);
+    return `${d.d}/${d.m}`;
+  }
+  return String(raw).trim();
+};
+const excelCellToNum = (raw) => {
+  if (raw === null || raw === undefined || raw === "") return undefined;
+  const n = Number(raw);
+  return isNaN(n) ? undefined : n;
+};
+const excelCellToBoolLabel = (raw) => {
+  if (raw === null || raw === undefined || raw === "") return "";
+  if (typeof raw === "boolean") return raw ? "Có" : "Không";
+  return String(raw).trim();
+};
+
+// CRITICAL: in the Social Outreach file, "Aired Link" / "Reup Link" cells often
+// display placeholder text like "Aired" or "IG\nYT" while the REAL URL is stored
+// as a hidden hyperlink underneath. sheet_to_json only returns the display text,
+// so we must read the raw cell's .l.Target to recover the actual link.
+const getLinkOrText = (ws, r, c, fallbackVal) => {
+  const addr = XLSX.utils.encode_cell({ r, c });
+  const cell = ws[addr];
+  const decodeEntities = (s) => s.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+  if (cell && cell.l && cell.l.Target && /^https?:\/\//i.test(cell.l.Target)) return decodeEntities(cell.l.Target);
+  const text = excelCellToStr(fallbackVal);
+  if (/^https?:\/\//i.test(text)) return text;
+  return text; // keep original text (e.g. Google Docs links already stored as plain text in INTERNAL file)
+};
+
+const findHeaderIdx = (header, ...candidates) => {
+  const norm = (s) => (s || "").toString().toLowerCase().replace(/\s+/g, " ").trim();
+  const cands = candidates.map(norm);
+  for (let i = 0; i < header.length; i++) {
+    const h = norm(header[i]);
+    if (cands.includes(h)) return i;
+  }
+  // fallback: partial match
+  for (let i = 0; i < header.length; i++) {
+    const h = norm(header[i]);
+    if (cands.some(c => c && h.includes(c))) return i;
+  }
+  return -1;
+};
+
+// Detect which of the two known file formats a workbook is ---------------
+const detectFileRole = (wb, fileName) => {
+  const allHeaders = new Set();
+  wb.SheetNames.forEach(name => {
+    const ws = wb.Sheets[name];
+    const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
+    if (aoa[0]) aoa[0].forEach(h => allHeaders.add((h || "").toString().toLowerCase().trim()));
+  });
+  const has = (s) => Array.from(allHeaders).some(h => h.includes(s));
+  const looksInternal = has("status") && has("group") && has("add-on fee");
+  const looksSocial = has("est view") && (has("reup") || has("tt + reup") || has("achieved"));
+
+  if (looksInternal && !looksSocial) return "internal";
+  if (looksSocial && !looksInternal) return "social";
+
+  const fn = fileName.toLowerCase();
+  if (fn.includes("internal")) return "internal";
+  if (fn.includes("social") || fn.includes("outreach")) return "social";
+  return "unknown";
+};
+
+// Parse the [INTERNAL] Execution file → { campaignKey: Map(kolKeyLower -> fields) }
+const parseInternalWorkbook = (wb) => {
+  const out = {};
+  wb.SheetNames.forEach(sheetName => {
+    const campaignKey = normalizeCampaignKey(sheetName);
+    if (!CAMPAIGNS.find(c => c.key === campaignKey)) return;
+    const ws = wb.Sheets[sheetName];
+    const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
+    if (!aoa.length) return;
+    const header = aoa[0].map(h => (h || "").toString());
+    const iKol = findHeaderIdx(header, "kol");
+    const iLink = findHeaderIdx(header, "link");
+    const iFollower = findHeaderIdx(header, "follower");
+    const iType = findHeaderIdx(header, "type");
+    const iLocation = findHeaderIdx(header, "location");
+    const iGroup = findHeaderIdx(header, "group");
+    const iCost = findHeaderIdx(header, "cost");
+    const iAddon = findHeaderIdx(header, "add-on fee");
+    const iStatus = findHeaderIdx(header, "status");
+    const iMonAn = findHeaderIdx(header, "món ăn", "mon an");
+    const iScript = findHeaderIdx(header, "ngày gửi script", "ngay gui script");
+    const iDemo = findHeaderIdx(header, "ngày gửi 1st demo", "ngày gửi demo", "ngay gui 1st demo");
+    const iAir = findHeaderIdx(header, "ngày air", "ngay air");
+    const iAiredLink = findHeaderIdx(header, "aired link");
+    const iAiredFb = findHeaderIdx(header, "aired fb");
+    if (iKol < 0) return;
+
+    const map = new Map();
+    for (let r = 1; r < aoa.length; r++) {
+      const row = aoa[r];
+      if (!row) continue;
+      const no = row[0];
+      if (no === null || no === "" || isNaN(Number(no))) continue; // skip totals/blank rows
+      const kolName = (row[iKol] || "").toString().trim();
+      if (!kolName) continue;
+      map.set(kolName.toLowerCase(), {
+        kol: kolName,
+        link: excelCellToStr(row[iLink]),
+        follower: excelCellToStr(row[iFollower]),
+        type: excelCellToStr(row[iType]),
+        location: excelCellToStr(row[iLocation]),
+        group: excelCellToStr(row[iGroup]),
+        cost: excelCellToNum(row[iCost]) || 0,
+        addonFee: excelCellToStr(row[iAddon]),
+        statusKey: iStatus >= 0 ? (STATUS_LABEL_TO_KEY[(row[iStatus] || "").toString().toLowerCase().trim()] || "") : "",
+        monAn: excelCellToStr(row[iMonAn]),
+        ngayGuiScript: iScript >= 0 ? getLinkOrText(ws, r, iScript, row[iScript]) : "",
+        ngayGuiDemo: iDemo >= 0 ? getLinkOrText(ws, r, iDemo, row[iDemo]) : "",
+        ngayAir: excelCellToStr(row[iAir]),
+        airedLink: iAiredLink >= 0 ? getLinkOrText(ws, r, iAiredLink, row[iAiredLink]) : "",
+        airedFb: excelCellToStr(row[iAiredFb]),
+      });
+    }
+    out[campaignKey] = map;
+  });
+  return out;
+};
+
+// Parse the [AVNxTCV] Social Outreach file → { campaignKey: Map(kolKeyLower -> fields) }
+const parseSocialWorkbook = (wb) => {
+  const out = {};
+  wb.SheetNames.forEach(sheetName => {
+    const campaignKey = normalizeCampaignKey(sheetName);
+    if (!CAMPAIGNS.find(c => c.key === campaignKey)) return;
+    const ws = wb.Sheets[sheetName];
+    const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
+    if (!aoa.length) return;
+    const header = aoa[0].map(h => (h || "").toString());
+    const iKol = findHeaderIdx(header, "kol");
+    const iLink = findHeaderIdx(header, "link");
+    const iType = findHeaderIdx(header, "type");
+    const iEstView = findHeaderIdx(header, "est view");
+    const iEstEng = findHeaderIdx(header, "est engagement", "est eng");
+    const iFollower = findHeaderIdx(header, "follower");
+    const iCost = findHeaderIdx(header, "cost");
+    const iDateAired = findHeaderIdx(header, "date aired");
+    const iAiredLink = findHeaderIdx(header, "aired link", "airing link");
+    const iReupLink = findHeaderIdx(header, "reup link");
+    const iBrandReup = findHeaderIdx(header, "brand reup");
+    const iView = findHeaderIdx(header, "view");
+    const iLike = findHeaderIdx(header, "like");
+    const iComment = findHeaderIdx(header, "comment");
+    const iShare = findHeaderIdx(header, "share");
+    const iSave = findHeaderIdx(header, "save");
+    const iPctViewAch = findHeaderIdx(header, "% view achieved");
+    const iPctEngAch = findHeaderIdx(header, "% eng achieved (like, cmt, share)", "% eng achieved");
+    const iPaidAvgView = findHeaderIdx(header, "paid avg. view", "paid avg view");
+    const iPaidPctCompleted = findHeaderIdx(header, "paid % completed view");
+    const iCodeAds = findHeaderIdx(header, "code ads");
+    const iReupView = findHeaderIdx(header, "reup view");
+    const iReupEng = findHeaderIdx(header, "reup eng");
+    const iTotalView = findHeaderIdx(header, "total view\n(tt + reup)", "total view (tt + reup)");
+    const iTotalEng = findHeaderIdx(header, "total eng.\n(tt + reup)", "total eng. (tt + reup)");
+    // The last two "% ... achieved" columns (combined w/ reup) share the same lowercase text as the
+    // first two but with different capitalization in the source files — find their *second* occurrence.
+    let iPctViewTotal = -1, iPctEngTotal = -1;
+    header.forEach((h, i) => {
+      const hn = (h || "").toLowerCase().trim();
+      if (hn === "% view achieved" && i !== iPctViewAch) iPctViewTotal = i;
+      if ((hn === "% eng. achieved" || hn === "% eng achieved") && i !== iPctEngAch) iPctEngTotal = i;
+    });
+    if (iKol < 0) return;
+
+    const map = new Map();
+    for (let r = 1; r < aoa.length; r++) {
+      const row = aoa[r];
+      if (!row) continue;
+      const no = row[0];
+      if (no === null || no === "" || isNaN(Number(no))) continue;
+      const kolName = (row[iKol] || "").toString().trim();
+      if (!kolName) continue;
+      map.set(kolName.toLowerCase(), {
+        kol: kolName,
+        link: excelCellToStr(row[iLink]),
+        type: excelCellToStr(row[iType]),
+        follower: excelCellToStr(row[iFollower]),
+        estView: excelCellToNum(row[iEstView]),
+        estEng: excelCellToNum(row[iEstEng]),
+        cost: excelCellToNum(row[iCost]),
+        ngayAir: excelCellToStr(row[iDateAired]),
+        airedLink: iAiredLink >= 0 ? getLinkOrText(ws, r, iAiredLink, row[iAiredLink]) : "",
+        reupLink: iReupLink >= 0 ? getLinkOrText(ws, r, iReupLink, row[iReupLink]) : "",
+        brandReup: excelCellToStr(row[iBrandReup]),
+        views: excelCellToNum(row[iView]),
+        likes: excelCellToNum(row[iLike]),
+        comments: excelCellToNum(row[iComment]),
+        shares: excelCellToNum(row[iShare]),
+        saves: excelCellToNum(row[iSave]),
+        pctViewAchieved: excelCellToNum(row[iPctViewAch]),
+        pctEngAchieved: excelCellToNum(row[iPctEngAch]),
+        pctViewAchievedTotal: iPctViewTotal >= 0 ? excelCellToNum(row[iPctViewTotal]) : undefined,
+        pctEngAchievedTotal: iPctEngTotal >= 0 ? excelCellToNum(row[iPctEngTotal]) : undefined,
+        paidAvgView: excelCellToNum(row[iPaidAvgView]),
+        paidPctCompletedView: excelCellToNum(row[iPaidPctCompleted]),
+        codeAds: excelCellToBoolLabel(row[iCodeAds]),
+        reupViews: excelCellToNum(row[iReupView]),
+        reupEngagement: excelCellToNum(row[iReupEng]),
+        totalViewCombined: excelCellToNum(row[iTotalView]),
+        totalEngCombined: excelCellToNum(row[iTotalEng]),
+      });
+    }
+    out[campaignKey] = map;
+  });
+  return out;
+};
+
+// Merge internal + social maps against existing app data ------------------
+// Internal file wins for tracking/process fields; Social Outreach wins for
+// performance numbers + aired link/date (source of truth per yêu cầu).
+// Never overwrites an existing value with a blank incoming one.
+const mergeDualFiles = (internalMap, socialMap, existingData) => {
+  const campaignKeys = new Set([...Object.keys(internalMap), ...Object.keys(socialMap)]);
+  const toUpdate = [];
+  const toAdd = [];
+  const warnings = [];
+
+  campaignKeys.forEach(campaignKey => {
+    const intMap = internalMap[campaignKey] || new Map();
+    const socMap = socialMap[campaignKey] || new Map();
+    const allKolKeys = new Set([...intMap.keys(), ...socMap.keys()]);
+
+    allKolKeys.forEach(kolKey => {
+      const intRow = intMap.get(kolKey);
+      const socRow = socMap.get(kolKey);
+      const displayName = (intRow && intRow.kol) || (socRow && socRow.kol) || kolKey;
+
+      if (!intRow) warnings.push(`[${campaignKey}] "${displayName}" — chỉ có trong file Social Outreach (thiếu Status/Chi phí/Nhóm... từ file INTERNAL)`);
+      if (!socRow) warnings.push(`[${campaignKey}] "${displayName}" — chỉ có trong file INTERNAL (chưa có chỉ số hiệu suất từ Social Outreach)`);
+
+      const merged = {};
+      if (intRow) Object.assign(merged, intRow);
+      if (socRow) {
+        Object.assign(merged, {
+          estView: socRow.estView, estEng: socRow.estEng,
+          views: socRow.views, likes: socRow.likes, comments: socRow.comments, shares: socRow.shares, saves: socRow.saves,
+          reupViews: socRow.reupViews, reupEngagement: socRow.reupEngagement,
+          totalViewCombined: socRow.totalViewCombined, totalEngCombined: socRow.totalEngCombined,
+          pctViewAchieved: socRow.pctViewAchieved, pctEngAchieved: socRow.pctEngAchieved,
+          pctViewAchievedTotal: socRow.pctViewAchievedTotal, pctEngAchievedTotal: socRow.pctEngAchievedTotal,
+          paidAvgView: socRow.paidAvgView, paidPctCompletedView: socRow.paidPctCompletedView,
+          codeAds: socRow.codeAds, reupLink: socRow.reupLink, brandReup: socRow.brandReup,
+        });
+        // Social Outreach is the source of truth for the aired link + air date —
+        // but ONLY when it actually resolved to a real URL (hyperlink extracted).
+        // Otherwise its "Aired" placeholder text would wipe out a real link already
+        // present in the INTERNAL file.
+        if (socRow.airedLink && /^https?:\/\//i.test(socRow.airedLink)) merged.airedLink = socRow.airedLink;
+        if (socRow.ngayAir) merged.ngayAir = socRow.ngayAir;
+        if (!merged.kol) merged.kol = socRow.kol;
+        if (!merged.follower) merged.follower = socRow.follower;
+        if (!merged.type) merged.type = socRow.type;
+        if (!merged.link) merged.link = socRow.link;
+        if (!merged.cost) merged.cost = socRow.cost;
+      }
+      merged.campaign = campaignKey;
+
+      const existing = existingData.find(r =>
+        resolveCampaignKey(r) === campaignKey && (r.kol || "").trim().toLowerCase() === kolKey
+      );
+
+      if (existing) {
+        const changes = {};
+        Object.entries(merged).forEach(([k, v]) => {
+          if (v === undefined || v === null || v === "") return; // never blank out existing data
+          changes[k] = v;
+        });
+        toUpdate.push({ id: existing.id, kol: existing.kol, campaign: campaignKey, changes });
+      } else {
+        const newRow = { ...emptyKOL(), ...merged };
+        newRow.id = `${campaignKey}-${kolKey.replace(/[^a-z0-9]+/gi, "-").replace(/(^-|-$)/g, "")}`;
+        if (!newRow.statusKey) {
+          newRow.statusKey = (newRow.airedLink || newRow.ngayAir) ? "aired" : "waiting_food";
+        }
+        toAdd.push(newRow);
+      }
+    });
+  });
+
+  return { toUpdate, toAdd, warnings };
+};
+
+const DualFileImportModal = ({ existingData, onConfirm, onClose }) => {
+  const [step, setStep] = useState("drop"); // drop | error | preview
+  const [error, setError] = useState("");
+  const [dragOver, setDragOver] = useState(false);
+  const [roles, setRoles] = useState(null); // { internal: {name, wb}, social: {name, wb} }
+  const [result, setResult] = useState(null); // { toUpdate, toAdd, warnings }
+  const fileRef = useRef(null);
+
+  const processFiles = async (fileList) => {
+    const files = Array.from(fileList).filter(f => /\.(xlsx|xls)$/i.test(f.name));
+    if (files.length !== 2) {
+      setError(`Cần đúng 2 file .xlsx (INTERNAL + Social Outreach). Đã nhận ${files.length} file.`);
+      setStep("error");
+      return;
+    }
+    try {
+      const parsed = await Promise.all(files.map(f => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          try {
+            const wb = XLSX.read(ev.target.result, { type: "array", cellDates: true });
+            resolve({ name: f.name, wb });
+          } catch (err) { reject(err); }
+        };
+        reader.onerror = reject;
+        reader.readAsArrayBuffer(f);
+      })));
+
+      const withRoles = parsed.map(p => ({ ...p, role: detectFileRole(p.wb, p.name) }));
+      const internalFile = withRoles.find(p => p.role === "internal");
+      const socialFile = withRoles.find(p => p.role === "social");
+
+      if (!internalFile || !socialFile) {
+        setError(
+          "Không nhận diện được đủ 2 vai trò file.\n" +
+          withRoles.map(p => `• ${p.name} → ${p.role === "unknown" ? "chưa rõ" : p.role}`).join("\n") +
+          "\n\nKiểm tra lại: file INTERNAL cần có cột Status/Group/Add-on Fee, file Social Outreach cần có cột Est View + Reup/Total View/Achieved."
+        );
+        setStep("error");
+        return;
+      }
+
+      setRoles({ internal: internalFile, social: socialFile });
+
+      const internalMap = parseInternalWorkbook(internalFile.wb);
+      const socialMap = parseSocialWorkbook(socialFile.wb);
+      const merged = mergeDualFiles(internalMap, socialMap, existingData);
+      setResult(merged);
+      setStep("preview");
+    } catch (err) {
+      setError("Lỗi khi đọc file: " + err.message);
+      setStep("error");
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length) processFiles(e.dataTransfer.files);
+  };
+
+  const perCampaignCounts = useMemo(() => {
+    if (!result) return [];
+    const map = {};
+    result.toUpdate.forEach(u => { map[u.campaign] = map[u.campaign] || { update: 0, add: 0 }; map[u.campaign].update++; });
+    result.toAdd.forEach(a => { map[a.campaign] = map[a.campaign] || { update: 0, add: 0 }; map[a.campaign].add++; });
+    return Object.entries(map);
+  }, [result]);
+
+  return (
+    <div className="kt-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="kt-modal kt-anim" style={{ maxWidth: 720 }}>
+        <div style={{ padding: "18px 22px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+              CẬP NHẬT DỮ LIỆU
+            </div>
+            <div style={{ fontSize: 17, fontWeight: 700, color: "var(--ink)" }}>Auto-merge 2 file AVN x TCV</div>
+          </div>
+          <button className="kt-btn kt-btn-ghost" onClick={onClose} style={{ padding: "6px 10px" }}>✕</button>
+        </div>
+
+        <div style={{ padding: "20px 22px", display: "flex", flexDirection: "column", gap: 16 }}>
+          {step === "drop" && (
+            <div
+              onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={handleDrop}
+              onClick={() => fileRef.current?.click()}
+              style={{
+                border: `2px dashed ${dragOver ? "var(--accent)" : "var(--line)"}`,
+                borderRadius: 12, padding: "40px 20px", textAlign: "center", cursor: "pointer",
+                background: dragOver ? "var(--accent-bg)" : "var(--paper)", transition: "all 0.15s"
+              }}
+            >
+              <div style={{ fontSize: 32, marginBottom: 10 }}>📂</div>
+              <div style={{ fontWeight: 700, color: "var(--ink)", marginBottom: 6 }}>Kéo thả 2 file vào đây (hoặc bấm để chọn)</div>
+              <div style={{ fontSize: 12, color: "var(--ink-soft)", lineHeight: 1.6 }}>
+                1 file <strong>[INTERNAL] AVN x TCV — Execution</strong> (tiến độ, status, chi phí)<br />
+                1 file <strong>[AVNxTCV] Social Outreach Campaign</strong> (chỉ số, views, link air)<br />
+                Claude tự nhận diện vai trò từng file — không cần chọn thủ công.
+              </div>
+              <input ref={fileRef} type="file" multiple accept=".xlsx,.xls" style={{ display: "none" }}
+                onChange={e => e.target.files.length && processFiles(e.target.files)} />
+            </div>
+          )}
+
+          {step === "error" && (
+            <div>
+              <div style={{ background: "var(--danger-bg)", color: "var(--danger)", padding: "14px 16px", borderRadius: 10, fontSize: 13, whiteSpace: "pre-line", lineHeight: 1.6 }}>
+                ⚠️ {error}
+              </div>
+              <button className="kt-btn kt-btn-ghost" style={{ marginTop: 12 }} onClick={() => { setStep("drop"); setError(""); }}>
+                ← Thử lại
+              </button>
+            </div>
+          )}
+
+          {step === "preview" && result && roles && (
+            <>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                <div style={{ flex: 1, minWidth: 220, background: "var(--paper)", borderRadius: 10, padding: "10px 14px" }}>
+                  <div style={{ fontSize: 11, color: "var(--ink-soft)", textTransform: "uppercase", fontWeight: 700 }}>File INTERNAL (tiến độ)</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{roles.internal.name}</div>
+                </div>
+                <div style={{ flex: 1, minWidth: 220, background: "var(--paper)", borderRadius: 10, padding: "10px 14px" }}>
+                  <div style={{ fontSize: 11, color: "var(--ink-soft)", textTransform: "uppercase", fontWeight: 700 }}>File Social Outreach (chỉ số)</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{roles.social.name}</div>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: 12 }}>
+                <div style={{ flex: 1, background: "var(--accent-bg)", borderRadius: 10, padding: "12px 16px", textAlign: "center" }}>
+                  <div style={{ fontSize: 24, fontWeight: 800, color: "var(--accent)" }}>{result.toUpdate.length}</div>
+                  <div style={{ fontSize: 12, color: "var(--ink-soft)" }}>dòng sẽ cập nhật</div>
+                </div>
+                <div style={{ flex: 1, background: "#EBF8F5", borderRadius: 10, padding: "12px 16px", textAlign: "center" }}>
+                  <div style={{ fontSize: 24, fontWeight: 800, color: "var(--ok)" }}>{result.toAdd.length}</div>
+                  <div style={{ fontSize: 12, color: "var(--ink-soft)" }}>KOL mới sẽ thêm</div>
+                </div>
+              </div>
+
+              {perCampaignCounts.length > 0 && (
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                  {perCampaignCounts.map(([ck, c]) => (
+                    <span key={ck} className="kt-badge" style={{ background: `${CAMPAIGN_COLOR[ck] || "#888"}22`, color: CAMPAIGN_COLOR[ck] || "#888", border: `1px solid ${CAMPAIGN_COLOR[ck] || "#888"}55` }}>
+                      {ck}: {c.update} cập nhật · {c.add} mới
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {result.warnings.length > 0 && (
+                <div>
+                  <div className="kt-label" style={{ marginBottom: 6, fontSize: 12 }}>⚠️ Cần chú ý ({result.warnings.length})</div>
+                  <div style={{ maxHeight: 160, overflowY: "auto", background: "var(--paper)", borderRadius: 10, padding: 12, fontSize: 12, color: "var(--ink-soft)", lineHeight: 1.7 }}>
+                    {result.warnings.map((w, i) => <div key={i}>• {w}</div>)}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        {step === "preview" && (
+          <div style={{ padding: "14px 22px", borderTop: "1px solid var(--line)", display: "flex", justifyContent: "flex-end", gap: 8 }}>
+            <button className="kt-btn kt-btn-ghost" onClick={() => { setStep("drop"); setResult(null); setRoles(null); }}>← Chọn lại file</button>
+            <button className="kt-btn kt-btn-primary" onClick={() => onConfirm(result)}>
+              ✅ Xác nhận cập nhật {result.toUpdate.length + result.toAdd.length} dòng
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+/* ================================================================
    STATUS BADGE
 ================================================================ */
 const StatusBadge = ({ statusKey }) => {
@@ -836,6 +1355,32 @@ const DetailModal = ({ kol, onClose, onSave, onDelete }) => {
 
               <Field label="Thêm giỏ hàng (ATC)" field="addToCart" type="number" />
               <Field label="Doanh thu / GMV (VNĐ)" field="revenue" type="number" />
+            </div>
+          </div>
+
+          {/* Reup & Extended KPI (from Social Outreach file) */}
+          <div style={{ gridColumn: "1 / -1", borderTop: "1px solid var(--line)", paddingTop: 16, marginTop: 10 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)", display: "flex", alignItems: "center", gap: 6 }}>
+              🔁 Reup & KPI mở rộng (Social Outreach)
+            </h3>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0 16px" }}>
+              <Field label="Reup Views" field="reupViews" type="number" />
+              <Field label="Reup Engagement" field="reupEngagement" type="number" />
+              <Field label="Tổng View (TikTok + Reup)" field="totalViewCombined" type="number" />
+
+              <Field label="Tổng Engagement (TikTok + Reup)" field="totalEngCombined" type="number" />
+              <Field label="% View đạt KPI" field="pctViewAchieved" type="number" />
+              <Field label="% Eng đạt KPI" field="pctEngAchieved" type="number" />
+
+              <Field label="% View đạt KPI (kèm Reup)" field="pctViewAchievedTotal" type="number" />
+              <Field label="% Eng đạt KPI (kèm Reup)" field="pctEngAchievedTotal" type="number" />
+              <Field label="Paid Avg. View" field="paidAvgView" type="number" />
+
+              <Field label="Paid % Completed View" field="paidPctCompletedView" type="number" />
+              <Field label="Code Ads" field="codeAds" />
+              <Field label="Brand Reup" field="brandReup" />
+
+              <Field label="Link Reup" field="reupLink" />
             </div>
           </div>
         </div>
@@ -1981,6 +2526,7 @@ const [view, setView] = useState("table");
 
 
   const [wizardData, setWizardData] = useState(null); // { rawHeaders, rawRows, fileName }
+  const [showDualImport, setShowDualImport] = useState(false);
 
   const showToast = (msg, ok = true) => {
     setToast({ msg, ok });
@@ -2284,6 +2830,19 @@ const [view, setView] = useState("table");
     }));
     showToast("✅ Đã cập nhật hồ sơ KOL");
   };
+  // Commit the preview from DualFileImportModal: update matched rows in place
+  // (by id) and append brand-new ones, in a single history-tracked setData call.
+  const handleDualFileMerge = (result) => {
+    setData(d => {
+      const byId = Object.fromEntries(d.map(r => [r.id, r]));
+      result.toUpdate.forEach(u => {
+        byId[u.id] = { ...byId[u.id], ...u.changes, updatedAt: new Date().toISOString().slice(0, 10) };
+      });
+      return [...Object.values(byId), ...result.toAdd];
+    });
+    showToast(`✅ Đã cập nhật ${result.toUpdate.length} dòng, thêm ${result.toAdd.length} KOL mới`);
+    setShowDualImport(false);
+  };
   const handleReset = () => {
     const clearAll = window.confirm(
       "Bạn muốn thực hiện thao tác nào?\n\n" +
@@ -2379,6 +2938,10 @@ const [view, setView] = useState("table");
             <button className="kt-btn kt-btn-ghost" onClick={() => importRef.current?.click()}
               title="Import file Excel (.xlsx) hoặc JSON" style={{ padding: "8px 14px" }}>
               📥 Nhập
+            </button>
+            <button className="kt-btn kt-btn-ghost" onClick={() => setShowDualImport(true)}
+              title="Kéo thả 2 file INTERNAL + Social Outreach, tự nhận diện & merge dữ liệu" style={{ padding: "8px 14px" }}>
+              🔄 Cập nhật 2 file
             </button>
             <button className="kt-btn kt-btn-ghost" onClick={handleExportData}
               title="Tải toàn bộ dữ liệu hiện tại trên web về máy (.xlsx)" style={{ padding: "8px 14px" }}>
@@ -2525,6 +3088,14 @@ const [view, setView] = useState("table");
       )}
 
       {/* ── IMPORT WIZARD ── */}
+      {showDualImport && (
+        <DualFileImportModal
+          existingData={data}
+          onClose={() => setShowDualImport(false)}
+          onConfirm={handleDualFileMerge}
+        />
+      )}
+
       {wizardData && (
         <ImportWizard
           {...wizardData}
