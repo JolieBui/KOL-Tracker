@@ -878,6 +878,7 @@ const parseInternalWorkbook = (wb) => {
       if (!kolName) continue;
       map.set(kolName.toLowerCase(), {
         kol: kolName,
+        no: Number(no),
         link: excelCellToStr(row[iLink]),
         follower: excelCellToStr(row[iFollower]),
         type: excelCellToStr(row[iType]),
@@ -954,6 +955,7 @@ const parseSocialWorkbook = (wb) => {
       if (!kolName) continue;
       map.set(kolName.toLowerCase(), {
         kol: kolName,
+        no: Number(no),
         link: excelCellToStr(row[iLink]),
         type: excelCellToStr(row[iType]),
         follower: excelCellToStr(row[iFollower]),
@@ -1036,6 +1038,8 @@ const mergeDualFiles = (internalMap, socialMap, existingData) => {
         if (!merged.cost) merged.cost = socRow.cost;
       }
       merged.campaign = campaignKey;
+      const seqNo = (intRow && intRow.no) ?? (socRow && socRow.no);
+      delete merged.no; // transient field, not part of the row schema
 
       const existing = existingData.find(r =>
         resolveCampaignKey(r) === campaignKey && (r.kol || "").trim().toLowerCase() === kolKey
@@ -1050,7 +1054,7 @@ const mergeDualFiles = (internalMap, socialMap, existingData) => {
         toUpdate.push({ id: existing.id, kol: existing.kol, campaign: campaignKey, changes });
       } else {
         const newRow = { ...emptyKOL(), ...merged };
-        newRow.id = `${campaignKey}-${kolKey.replace(/[^a-z0-9]+/gi, "-").replace(/(^-|-$)/g, "")}`;
+        newRow.id = `${campaignKey}-${seqNo || (toAdd.length + 1)}`;
         if (!newRow.statusKey) {
           newRow.statusKey = (newRow.airedLink || newRow.ngayAir) ? "aired" : "waiting_food";
         }
@@ -1109,6 +1113,21 @@ const DualFileImportModal = ({ existingData, onConfirm, onClose }) => {
       const internalMap = parseInternalWorkbook(internalFile.wb);
       const socialMap = parseSocialWorkbook(socialFile.wb);
       const merged = mergeDualFiles(internalMap, socialMap, existingData);
+
+      // Real campaign labels = the actual sheet names in the source files
+      // (e.g. "AM", "AX", "Vinegar"), so the filter dropdown & header stop
+      // showing the generic "Campaign A/B/C" placeholder once real files land.
+      const sheetLabels = {};
+      [internalFile.wb, socialFile.wb].forEach(wb => {
+        wb.SheetNames.forEach(sheetName => {
+          const key = normalizeCampaignKey(sheetName);
+          if (CAMPAIGNS.find(c => c.key === key) && sheetName.trim()) {
+            sheetLabels[key] = sheetName.trim();
+          }
+        });
+      });
+      merged.sheetLabels = sheetLabels;
+
       setResult(merged);
       setStep("preview");
     } catch (err) {
@@ -2835,6 +2854,15 @@ const [view, setView] = useState("table");
       });
       return [...Object.values(byId), ...result.toAdd];
     });
+
+    if (result.sheetLabels && Object.keys(result.sheetLabels).length) {
+      setCampaignLabels(prev => {
+        const next = { ...prev, ...result.sheetLabels };
+        localStorage.setItem("kol_campaign_labels", JSON.stringify(next));
+        return next;
+      });
+    }
+
     showToast(`✅ Đã cập nhật ${result.toUpdate.length} dòng, thêm ${result.toAdd.length} KOL mới`);
     setShowDualImport(false);
   };
