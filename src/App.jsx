@@ -1158,12 +1158,7 @@ const DualFileImportModal = ({ existingData, onConfirm, onClose }) => {
               }}
             >
               <div style={{ fontSize: 32, marginBottom: 10 }}>📂</div>
-              <div style={{ fontWeight: 700, color: "var(--ink)", marginBottom: 6 }}>Kéo thả 2 file vào đây (hoặc bấm để chọn)</div>
-              <div style={{ fontSize: 12, color: "var(--ink-soft)", lineHeight: 1.6 }}>
-                1 file <strong>[INTERNAL] AVN x TCV — Execution</strong> (tiến độ, status, chi phí)<br />
-                1 file <strong>[AVNxTCV] Social Outreach Campaign</strong> (chỉ số, views, link air)<br />
-                Claude tự nhận diện vai trò từng file — không cần chọn thủ công.
-              </div>
+              <div style={{ fontWeight: 700, color: "var(--ink)" }}>Kéo thả 2 file vào đây (hoặc bấm để chọn)</div>
               <input ref={fileRef} type="file" multiple accept=".xlsx,.xls" style={{ display: "none" }}
                 onChange={e => e.target.files.length && processFiles(e.target.files)} />
             </div>
