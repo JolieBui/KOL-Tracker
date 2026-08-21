@@ -112,37 +112,33 @@ Error generating stack: `+e.message+`
 `;var n=Dy(e,t);return P===void 0||t.type==`string`?n:`ÿþ`+P.utils.encode(1200,n,`str`)}function ky(e){var t=``,n,r=``;if(e==null||e[`!ref`]==null)return[];var i=ei(e[`!ref`]),a=``,o=[],s,c=[],l=Array.isArray(e);for(s=i.s.c;s<=i.e.c;++s)o[s]=Jr(s);for(var u=i.s.r;u<=i.e.r;++u)for(a=Wr(u),s=i.s.c;s<=i.e.c;++s)if(t=o[s]+a,n=l?(e[u]||[])[s]:e[t],r=``,n!==void 0){if(n.F!=null){if(t=n.F,!n.f)continue;r=n.f,t.indexOf(`:`)==-1&&(t=t+`:`+t)}if(n.f!=null)r=n.f;else if(n.t==`z`)continue;else if(n.t==`n`&&n.v!=null)r=``+n.v;else if(n.t==`b`)r=n.v?`TRUE`:`FALSE`;else if(n.w!==void 0)r=`'`+n.w;else if(n.v===void 0)continue;else r=n.t==`s`?`'`+n.v:``+n.v;c[c.length]=t+`=`+r}return c}function Ay(e,t,n){var r=n||{},i=+!r.skipHeader,a=e||{},o=0,s=0;if(a&&r.origin!=null){if(typeof r.origin==`number`)o=r.origin;else{var c=typeof r.origin==`string`?Qr(r.origin):r.origin;o=c.r,s=c.c}}var l,u={s:{c:0,r:0},e:{c:s,r:o+t.length-1+i}};if(a[`!ref`]){var d=ei(a[`!ref`]);u.e.c=Math.max(u.e.c,d.e.c),u.e.r=Math.max(u.e.r,d.e.r),o==-1&&(o=d.e.r+1,u.e.r=o+t.length-1+i)}else o==-1&&(o=0,u.e.r=t.length-1+i);var f=r.header||[],p=0;t.forEach(function(e,t){kt(e).forEach(function(n){(p=f.indexOf(n))==-1&&(f[p=f.length]=n);var c=e[n],u=`z`,d=``,m=J({c:s+p,r:o+t+i});l=My(a,m),c&&typeof c==`object`&&!(c instanceof Date)?a[m]=c:(typeof c==`number`?u=`n`:typeof c==`boolean`?u=`b`:typeof c==`string`?u=`s`:c instanceof Date?(u=`d`,r.cellDates||(u=`n`,c=Ft(c)),d=r.dateNF||V[14]):c===null&&r.nullError&&(u=`e`,c=0),l?(l.t=u,l.v=c,delete l.w,delete l.R,d&&(l.z=d)):a[m]=l={t:u,v:c},d&&(l.z=d))})}),u.e.c=Math.max(u.e.c,s+f.length-1);var m=Wr(o);if(i)for(p=0;p<f.length;++p)a[Jr(p+s)+m]={t:`s`,v:f[p]};return a[`!ref`]=Y(u),a}function jy(e,t){return Ay(null,e,t)}function My(e,t,n){if(typeof t==`string`){if(Array.isArray(e)){var r=Qr(t);return e[r.r]||(e[r.r]=[]),e[r.r][r.c]||(e[r.r][r.c]={t:`z`})}return e[t]||(e[t]={t:`z`})}return typeof t==`number`?My(e,J({r:t,c:n||0})):My(e,J(t))}function Ny(e,t){if(typeof t==`number`){if(t>=0&&e.SheetNames.length>t)return t;throw Error(`Cannot find sheet # `+t)}if(typeof t==`string`){var n=e.SheetNames.indexOf(t);if(n>-1)return n;throw Error(`Cannot find sheet name |`+t+`|`)}throw Error(`Cannot find sheet |`+t+`|`)}function Py(){return{SheetNames:[],Sheets:{}}}function Fy(e,t,n,r){var i=1;if(!n)for(;i<=65535&&e.SheetNames.indexOf(n=`Sheet`+i)!=-1;++i,n=void 0);if(!n||e.SheetNames.length>=65535)throw Error(`Too many worksheets`);if(r&&e.SheetNames.indexOf(n)>=0){var a=n.match(/(^.*?)(\d+)$/);i=a&&+a[2]||0;var o=a&&a[1]||n;for(++i;i<=65535&&e.SheetNames.indexOf(n=o+i)!=-1;++i);}if(og(n),e.SheetNames.indexOf(n)>=0)throw Error(`Worksheet with name |`+n+`| already exists!`);return e.SheetNames.push(n),e.Sheets[n]=t,n}function Iy(e,t,n){e.Workbook||={},e.Workbook.Sheets||(e.Workbook.Sheets=[]);var r=Ny(e,t);switch(e.Workbook.Sheets[r]||(e.Workbook.Sheets[r]={}),n){case 0:case 1:case 2:break;default:throw Error(`Bad sheet visibility setting `+n)}e.Workbook.Sheets[r].Hidden=n}function Ly(e,t){return e.z=t,e}function Ry(e,t,n){return t?(e.l={Target:t},n&&(e.l.Tooltip=n)):delete e.l,e}function zy(e,t,n){return Ry(e,`#`+t,n)}function By(e,t,n){e.c||=[],e.c.push({t,a:n||`SheetJS`})}function Vy(e,t,n,r){for(var i=typeof t==`string`?ei(t):t,a=typeof t==`string`?t:Y(t),o=i.s.r;o<=i.e.r;++o)for(var s=i.s.c;s<=i.e.c;++s){var c=My(e,o,s);c.t=`n`,c.F=a,delete c.v,o==i.s.r&&s==i.s.c&&(c.f=n,r&&(c.D=!0))}return e}var Hy={encode_col:Jr,encode_row:Wr,encode_cell:J,encode_range:Y,decode_col:qr,decode_row:Ur,split_cell:Zr,decode_cell:Qr,decode_range:$r,format_cell:ni,sheet_add_aoa:ii,sheet_add_json:Ay,sheet_add_dom:Q_,aoa_to_sheet:ai,json_to_sheet:jy,table_to_sheet:$_,table_to_book:ev,sheet_to_csv:Dy,sheet_to_txt:Oy,sheet_to_json:wy,sheet_to_html:Z_,sheet_to_formulae:ky,sheet_to_row_object_array:wy,sheet_get_cell:My,book_new:Py,book_append_sheet:Fy,book_set_sheet_visibility:Iy,cell_set_number_format:Ly,cell_set_hyperlink:Ry,cell_set_internal_link:zy,cell_add_comment:By,sheet_set_array_formula:Vy,consts:{SHEET_VISIBLE:0,SHEET_HIDDEN:1,SHEET_VERY_HIDDEN:2}};y.version;var Uy=o((e=>{var t=Symbol.for(`react.transitional.element`),n=Symbol.for(`react.fragment`);function r(e,n,r){var i=null;if(r!==void 0&&(i=``+r),n.key!==void 0&&(i=``+n.key),`key`in n)for(var a in r={},n)a!==`key`&&(r[a]=n[a]);else r=n;return n=r.ref,{$$typeof:t,type:e,key:i,ref:n===void 0?null:n,props:r}}e.Fragment=n,e.jsx=r,e.jsxs=r})),Q=o(((e,t)=>{t.exports=Uy()}))(),Wy=()=>(0,Q.jsx)(`style`,{children:`
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
-    /* ── DESIGN TOKENS: Serene Lavender & Linen Minimalism ── */
+    /* ── DESIGN TOKENS: Slate & Indigo Modern Minimalism ── */
     .kt-root {
-      --ink:        #231F34; /* Deep charcoal lavender */
-      --ink-mid:    #544D76; /* Dusky violet */
-      --ink-soft:   #8B84B2; /* Muted lavender grey */
-      --ink-faint:  #CDC9DC; /* Soft grey wash */
-      --paper:      #F5F3FA; /* Pearled cream/lilac linen background */
-      --card:       #FFFFFF; /* Pure white cards */
-      --rule:       #E4E1EE; /* Delicate border rule */
-      --line:       #E4E1EE;
-      --accent:     #8A7BFF; /* Serene Lavender Lilac */
-      --accent-dim: #CDCAFF; /* Soft Lavender purple */
-      --accent-bg:  #F4F2FF; /* Serene light lilac wash */
+      --ink:        #0F172A; /* Slate 900 */
+      --ink-mid:    #475569; /* Slate 600 */
+      --ink-soft:   #64748B; /* Slate 500 */
+      --ink-faint:  #CBD5E1; /* Slate 300 */
+      --paper:      #F8FAFC; /* Slate 50 background */
+      --card:       #FFFFFF; /* Card white */
+      --rule:       #E2E8F0; /* Slate 200 borders */
+      --line:       #E2E8F0;
+      --accent:     #6366F1; /* Indigo 500 Accent */
+      --accent-dim: #C7D2FE; /* Indigo 200 */
+      --accent-bg:  #EEF2FF; /* Indigo 50 wash */
       
-      --ok:         #34A885; /* Soft mint green */
-      --ok-bg:      #EEF8F5; /* Thin mint wash */
-      --warn:       #D97706; /* Soft apricot amber */
-      --warn-bg:    #FFFBEB; /* Thin amber wash */
-      --danger:     #E15252; /* Soft pastel red */
-      --danger-bg:  #FFF5F5; /* Thin red wash */
-      --blue:       #4F83E1; /* Soft periwinkle blue */
-      --blue-bg:    #F0F4FF; /* Thin blue wash */
+      --ok:         #10B981; /* Emerald 500 */
+      --ok-bg:      #ECFDF5;
+      --warn:       #F59E0B; /* Amber 500 */
+      --warn-bg:    #FFFBEB;
+      --danger:     #EF4444; /* Red 500 */
+      --danger-bg:  #FEF2F2;
+      --blue:       #3B82F6; /* Blue 500 */
+      --blue-bg:    #EFF6FF;
 
       font-family: 'Plus Jakarta Sans', sans-serif;
       font-size: 14px;
       color: var(--ink);
       background-color: var(--paper);
-
-      /* Subtly textured background grain */
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E");
-      background-size: 180px 180px;
 
       display: flex;
       flex-direction: column;
@@ -161,24 +157,24 @@ Error generating stack: `+e.message+`
     .kt-scrollbar::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 4px; }
     .kt-scrollbar::-webkit-scrollbar-track { background: transparent; }
 
-    /* ── CARDS: Soft rounded corners, clean border, no heavy outline ── */
+    /* ── CARDS: Flat minimal borders, extremely light shadows ── */
     .kt-card {
       background: var(--card);
       border: 1px solid var(--rule);
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(72, 67, 92, 0.015);
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
     }
     .kt-card-neutral {
       background: var(--card);
       border: 1px solid var(--rule);
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(72, 67, 92, 0.015);
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
     }
     .kt-glass {
       background: var(--card);
       border: 1px solid var(--rule);
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(72, 67, 92, 0.015);
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
     }
 
     /* ── KANBAN TICKET ── */
@@ -186,30 +182,21 @@ Error generating stack: `+e.message+`
       position: relative;
       background: var(--card);
       border: 1px solid var(--rule);
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(72, 67, 92, 0.01);
+      border-radius: 10px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
       transition: all 0.2s ease;
     }
     .kt-ticket:hover {
-      border-color: var(--accent-dim);
-      box-shadow: 0 6px 16px rgba(138, 123, 255, 0.06);
+      border-color: var(--accent);
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.08);
+      transform: translateY(-1px);
     }
     .kt-ticket .kt-perf {
       position: relative;
-      border-top: 1px dashed var(--rule);
+      border-top: 1px solid var(--rule);
       margin: 0 14px;
     }
-    .kt-ticket .kt-perf::before, .kt-ticket .kt-perf::after {
-      content: '';
-      position: absolute;
-      top: -7px;
-      width: 14px; height: 14px;
-      border-radius: 50%;
-      background: var(--paper);
-      border: 1px solid var(--rule);
-    }
-    .kt-ticket .kt-perf::before { left: -21px; }
-    .kt-ticket .kt-perf::after  { right: -21px; }
+
 
     /* ── STAMP ── */
     .kt-stamp {
