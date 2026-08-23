@@ -309,8 +309,6 @@ const CAMPAIGNS = [
   { key: "MSG", label: "MGS", color: "#FFD175" },
   { key: "Blendy", label: "Blendy", color: "#C7B1E6" },
 ];
-const CAMPAIGN_COLOR = Object.fromEntries(CAMPAIGNS.map(c => [c.key, c.color]));
-const CAMPAIGN_LABELS = Object.fromEntries(CAMPAIGNS.map(c => [c.key, c.label]));
 
 const normalizeCampaignKey = (sheetName) => {
   if (!sheetName) return "";
@@ -330,7 +328,7 @@ const resolveCampaignKey = (row) => {
   return "";
 };
 
-const STATUS_STAGES = [
+const statusStages = [
   { key: "waiting_food",   label: "Chờ duyệt món ăn",   color: "#E28B65", soft: "#FAF0EB" },
   { key: "waiting_script", label: "Chờ duyệt script",   color: "#B284A3", soft: "#FAF0F6" },
   { key: "doing_demo",     label: "Đang làm demo",       color: "#5E9BE2", soft: "#EBF3FC" },
@@ -339,11 +337,11 @@ const STATUS_STAGES = [
   { key: "confirmed_demo", label: "Demo đã duyệt",       color: "#47B39C", soft: "#EBF8F5" },
   { key: "aired",          label: "Đã lên sóng",         color: "#8A7BFF", soft: "#F4F2FF" },
 ];
-const STATUS_MAP = Object.fromEntries(STATUS_STAGES.map(s => [s.key, s]));
+const statusMap = Object.fromEntries(statusStages.map(s => [s.key, s]));
 // reverse: label → key  (also accept key directly)
-const STATUS_LABEL_TO_KEY = Object.fromEntries([
-  ...STATUS_STAGES.map(s => [s.label.toLowerCase(), s.key]),
-  ...STATUS_STAGES.map(s => [s.key.toLowerCase(), s.key]),
+const statusLabelToKey = Object.fromEntries([
+  ...statusStages.map(s => [s.label.toLowerCase(), s.key]),
+  ...statusStages.map(s => [s.key.toLowerCase(), s.key]),
   // common aliases for aired (đã lên sóng)
   ["aired", "aired"],
   ["đã lên sóng", "aired"],
@@ -808,9 +806,9 @@ const applyMapping = (rawRows, mapping) => {
       if (numericFields.includes(field)) {
         out[field] = parseFloat(val.replace(/[^0-9.-]/g, "")) || 0;
       } else if (field === "status") {
-        out.statusKey = STATUS_LABEL_TO_KEY[val.toLowerCase().trim()] || "waiting_food";
+        out.statusKey = (statusLabelToKey[val.toLowerCase().trim()]) || "waiting_food";
       } else if (field === "statusKey") {
-        out.statusKey = STATUS_LABEL_TO_KEY[val.toLowerCase().trim()] || val || "waiting_food";
+        out.statusKey = (statusLabelToKey[val.toLowerCase().trim()]) || val || "waiting_food";
       } else {
         out[field] = val;
       }
@@ -850,7 +848,7 @@ const ImportWizard = ({ rawHeaders, rawRows, sheetInfo, fileName, onConfirm, onC
             {sheetInfo && (
               <div style={{ display: "flex", gap: 8, marginTop: 6, flexWrap: "wrap" }}>
                 {sheetInfo.map(s => (
-                  <span key={s.name} className="kt-badge" style={{ background: CAMPAIGN_COLOR[s.name] ? CAMPAIGN_COLOR[s.name] + "22" : "var(--paper)", color: CAMPAIGN_COLOR[s.name] || "var(--ink-soft)", border: `1px solid ${CAMPAIGN_COLOR[s.name] || "var(--line)"}` }}>
+                  <span key={s.name} className="kt-badge" style={{ background: getCampaignColor(s.name) ? getCampaignColor(s.name) + "22" : "var(--paper)", color: getCampaignColor(s.name) || "var(--ink-soft)", border: `1px solid ${getCampaignColor(s.name) || "var(--line)"}` }}>
                     {s.name}: {s.count} KOLs
                   </span>
                 ))}
@@ -912,9 +910,9 @@ const ImportWizard = ({ rawHeaders, rawRows, sheetInfo, fileName, onConfirm, onC
               {preview.map((r, i) => (
                 <div key={i} style={{ display: "flex", gap: 12, marginBottom: 8, flexWrap: "wrap", fontSize: 12 }}>
                   <span style={{ fontWeight: 700, minWidth: 60 }}>{r.kol || `Row ${i+1}`}</span>
-                  <span style={{ color: CAMPAIGN_COLOR[r.campaign] || "var(--ink-soft)" }}>{campaignLabels[r.campaign] || r.campaign}</span>
+                  <span style={{ color: getCampaignColor(r.campaign) || "var(--ink-soft)" }}>{campaignLabels[r.campaign] || r.campaign}</span>
                   <span className="kt-mono">{r.follower || "?"}</span>
-                  <StatusBadge statusKey={r.statusKey} />
+                  <StatusBadge statusKey={r.statusKey} statusMap={statusMap} />
                   <span className="kt-mono" style={{ color: "var(--accent)" }}>{fmtVND(r.cost)}</span>
                   {r.monAn && <span style={{ color: "var(--ink-soft)" }}>{r.monAn.slice(0, 40)}{r.monAn.length > 40 ? "…" : ""}</span>}
                 </div>
@@ -1078,7 +1076,7 @@ const detectFileRole = (wb, fileName) => {
 };
 
 // Parse the [INTERNAL] Execution file → { campaignKey: Map(kolKeyLower -> fields) }
-const parseInternalWorkbook = (wb) => {
+const parseInternalWorkbook = (wb, statusLabelToKey) => {
   const out = {};
   wb.SheetNames.forEach(sheetName => {
     const ws = wb.Sheets[sheetName];
@@ -1119,8 +1117,7 @@ const parseInternalWorkbook = (wb) => {
     
     // If we have a campaign column, we don't strictly require the sheet name to match a campaign
     const sheetCampaignKey = normalizeCampaignKey(sheetName);
-    if (iCampaign < 0 && !CAMPAIGNS.find(c => c.key === sheetCampaignKey)) return;
-
+    
     for (let r = headerIdx + 1; r < aoa.length; r++) {
       const row = aoa[r];
       if (!row) continue;
@@ -1136,8 +1133,7 @@ const parseInternalWorkbook = (wb) => {
       let rowCampaignRaw = iCampaign >= 0 ? excelCellToStr(row[iCampaign]) : sheetName;
       if (!rowCampaignRaw) rowCampaignRaw = sheetName;
       const campaignKey = normalizeCampaignKey(rowCampaignRaw);
-      if (!CAMPAIGNS.find(c => c.key === campaignKey)) continue;
-
+      
       if (!out[campaignKey]) out[campaignKey] = new Map();
       const map = out[campaignKey];
 
@@ -1145,7 +1141,7 @@ const parseInternalWorkbook = (wb) => {
       const no = (noVal !== null && noVal !== "" && !isNaN(Number(noVal))) ? Number(noVal) : (r - headerIdx);
       const intAiredLink = iAiredLink >= 0 ? getLinkOrText(ws, r, iAiredLink, row[iAiredLink]) : "";
       const intNgayAir = excelCellToStr(row[iAir]);
-      let intStatusKey = iStatus >= 0 ? (STATUS_LABEL_TO_KEY[(row[iStatus] || "").toString().toLowerCase().trim()] || "") : "";
+      let intStatusKey = iStatus >= 0 ? (statusLabelToKey[(row[iStatus] || "").toString().toLowerCase().trim()] || "") : "";
       // Auto-infer "aired" if there is a real air date or aired link but status not yet set
       if (!intStatusKey || intStatusKey === "waiting_food") {
         const hasAiredLink = intAiredLink && /^https?:\/\//i.test(intAiredLink);
@@ -1177,7 +1173,7 @@ const parseInternalWorkbook = (wb) => {
 };
 
 // Parse the [AVNxTCV] Social Outreach file → { campaignKey: Map(kolKeyLower -> fields) }
-const parseSocialWorkbook = (wb) => {
+const parseSocialWorkbook = (wb, statusLabelToKey) => {
   const out = {};
   
   const isHeaderRow = (row) => {
@@ -1241,8 +1237,7 @@ const parseSocialWorkbook = (wb) => {
       const iCampaign = findHeaderIdx(header, "chiến dịch", "campaign name");
       
       const sheetCampaignKey = normalizeCampaignKey(sheetName);
-      if (iCampaign < 0 && !CAMPAIGNS.find(c => c.key === sheetCampaignKey)) return;
-
+      
       const iLink = findHeaderIdx(header, "link");
       const iType = findHeaderIdx(header, "type");
       const iEstView = findHeaderIdx(header, "est view");
@@ -1287,8 +1282,7 @@ const parseSocialWorkbook = (wb) => {
         let rowCampaignRaw = iCampaign >= 0 ? excelCellToStr(row[iCampaign]) : sheetName;
         if (!rowCampaignRaw) rowCampaignRaw = sheetName;
         const campaignKey = normalizeCampaignKey(rowCampaignRaw);
-        if (!CAMPAIGNS.find(c => c.key === campaignKey)) return;
-
+        
         if (!out[campaignKey]) out[campaignKey] = new Map();
         const map = out[campaignKey];
 
@@ -1573,7 +1567,7 @@ const DualFileImportModal = ({ existingData, onConfirm, onClose, onImportSingle 
   const [result, setResult] = useState(null); // { toUpdate, toAdd, warnings }
   const fileRef = useRef(null);
 
-  const processFiles = async (fileList) => {
+  const processFiles = async (fileList, statusLabelToKey) => {
     const files = Array.from(fileList).filter(f => /\.(xlsx|xls|csv|json)$/i.test(f.name));
     if (files.length === 0) return;
 
@@ -1619,7 +1613,7 @@ const DualFileImportModal = ({ existingData, onConfirm, onClose, onImportSingle 
   const handleDrop = (e) => {
     e.preventDefault();
     setDragOver(false);
-    if (e.dataTransfer.files && e.dataTransfer.files.length) processFiles(e.dataTransfer.files);
+    if (e.dataTransfer.files && e.dataTransfer.files.length) processFiles(e.dataTransfer.files, statusLabelToKey);
   };
 
   const handleMergeAndProceed = () => {
@@ -1692,7 +1686,7 @@ const DualFileImportModal = ({ existingData, onConfirm, onClose, onImportSingle 
                   Có thể kéo thả từng file hoặc cả 2 file cùng lúc
                 </div>
                 <input ref={fileRef} type="file" multiple accept=".xlsx,.xls,.csv,.json" style={{ display: "none" }}
-                  onChange={e => e.target.files.length && processFiles(e.target.files)} />
+                  onChange={e => e.target.files.length && processFiles(e.target.files, statusLabelToKey)} />
               </div>
 
               {/* Status slots */}
@@ -1795,7 +1789,7 @@ const DualFileImportModal = ({ existingData, onConfirm, onClose, onImportSingle 
               {perCampaignCounts.length > 0 && (
                 <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                   {perCampaignCounts.map(([ck, c]) => (
-                    <span key={ck} className="kt-badge" style={{ background: `${CAMPAIGN_COLOR[ck] || "#888"}22`, color: CAMPAIGN_COLOR[ck] || "#888", border: `1px solid ${CAMPAIGN_COLOR[ck] || "#888"}55` }}>
+                    <span key={ck} className="kt-badge" style={{ background: `${getCampaignColor(ck) || "#888"}22`, color: getCampaignColor(ck) || "#888", border: `1px solid ${getCampaignColor(ck) || "#888"}55` }}>
                       {ck}: {c.update} cập nhật · {c.add} mới
                     </span>
                   ))}
@@ -1830,8 +1824,8 @@ const DualFileImportModal = ({ existingData, onConfirm, onClose, onImportSingle 
 /* ================================================================
    STATUS BADGE
 ================================================================ */
-const StatusBadge = ({ statusKey }) => {
-  const s = STATUS_MAP[statusKey] || { label: statusKey, color: "#888", soft: "#eee" };
+const StatusBadge = ({ statusKey, statusMap }) => {
+  const s = statusMap[statusKey] || { label: statusKey, color: "#888", soft: "#eee" };
   return (
     <span className="kt-badge" style={{ background: s.soft, color: s.color }}>
       {s.label}
@@ -1845,20 +1839,71 @@ const StatusBadge = ({ statusKey }) => {
 const CampaignDot = ({ campaign, labels }) => (
   <span style={{
     display: "inline-flex", alignItems: "center", gap: 5,
-    fontSize: 12, fontWeight: 600, color: CAMPAIGN_COLOR[campaign] || "#888"
+    fontSize: 12, fontWeight: 600, color: getCampaignColor(campaign) || "#888"
   }}>
     <span style={{
       width: 8, height: 8, borderRadius: "50%",
-      background: CAMPAIGN_COLOR[campaign] || "#888", display: "inline-block"
+      background: getCampaignColor(campaign) || "#888", display: "inline-block"
     }} />
-    {(labels && labels[campaign]) || CAMPAIGN_LABELS[campaign] || campaign}
+    {(labels && labels[campaign])  || campaign}
   </span>
 );
+
+
+/* ================================================================
+   STATUS SETTINGS MODAL
+================================================================ */
+const StatusSettingsModal = ({ statuses, onSave, onClose }) => {
+  const [list, setList] = useState([...statuses]);
+
+  const handleChange = (idx, field, val) => {
+    const arr = [...list];
+    arr[idx][field] = val;
+    if (field === "color") arr[idx].soft = val + "22";
+    setList(arr);
+  };
+
+  const handleAdd = () => {
+    setList([...list, { key: "new_status_" + Date.now(), label: "New Status", color: "#888888", soft: "#eeeeee" }]);
+  };
+
+  const handleRemove = (idx) => {
+    const arr = [...list];
+    arr.splice(idx, 1);
+    setList(arr);
+  };
+
+  return (
+    <div className="kt-overlay" style={{ zIndex: 200 }} onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="kt-modal kt-anim" style={{ width: 600, padding: 20 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+          <h3 style={{ margin: 0 }}>Cài đặt Trạng thái (Statuses)</h3>
+          <button className="kt-btn kt-btn-ghost" onClick={onClose}>✕</button>
+        </div>
+        <div style={{ maxHeight: "60vh", overflowY: "auto", paddingRight: 10 }}>
+          {list.map((s, i) => (
+            <div key={i} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "center" }}>
+              <input className="kt-input" style={{ flex: 1 }} value={s.label} onChange={e => handleChange(i, "label", e.target.value)} placeholder="Tên hiển thị" />
+              <input className="kt-input" style={{ flex: 1 }} value={s.key} onChange={e => handleChange(i, "key", e.target.value)} placeholder="Mã nội bộ (key)" disabled={s.key.includes("new_status") ? false : true} title={s.key.includes("new_status") ? "" : "Không nên sửa mã nội bộ cũ để tránh mất liên kết dữ liệu"} />
+              <input type="color" value={s.color} onChange={e => handleChange(i, "color", e.target.value)} style={{ width: 36, height: 36, padding: 0, border: "none", borderRadius: 4, cursor: "pointer" }} />
+              <button className="kt-btn kt-btn-ghost" style={{ padding: "6px 10px", color: "var(--red)" }} onClick={() => handleRemove(i)}>✕</button>
+            </div>
+          ))}
+          <button className="kt-btn kt-btn-ghost" onClick={handleAdd} style={{ marginTop: 10, width: "100%", border: "1px dashed var(--line)" }}>+ Thêm trạng thái mới</button>
+        </div>
+        <div style={{ marginTop: 20, display: "flex", justifyContent: "flex-end", gap: 10 }}>
+          <button className="kt-btn kt-btn-ghost" onClick={onClose}>Hủy</button>
+          <button className="kt-btn kt-btn-primary" onClick={() => onSave(list)}>Lưu thay đổi</button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 /* ================================================================
    DETAIL MODAL
 ================================================================ */
-const DetailModal = ({ kol, onClose, onSave, onDelete }) => {
+const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCampaigns }) => {
   const [form, setForm] = useState({ ...kol });
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -1899,7 +1944,7 @@ const DetailModal = ({ kol, onClose, onSave, onDelete }) => {
         {/* Body */}
         <div style={{ padding: "18px 22px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 20px" }}>
           <div>
-            <Field label="Campaign" field="campaign" type="select" options={CAMPAIGNS.map(c => c.key)} />
+            <Field label="Campaign" field="campaign" type="select" options={dynamicCampaigns.map(c => c.key)} />
             <Field label="Tên KOL" field="kol" />
             <Field label="Link TikTok" field="link" />
             <Field label="Followers" field="follower" />
@@ -1911,7 +1956,7 @@ const DetailModal = ({ kol, onClose, onSave, onDelete }) => {
             <Field label="Chi phí (VNĐ)" field="cost" type="number" />
             <Field label="Add-on / Deliverable" field="addonFee" type="textarea" />
             <Field label="Trạng thái" field="statusKey" type="select"
-              options={STATUS_STAGES.map(s => s.key)} />
+              options={statusStages.map(s => s.key)} />
             <Field label="Món ăn" field="monAn" type="textarea" />
           </div>
           <div style={{ gridColumn: "1 / -1" }}>
@@ -2050,7 +2095,7 @@ const StatsBar = ({ rows, currentStatus = "all", onCardClick }) => {
 /* ================================================================
    TABLE VIEW
 ================================================================ */
-const TableView = ({ rows, onOpen, onSave, campaignLabels }) => {
+const TableView = ({ rows, onOpen, onSave, campaignLabels, statusMap }) => {
   const [sortKey, setSortKey] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
 
@@ -2163,11 +2208,11 @@ const TableView = ({ rows, onOpen, onSave, campaignLabels }) => {
                     fontSize: 11, fontWeight: 600, border: "none", borderRadius: 20,
                     padding: "3px 8px", cursor: "pointer", appearance: "none",
                     WebkitAppearance: "none", outline: "none",
-                    background: STATUS_MAP[r.statusKey]?.soft || "#eee",
-                    color: STATUS_MAP[r.statusKey]?.color || "#888"
+                    background: statusMap[r.statusKey]?.soft || "#eee",
+                    color: statusMap[r.statusKey]?.color || "#888"
                   }}
                 >
-                  {STATUS_STAGES.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
+                  {statusStages.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
                 </select>
               </td>
               <td title={r.ngayAir} style={{ fontSize: 12, color: "var(--ink-soft)", maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
@@ -2318,8 +2363,8 @@ const KanbanColumn = ({ stage, cards, onOpen, onUpdateStatus, campaignLabels }) 
 };
 
 const KanbanView = ({ rows, onOpen, onUpdateStatus, campaignLabels }) => (
-  <div style={{ display: "grid", gridTemplateColumns: `repeat(${STATUS_STAGES.length}, minmax(0, 1fr))`, gap: 10, padding: 16, alignItems: "stretch", flex: 1, height: "100%", overflow: "hidden" }}>
-    {STATUS_STAGES.map(stage => {
+  <div style={{ display: "grid", gridTemplateColumns: `repeat(${statusStages.length}, minmax(0, 1fr))`, gap: 10, padding: 16, alignItems: "stretch", flex: 1, height: "100%", overflow: "hidden" }}>
+    {statusStages.map(stage => {
       const cards = rows.filter(r => r.statusKey === stage.key);
       return (
         <KanbanColumn 
@@ -2529,7 +2574,7 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels }) => {
                       }}
                       style={{
                         background: "var(--card)",
-                        borderLeft: `3px solid ${CAMPAIGN_COLOR[r.campaign] || "var(--green)"}`,
+                        borderLeft: `3px solid ${getCampaignColor(r.campaign) || "var(--green)"}`,
                         borderRadius: 4,
                         padding: "2px 4px",
                         fontSize: 9,
@@ -2819,7 +2864,7 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels }) => {
           />
           <select className="kt-select" value={filterCampaign} onChange={e => setFilterCampaign(e.target.value)} style={{ flex: "0 0 120px", width: 120 }}>
             <option value="all">Tất cả Dự án</option>
-            {CAMPAIGNS.map(c => <option key={c.key} value={c.key}>{campaignLabels[c.key] || c.label}</option>)}
+            {dynamicCampaigns.map(c => <option key={c.key} value={c.key}>{campaignLabels[c.key] || c.label}</option>)}
           </select>
           <select className="kt-select" value={filterTier} onChange={e => setFilterTier(e.target.value)} style={{ flex: "0 0 110px", width: 110 }}>
             <option value="all">Tất cả Tier</option>
@@ -2841,7 +2886,7 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels }) => {
           </select>
           <select className="kt-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ flex: "0 0 130px", width: 130 }}>
             <option value="all">Tất cả Tiến độ</option>
-            {STATUS_STAGES.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
+            {statusStages.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
           </select>
           <select className="kt-select" value={sortOrder} onChange={e => setSortOrder(e.target.value)} style={{ flex: "0 0 150px", width: 150, background: "var(--surface)", border: "1px solid var(--line)" }}>
             <option value="default">Sắp xếp: Mặc định (A-Z)</option>
@@ -3211,7 +3256,7 @@ const MediaPerformanceView = ({ rows, onOpenProfile, campaignLabels, search = ""
   );
 };
 
-const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpenRow }) => {
+const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpenRow, statusMap }) => {
   const [form, setForm] = useState({
     kol: kol.kol || "", follower: kol.follower || "", type: kol.type || "",
     group: kol.group || "", link: kol.link || "",
@@ -3461,7 +3506,7 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpe
                         </td>
                         <td style={{ padding: "8px 4px", fontWeight: 600, color: "var(--accent)", whiteSpace: "nowrap", textAlign: "right" }}>{fmtVND(c.cost)}</td>
                         <td style={{ padding: "8px 4px", whiteSpace: "nowrap", textAlign: "center" }}>
-                          <StatusBadge statusKey={c.statusKey} />
+                          <StatusBadge statusKey={c.statusKey} statusMap={statusMap} />
                         </td>
                         <td style={{ padding: "8px 4px", whiteSpace: "nowrap", textAlign: "center" }}>{c.estView > 0 ? c.estView.toLocaleString() : "—"}</td>
                         <td style={{ padding: "8px 4px", whiteSpace: "nowrap", textAlign: "center" }}>{c.estEng > 0 ? c.estEng.toLocaleString() : "—"}</td>
@@ -3565,6 +3610,14 @@ export default function App() {
       Blendy: "Blendy"
     };
   });
+  const dynamicCampaigns = useMemo(() => {
+    const uniqueKeys = Array.from(new Set(data.map(d => d.campaign).filter(Boolean)));
+    return uniqueKeys.map(key => ({
+      key,
+      label: campaignLabels[key] || key
+    }));
+  }, [data, campaignLabels]);
+
 
 const [view, setView] = useState("table");
   const [selectedProfile, setSelectedProfile] = useState(null); // "table" | "kanban"
@@ -4114,7 +4167,14 @@ const [view, setView] = useState("table");
               </button>
             </div>
  
+            
+            <button className="kt-btn kt-btn-ghost" onClick={() => setShowStatusSettings(true)}
+              title="Cài đặt hệ thống (Thêm/bớt Trạng thái)" style={{ padding: "6px 10px", fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+              Cài đặt
+            </button>
             {/* Reset / Đặt lại */}
+
             <button className="kt-btn kt-btn-ghost" onClick={handleReset} title="Khôi phục dữ liệu ban đầu" style={{ padding: "6px 10px", fontSize: 12 }}>Đặt lại</button>
  
             {/* Main Add Button */}
@@ -4134,7 +4194,7 @@ const [view, setView] = useState("table");
             <select className="kt-select" value={filterCampaign} onChange={e => setFilterCampaign(e.target.value)}
               style={{ width: 180 }}>
               <option value="all">Tất cả Chiến dịch</option>
-              {CAMPAIGNS.map(c => <option key={c.key} value={c.key}>{campaignLabels[c.key] || c.label}</option>)}
+              {dynamicCampaigns.map(c => <option key={c.key} value={c.key}>{campaignLabels[c.key] || c.label}</option>)}
             </select>
 
              {/* Status filter */}
@@ -4142,7 +4202,7 @@ const [view, setView] = useState("table");
               style={{ width: 210 }}>
               <option value="all">Tất cả Trạng thái</option>
               <option value="in_progress">Đang xử lý (Chưa lên sóng)</option>
-              {STATUS_STAGES.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
+              {statusStages.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
             </select>
 
             {/* Type filter */}
@@ -4178,14 +4238,14 @@ const [view, setView] = useState("table");
           minHeight: 0,
           boxShadow: "0 8px 30px rgba(72, 67, 92, 0.015)"
         }}>
-          {view === "table" && <TableView rows={filtered} onOpen={r => setSelected(r)} onSave={(id, changes) => { setData(prev => prev.map(item => item.id === id ? { ...item, ...changes } : item)); }} campaignLabels={campaignLabels} />}
+          {view === "table" && <TableView rows={filtered} statusMap={statusMap} onOpen={r => setSelected(r)} onSave={(id, changes) => { setData(prev => prev.map(item => item.id === id ? { ...item, ...changes } : item)); }} campaignLabels={campaignLabels} />}
           {view === "kanban" && (
             <KanbanView 
               rows={filtered} 
               onOpen={r => setSelected(r)} 
               onUpdateStatus={(id, newStatus) => {
                 setData(prev => prev.map(item => item.id === id ? { ...item, statusKey: newStatus } : item));
-                showToast(`Đã chuyển trạng thái sang: ${STATUS_MAP[newStatus]?.label || newStatus}`);
+                showToast(`Đã chuyển trạng thái sang: ${statusMap[newStatus]?.label || newStatus}`);
               }}
               campaignLabels={campaignLabels}
             />
@@ -4215,6 +4275,8 @@ const [view, setView] = useState("table");
       {selected && (
         <DetailModal
           kol={selected}
+          statusStages={statusStages}
+          dynamicCampaigns={dynamicCampaigns}
           onClose={() => setSelected(null)}
           onSave={handleSave}
           onDelete={handleDelete}
@@ -4225,6 +4287,8 @@ const [view, setView] = useState("table");
       {showNew && (
         <DetailModal
           kol={emptyKOL()}
+          statusStages={statusStages}
+          dynamicCampaigns={dynamicCampaigns}
           onClose={() => setShowNew(false)}
           onSave={(row) => { handleAdd(row); setShowNew(false); }}
           onDelete={() => setShowNew(false)}
@@ -4235,6 +4299,7 @@ const [view, setView] = useState("table");
       {showDualImport && (
         <DualFileImportModal
           existingData={data}
+          statusLabelToKey={statusLabelToKey}
           onClose={() => setShowDualImport(false)}
           onConfirm={handleDualFileMerge}
           onImportSingle={importSingleFile}
@@ -4328,6 +4393,7 @@ const [view, setView] = useState("table");
       {selectedProfile && (
         <ProfileDetailModal
           kol={selectedProfile}
+          statusMap={statusMap}
           onClose={() => setSelectedProfile(null)}
           campaignLabels={campaignLabels}
           onSaveProfile={handleUpdateProfile}
@@ -4335,7 +4401,21 @@ const [view, setView] = useState("table");
         />
       )}
 
+      
+      {/* ── SETTINGS MODAL ── */}
+      {showStatusSettings && (
+        <StatusSettingsModal
+          statuses={statusStages}
+          onClose={() => setShowStatusSettings(false)}
+          onSave={(newList) => {
+            setStatusStages(newList);
+            localStorage.setItem("kol_status_stages", JSON.stringify(newList));
+            setShowStatusSettings(false);
+          }}
+        />
+      )}
       {/* ── FOOTER ── */}
+
       <div style={{
         background: "var(--card)",
         borderTop: "1px solid var(--line)",
