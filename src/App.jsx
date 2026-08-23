@@ -1800,17 +1800,16 @@ const CampaignDot = ({ campaign, labels }) => (
    STATUS SETTINGS MODAL
 ================================================================ */
 const StatusSettingsModal = ({ statuses, onSave, onClose }) => {
-  const [list, setList] = useState([...statuses]);
+  const [list, setList] = useState(() => statuses.map(s => ({ ...s, originalKey: s.originalKey || s.key })));
 
   const handleChange = (idx, field, val) => {
-    const arr = [...list];
-    arr[idx][field] = val;
-    if (field === "color") arr[idx].soft = val + "22";
+    const arr = list.map((item, i) => i === idx ? { ...item, [field]: val, ...(field === "color" ? { soft: val + "22" } : {}) } : item);
     setList(arr);
   };
 
   const handleAdd = () => {
-    setList([...list, { key: "new_status_" + Date.now(), label: "New Status", color: "#888888", soft: "#eeeeee" }]);
+    const newKey = "new_status_" + Date.now();
+    setList([...list, { key: newKey, originalKey: newKey, label: "Trạng thái mới", color: "#888888", soft: "#eeeeee" }]);
   };
 
   const handleRemove = (idx) => {
@@ -1830,7 +1829,7 @@ const StatusSettingsModal = ({ statuses, onSave, onClose }) => {
           {list.map((s, i) => (
             <div key={i} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "center" }}>
               <input className="kt-input" style={{ flex: 1 }} value={s.label} onChange={e => handleChange(i, "label", e.target.value)} placeholder="Tên hiển thị" />
-              <input className="kt-input" style={{ flex: 1 }} value={s.key} onChange={e => handleChange(i, "key", e.target.value)} placeholder="Mã nội bộ (key)" disabled={s.key.includes("new_status") ? false : true} title={s.key.includes("new_status") ? "" : "Không nên sửa mã nội bộ cũ để tránh mất liên kết dữ liệu"} />
+              <input className="kt-input" style={{ flex: 1 }} value={s.key} onChange={e => handleChange(i, "key", e.target.value)} placeholder="Mã nội bộ (key)" />
               <input type="color" value={s.color} onChange={e => handleChange(i, "color", e.target.value)} style={{ width: 36, height: 36, padding: 0, border: "none", borderRadius: 4, cursor: "pointer" }} />
               <button className="kt-btn kt-btn-ghost" style={{ padding: "6px 10px", color: "var(--red)" }} onClick={() => handleRemove(i)}>✕</button>
             </div>
@@ -4425,8 +4424,19 @@ const [view, setView] = useState("table");
           statuses={statusStages}
           onClose={() => setShowStatusSettings(false)}
           onSave={(newList) => {
-            setStatusStages(newList);
-            localStorage.setItem("kol_status_stages", JSON.stringify(newList));
+            // Update statusKey in database for renamed keys
+            setData(prev => prev.map(item => {
+              const match = newList.find(ns => ns.originalKey === item.statusKey);
+              if (match && match.key !== item.statusKey) {
+                return { ...item, statusKey: match.key };
+              }
+              return item;
+            }));
+
+            // Clean up originalKey field before saving
+            const cleanedList = newList.map(({ key, label, color, soft }) => ({ key, label, color, soft }));
+            setStatusStages(cleanedList);
+            localStorage.setItem("kol_status_stages", JSON.stringify(cleanedList));
             setShowStatusSettings(false);
           }}
         />
