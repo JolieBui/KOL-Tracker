@@ -1884,7 +1884,7 @@ const DetailModal = ({ kol, onClose, onSave, onDelete }) => {
   );
 
   return (
-    <div className="kt-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+    <div className="kt-overlay" style={{ zIndex: 110 }} onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="kt-modal kt-anim">
         {/* Header */}
         <div style={{ padding: "18px 22px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 10 }}>
@@ -4331,7 +4331,7 @@ const [view, setView] = useState("table");
           onClose={() => setSelectedProfile(null)}
           campaignLabels={campaignLabels}
           onSaveProfile={handleUpdateProfile}
-          onOpenRow={(row) => setSelectedRow(row)}
+          onOpenRow={(row) => setSelected(row)}
         />
       )}
 
