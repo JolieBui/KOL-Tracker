@@ -3589,13 +3589,24 @@ export default function App() {
     }
   });
     const [campaignLabels, setCampaignLabels] = useState(() => {
-    return {
-      AM: "AM",
-      AX: "AX",
-      Vinegar: "Vinegar",
-      MSG: "MGS",
-      Blendy: "Blendy"
-    };
+    try {
+      const s = localStorage.getItem("kol_campaign_labels");
+      return s ? JSON.parse(s) : {
+        AM: "AM",
+        AX: "AX",
+        Vinegar: "Vinegar",
+        MSG: "MGS",
+        Blendy: "Blendy"
+      };
+    } catch {
+      return {
+        AM: "AM",
+        AX: "AX",
+        Vinegar: "Vinegar",
+        MSG: "MGS",
+        Blendy: "Blendy"
+      };
+    }
   });
 
   const [statusStages, setStatusStages] = useState(() => {
@@ -3618,7 +3629,10 @@ export default function App() {
   const [showStatusSettings, setShowStatusSettings] = useState(false);
 
   const dynamicCampaigns = useMemo(() => {
-    const uniqueKeys = Array.from(new Set(data.map(d => d.campaign).filter(Boolean)));
+    const uniqueKeys = Array.from(new Set([
+      ...Object.keys(campaignLabels),
+      ...data.map(d => d.campaign).filter(Boolean)
+    ]));
     return uniqueKeys.map(key => ({
       key,
       label: campaignLabels[key] || key
