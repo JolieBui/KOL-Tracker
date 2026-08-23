@@ -4,39 +4,35 @@ import * as XLSX from "xlsx";
 /* ---------------- Design tokens (injected via <style>) ---------------- */
 const GlobalStyle = () => (
   <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Questrial&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
-    /* ── DESIGN TOKENS: Serene Lavender & Linen Minimalism ── */
+    /* ── DESIGN TOKENS: Pebble & Yam Theme ── */
     .kt-root {
-      --ink:        #231F34; /* Deep charcoal lavender */
-      --ink-mid:    #544D76; /* Dusky violet */
-      --ink-soft:   #8B84B2; /* Muted lavender grey */
-      --ink-faint:  #CDC9DC; /* Soft grey wash */
-      --paper:      #F5F3FA; /* Pearled cream/lilac linen background */
-      --card:       #FFFFFF; /* Pure white cards */
-      --rule:       #E4E1EE; /* Delicate border rule */
-      --line:       #E4E1EE;
-      --accent:     #8A7BFF; /* Serene Lavender Lilac */
-      --accent-dim: #CDCAFF; /* Soft Lavender purple */
-      --accent-bg:  #F4F2FF; /* Serene light lilac wash */
+      --ink:        #313841; /* High Tide - darkest text */
+      --ink-mid:    #3A4750; /* Cadet Blue - secondary text */
+      --ink-soft:   #5E6E7A; /* Muted cadet */
+      --ink-faint:  #B0BEC5; /* Light cadet */
+      --paper:      #EEEEEE; /* Pebble background */
+      --card:       #FFFFFF; /* Card white */
+      --rule:       #D8D8D8; /* Pebble border */
+      --line:       #D8D8D8;
+      --accent:     #EA9216; /* Yam orange */
+      --accent-dim: #3A4750; /* Cadet Blue dim */
+      --accent-bg:  #FDF0DC; /* Light Yam wash */
       
-      --ok:         #34A885; /* Soft mint green */
-      --ok-bg:      #EEF8F5; /* Thin mint wash */
-      --warn:       #D97706; /* Soft apricot amber */
-      --warn-bg:    #FFFBEB; /* Thin amber wash */
-      --danger:     #E15252; /* Soft pastel red */
-      --danger-bg:  #FFF5F5; /* Thin red wash */
-      --blue:       #4F83E1; /* Soft periwinkle blue */
-      --blue-bg:    #F0F4FF; /* Thin blue wash */
+      --ok:         #10B981; /* Emerald Green */
+      --ok-bg:      #ECFDF5;
+      --warn:       #F59E0B; /* Amber Yellow */
+      --warn-bg:    #FFFBEB;
+      --danger:     #EF4444; /* Bright Red */
+      --danger-bg:  #FEF2F2;
+      --blue:       #3B82F6; /* Bright Blue */
+      --blue-bg:    #EFF6FF;
 
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Questrial', sans-serif;
       font-size: 14px;
       color: var(--ink);
       background-color: var(--paper);
-
-      /* Subtly textured background grain */
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E");
-      background-size: 180px 180px;
 
       display: flex;
       flex-direction: column;
@@ -44,9 +40,9 @@ const GlobalStyle = () => (
       overflow: hidden;
     }
     .kt-root input, .kt-root select, .kt-root button, .kt-root textarea {
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Questrial', sans-serif;
     }
-    .kt-serif  { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; letter-spacing: -0.02em; }
+    .kt-serif  { font-family: 'Questrial', sans-serif; font-weight: 800; letter-spacing: -0.02em; }
     .kt-mono   { font-family: 'IBM Plex Mono', monospace; }
     .kt-caps   { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.72em; font-weight: 700; }
 
@@ -55,24 +51,24 @@ const GlobalStyle = () => (
     .kt-scrollbar::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 4px; }
     .kt-scrollbar::-webkit-scrollbar-track { background: transparent; }
 
-    /* ── CARDS: Soft rounded corners, clean border, no heavy outline ── */
+    /* ── CARDS: Flat minimal borders, extremely light shadows ── */
     .kt-card {
       background: var(--card);
       border: 1px solid var(--rule);
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(72, 67, 92, 0.015);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
     }
     .kt-card-neutral {
       background: var(--card);
       border: 1px solid var(--rule);
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(72, 67, 92, 0.015);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
     }
     .kt-glass {
       background: var(--card);
       border: 1px solid var(--rule);
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(72, 67, 92, 0.015);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
     }
 
     /* ── KANBAN TICKET ── */
@@ -80,30 +76,21 @@ const GlobalStyle = () => (
       position: relative;
       background: var(--card);
       border: 1px solid var(--rule);
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(72, 67, 92, 0.01);
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
       transition: all 0.2s ease;
     }
     .kt-ticket:hover {
-      border-color: var(--accent-dim);
-      box-shadow: 0 6px 16px rgba(138, 123, 255, 0.06);
+      border-color: var(--accent);
+      box-shadow: 0 6px 20px rgba(234, 146, 22, 0.15);
+      transform: translateY(-1px);
     }
     .kt-ticket .kt-perf {
       position: relative;
-      border-top: 1px dashed var(--rule);
+      border-top: 1px solid var(--rule);
       margin: 0 14px;
     }
-    .kt-ticket .kt-perf::before, .kt-ticket .kt-perf::after {
-      content: '';
-      position: absolute;
-      top: -7px;
-      width: 14px; height: 14px;
-      border-radius: 50%;
-      background: var(--paper);
-      border: 1px solid var(--rule);
-    }
-    .kt-ticket .kt-perf::before { left: -21px; }
-    .kt-ticket .kt-perf::after  { right: -21px; }
+
 
     /* ── STAMP ── */
     .kt-stamp {
@@ -132,7 +119,7 @@ const GlobalStyle = () => (
       transform: translateX(-50%);
       opacity: 0; transition: opacity 0.15s ease;
       font-size: 11px; line-height: 1.5; font-weight: 400;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
       border: 1px solid var(--ink-mid); pointer-events: none;
       white-space: normal; text-transform: none; letter-spacing: normal;
     }
@@ -146,7 +133,7 @@ const GlobalStyle = () => (
 
     /* ── BUTTONS ── */
     .kt-btn {
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Questrial', sans-serif;
       font-weight: 700; border-radius: 12px;
       padding: 8px 16px; font-size: 12px;
       cursor: pointer; border: 1px solid transparent;
@@ -155,19 +142,20 @@ const GlobalStyle = () => (
       white-space: nowrap; letter-spacing: -0.01em;
     }
     .kt-btn-primary {
-      background: var(--accent); color: #fff;
-      border-color: var(--accent);
+      background: #EA9216;
+      color: #fff;
+      border: none;
     }
     .kt-btn-primary:hover {
-      background: #7362E3; border-color: #7362E3;
+      background: #D4820E;
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(138, 123, 255, 0.25);
+      box-shadow: 0 4px 14px rgba(234, 146, 22, 0.35);
     }
     .kt-btn-ghost {
       background: transparent; color: var(--ink);
       border-color: var(--rule);
     }
-    .kt-btn-ghost:hover { background: var(--accent-bg); border-color: var(--accent-dim); }
+    .kt-btn-ghost:hover { background: var(--accent-bg); border-color: var(--accent); }
     .kt-btn-ghost.active {
       background: var(--accent); color: #fff; border-color: var(--accent);
     }
@@ -176,7 +164,7 @@ const GlobalStyle = () => (
 
     /* ── FORM ELEMENTS ── */
     .kt-input, .kt-select, .kt-textarea {
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Questrial', sans-serif;
       background: var(--card);
       border: 1px solid var(--rule);
       border-radius: 10px;
@@ -189,7 +177,7 @@ const GlobalStyle = () => (
     }
     .kt-input:focus, .kt-select:focus, .kt-textarea:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-bg);
+      box-shadow: 0 0 0 3px rgba(234, 146, 22, 0.18);
       background: var(--card);
     }
     .kt-label {
@@ -214,7 +202,7 @@ const GlobalStyle = () => (
     /* ── OVERLAY & MODAL ── */
     .kt-overlay {
       position: fixed; inset: 0;
-      background: rgba(35, 31, 52, 0.4);
+      background: rgba(15, 23, 42, 0.3);
       backdrop-filter: blur(4px);
       z-index: 100;
       display: flex; align-items: center; justify-content: center;
@@ -233,13 +221,17 @@ const GlobalStyle = () => (
       max-width: 700px;
       max-height: 90vh;
       overflow-y: auto;
-      box-shadow: 0 20px 50px rgba(26, 22, 37, 0.05);
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
       border: 1px solid var(--rule);
       animation: kt-modal-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     @keyframes kt-modal-pop {
       from { transform: scale(0.95); opacity: 0; }
       to   { transform: scale(1); opacity: 1; }
+    }
+    @keyframes kt-spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
     }
 
     /* Table styling */
@@ -311,11 +303,11 @@ const GlobalStyle = () => (
 );
 /* ---------------- Domain constants ---------------- */
 const CAMPAIGNS = [
-  { key: "AM", label: "Campaign A", color: "#FFAFA3" },
-  { key: "AX", label: "Campaign B", color: "#A2C2E8" },
-  { key: "Vinegar", label: "Campaign C", color: "#A8C3A0" },
-  { key: "MSG", label: "Campaign D", color: "#FFD175" },
-  { key: "Blendy", label: "Campaign E", color: "#C7B1E6" },
+  { key: "AM", label: "AM", color: "#FFAFA3" },
+  { key: "AX", label: "AX", color: "#A2C2E8" },
+  { key: "Vinegar", label: "Vinegar", color: "#A8C3A0" },
+  { key: "MSG", label: "MGS", color: "#FFD175" },
+  { key: "Blendy", label: "Blendy", color: "#C7B1E6" },
 ];
 const CAMPAIGN_COLOR = Object.fromEntries(CAMPAIGNS.map(c => [c.key, c.color]));
 const CAMPAIGN_LABELS = Object.fromEntries(CAMPAIGNS.map(c => [c.key, c.label]));
@@ -323,11 +315,11 @@ const CAMPAIGN_LABELS = Object.fromEntries(CAMPAIGNS.map(c => [c.key, c.label]))
 const normalizeCampaignKey = (sheetName) => {
   if (!sheetName) return "";
   const name = sheetName.toString().toLowerCase().trim();
-  if (name.includes("mayo") || name === "am" || name.includes("campaign a") || name.includes("campaign_a")) return "AM";
-  if (name.includes("xốt") || name === "ax" || name.includes("campaign b") || name.includes("campaign_b")) return "AX";
-  if (name.includes("giấm") || name.includes("vinegar") || name === "giấm_fy25" || name.includes("campaign c") || name.includes("campaign_c")) return "Vinegar";
-  if (name.includes("msg") || name.includes("bột ngọt") || name.includes("mì chính") || name.includes("campaign d") || name.includes("campaign_d")) return "MSG";
-  if (name.includes("blendy") || name.includes("campaign e") || name.includes("campaign_e")) return "Blendy";
+  if (name.startsWith("am_") || name.includes("mayo") || name === "am" || name.includes("campaign a") || name.includes("campaign_a")) return "AM";
+  if (name.startsWith("ax_") || name.includes("xốt") || name === "ax" || name.includes("campaign b") || name.includes("campaign_b")) return "AX";
+  if (name.startsWith("av_") || name.startsWith("vinegar") || name.startsWith("vinegear") || name.includes("giấm") || name.includes("vinegar") || name === "giấm_fy25" || name.includes("campaign c") || name.includes("campaign_c")) return "Vinegar";
+  if (name.startsWith("msg_") || name.startsWith("mgs_") || name.includes("msg") || name.includes("mgs") || name === "mgs" || name.includes("bột ngọt") || name.includes("mì chính") || name.includes("campaign d") || name.includes("campaign_d")) return "MSG";
+  if (name.startsWith("blendy_") || name.includes("blendy") || name.includes("campaign e") || name.includes("campaign_e")) return "Blendy";
   return sheetName;
 };
 
@@ -402,14 +394,178 @@ const STATUS_LABEL_TO_KEY = Object.fromEntries([
   ["demo ok", "confirmed_demo"],
   ["duyệt demo ok", "confirmed_demo"],
   // common aliases for waiting_food (chờ duyệt món ăn)
+  ["chờ duyệt món", "waiting_food"],
   ["chờ duyệt món ăn", "waiting_food"],
   ["cho duyet mon an", "waiting_food"],
   ["waiting food", "waiting_food"],
   ["món ăn", "waiting_food"],
   ["mon an", "waiting_food"],
-  ["duyệt món", "waiting_food"],
-  ["duyet mon", "waiting_food"],
+  // common aliases for waiting_demo (feedback / chờ duyệt demo)
+  ["waiting feedback demo", "waiting_demo"],
+  ["feedback demo", "waiting_demo"],
+  ["waiting fb demo", "waiting_demo"],
+  ["confirmed demo", "confirmed_demo"],
+  ["doing demo", "doing_demo"],
 ]);
+
+const cleanName = (str) => {
+  if (!str) return "";
+  return str.toString().toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "d")
+    .replace(/[^a-z0-9]/g, "");
+};
+
+const CUSTOM_INITIALS = {
+  // ═══════════════════════════════════════════════════════
+  // VERIFIED from Internal planner (Code column) + Raw Ads
+  // ═══════════════════════════════════════════════════════
+
+  // Confirmed from AVN-SO_Aji mayo sheet (Code column)
+  "agto":   ["ăn gì thương ơi", "an gi thuong oi", "ăn Gì Thương Ơi"],
+  "agto2":  ["ăn gì thương ơi", "an gi thuong oi"],         // P2 slot
+  "kl":     ["khánh linh", "khanh linh"],
+  "kl2":    ["bếp nhà linh", "bep nha linh"],               // P2 slot maps to Bếp Nhà Linh
+  "gbtna":  ["gái bắc thích nấu ăn", "gai bac thich nau an"],
+  "gbtna2": ["gái bắc thích nấu ăn", "gai bac thich nau an"],
+  "es":     ["emmer sweet"],
+  "es2":    ["emmer sweet"],
+  "mc":     ["minn cookie", "min cookie", "mincookie"],
+  "hvqh":   ["hương vị quê hương 89", "huong vi que huong 89", "hương vị quê hương"],
+  "ttmt":   ["thi thi miền tây", "thi thi mien tay", "thi thi miền tây"],
+  "kmv":    ["khang miệt vườn", "khang miet vuon"],
+  "ut":     ["út tình", "ut tinh"],
+
+  // Confirmed from AVN-SO_Aji xốt sheet (Code column)
+  "bkh":    ["babykopo home", "baby kopo home"],
+  "nltt":   ["nguyễn lê thu thủy", "ng lê thu thủy", "nguyen le thu thuy"],
+  "ci":     ["chou iu", "chouiu", "chou.iu"],              // Chou.iu in Aji xốt
+
+  // Confirmed from AVN-SO_Bột ngọt (MSG) sheet (Code column)
+  "bdn":    ["bon đây nè", "bon day ne"],
+  "cl":     ["cờ ly", "co ly", "chou iu", "chouiu", "cou iu"], // CL = Cờ Ly in MSG, Chou.iu elsewhere
+  "bnl":    ["bếp nhà linh", "bep nha linh"],
+
+  // ═══════════════════════════════════════════════════════
+  // VERIFIED from raw2026 sheet (Ad name column)
+  // ═══════════════════════════════════════════════════════
+  "cnbx":   ["cơm nhà bếp xưa", "com nha bep xua"],
+  "mh":     ["my huyền", "my huyen"],
+  "nadl":   ["nấu ăn dễ lắm", "nau an de lam", "nấu ăn dễ lắm 🤤"],
+  "htvb":   ["hảo thích vào bếp", "hao thich vao bep"],
+  "mbb":    ["mẹ bảo bối", "me bao boi"],
+  "bnn":    ["bếp nga nè", "bep nga ne"],
+  "ttam":   ["trang tấm", "trang tam"],
+  "emsw":   ["emmer sweet"],
+  "bemsw":  ["emmer sweet"],
+  "gdsrn":  ["gia đình sầu rất ngầu", "gia dinh sau rat ngau"],
+  "bbkbh":  ["babykopo home", "baby kopo home"],
+  "bbkp":   ["babykopo home", "baby kopo home"],
+  "cnb":    ["cơm nhà bông", "com nha bong"],
+  "ntm":    ["nông thôn mới", "nong thon moi"],
+  "cd":     ["chú đàn", "chu dan"],
+  "ckm":    ["châu kiều my", "chau kieu my"],
+  "mtn":    ["mạnh tây nguyên", "manh tay nguyen"],
+  "pha":    ["pít ham ăn", "pit ham an", "phương hà", "phuong ha"],
+  "tngd":   ["toe nấu gì đó", "toe nau gi do", "tngd", "toe nấu gì đó"],
+  "ln":     ["linh nấu", "linh nau", "linh nấu🍜"],
+
+  // ═══════════════════════════════════════════════════════
+  // VERIFIED from rawdata sheet (Ad name column)
+  // ═══════════════════════════════════════════════════════
+  "lnc":    ["let nhân cook", "let nhan cook"],
+  "cllm":   ["cờ ly làm mẹ", "co ly lam me"],
+  "tv":     ["tiền võ", "tien vo"],
+  "htvb":   ["hảo thích vào bếp", "hao thich vao bep"],
+  "bdfml":  ["bích đức family", "bich duc family", "🌱 bích đức' family 🍎"],
+  "bbkph":  ["babykopo home", "baby kopo home"],
+  "hhvlog": ["huỳnh hải vlog", "huynh hai vlog"],
+  "sammy":  ["sammy"],
+  "ad":     ["an đen", "an den"],
+  "hc":     ["hà cooking", "ha cooking"],
+  "blm":    ["bin bun nè", "bin bun ne"],             // BLM in rawdata
+  "bbn":    ["bin bun nè", "bin bun ne"],
+  "gdmn":   ["gia đình milk nè", "gia dinh milk ne"],
+  "tt":     ["thao ng - nấu ăn healthy", "thao ng nau an healthy"],
+  "qqtnn":  ["quê nhà có mẹ", "que nha co me"],
+  "cmd":    ["cá mập đói", "ca map doi"],
+  "ml":     ["miu linh"],
+  "toe":    ["toe nấu gì đó", "toe nau gi do"],
+  "mhk":    ["mập hay kể", "map hay ke"],
+  "cltd":   ["cờ ly làm mẹ", "co ly lam me"],
+
+  // ═══════════════════════════════════════════════════════
+  // TTS / Click campaign variants (from raw sheet)
+  // ═══════════════════════════════════════════════════════
+  "angithuongoi_tts":  ["ăn gì thương ơi", "an gi thuong oi"],
+  "bondayne__tts":     ["bon đây nè", "bon day ne"],
+  "minn cookie__tts":  ["minn cookie", "min cookie"],
+  "ng-lê-thu-thủy_tts":["nguyễn lê thu thủy", "ng lê thu thủy"],
+  "minncookie_tts":    ["minn cookie", "min cookie"],
+
+  // ═══════════════════════════════════════════════════════
+  // Logical abbreviations for KOLs without explicit codes
+  // ═══════════════════════════════════════════════════════
+  "bnm":    ["bếp nhà mầm", "bep nha mam", "bếp nhà mâm"],
+  "bnc":    ["bepnhacotam"],
+  "cn28":   ["comnha28"],
+  "gdmh":   ["gia đình mắt hí", "gia dinh mat hi"],
+  "hxoy":   ["hằng xoy", "hang xoy"],
+  "ktb":    ["kim thoa bùi", "kim thoa bui"],
+  "ldhl":   ["lamdauhalong"],
+  "mhna":   ["mai hà thích nấu ăn", "mai ha thich nau an", "mai hà thích nấu ăn ✿"],
+  "mhtna":  ["mai hà thích nấu ăn", "mai ha thich nau an"],
+  "nmqx":   ["na mít quýt xoài", "na mit quyt xoai"],
+  "nbd":    ["nhà bún đây", "nha bun day"],
+  "nsh":    ["nhi say hi"],
+  "qnkm":   ["quê nhà có mẹ", "que nha co me"],
+  "qc":     ["quán cooking", "quan cooking", "quân cooking"],
+  "tanha":  ["thao ng nấu ăn healthy", "thao ng - nấu ăn healthy"],
+  "hvqh89": ["hương vị quê hương 89", "huong vi que huong 89"],
+  "motis":  ["mẹ otis", "me otis"],
+  "bbn2":   ["bin bun nè", "bin bun ne"],
+  "ckm":    ["châu kiều my", "chau kieu my"],
+  "gdmilk": ["gia đình milk nè", "gia dinh milk ne"],
+};
+
+const getInitials = (name) => {
+  if (!name) return "";
+  const n = name.toString().toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d");
+  const words = n.split(/[\s\-_]+/).filter(Boolean);
+  return words.map(w => w[0]).join("");
+};
+
+const isKolMatch = (importedName, kolName) => {
+  if (!importedName || !kolName) return false;
+  
+  const clean = (s) => {
+    let t = cleanName(s);
+    t = t.replace(/^(urban|rural|p1|p2|phase1|phase2|otherprovince)/g, "");
+    t = t.replace(/(tts|click|view|conversion|sales|ads|group|urban|rural)$/g, "");
+    return t;
+  };
+  
+  const impClean = clean(importedName);
+  const kolClean = clean(kolName);
+
+  if (impClean === kolClean || kolClean.includes(impClean) || impClean.includes(kolClean)) return true;
+
+  if (CUSTOM_INITIALS[impClean]) {
+    if (CUSTOM_INITIALS[impClean].some(alias => clean(alias) === kolClean || kolClean.includes(clean(alias)) || clean(alias).includes(kolClean))) return true;
+  }
+
+  // Fallback: match by initials (with or without numbers)
+  const kolInitials = getInitials(kolName);
+  if (impClean === kolInitials) return true;
+  
+  const impCleanNoDigits = impClean.replace(/[0-9]/g, "");
+  if (impCleanNoDigits && impCleanNoDigits === kolInitials) return true;
+
+  return false;
+};
 
 // ── Column auto-mapping: raw header (lowercase) → internal field key
 // ORDER MATTERS: more specific fields must come before generic ones
@@ -510,6 +666,27 @@ const fmtVND = (n) => {
   return new Intl.NumberFormat("vi-VN").format(Math.round(Number(n))) + "đ";
 };
 
+const getAvatarColor = (name) => {
+  if (!name) return "var(--accent)";
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const colors = [
+    "#4F46E5", // Indigo
+    "#0EA5E9", // Sky
+    "#10B981", // Emerald
+    "#F59E0B", // Amber
+    "#EC4899", // Pink
+    "#8B5CF6", // Violet
+    "#F43F5E", // Rose
+    "#06B6D4", // Cyan
+    "#84CC16", // Lime
+    "#A855F7", // Purple
+  ];
+  const idx = Math.abs(hash) % colors.length;
+  return colors[idx];
+};
 
 const emptyKOL = () => ({
   id: "new-" + Date.now(),
@@ -785,6 +962,31 @@ const excelCellToNum = (raw) => {
   const n = Number(raw);
   return isNaN(n) ? undefined : n;
 };
+const excelCellToCountNum = (raw) => {
+  const n = excelCellToNum(raw);
+  if (n === undefined) return undefined;
+  if (!Number.isInteger(n)) {
+    const str = n.toString();
+    const parts = str.split('.');
+    if (parts[1]) {
+      if (parts[1].length === 3) {
+        return Math.round(n * 1000);
+      } else if (parts[1].length === 6) {
+        return Math.round(n * 1000000);
+      } else {
+        return Math.round(n);
+      }
+    }
+  }
+  return n;
+};
+const excelCellToPercentNum = (raw) => {
+  const n = excelCellToNum(raw);
+  if (n === undefined) return undefined;
+  // Excel stores percentage values as decimal ratios (e.g. 0.7093 = 70.93%, 8.5 = 850%, 43.22 = 4322%).
+  // We must always multiply by 100 to get the raw percentage value.
+  return n * 100;
+};
 const excelCellToBoolLabel = (raw) => {
   if (raw === null || raw === undefined || raw === "") return "";
   if (typeof raw === "boolean") return raw ? "Có" : "Không";
@@ -822,36 +1024,82 @@ const findHeaderIdx = (header, ...candidates) => {
 
 // Detect which of the two known file formats a workbook is ---------------
 const detectFileRole = (wb, fileName) => {
+  const fn = (fileName || "").toLowerCase().trim();
+  
+  // 1. Primary: Classify by explicit filename keywords
+  if (fn.includes("social") || fn.includes("outreach") || fn.includes("báo cáo") || fn.includes("hiệu suất")) {
+    return ["social"];
+  }
+  if (fn.includes("internal") || fn.includes("execution") || fn.includes("kế hoạch")) {
+    return ["internal"];
+  }
+  if (fn.includes("media") || fn.includes("raw") || fn.includes("ads")) {
+    return ["media"];
+  }
+
+  // 2. Secondary: Fallback to sheet headers if filename is generic
   const allHeaders = new Set();
+  const allSheetNames = new Set(wb.SheetNames.map(n => n.toLowerCase().trim()));
+  
   wb.SheetNames.forEach(name => {
     const ws = wb.Sheets[name];
     const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
-    if (aoa[0]) aoa[0].forEach(h => allHeaders.add((h || "").toString().toLowerCase().trim()));
+    if (!aoa.length) return;
+
+    let headerIdx = 0;
+    for (let r = 0; r < Math.min(aoa.length, 25); r++) {
+      const row = aoa[r];
+      if (Array.isArray(row)) {
+        const hasKol = row.some(cell => cell && cell.toString().toLowerCase().includes("kol"));
+        if (hasKol) {
+          headerIdx = r;
+          break;
+        }
+      }
+    }
+
+    if (aoa[headerIdx]) {
+      aoa[headerIdx].forEach(h => allHeaders.add((h || "").toString().toLowerCase().trim()));
+    }
   });
+  
   const has = (s) => Array.from(allHeaders).some(h => h.includes(s));
-  const looksInternal = has("status") && has("group") && has("add-on fee");
-  const looksSocial = has("est view") && (has("reup") || has("tt + reup") || has("achieved"));
+  const looksInternal = has("status") && (has("group") || has("add-on fee") || has("deliverable"));
+  const looksSocial = has("view") || has("reach") || has("impression") || has("timeline");
+  const looksMedia = allSheetNames.has("raw") || allSheetNames.has("raw2026") || allSheetNames.has("rawdata") || has("6-second focused views") || has("video view rate");
 
-  if (looksInternal && !looksSocial) return "internal";
-  if (looksSocial && !looksInternal) return "social";
-
-  const fn = fileName.toLowerCase();
-  if (fn.includes("internal")) return "internal";
-  if (fn.includes("social") || fn.includes("outreach")) return "social";
-  return "unknown";
+  const roles = [];
+  if (looksInternal) roles.push("internal");
+  if (looksSocial) roles.push("social");
+  if (looksMedia) roles.push("media");
+  
+  if (roles.length === 0) roles.push("unknown");
+  return roles;
 };
 
 // Parse the [INTERNAL] Execution file → { campaignKey: Map(kolKeyLower -> fields) }
 const parseInternalWorkbook = (wb) => {
   const out = {};
   wb.SheetNames.forEach(sheetName => {
-    const campaignKey = normalizeCampaignKey(sheetName);
-    if (!CAMPAIGNS.find(c => c.key === campaignKey)) return;
     const ws = wb.Sheets[sheetName];
     const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
     if (!aoa.length) return;
-    const header = aoa[0].map(h => (h || "").toString());
+
+    let headerIdx = 0;
+    for (let r = 0; r < Math.min(aoa.length, 25); r++) {
+      const row = aoa[r];
+      if (Array.isArray(row)) {
+        const hasKol = row.some(cell => cell && cell.toString().toLowerCase().includes("kol"));
+        if (hasKol) {
+          headerIdx = r;
+          break;
+        }
+      }
+    }
+
+    const header = aoa[headerIdx].map(h => (h || "").toString());
     const iKol = findHeaderIdx(header, "kol");
+    const iCampaign = findHeaderIdx(header, "chiến dịch", "campaign", "dự án");
     const iLink = findHeaderIdx(header, "link");
     const iFollower = findHeaderIdx(header, "follower");
     const iType = findHeaderIdx(header, "type");
@@ -866,36 +1114,64 @@ const parseInternalWorkbook = (wb) => {
     const iAir = findHeaderIdx(header, "ngày air", "ngay air");
     const iAiredLink = findHeaderIdx(header, "aired link");
     const iAiredFb = findHeaderIdx(header, "aired fb");
+    const iAdName = findHeaderIdx(header, "ad name", "ad_name", "adname", "tên ads");
     if (iKol < 0) return;
+    
+    // If we have a campaign column, we don't strictly require the sheet name to match a campaign
+    const sheetCampaignKey = normalizeCampaignKey(sheetName);
+    if (iCampaign < 0 && !CAMPAIGNS.find(c => c.key === sheetCampaignKey)) return;
 
-    const map = new Map();
-    for (let r = 1; r < aoa.length; r++) {
+    for (let r = headerIdx + 1; r < aoa.length; r++) {
       const row = aoa[r];
       if (!row) continue;
-      const no = row[0];
-      if (no === null || no === "" || isNaN(Number(no))) continue; // skip totals/blank rows
+      
+      const isEmpty = row.every(cell => cell === null || cell === undefined || cell.toString().trim() === "");
+      if (isEmpty) break;
+      
       const kolName = (row[iKol] || "").toString().trim();
       if (!kolName) continue;
+      const kolNameLower = kolName.toLowerCase();
+      if (kolNameLower === "total" || kolNameLower === "average" || kolNameLower === "kol/koc") continue;
+      
+      let rowCampaignRaw = iCampaign >= 0 ? excelCellToStr(row[iCampaign]) : sheetName;
+      if (!rowCampaignRaw) rowCampaignRaw = sheetName;
+      const campaignKey = normalizeCampaignKey(rowCampaignRaw);
+      if (!CAMPAIGNS.find(c => c.key === campaignKey)) continue;
+
+      if (!out[campaignKey]) out[campaignKey] = new Map();
+      const map = out[campaignKey];
+
+      const noVal = row[0];
+      const no = (noVal !== null && noVal !== "" && !isNaN(Number(noVal))) ? Number(noVal) : (r - headerIdx);
+      const intAiredLink = iAiredLink >= 0 ? getLinkOrText(ws, r, iAiredLink, row[iAiredLink]) : "";
+      const intNgayAir = excelCellToStr(row[iAir]);
+      let intStatusKey = iStatus >= 0 ? (STATUS_LABEL_TO_KEY[(row[iStatus] || "").toString().toLowerCase().trim()] || "") : "";
+      // Auto-infer "aired" if there is a real air date or aired link but status not yet set
+      if (!intStatusKey || intStatusKey === "waiting_food") {
+        const hasAiredLink = intAiredLink && /^https?:\/\//i.test(intAiredLink);
+        const hasAiredDate = intNgayAir && intNgayAir.trim() !== "" && intNgayAir.trim() !== "—" && intNgayAir.trim().toLowerCase() !== "asap";
+        if (hasAiredLink || hasAiredDate) intStatusKey = "aired";
+      }
       map.set(kolName.toLowerCase(), {
         kol: kolName,
         no: Number(no),
+        adName: iAdName >= 0 ? excelCellToStr(row[iAdName]) : "",
         link: excelCellToStr(row[iLink]),
         follower: excelCellToStr(row[iFollower]),
         type: excelCellToStr(row[iType]),
         location: excelCellToStr(row[iLocation]),
         group: excelCellToStr(row[iGroup]),
-        cost: excelCellToNum(row[iCost]) || 0,
+        cost: excelCellToCountNum(row[iCost]) || 0,
         addonFee: excelCellToStr(row[iAddon]),
-        statusKey: iStatus >= 0 ? (STATUS_LABEL_TO_KEY[(row[iStatus] || "").toString().toLowerCase().trim()] || "") : "",
+        statusKey: intStatusKey,
         monAn: excelCellToStr(row[iMonAn]),
         ngayGuiScript: iScript >= 0 ? getLinkOrText(ws, r, iScript, row[iScript]) : "",
         ngayGuiDemo: iDemo >= 0 ? getLinkOrText(ws, r, iDemo, row[iDemo]) : "",
-        ngayAir: excelCellToStr(row[iAir]),
-        airedLink: iAiredLink >= 0 ? getLinkOrText(ws, r, iAiredLink, row[iAiredLink]) : "",
+        ngayAir: intNgayAir,
+        airedLink: intAiredLink,
         airedFb: excelCellToStr(row[iAiredFb]),
       });
     }
-    out[campaignKey] = map;
   });
   return out;
 };
@@ -903,114 +1179,313 @@ const parseInternalWorkbook = (wb) => {
 // Parse the [AVNxTCV] Social Outreach file → { campaignKey: Map(kolKeyLower -> fields) }
 const parseSocialWorkbook = (wb) => {
   const out = {};
+  
+  const isHeaderRow = (row) => {
+    if (!Array.isArray(row)) return false;
+    return row.some(cell => {
+      if (!cell) return false;
+      const s = cell.toString().toLowerCase().trim();
+      return s === "kol" || s === "kol/koc" || s === "ad name" || s === "ad_name" || s === "creator" || s === "koc" || s === "ad group name" || s === "ad group" || s === "ad_group";
+    });
+  };
+
   wb.SheetNames.forEach(sheetName => {
-    const campaignKey = normalizeCampaignKey(sheetName);
-    if (!CAMPAIGNS.find(c => c.key === campaignKey)) return;
     const ws = wb.Sheets[sheetName];
     const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
     if (!aoa.length) return;
-    const header = aoa[0].map(h => (h || "").toString());
-    const iKol = findHeaderIdx(header, "kol");
-    const iLink = findHeaderIdx(header, "link");
-    const iType = findHeaderIdx(header, "type");
-    const iEstView = findHeaderIdx(header, "est view");
-    const iEstEng = findHeaderIdx(header, "est engagement", "est eng");
-    const iFollower = findHeaderIdx(header, "follower");
-    const iCost = findHeaderIdx(header, "cost");
-    const iDateAired = findHeaderIdx(header, "date aired");
-    const iAiredLink = findHeaderIdx(header, "aired link", "airing link");
-    const iReupLink = findHeaderIdx(header, "reup link");
-    const iBrandReup = findHeaderIdx(header, "brand reup");
-    const iView = findHeaderIdx(header, "view");
-    const iLike = findHeaderIdx(header, "like");
-    const iComment = findHeaderIdx(header, "comment");
-    const iShare = findHeaderIdx(header, "share");
-    const iSave = findHeaderIdx(header, "save");
-    const iPctViewAch = findHeaderIdx(header, "% view achieved");
-    const iPctEngAch = findHeaderIdx(header, "% eng achieved (like, cmt, share)", "% eng achieved");
-    const iPaidAvgView = findHeaderIdx(header, "paid avg. view", "paid avg view");
-    const iPaidPctCompleted = findHeaderIdx(header, "paid % completed view");
-    const iCodeAds = findHeaderIdx(header, "code ads");
-    const iReupView = findHeaderIdx(header, "reup view");
-    const iReupEng = findHeaderIdx(header, "reup eng");
-    const iTotalView = findHeaderIdx(header, "total view\n(tt + reup)", "total view (tt + reup)");
-    const iTotalEng = findHeaderIdx(header, "total eng.\n(tt + reup)", "total eng. (tt + reup)");
-    // The last two "% ... achieved" columns (combined w/ reup) share the same lowercase text as the
-    // first two but with different capitalization in the source files — find their *second* occurrence.
-    let iPctViewTotal = -1, iPctEngTotal = -1;
-    header.forEach((h, i) => {
-      const hn = (h || "").toLowerCase().trim();
-      if (hn === "% view achieved" && i !== iPctViewAch) iPctViewTotal = i;
-      if ((hn === "% eng. achieved" || hn === "% eng achieved") && i !== iPctEngAch) iPctEngTotal = i;
-    });
-    if (iKol < 0) return;
 
-    const map = new Map();
-    for (let r = 1; r < aoa.length; r++) {
+    const sections = [];
+    let currentSection = null;
+
+    for (let r = 0; r < aoa.length; r++) {
       const row = aoa[r];
-      if (!row) continue;
-      const no = row[0];
-      if (no === null || no === "" || isNaN(Number(no))) continue;
-      const kolName = (row[iKol] || "").toString().trim();
-      if (!kolName) continue;
-      map.set(kolName.toLowerCase(), {
-        kol: kolName,
-        no: Number(no),
-        link: excelCellToStr(row[iLink]),
-        type: excelCellToStr(row[iType]),
-        follower: excelCellToStr(row[iFollower]),
-        estView: excelCellToNum(row[iEstView]),
-        estEng: excelCellToNum(row[iEstEng]),
-        cost: excelCellToNum(row[iCost]),
-        ngayAir: excelCellToStr(row[iDateAired]),
-        airedLink: iAiredLink >= 0 ? getLinkOrText(ws, r, iAiredLink, row[iAiredLink]) : "",
-        reupLink: iReupLink >= 0 ? getLinkOrText(ws, r, iReupLink, row[iReupLink]) : "",
-        brandReup: excelCellToStr(row[iBrandReup]),
-        views: excelCellToNum(row[iView]),
-        likes: excelCellToNum(row[iLike]),
-        comments: excelCellToNum(row[iComment]),
-        shares: excelCellToNum(row[iShare]),
-        saves: excelCellToNum(row[iSave]),
-        pctViewAchieved: excelCellToNum(row[iPctViewAch]),
-        pctEngAchieved: excelCellToNum(row[iPctEngAch]),
-        pctViewAchievedTotal: iPctViewTotal >= 0 ? excelCellToNum(row[iPctViewTotal]) : undefined,
-        pctEngAchievedTotal: iPctEngTotal >= 0 ? excelCellToNum(row[iPctEngTotal]) : undefined,
-        paidAvgView: excelCellToNum(row[iPaidAvgView]),
-        paidPctCompletedView: excelCellToNum(row[iPaidPctCompleted]),
-        codeAds: excelCellToBoolLabel(row[iCodeAds]),
-        reupViews: excelCellToNum(row[iReupView]),
-        reupEngagement: excelCellToNum(row[iReupEng]),
-        totalViewCombined: excelCellToNum(row[iTotalView]),
-        totalEngCombined: excelCellToNum(row[iTotalEng]),
-      });
+      if (isHeaderRow(row)) {
+        if (currentSection) {
+          sections.push(currentSection);
+        }
+        const header = row.map(h => (h || "").toString());
+        currentSection = {
+          header,
+          headerIdx: r,
+          rows: []
+        };
+      } else if (currentSection) {
+        const isEmpty = !row || row.every(cell => cell === null || cell === undefined || cell.toString().trim() === "");
+        if (isEmpty) {
+          sections.push(currentSection);
+          currentSection = null;
+        } else {
+          const firstCell = (row[0] || "").toString().toLowerCase().trim();
+          const secondCell = (row[1] || "").toString().toLowerCase().trim();
+          if (firstCell.includes("tổng cộng") || firstCell.includes("average") || firstCell.includes("total") ||
+              secondCell.includes("tổng cộng") || secondCell.includes("average") || secondCell.includes("total")) {
+            continue;
+          }
+          currentSection.rows.push({ rIdx: r, row });
+        }
+      }
     }
-    out[campaignKey] = map;
+    if (currentSection) sections.push(currentSection);
+
+    sections.forEach(sec => {
+      const header = sec.header;
+      
+      // Determine if this is a Plan/KPI Setup section instead of actual performance
+      const isPlanSection = header.some(h => {
+        const s = (h || "").toString().toLowerCase().trim();
+        return s.includes("kpi") || s.includes("objective") || s.includes("buying method");
+      });
+      if (isPlanSection) return; // Skip Plan/Setup tables in Social Outreach sheets
+
+      const iKol = findHeaderIdx(header, "kol", "ad name", "ad_name", "kol/koc", "creator", "ad group name", "ad group", "ad_group");
+      const iCampaign = findHeaderIdx(header, "chiến dịch", "campaign name");
+      
+      const sheetCampaignKey = normalizeCampaignKey(sheetName);
+      if (iCampaign < 0 && !CAMPAIGNS.find(c => c.key === sheetCampaignKey)) return;
+
+      const iLink = findHeaderIdx(header, "link");
+      const iType = findHeaderIdx(header, "type");
+      const iEstView = findHeaderIdx(header, "est view");
+      const iEstEng = findHeaderIdx(header, "est engagement", "est eng");
+      const iFollower = findHeaderIdx(header, "follower");
+      const iCost = findHeaderIdx(header, "cost", "budget");
+      const iDateAired = findHeaderIdx(header, "date aired", "timeline");
+      const iAiredLink = findHeaderIdx(header, "aired link", "airing link");
+      const iReupLink = findHeaderIdx(header, "reup link");
+      const iBrandReup = findHeaderIdx(header, "brand reup");
+      const iView = findHeaderIdx(header, "video views", "views", "view", "sum của view");
+      const iLike = findHeaderIdx(header, "like", "paid likes");
+      const iComment = findHeaderIdx(header, "comment", "paid comments");
+      const iShare = findHeaderIdx(header, "share", "paid shares");
+      const iSave = findHeaderIdx(header, "save");
+      const iImpressions = findHeaderIdx(header, "impressions", "impression");
+      const iPctViewAch = findHeaderIdx(header, "% view achieved");
+      const iPctEngAch = findHeaderIdx(header, "% eng achieved (like, cmt, share)", "% eng achieved");
+      const iPaidAvgView = findHeaderIdx(header, "paid avg. view", "paid avg view");
+      const iPaidPctCompleted = findHeaderIdx(header, "paid % completed view");
+      const iCodeAds = findHeaderIdx(header, "code ads");
+      const iReupView = findHeaderIdx(header, "reup view");
+      const iReupEng = findHeaderIdx(header, "reup eng");
+      const iTotalView = findHeaderIdx(header, "total view\n(tt + reup)", "total view (tt + reup)", "total view combined");
+      const iTotalEng = findHeaderIdx(header, "total eng.\n(tt + reup)", "total eng. (tt + reup)");
+
+      let iPctViewTotal = -1, iPctEngTotal = -1;
+      header.forEach((h, idx) => {
+        const hn = (h || "").toLowerCase().trim();
+        if (hn === "% view achieved" && idx !== iPctViewAch) iPctViewTotal = idx;
+        if ((hn === "% eng. achieved" || hn === "% eng achieved") && idx !== iPctEngAch) iPctEngTotal = idx;
+      });
+
+      if (iKol < 0) return;
+
+      sec.rows.forEach(({ rIdx, row }) => {
+        const kolName = (row[iKol] || "").toString().trim();
+        if (!kolName) return;
+        const kolNameLower = kolName.toLowerCase();
+        if (kolNameLower === "total" || kolNameLower === "average" || kolNameLower === "kol/koc" || kolNameLower === "ad name") return;
+
+        let rowCampaignRaw = iCampaign >= 0 ? excelCellToStr(row[iCampaign]) : sheetName;
+        if (!rowCampaignRaw) rowCampaignRaw = sheetName;
+        const campaignKey = normalizeCampaignKey(rowCampaignRaw);
+        if (!CAMPAIGNS.find(c => c.key === campaignKey)) return;
+
+        if (!out[campaignKey]) out[campaignKey] = new Map();
+        const map = out[campaignKey];
+
+        const key = kolNameLower;
+        const existing = map.get(key) || {
+          kol: kolName,
+          no: rIdx - sec.headerIdx,
+        };
+
+        if (iLink >= 0 && row[iLink]) existing.link = excelCellToStr(row[iLink]);
+        if (iType >= 0 && row[iType]) existing.type = excelCellToStr(row[iType]);
+        if (iFollower >= 0 && row[iFollower]) existing.follower = excelCellToStr(row[iFollower]);
+        if (iEstView >= 0 && row[iEstView]) existing.estView = excelCellToCountNum(row[iEstView]);
+        if (iEstEng >= 0 && row[iEstEng]) existing.estEng = excelCellToCountNum(row[iEstEng]);
+        
+        if (iCost >= 0 && row[iCost]) {
+          const costVal = excelCellToCountNum(row[iCost]);
+          if (costVal > 0) {
+            existing.cost = Math.max(existing.cost || 0, costVal);
+          }
+        }
+        
+        if (iDateAired >= 0 && row[iDateAired]) existing.ngayAir = excelCellToStr(row[iDateAired]);
+        if (iAiredLink >= 0 && row[iAiredLink]) existing.airedLink = getLinkOrText(ws, rIdx, iAiredLink, row[iAiredLink]);
+        if (iReupLink >= 0 && row[iReupLink]) existing.reupLink = getLinkOrText(ws, rIdx, iReupLink, row[iReupLink]);
+        if (iBrandReup >= 0 && row[iBrandReup]) existing.brandReup = excelCellToStr(row[iBrandReup]);
+        
+        if (iView >= 0 && row[iView]) existing.views = (existing.views || 0) + excelCellToCountNum(row[iView]);
+        if (iLike >= 0 && row[iLike]) existing.likes = (existing.likes || 0) + excelCellToCountNum(row[iLike]);
+        if (iComment >= 0 && row[iComment]) existing.comments = (existing.comments || 0) + excelCellToCountNum(row[iComment]);
+        if (iShare >= 0 && row[iShare]) existing.shares = (existing.shares || 0) + excelCellToCountNum(row[iShare]);
+        if (iSave >= 0 && row[iSave]) existing.saves = (existing.saves || 0) + excelCellToCountNum(row[iSave]);
+        if (iImpressions >= 0 && row[iImpressions]) existing.impressions = (existing.impressions || 0) + excelCellToCountNum(row[iImpressions]);
+        
+        if (iPctViewAch >= 0 && row[iPctViewAch]) existing.pctViewAchieved = excelCellToPercentNum(row[iPctViewAch]);
+        if (iPctEngAch >= 0 && row[iPctEngAch]) existing.pctEngAchieved = excelCellToPercentNum(row[iPctEngAch]);
+        if (iPctViewTotal >= 0 && row[iPctViewTotal]) existing.pctViewAchievedTotal = excelCellToPercentNum(row[iPctViewTotal]);
+        if (iPctEngTotal >= 0 && row[iPctEngTotal]) existing.pctEngAchievedTotal = excelCellToPercentNum(row[iPctEngTotal]);
+        if (iPaidAvgView >= 0 && row[iPaidAvgView]) existing.paidAvgView = excelCellToNum(row[iPaidAvgView]);
+        if (iPaidPctCompleted >= 0 && row[iPaidPctCompleted]) existing.paidPctCompletedView = excelCellToPercentNum(row[iPaidPctCompleted]);
+        if (iCodeAds >= 0 && row[iCodeAds]) existing.codeAds = excelCellToBoolLabel(row[iCodeAds]);
+        if (iReupView >= 0 && row[iReupView]) existing.reupViews = (existing.reupViews || 0) + excelCellToCountNum(row[iReupView]);
+        if (iReupEng >= 0 && row[iReupEng]) existing.reupEngagement = (existing.reupEngagement || 0) + excelCellToCountNum(row[iReupEng]);
+        if (iTotalView >= 0 && row[iTotalView]) existing.totalViewCombined = (existing.totalViewCombined || 0) + excelCellToCountNum(row[iTotalView]);
+        if (iTotalEng >= 0 && row[iTotalEng]) existing.totalEngCombined = (existing.totalEngCombined || 0) + excelCellToCountNum(row[iTotalEng]);
+
+        map.set(key, existing);
+      });
+    });
   });
   return out;
 };
 
-// Merge internal + social maps against existing app data ------------------
+// Parse the Media Plan / Raw Ads workbook -> { campaignKey: Map(kolKeyLower -> fields) }
+const parseMediaWorkbook = (wb) => {
+  const out = {};
+  const rawSheets = ["raw", "raw2026", "rawdata"];
+  
+  wb.SheetNames.forEach(sheetName => {
+    const sName = sheetName.trim();
+    if (!rawSheets.includes(sName.toLowerCase())) return;
+    
+    const ws = wb.Sheets[sheetName];
+    const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
+    if (!aoa.length) return;
+
+    let headerIdx = 0;
+    for (let r = 0; r < Math.min(aoa.length, 25); r++) {
+      const row = aoa[r];
+      if (Array.isArray(row)) {
+        const hasCampaignOrAd = row.some(cell => {
+          if (!cell) return false;
+          const str = cell.toString().toLowerCase();
+          return str.includes("campaign") || str.includes("ad name") || str.includes("ad_name");
+        });
+        if (hasCampaignOrAd) {
+          headerIdx = r;
+          break;
+        }
+      }
+    }
+    
+    const header = aoa[headerIdx].map(h => (h || "").toString());
+    const iCampaign = findHeaderIdx(header, "campaign name", "campaign");
+    const iAdName = findHeaderIdx(header, "ad name", "ad_name", "kol", "creator");
+    const iSpend = findHeaderIdx(header, "spend", "cost", "adspend", "ad spend");
+    const iImpressions = findHeaderIdx(header, "impressions", "impression");
+    const iViews = findHeaderIdx(header, "video views", "video view", "views", "view");
+    const iViews2s = findHeaderIdx(header, "2-second video views", "2-second video view", "2s views", "2s view");
+    const iViews6s = findHeaderIdx(header, "6-second focused views", "6-second focused view", "6s-focused views", "6-second video views", "6-second video view", "6s views", "6s view");
+    const iConversions = findHeaderIdx(header, "conversions", "conversion", "results");
+    
+    if (iAdName < 0) return;
+    
+    for (let r = headerIdx + 1; r < aoa.length; r++) {
+      const row = aoa[r];
+      if (!row) continue;
+      
+      const adName = (row[iAdName] || "").toString().trim();
+      if (!adName) continue;
+      
+      let campaignRaw = iCampaign >= 0 ? (row[iCampaign] || "").toString() : "";
+      if (!campaignRaw) {
+        campaignRaw = sheetName;
+      }
+      const campaignKey = normalizeCampaignKey(campaignRaw);
+      
+      if (!out[campaignKey]) {
+        out[campaignKey] = new Map();
+      }
+      
+      const key = adName.toLowerCase();
+      
+      // Try to resolve full KOL name from ad code via CUSTOM_INITIALS
+      let resolvedKol = adName;
+      if (CUSTOM_INITIALS[key] && CUSTOM_INITIALS[key].length > 0) {
+        // Use first alias as display name (it's the full Vietnamese name)
+        resolvedKol = CUSTOM_INITIALS[key][0];
+        // Capitalize first letter of each word
+        resolvedKol = resolvedKol.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      }
+      
+      const existing = out[campaignKey].get(key) || {
+        kol: resolvedKol,
+        adName: adName,       // preserve the short code
+        adSpend: 0,
+        impressions: 0,
+        views: 0,
+        views2s: 0,
+        views6s: 0,
+        conversions: 0
+      };
+      
+      if (iSpend >= 0) existing.adSpend += excelCellToCountNum(row[iSpend]) || 0;
+      if (iImpressions >= 0) existing.impressions += excelCellToCountNum(row[iImpressions]) || 0;
+      if (iViews >= 0) existing.views += excelCellToCountNum(row[iViews]) || 0;
+      if (iViews2s >= 0) existing.views2s += excelCellToCountNum(row[iViews2s]) || 0;
+      if (iViews6s >= 0) existing.views6s += excelCellToCountNum(row[iViews6s]) || 0;
+      if (iConversions >= 0) existing.conversions += excelCellToCountNum(row[iConversions]) || 0;
+      
+      out[campaignKey].set(key, existing);
+    }
+  });
+  
+  return out;
+};
+
+// Merge internal + social + media maps against existing app data ------------------
 // Internal file wins for tracking/process fields; Social Outreach wins for
-// performance numbers + aired link/date (source of truth per yêu cầu).
-// Never overwrites an existing value with a blank incoming one.
-const mergeDualFiles = (internalMap, socialMap, existingData) => {
-  const campaignKeys = new Set([...Object.keys(internalMap), ...Object.keys(socialMap)]);
+// performance numbers + aired link/date; Media raw performance wins for ad spend,
+// impressions, 2s views, 6s views, and clicks.
+const mergeDualFiles = (internalMap, socialMap, mediaMap, existingData) => {
+  const campaignKeys = new Set([
+    ...Object.keys(internalMap || {}), 
+    ...Object.keys(socialMap || {}),
+    ...Object.keys(mediaMap || {})
+  ]);
   const toUpdate = [];
   const toAdd = [];
   const warnings = [];
 
   campaignKeys.forEach(campaignKey => {
-    const intMap = internalMap[campaignKey] || new Map();
-    const socMap = socialMap[campaignKey] || new Map();
-    const allKolKeys = new Set([...intMap.keys(), ...socMap.keys()]);
+    const intMap = (internalMap && internalMap[campaignKey]) || new Map();
+    const socMap = (socialMap && socialMap[campaignKey]) || new Map();
+    const medMap = (mediaMap && mediaMap[campaignKey]) || new Map();
+    const allKolKeys = new Set([...intMap.keys(), ...socMap.keys(), ...medMap.keys()]);
 
     allKolKeys.forEach(kolKey => {
       const intRow = intMap.get(kolKey);
-      const socRow = socMap.get(kolKey);
-      const displayName = (intRow && intRow.kol) || (socRow && socRow.kol) || kolKey;
+      
+      let socRow = socMap.get(kolKey);
+      if (!socRow) {
+        for (const [sKey, sVal] of socMap.entries()) {
+          if (isKolMatch(sKey, kolKey) || isKolMatch(kolKey, sKey)) {
+            socRow = sVal;
+            break;
+          }
+        }
+      }
+      
+      let medRow = medMap.get(kolKey);
+      if (!medRow) {
+        for (const [mKey, mVal] of medMap.entries()) {
+          if (isKolMatch(mKey, kolKey) || isKolMatch(kolKey, mKey)) {
+            medRow = mVal;
+            break;
+          }
+        }
+      }
 
-      if (!intRow) warnings.push(`[${campaignKey}] "${displayName}" — chỉ có trong file Social Outreach (thiếu Status/Chi phí/Nhóm... từ file INTERNAL)`);
-      if (!socRow) warnings.push(`[${campaignKey}] "${displayName}" — chỉ có trong file INTERNAL (chưa có chỉ số hiệu suất từ Social Outreach)`);
+      const displayName = (intRow && intRow.kol) || (socRow && socRow.kol) || (medRow && medRow.kol) || kolKey;
+
+      const hasBoth = (internalMap && Object.keys(internalMap).length > 0) && (socialMap && Object.keys(socialMap).length > 0);
+      if (hasBoth) {
+        if (!intRow) warnings.push(`[${campaignKey}] "${displayName}" — chỉ có trong file chỉ số/media (thiếu Status/Chi phí/Nhóm... từ file INTERNAL)`);
+        if (!socRow && intRow) warnings.push(`[${campaignKey}] "${displayName}" — chỉ có trong file INTERNAL (chưa có chỉ số hiệu suất từ Social Outreach)`);
+      }
 
       const merged = {};
       if (intRow) Object.assign(merged, intRow);
@@ -1024,11 +1499,9 @@ const mergeDualFiles = (internalMap, socialMap, existingData) => {
           pctViewAchievedTotal: socRow.pctViewAchievedTotal, pctEngAchievedTotal: socRow.pctEngAchievedTotal,
           paidAvgView: socRow.paidAvgView, paidPctCompletedView: socRow.paidPctCompletedView,
           codeAds: socRow.codeAds, reupLink: socRow.reupLink, brandReup: socRow.brandReup,
+          impressions: socRow.impressions,
+          views6s: socRow.views6s,
         });
-        // Social Outreach is the source of truth for the aired link + air date —
-        // but ONLY when it actually resolved to a real URL (hyperlink extracted).
-        // Otherwise its "Aired" placeholder text would wipe out a real link already
-        // present in the INTERNAL file.
         if (socRow.airedLink && /^https?:\/\//i.test(socRow.airedLink)) merged.airedLink = socRow.airedLink;
         if (socRow.ngayAir) merged.ngayAir = socRow.ngayAir;
         if (!merged.kol) merged.kol = socRow.kol;
@@ -1037,12 +1510,29 @@ const mergeDualFiles = (internalMap, socialMap, existingData) => {
         if (!merged.link) merged.link = socRow.link;
         if (!merged.cost) merged.cost = socRow.cost;
       }
+      
+      if (medRow) {
+        if (medRow.adSpend > 0) merged.adSpend = medRow.adSpend;
+        if (medRow.impressions > 0) merged.impressions = medRow.impressions;
+        if (medRow.views2s > 0) merged.views2s = medRow.views2s;
+        if (medRow.views6s > 0) merged.views6s = medRow.views6s;
+        if (medRow.views > 0 && (!merged.views || merged.views === 0)) {
+          merged.views = medRow.views;
+        }
+        if (!merged.kol) merged.kol = medRow.kol;
+        // Carry over the raw ad code for reference
+        if (medRow.adName && !merged.adName) merged.adName = medRow.adName;
+      }
+      
       merged.campaign = campaignKey;
       const seqNo = (intRow && intRow.no) ?? (socRow && socRow.no);
       delete merged.no; // transient field, not part of the row schema
 
       const existing = existingData.find(r =>
-        resolveCampaignKey(r) === campaignKey && (r.kol || "").trim().toLowerCase() === kolKey
+        resolveCampaignKey(r) === campaignKey && (
+          (r.kol || "").trim().toLowerCase() === kolKey ||
+          isKolMatch(r.kol, displayName)
+        )
       );
 
       if (existing) {
@@ -1051,6 +1541,14 @@ const mergeDualFiles = (internalMap, socialMap, existingData) => {
           if (v === undefined || v === null || v === "") return; // never blank out existing data
           changes[k] = v;
         });
+        // Auto-infer "aired" status: if the record has an aired link or air date,
+        // but the incoming status is empty or was previously waiting_food, upgrade it.
+        const effectiveStatus = changes.statusKey || existing.statusKey;
+        const hasAiredLink = (changes.airedLink || existing.airedLink) && /^https?:\/\//i.test(changes.airedLink || existing.airedLink);
+        const hasAiredDate = (changes.ngayAir || existing.ngayAir) && (changes.ngayAir || existing.ngayAir).trim() !== "" && (changes.ngayAir || existing.ngayAir).trim() !== "—";
+        if ((hasAiredLink || hasAiredDate) && (!effectiveStatus || effectiveStatus === "waiting_food")) {
+          changes.statusKey = "aired";
+        }
         toUpdate.push({ id: existing.id, kol: existing.kol, campaign: campaignKey, changes });
       } else {
         const newRow = { ...emptyKOL(), ...merged };
@@ -1066,21 +1564,19 @@ const mergeDualFiles = (internalMap, socialMap, existingData) => {
   return { toUpdate, toAdd, warnings };
 };
 
-const DualFileImportModal = ({ existingData, onConfirm, onClose }) => {
+const DualFileImportModal = ({ existingData, onConfirm, onClose, onImportSingle }) => {
   const [step, setStep] = useState("drop"); // drop | error | preview
   const [error, setError] = useState("");
   const [dragOver, setDragOver] = useState(false);
-  const [roles, setRoles] = useState(null); // { internal: {name, wb}, social: {name, wb} }
+  const [internalFile, setInternalFile] = useState(null); // { name, wb }
+  const [socialFile, setSocialFile] = useState(null); // { name, wb }
   const [result, setResult] = useState(null); // { toUpdate, toAdd, warnings }
   const fileRef = useRef(null);
 
   const processFiles = async (fileList) => {
-    const files = Array.from(fileList).filter(f => /\.(xlsx|xls)$/i.test(f.name));
-    if (files.length !== 2) {
-      setError(`Cần đúng 2 file .xlsx (INTERNAL + Social Outreach). Đã nhận ${files.length} file.`);
-      setStep("error");
-      return;
-    }
+    const files = Array.from(fileList).filter(f => /\.(xlsx|xls|csv|json)$/i.test(f.name));
+    if (files.length === 0) return;
+
     try {
       const parsed = await Promise.all(files.map(f => new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -1094,45 +1590,29 @@ const DualFileImportModal = ({ existingData, onConfirm, onClose }) => {
         reader.readAsArrayBuffer(f);
       })));
 
-      const withRoles = parsed.map(p => ({ ...p, role: detectFileRole(p.wb, p.name) }));
-      const internalFile = withRoles.find(p => p.role === "internal");
-      const socialFile = withRoles.find(p => p.role === "social");
+      let newInternal = internalFile;
+      let newSocial = socialFile;
 
-      if (!internalFile || !socialFile) {
-        setError(
-          "Không nhận diện được đủ 2 vai trò file.\n" +
-          withRoles.map(p => `• ${p.name} → ${p.role === "unknown" ? "chưa rõ" : p.role}`).join("\n") +
-          "\n\nKiểm tra lại: file INTERNAL cần có cột Status/Group/Add-on Fee, file Social Outreach cần có cột Est View + Reup/Total View/Achieved."
-        );
-        setStep("error");
-        return;
-      }
-
-      setRoles({ internal: internalFile, social: socialFile });
-
-      const internalMap = parseInternalWorkbook(internalFile.wb);
-      const socialMap = parseSocialWorkbook(socialFile.wb);
-      const merged = mergeDualFiles(internalMap, socialMap, existingData);
-
-      // Real campaign labels = the actual sheet names in the source files
-      // (e.g. "AM", "AX", "Vinegar"), so the filter dropdown & header stop
-      // showing the generic "Campaign A/B/C" placeholder once real files land.
-      const sheetLabels = {};
-      [internalFile.wb, socialFile.wb].forEach(wb => {
-        wb.SheetNames.forEach(sheetName => {
-          const key = normalizeCampaignKey(sheetName);
-          if (CAMPAIGNS.find(c => c.key === key) && sheetName.trim()) {
-            sheetLabels[key] = sheetName.trim();
+      if (parsed.length === 1 && !internalFile && !socialFile) {
+        // Unified file upload
+        newInternal = parsed[0];
+        newSocial = parsed[0];
+      } else {
+        parsed.forEach(p => {
+          const roles = detectFileRole(p.wb, p.name);
+          if (roles.includes("internal")) {
+            newInternal = p;
+          } else if (roles.includes("social")) {
+            newSocial = p;
           }
         });
-      });
-      merged.sheetLabels = sheetLabels;
+      }
 
-      setResult(merged);
-      setStep("preview");
+      setInternalFile(newInternal);
+      setSocialFile(newSocial);
+      setError("");
     } catch (err) {
       setError("Lỗi khi đọc file: " + err.message);
-      setStep("error");
     }
   };
 
@@ -1140,6 +1620,34 @@ const DualFileImportModal = ({ existingData, onConfirm, onClose }) => {
     e.preventDefault();
     setDragOver(false);
     if (e.dataTransfer.files && e.dataTransfer.files.length) processFiles(e.dataTransfer.files);
+  };
+
+  const handleMergeAndProceed = () => {
+    if (!internalFile && !socialFile) return;
+    try {
+      const internalMap = internalFile ? parseInternalWorkbook(internalFile.wb) : {};
+      const socialMap = socialFile ? parseSocialWorkbook(socialFile.wb) : {};
+      const merged = mergeDualFiles(internalMap, socialMap, null, existingData);
+
+      const sheetLabels = {};
+      [internalFile, socialFile].forEach(file => {
+        if (file && file.wb) {
+          file.wb.SheetNames.forEach(sheetName => {
+            const key = normalizeCampaignKey(sheetName);
+            if (CAMPAIGNS.find(c => c.key === key)) {
+              sheetLabels[key] = key === "MSG" ? "MGS" : key;
+            }
+          });
+        }
+      });
+      merged.sheetLabels = sheetLabels;
+
+      setResult(merged);
+      setStep("preview");
+    } catch (err) {
+      setError("Lỗi khi ghép nối dữ liệu: " + err.message);
+      setStep("error");
+    }
   };
 
   const perCampaignCounts = useMemo(() => {
@@ -1158,28 +1666,90 @@ const DualFileImportModal = ({ existingData, onConfirm, onClose }) => {
             <div style={{ fontSize: 11, fontWeight: 600, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
               CẬP NHẬT DỮ LIỆU
             </div>
-            <div style={{ fontSize: 17, fontWeight: 700, color: "var(--ink)" }}>Auto-merge 2 file AVN x TCV</div>
+            <div style={{ fontSize: 17, fontWeight: 700, color: "var(--ink)" }}>Ghép nối & Cập nhật Dữ liệu</div>
           </div>
           <button className="kt-btn kt-btn-ghost" onClick={onClose} style={{ padding: "6px 10px" }}>✕</button>
         </div>
 
         <div style={{ padding: "20px 22px", display: "flex", flexDirection: "column", gap: 16 }}>
           {step === "drop" && (
-            <div
-              onDragOver={e => { e.preventDefault(); setDragOver(true); }}
-              onDragLeave={() => setDragOver(false)}
-              onDrop={handleDrop}
-              onClick={() => fileRef.current?.click()}
-              style={{
-                border: `2px dashed ${dragOver ? "var(--accent)" : "var(--line)"}`,
-                borderRadius: 12, padding: "40px 20px", textAlign: "center", cursor: "pointer",
-                background: dragOver ? "var(--accent-bg)" : "var(--paper)", transition: "all 0.15s"
-              }}
-            >
-              <div style={{ fontSize: 32, marginBottom: 10 }}>📂</div>
-              <div style={{ fontWeight: 700, color: "var(--ink)" }}>Kéo thả 2 file vào đây (hoặc bấm để chọn)</div>
-              <input ref={fileRef} type="file" multiple accept=".xlsx,.xls" style={{ display: "none" }}
-                onChange={e => e.target.files.length && processFiles(e.target.files)} />
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {/* Drag drop area */}
+              <div
+                onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={handleDrop}
+                onClick={() => fileRef.current?.click()}
+                style={{
+                  border: `2px dashed ${dragOver ? "var(--accent)" : "var(--line)"}`,
+                  borderRadius: 12, padding: "30px 20px", textAlign: "center", cursor: "pointer",
+                  background: dragOver ? "var(--accent-bg)" : "var(--paper)", transition: "all 0.15s"
+                }}
+              >
+                <div style={{ fontSize: 32, marginBottom: 8 }}>📂</div>
+                <div style={{ fontWeight: 700, color: "var(--ink)", fontSize: 14 }}>Kéo thả file Excel vào đây (hoặc bấm để chọn)</div>
+                <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 4 }}>
+                  Có thể kéo thả từng file hoặc cả 2 file cùng lúc
+                </div>
+                <input ref={fileRef} type="file" multiple accept=".xlsx,.xls,.csv,.json" style={{ display: "none" }}
+                  onChange={e => e.target.files.length && processFiles(e.target.files)} />
+              </div>
+
+              {/* Status slots */}
+              <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                {/* Slot 1: Internal File */}
+                <div style={{
+                  flex: "1 1 200px", borderRadius: 10, padding: 12,
+                  border: `1px ${internalFile ? "solid var(--line)" : "dashed #CCD3DC"}`,
+                  background: internalFile ? "var(--card)" : "#FAFAFB",
+                  display: "flex", alignItems: "center", gap: 10
+                }}>
+                  <div style={{ fontSize: 20 }}>📈</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 10, color: "var(--ink-soft)", fontWeight: 700, textTransform: "uppercase" }}>File Kế hoạch (Execution/Internal)</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: internalFile ? "var(--ink)" : "var(--ink-soft)", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
+                      {internalFile ? internalFile.name : "Chưa tải lên"}
+                    </div>
+                  </div>
+                  {internalFile && (
+                    <button className="kt-btn kt-btn-ghost" onClick={(e) => { e.stopPropagation(); setInternalFile(null); }} style={{ padding: "4px 8px", color: "var(--danger)" }}>✕</button>
+                  )}
+                </div>
+
+                {/* Slot 2: Social File */}
+                <div style={{
+                  flex: "1 1 200px", borderRadius: 10, padding: 12,
+                  border: `1px ${socialFile ? "solid var(--line)" : "dashed #CCD3DC"}`,
+                  background: socialFile ? "var(--card)" : "#FAFAFB",
+                  display: "flex", alignItems: "center", gap: 10
+                }}>
+                  <div style={{ fontSize: 20 }}>📊</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 10, color: "var(--ink-soft)", fontWeight: 700, textTransform: "uppercase" }}>File Báo cáo (Social Outreach)</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: socialFile ? "var(--ink)" : "var(--ink-soft)", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
+                      {socialFile ? socialFile.name : "Chưa tải lên"}
+                    </div>
+                  </div>
+                  {socialFile && (
+                    <button className="kt-btn kt-btn-ghost" onClick={(e) => { e.stopPropagation(); setSocialFile(null); }} style={{ padding: "4px 8px", color: "var(--danger)" }}>✕</button>
+                  )}
+                </div>
+              </div>
+
+              {/* Action Button */}
+              <div style={{ marginTop: 8, display: "flex", justifyContent: "center" }}>
+                <button
+                  className="kt-btn kt-btn-primary"
+                  disabled={!internalFile && !socialFile}
+                  onClick={handleMergeAndProceed}
+                  style={{
+                    width: "100%", justifyContent: "center", padding: "12px", fontSize: 13,
+                    opacity: (!internalFile && !socialFile) ? 0.5 : 1, cursor: (!internalFile && !socialFile) ? "not-allowed" : "pointer"
+                  }}
+                >
+                  ⚡️ {internalFile && socialFile ? "Ghép nối & Kiểm tra dữ liệu" : "Cập nhật với 1 file"}
+                </button>
+              </div>
             </div>
           )}
 
@@ -1194,17 +1764,21 @@ const DualFileImportModal = ({ existingData, onConfirm, onClose }) => {
             </div>
           )}
 
-          {step === "preview" && result && roles && (
+          {step === "preview" && result && (internalFile || socialFile) && (
             <>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <div style={{ flex: 1, minWidth: 220, background: "var(--paper)", borderRadius: 10, padding: "10px 14px" }}>
-                  <div style={{ fontSize: 11, color: "var(--ink-soft)", textTransform: "uppercase", fontWeight: 700 }}>File INTERNAL (tiến độ)</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{roles.internal.name}</div>
-                </div>
-                <div style={{ flex: 1, minWidth: 220, background: "var(--paper)", borderRadius: 10, padding: "10px 14px" }}>
-                  <div style={{ fontSize: 11, color: "var(--ink-soft)", textTransform: "uppercase", fontWeight: 700 }}>File Social Outreach (chỉ số)</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{roles.social.name}</div>
-                </div>
+                {internalFile && (
+                  <div style={{ flex: 1, minWidth: 200, background: "var(--paper)", borderRadius: 10, padding: "10px 14px" }}>
+                    <div style={{ fontSize: 11, color: "var(--ink-soft)", textTransform: "uppercase", fontWeight: 700 }}>File Kế hoạch (Chi tiết/Tiến độ)</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{internalFile.name}</div>
+                  </div>
+                )}
+                {socialFile && (
+                  <div style={{ flex: 1, minWidth: 200, background: "var(--paper)", borderRadius: 10, padding: "10px 14px" }}>
+                    <div style={{ fontSize: 11, color: "var(--ink-soft)", textTransform: "uppercase", fontWeight: 700 }}>File Báo cáo Hiệu suất (Chỉ số)</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{socialFile.name}</div>
+                  </div>
+                )}
               </div>
 
               <div style={{ display: "flex", gap: 12 }}>
@@ -1364,11 +1938,6 @@ const DetailModal = ({ kol, onClose, onSave, onDelete }) => {
               <Field label="Lượt Lưu (Saves)" field="saves" type="number" />
 
               <Field label="Lượt Chia sẻ (Shares)" field="shares" type="number" />
-              <Field label="Chi phí chạy Ads (VNĐ)" field="adSpend" type="number" />
-              <Field label="Lượt chuyển đổi (Orders)" field="conversions" type="number" />
-
-              <Field label="Thêm giỏ hàng (ATC)" field="addToCart" type="number" />
-              <Field label="Doanh thu / GMV (VNĐ)" field="revenue" type="number" />
             </div>
           </div>
 
@@ -1476,10 +2045,12 @@ const StatsBar = ({ rows, currentStatus = "all", onCardClick }) => {
   );
 };
 
+
+
 /* ================================================================
    TABLE VIEW
 ================================================================ */
-const TableView = ({ rows, onOpen, campaignLabels }) => {
+const TableView = ({ rows, onOpen, onSave, campaignLabels }) => {
   const [sortKey, setSortKey] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
 
@@ -1565,10 +2136,40 @@ const TableView = ({ rows, onOpen, campaignLabels }) => {
                   style={{ fontSize: 11, color: "var(--ink-soft)" }}>TikTok ↗</a>}
               </td>
               <td><CampaignDot campaign={r.campaign} labels={campaignLabels} /></td>
-              <td>{r.type && <span className="kt-badge" style={{ background: "var(--paper-bg)", color: "var(--ink-soft)", border: "1px solid var(--line)" }}>{r.type}</span>}</td>
+              <td onClick={e => e.stopPropagation()} style={{ padding: "4px 6px" }}>
+                <select
+                  value={r.type || ""}
+                  onChange={e => onSave && onSave(r.id, { type: e.target.value })}
+                  onClick={e => e.stopPropagation()}
+                  style={{
+                    fontSize: 11, fontWeight: 600, border: "1px solid var(--line)",
+                    borderRadius: 20, padding: "3px 8px", cursor: "pointer",
+                    background: "var(--paper-bg)", color: "var(--ink-soft)",
+                    appearance: "none", WebkitAppearance: "none", outline: "none"
+                  }}
+                >
+                  <option value="">—</option>
+                  {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </td>
               <td><span className="kt-mono" style={{ fontSize: 12 }}>{r.follower || "—"}</span></td>
               <td><span className="kt-mono" style={{ fontSize: 12, color: "var(--ink)" }}>{fmtVND(r.cost)}</span></td>
-              <td><StatusBadge statusKey={r.statusKey} /></td>
+              <td onClick={e => e.stopPropagation()} style={{ padding: "4px 6px" }}>
+                <select
+                  value={r.statusKey || ""}
+                  onChange={e => onSave && onSave(r.id, { statusKey: e.target.value })}
+                  onClick={e => e.stopPropagation()}
+                  style={{
+                    fontSize: 11, fontWeight: 600, border: "none", borderRadius: 20,
+                    padding: "3px 8px", cursor: "pointer", appearance: "none",
+                    WebkitAppearance: "none", outline: "none",
+                    background: STATUS_MAP[r.statusKey]?.soft || "#eee",
+                    color: STATUS_MAP[r.statusKey]?.color || "#888"
+                  }}
+                >
+                  {STATUS_STAGES.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
+                </select>
+              </td>
               <td title={r.ngayAir} style={{ fontSize: 12, color: "var(--ink-soft)", maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {r.ngayAir && r.ngayAir.startsWith("http") ? (
                   <a href={r.ngayAir} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>Link ↗</a>
@@ -1738,7 +2339,7 @@ const KanbanView = ({ rows, onOpen, onUpdateStatus, campaignLabels }) => (
    CALENDAR VIEW
 ================================================================ */
 const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels }) => {
-  const [currentMonth, setCurrentMonth] = useState(new Date(2026, 7, 15)); // August 2026 by default
+  const [currentMonth, setCurrentMonth] = useState(new Date()); // Default to current system date
   const [draggedOverDay, setDraggedOverDay] = useState(null); // String identifier of day cell 'YYYY-MM-DD'
 
   const year = currentMonth.getFullYear();
@@ -1751,21 +2352,34 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels }) => {
     setCurrentMonth(new Date(year, month + 1, 1));
   };
   const handleToday = () => {
-    setCurrentMonth(new Date(2026, 7, 15));
+    setCurrentMonth(new Date());
   };
 
-  // Helper date parsing
+  // Helper date parsing (supports Excel serial numbers, DD/MM strings, and standard dates)
   const parseDateStr = (str) => {
     if (!str) return null;
     const s = str.toString().trim();
     if (!s || s.startsWith("http")) return null;
-    const match = s.match(/^(\d{1,2})[/-](\d{1,2})(?:[/-](\d{2,4}))?$/);
+
+    // Handle Excel serial date numbers (e.g. 46234 -> 2026-07-20)
+    if (!isNaN(s) && Number(s) > 30000 && Number(s) < 60000) {
+      const d = new Date(Math.round((Number(s) - 25569) * 86400 * 1000));
+      if (!isNaN(d.getTime())) {
+        return { day: d.getDate(), month: d.getMonth(), year: d.getFullYear() };
+      }
+    }
+
+    // Match DD/MM or DD-MM or DD/MM/YYYY pattern in text
+    const match = s.match(/(\d{1,2})[/-](\d{1,2})(?:[/-](\d{2,4}))?/);
     if (match) {
       const day = parseInt(match[1], 10);
       const m = parseInt(match[2], 10) - 1;
       const y = match[3] ? (match[3].length === 2 ? 2000 + parseInt(match[3], 10) : parseInt(match[3], 10)) : 2026;
-      return { day, month: m, year: y };
+      if (day >= 1 && day <= 31 && m >= 0 && m <= 11) {
+        return { day, month: m, year: y };
+      }
     }
+
     const d = new Date(s);
     if (!isNaN(d.getTime())) {
       return { day: d.getDate(), month: d.getMonth(), year: d.getFullYear() };
@@ -1813,12 +2427,13 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels }) => {
   const unscheduled = [];
 
   rows.forEach(r => {
-    const dt = parseDateStr(r.ngayAir);
+    const dt = parseDateStr(r.ngayAir) || parseDateStr(r.ngayGuiDemo) || parseDateStr(r.ngayGuiScript);
+    const isAired = r.statusKey === "aired" || r.status === "Đã lên sóng" || (Number(r.views) > 0) || (r.airedLink && r.airedLink.toString().trim().length > 5);
     if (dt) {
       const key = `${dt.year}-${dt.month}-${dt.day}`;
       if (!scheduledMap[key]) scheduledMap[key] = [];
       scheduledMap[key].push(r);
-    } else {
+    } else if (!isAired) {
       unscheduled.push(r);
     }
   });
@@ -1839,7 +2454,7 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels }) => {
   return (
     <div style={{ display: "flex", gap: 16, flex: 1, minHeight: 0, padding: 12 }}>
       {/* Left panel: Calendar Grid */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "var(--card)", borderRadius: 12, border: "1px solid var(--line)", padding: 14 }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "var(--card)", borderRadius: 12, border: "1px solid var(--line)", padding: 14, overflow: "hidden" }}>
         {/* Navigation */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -1866,7 +2481,8 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels }) => {
           {cells.map((cell, idx) => {
             const cellKey = `${cell.year}-${cell.month}-${cell.day}`;
             const kols = scheduledMap[cellKey] || [];
-            const isToday = cell.day === 15 && cell.month === 7 && cell.year === 2026; // Highlight static Today
+            const todayObj = new Date();
+            const isToday = cell.day === todayObj.getDate() && cell.month === todayObj.getMonth() && cell.year === todayObj.getFullYear();
             const isDragOver = draggedOverDay === cellKey;
 
             return (
@@ -1882,7 +2498,7 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels }) => {
                   padding: 4,
                   display: "flex",
                   flexDirection: "column",
-                  minHeight: 50,
+                  minHeight: 30,
                   overflow: "hidden",
                   transition: "all 0.15s ease",
                   transform: isDragOver ? "scale(1.02)" : "none",
@@ -2025,10 +2641,11 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels }) => {
   const [search, setSearch] = useState("");
   const [filterCampaign, setFilterCampaign] = useState("all");
   const [filterTier, setFilterTier] = useState("all");
-  const [filterLocation, setFilterLocation] = useState("all");
   const [filterPhase, setFilterPhase] = useState("all");
   const [filterCost, setFilterCost] = useState("all");
   const [filterViews, setFilterViews] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [sortOrder, setSortOrder] = useState("default");
 
   const uniqueKols = useMemo(() => {
     const map = {};
@@ -2073,9 +2690,7 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels }) => {
       entry.totalConversions += Number(r.conversions) || 0;
       entry.totalRevenue += Number(r.revenue) || 0;
 
-      // Thời điểm hợp tác is a manually-picked profile field (see edit form),
-      // stored as a comma-joined string on every row of this KOL — no more
-      // guessing the phase from the air date.
+      // Zeitlich phaseTags manually chosen
       (r.phaseTags || "").split(",").map(s => s.trim()).filter(Boolean).forEach(p => entry.phases.add(p));
 
       entry.campaignDetails.push(r);
@@ -2090,19 +2705,46 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels }) => {
     return Object.values(map).sort((a, b) => a.kol.localeCompare(b.kol, "vi"));
   }, [rows]);
 
-  const uniqueLocations = useMemo(() => {
-    const set = new Set();
-    uniqueKols.forEach(k => { if (k.location && k.location.trim()) set.add(k.location.trim()); });
-    return Array.from(set).sort((a, b) => a.localeCompare(b, "vi"));
+  const topViewsKols = useMemo(() => {
+    return [...uniqueKols]
+      .filter(k => k.totalViews > 0)
+      .sort((a, b) => b.totalViews - a.totalViews)
+      .slice(0, 5);
+  }, [uniqueKols]);
+
+  const topEngKols = useMemo(() => {
+    return [...uniqueKols]
+      .map(k => ({
+        ...k,
+        totalEng: (k.totalLikes || 0) + (k.totalComments || 0) + (k.totalShares || 0)
+      }))
+      .filter(k => k.totalEng > 0)
+      .sort((a, b) => b.totalEng - a.totalEng)
+      .slice(0, 5);
+  }, [uniqueKols]);
+
+  const topCostKols = useMemo(() => {
+    return [...uniqueKols]
+      .filter(k => k.totalCost > 0)
+      .sort((a, b) => b.totalCost - a.totalCost)
+      .slice(0, 5);
+  }, [uniqueKols]);
+
+
+  const tierStats = useMemo(() => {
+    const counts = {};
+    uniqueKols.forEach(k => {
+      if (k.type) counts[k.type] = (counts[k.type] || 0) + 1;
+    });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
   }, [uniqueKols]);
 
   const filteredKols = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return uniqueKols.filter(k => {
+    const result = uniqueKols.filter(k => {
       if (q && !k.kol.toLowerCase().includes(q)) return false;
       if (filterCampaign !== "all" && !k.campaigns.has(filterCampaign)) return false;
       if (filterTier !== "all" && k.type !== filterTier) return false;
-      if (filterLocation !== "all" && k.location !== filterLocation) return false;
       if (filterPhase !== "all" && !k.phases.has(filterPhase)) return false;
       if (filterCost !== "all") {
         const bucket = COST_BUCKETS.find(b => b.key === filterCost);
@@ -2112,35 +2754,50 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels }) => {
         const bucket = VIEWS_BUCKETS.find(b => b.key === filterViews);
         if (bucket && !bucket.test(k.totalViews)) return false;
       }
+      if (filterStatus !== "all" && !k.campaignDetails.some(c => c.statusKey === filterStatus)) return false;
       return true;
     });
-  }, [uniqueKols, search, filterCampaign, filterTier, filterLocation, filterPhase, filterCost, filterViews]);
+
+    // Apply sorting
+    if (sortOrder === "costAsc") {
+      result.sort((a, b) => a.totalCost - b.totalCost);
+    } else if (sortOrder === "costDesc") {
+      result.sort((a, b) => b.totalCost - a.totalCost);
+    } else if (sortOrder === "viewAsc") {
+      result.sort((a, b) => a.totalViews - b.totalViews);
+    } else if (sortOrder === "viewDesc") {
+      result.sort((a, b) => b.totalViews - a.totalViews);
+    } // else "default" which is already sorted alphabetically by KOL name in uniqueKols
+
+    return result;
+  }, [uniqueKols, search, filterCampaign, filterTier, filterPhase, filterCost, filterViews, filterStatus, sortOrder]);
 
   const hasActiveFilters = !!search.trim() || filterCampaign !== "all" || filterTier !== "all" ||
-    filterLocation !== "all" || filterPhase !== "all" || filterCost !== "all" || filterViews !== "all";
+    filterPhase !== "all" || filterCost !== "all" || filterViews !== "all" || filterStatus !== "all";
 
   const clearFilters = () => {
     setSearch(""); setFilterCampaign("all"); setFilterTier("all");
-    setFilterLocation("all"); setFilterPhase("all"); setFilterCost("all"); setFilterViews("all");
+    setFilterPhase("all"); setFilterCost("all"); setFilterViews("all");
+    setFilterStatus("all"); setSortOrder("default");
   };
 
   const summary = useMemo(() => ({
     count: filteredKols.length,
     totalCost: filteredKols.reduce((s, k) => s + k.totalCost, 0),
     totalViews: filteredKols.reduce((s, k) => s + k.totalViews, 0),
-    totalConversions: filteredKols.reduce((s, k) => s + k.totalConversions, 0),
+    totalEng: filteredKols.reduce((s, k) => s + ((k.totalLikes || 0) + (k.totalComments || 0) + (k.totalShares || 0)), 0),
   }), [filteredKols]);
 
   return (
-    <div className="kt-scrollbar" style={{ display: "flex", flexDirection: "column", height: "100%", overflowY: "auto" }}>
-      {/* ── PINNED: Dashboard summary + filter bar stay visible while the card grid scrolls ── */}
-      <div style={{ position: "sticky", top: 0, zIndex: 5, background: "var(--card)", padding: "20px 20px 16px", borderBottom: "1px solid var(--line)" }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
+      {/* ── PINNED: Dashboard summary + filter bar stay visible ── */}
+      <div style={{ background: "var(--card)", padding: "20px 20px 16px", borderBottom: "1px solid var(--line)", flexShrink: 0 }}>
         <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
           {[
             { label: "Hồ sơ KOL", value: summary.count, color: "var(--ink)" },
             { label: "Tổng chi phí", value: fmtVND(summary.totalCost), color: "var(--accent)" },
             { label: "Tổng Views", value: summary.totalViews.toLocaleString(), color: "var(--blue)" },
-            { label: "Tổng đơn hàng", value: summary.totalConversions.toLocaleString(), color: "var(--ok)" },
+            { label: "Tổng Tương tác", value: summary.totalEng.toLocaleString(), color: "var(--ok)" },
           ].map(s => (
             <div key={s.label} className="kt-card" style={{ padding: "10px 16px", flex: "1 1 160px", minWidth: 160, boxSizing: "border-box" }}>
               <div style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap" }}>
@@ -2151,145 +2808,453 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels }) => {
           ))}
         </div>
 
-        {/* Filter bar: mỗi field lọc theo đúng 1 chiều dữ liệu, không chồng chéo với ô tìm tên */}
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+        {/* Filter bar */}
+        <div className="kt-scrollbar" style={{ display: "flex", gap: 8, flexWrap: "nowrap", alignItems: "center", overflowX: "auto", paddingBottom: 4 }}>
           <input
             className="kt-input"
             placeholder="🔍 Tìm tên KOL..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ flex: "1 1 160px", minWidth: 140, maxWidth: 220 }}
+            style={{ flex: "0 0 140px", width: 140 }}
           />
-          <select className="kt-select" value={filterCampaign} onChange={e => setFilterCampaign(e.target.value)} style={{ flex: "1 1 130px", minWidth: 120, maxWidth: 180 }}>
-            <option value="all">📁 Tất cả Dự án</option>
+          <select className="kt-select" value={filterCampaign} onChange={e => setFilterCampaign(e.target.value)} style={{ flex: "0 0 120px", width: 120 }}>
+            <option value="all">Tất cả Dự án</option>
             {CAMPAIGNS.map(c => <option key={c.key} value={c.key}>{campaignLabels[c.key] || c.label}</option>)}
           </select>
-          <select className="kt-select" value={filterTier} onChange={e => setFilterTier(e.target.value)} style={{ flex: "1 1 120px", minWidth: 110, maxWidth: 160 }}>
-            <option value="all">👥 Tất cả Tier</option>
+          <select className="kt-select" value={filterTier} onChange={e => setFilterTier(e.target.value)} style={{ flex: "0 0 110px", width: 110 }}>
+            <option value="all">Tất cả Tier</option>
             {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
           </select>
-          <select className="kt-select" value={filterLocation} onChange={e => setFilterLocation(e.target.value)} style={{ flex: "1 1 130px", minWidth: 120, maxWidth: 180 }}>
-            <option value="all">📍 Tất cả Địa điểm</option>
-            {uniqueLocations.map(l => <option key={l} value={l}>{l}</option>)}
-          </select>
-          <select className="kt-select" value={filterPhase} onChange={e => setFilterPhase(e.target.value)} style={{ flex: "1 1 140px", minWidth: 130, maxWidth: 190 }}>
-            <option value="all">🗓 Tất cả Thời điểm</option>
+
+          <select className="kt-select" value={filterPhase} onChange={e => setFilterPhase(e.target.value)} style={{ flex: "0 0 130px", width: 130 }}>
+            <option value="all">Tất cả Thời điểm</option>
             <option value="Phase 1">Phase 1</option>
             <option value="Phase 2">Phase 2</option>
           </select>
-          <select className="kt-select" value={filterCost} onChange={e => setFilterCost(e.target.value)} style={{ flex: "1 1 130px", minWidth: 120, maxWidth: 170 }}>
-            <option value="all">💰 Tất cả Chi phí</option>
+          <select className="kt-select" value={filterCost} onChange={e => setFilterCost(e.target.value)} style={{ flex: "0 0 120px", width: 120 }}>
+            <option value="all">Tất cả Chi phí</option>
             {COST_BUCKETS.map(b => <option key={b.key} value={b.key}>{b.label}</option>)}
           </select>
-          <select className="kt-select" value={filterViews} onChange={e => setFilterViews(e.target.value)} style={{ flex: "1 1 130px", minWidth: 120, maxWidth: 170 }}>
-            <option value="all">👁 Tất cả Views</option>
+          <select className="kt-select" value={filterViews} onChange={e => setFilterViews(e.target.value)} style={{ flex: "0 0 120px", width: 120 }}>
+            <option value="all">Tất cả Views</option>
             {VIEWS_BUCKETS.map(b => <option key={b.key} value={b.key}>{b.label}</option>)}
           </select>
+          <select className="kt-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ flex: "0 0 130px", width: 130 }}>
+            <option value="all">Tất cả Tiến độ</option>
+            {STATUS_STAGES.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
+          </select>
+          <select className="kt-select" value={sortOrder} onChange={e => setSortOrder(e.target.value)} style={{ flex: "0 0 150px", width: 150, background: "var(--surface)", border: "1px solid var(--line)" }}>
+            <option value="default">Sắp xếp: Mặc định (A-Z)</option>
+            <option value="costAsc">Chi phí: Thấp ➝ Cao</option>
+            <option value="costDesc">Chi phí: Cao ➝ Thấp</option>
+            <option value="viewAsc">Lượt xem: Thấp ➝ Cao</option>
+            <option value="viewDesc">Lượt xem: Cao ➝ Thấp</option>
+          </select>
           {hasActiveFilters && (
-            <button className="kt-btn kt-btn-ghost" onClick={clearFilters} style={{ padding: "8px 14px", whiteSpace: "nowrap" }}>
+            <button className="kt-btn kt-btn-ghost" onClick={clearFilters} style={{ flex: "0 0 auto", padding: "8px 14px", whiteSpace: "nowrap" }}>
               ✕ Xoá lọc
             </button>
           )}
-          <span style={{ fontSize: 13, color: "var(--ink-soft)", marginLeft: "auto", whiteSpace: "nowrap" }}>
-            Đang hiển thị: <strong>{filteredKols.length}</strong> / {uniqueKols.length} hồ sơ KOL
-          </span>
         </div>
       </div>
 
-      <div style={{ padding: "16px 20px 20px", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))", gap: 16 }}>
-        {filteredKols.map(k => {
-          const campaignsArr = Array.from(k.campaigns);
-          const phasesArr = Array.from(k.phases);
-          return (
-            <div key={k.kol} className="kt-card kt-anim" style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 12, border: "1px solid var(--line)" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
-                <div>
-                  <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--ink)", margin: 0 }}>{k.kol}</h3>
-                  {k.link && (
-                    <a href={k.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: "var(--accent)", textDecoration: "none" }}>
-                      TikTok Profile ↗
-                    </a>
+      {/* ── SPLIT BODY ── */}
+      <div style={{ display: "flex", flex: 1, minHeight: 0, overflow: "hidden" }}>
+        
+        {/* Left Column: KOL Cards Grid */}
+        <div className="kt-scrollbar" style={{ flex: 1, padding: "20px", overflowY: "auto" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))", gap: 16 }}>
+            {filteredKols.map(k => {
+              const campaignsArr = Array.from(k.campaigns);
+              const phasesArr = Array.from(k.phases);
+              return (
+                <div key={k.kol} className="kt-card kt-anim" style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 12, border: "1px solid var(--line)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
+                    <div>
+                      <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--ink)", margin: 0 }}>{k.kol}</h3>
+                      {k.link && (
+                        <a href={k.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: "var(--accent)", textDecoration: "none" }}>
+                          TikTok Profile ↗
+                        </a>
+                      )}
+                    </div>
+                    {k.type && (
+                      <span className="kt-badge" style={{ background: "var(--accent-bg)", color: "var(--accent)", border: "1px solid var(--accent-dim)" }}>
+                        {k.type}
+                      </span>
+                    )}
+                  </div>
+
+                  <div style={{ display: "flex", flexWrap: "wrap", columnGap: 16, rowGap: 4, fontSize: 12, color: "var(--ink-soft)" }}>
+                    <span>Followers <strong style={{ color: "var(--ink)" }}>{k.follower || "—"}</strong></span>
+                    <span>Nhóm <strong style={{ color: "var(--ink)" }}>{k.group || "—"}</strong></span>
+                  </div>
+
+                  {campaignsArr.length > 0 && (
+                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", borderTop: "1px dashed var(--line)", paddingTop: 10 }}>
+                      {campaignsArr.map(c => (
+                        <CampaignDot key={c} campaign={c} labels={campaignLabels} />
+                      ))}
+                    </div>
                   )}
+
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", fontSize: 11 }}>
+                    {phasesArr.length > 0 ? (
+                      phasesArr.map(p => (
+                        <span key={p} className="kt-badge" style={{ background: p === "Phase 1" ? "#FFAFA322" : "#A2C2E822", color: p === "Phase 1" ? "#D4826A" : "#4F83E1", border: `1px solid ${p === "Phase 1" ? "#FFAFA355" : "#4F83E155"}`, fontSize: 10 }}>
+                          {p}
+                        </span>
+                      ))
+                    ) : (
+                      <span style={{ color: "var(--ink-faint)" }}>Chưa chọn thời điểm hợp tác</span>
+                    )}
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, borderTop: "1px dashed var(--line)", paddingTop: 10, fontSize: 11, textAlign: "center" }}>
+                    <div>
+                      <div style={{ color: "var(--ink-soft)" }}>Chi phí</div>
+                      <strong style={{ color: "var(--accent)" }}>{fmtVND(k.totalCost)}</strong>
+                    </div>
+                    <div>
+                      <div style={{ color: "var(--ink-soft)" }}>Views</div>
+                      <strong style={{ color: "var(--ink)" }}>{k.totalViews ? k.totalViews.toLocaleString() : "—"}</strong>
+                    </div>
+                    <div>
+                      <div style={{ color: "var(--ink-soft)" }}>Đơn hàng</div>
+                      <strong style={{ color: "var(--ok)" }}>{k.totalConversions ? k.totalConversions.toLocaleString() : "—"}</strong>
+                    </div>
+                  </div>
+
+                  <button 
+                    className="kt-btn kt-btn-ghost" 
+                    onClick={() => onOpenProfile(k)} 
+                    style={{ width: "100%", justifyContent: "center", padding: "6px", marginTop: 4, display: "flex", alignItems: "center", gap: 6 }}
+                  >
+                    <span>Chi tiết chiến dịch</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                  </button>
                 </div>
-                {k.type && (
-                  <span className="kt-badge" style={{ background: "var(--accent-bg)", color: "var(--accent)", border: "1px solid var(--accent-dim)" }}>
-                    {k.type}
-                  </span>
-                )}
+              );
+            })}
+            {filteredKols.length === 0 && (
+              <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "80px 0", color: "var(--ink-soft)" }}>
+                Không tìm thấy hồ sơ KOL nào phù hợp.
               </div>
-
-              <div style={{ display: "flex", flexWrap: "wrap", columnGap: 16, rowGap: 4, fontSize: 12, color: "var(--ink-soft)" }}>
-                <span>Followers <strong style={{ color: "var(--ink)" }}>{k.follower || "—"}</strong></span>
-                <span>Địa điểm <strong style={{ color: "var(--ink)" }}>{k.location || "—"}</strong></span>
-                <span>Nhóm <strong style={{ color: "var(--ink)" }}>{k.group || "—"}</strong></span>
-              </div>
-
-              {campaignsArr.length > 0 && (
-                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", borderTop: "1px dashed var(--line)", paddingTop: 10 }}>
-                  {campaignsArr.map(c => (
-                    <CampaignDot key={c} campaign={c} labels={campaignLabels} />
-                  ))}
-                </div>
-              )}
-
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", fontSize: 11 }}>
-                {phasesArr.length > 0 ? (
-                  phasesArr.map(p => (
-                    <span key={p} className="kt-badge" style={{ background: p === "Phase 1" ? "#FFAFA322" : "#A2C2E822", color: p === "Phase 1" ? "#D4826A" : "#4F83E1", border: `1px solid ${p === "Phase 1" ? "#FFAFA355" : "#4F83E155"}`, fontSize: 10 }}>
-                      {p}
-                    </span>
-                  ))
-                ) : (
-                  <span style={{ color: "var(--ink-faint)" }}>Chưa chọn thời điểm hợp tác</span>
-                )}
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, borderTop: "1px dashed var(--line)", paddingTop: 10, fontSize: 11, textAlign: "center" }}>
-                <div>
-                  <div style={{ color: "var(--ink-soft)" }}>Chi phí</div>
-                  <strong style={{ color: "var(--accent)" }}>{fmtVND(k.totalCost)}</strong>
-                </div>
-                <div>
-                  <div style={{ color: "var(--ink-soft)" }}>Views</div>
-                  <strong style={{ color: "var(--ink)" }}>{k.totalViews ? k.totalViews.toLocaleString() : "—"}</strong>
-                </div>
-                <div>
-                  <div style={{ color: "var(--ink-soft)" }}>Đơn hàng</div>
-                  <strong style={{ color: "var(--ok)" }}>{k.totalConversions ? k.totalConversions.toLocaleString() : "—"}</strong>
-                </div>
-              </div>
-
-              <button 
-                className="kt-btn kt-btn-ghost" 
-                onClick={() => onOpenProfile(k)} 
-                style={{ width: "100%", justifyContent: "center", padding: "6px", marginTop: 4 }}
-              >
-                🔎 Xem chiến dịch chi tiết
-              </button>
-            </div>
-          );
-        })}
-        {filteredKols.length === 0 && (
-          <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "80px 0", color: "var(--ink-soft)" }}>
-            Không tìm thấy hồ sơ KOL nào phù hợp.
+            )}
           </div>
-        )}
+        </div>
+
+        {/* Right Column: Leaderboard Sidebar */}
+        <div className="kt-scrollbar" style={{ width: 340, minWidth: 340, borderLeft: "1px solid var(--line)", background: "var(--card)", padding: 20, display: "flex", flexDirection: "column", gap: 24, overflowY: "auto" }}>
+          
+          {/* Section 1: Views Leaderboard */}
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#F59E0B" }}><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+              BXH Lượt Xem (Views)
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {topViewsKols.map((k, idx) => {
+                const maxVal = topViewsKols[0]?.totalViews || 1;
+                const ratio = Math.min(100, Math.max(5, (k.totalViews / maxVal) * 100));
+                const colors = ["#F59E0B", "#94A3B8", "#B45309", "var(--ink-soft)", "var(--ink-soft)"];
+                const rankLabels = ["1st", "2nd", "3rd", "4th", "5th"];
+                return (
+                  <div key={k.kol} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
+                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                        <span style={{ fontSize: 11, fontWeight: 800, color: colors[idx], width: 22 }}>{rankLabels[idx]}</span>
+                        <span onClick={() => onOpenProfile(k)} style={{ fontWeight: 600, color: "var(--ink)", cursor: "pointer", textDecoration: "underline" }} className="kt-hover-accent">
+                          {k.kol}
+                        </span>
+                      </div>
+                      <span style={{ fontSize: 11, color: "var(--blue)", fontWeight: 700 }}>
+                        {k.totalViews >= 1000000 ? `${(k.totalViews / 1000000).toFixed(1)}M` : k.totalViews.toLocaleString()}
+                      </span>
+                    </div>
+                    <div style={{ height: 4, background: "var(--line)", borderRadius: 2, overflow: "hidden" }}>
+                      <div style={{ width: `${ratio}%`, height: "100%", background: "var(--blue)", borderRadius: 2 }} />
+                    </div>
+                  </div>
+                );
+              })}
+              {topViewsKols.length === 0 && <span style={{ fontSize: 12, color: "var(--ink-faint)" }}>Chưa có dữ liệu</span>}
+            </div>
+          </div>
+
+          {/* Section 2: Engagement Leaderboard */}
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--ok)" }}><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+              BXH Tương Tác (Eng)
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {topEngKols.map((k, idx) => {
+                const maxVal = topEngKols[0]?.totalEng || 1;
+                const ratio = Math.min(100, Math.max(5, (k.totalEng / maxVal) * 100));
+                const colors = ["#F59E0B", "#94A3B8", "#B45309", "var(--ink-soft)", "var(--ink-soft)"];
+                const rankLabels = ["1st", "2nd", "3rd", "4th", "5th"];
+                return (
+                  <div key={k.kol} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
+                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                        <span style={{ fontSize: 11, fontWeight: 800, color: colors[idx], width: 22 }}>{rankLabels[idx]}</span>
+                        <span onClick={() => onOpenProfile(k)} style={{ fontWeight: 600, color: "var(--ink)", cursor: "pointer", textDecoration: "underline" }} className="kt-hover-accent">
+                          {k.kol}
+                        </span>
+                      </div>
+                      <span style={{ fontSize: 11, color: "var(--ok)", fontWeight: 700 }}>
+                        {k.totalEng >= 1000000 ? `${(k.totalEng / 1000000).toFixed(1)}M` : k.totalEng.toLocaleString()}
+                      </span>
+                    </div>
+                    <div style={{ height: 4, background: "var(--line)", borderRadius: 2, overflow: "hidden" }}>
+                      <div style={{ width: `${ratio}%`, height: "100%", background: "var(--ok)", borderRadius: 2 }} />
+                    </div>
+                  </div>
+                );
+              })}
+              {topEngKols.length === 0 && <span style={{ fontSize: 12, color: "var(--ink-faint)" }}>Chưa có dữ liệu</span>}
+            </div>
+          </div>
+
+          {/* Section 3: Cost Leaderboard */}
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--accent)" }}><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+              BXH Ngân Sách Booking
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {topCostKols.map((k, idx) => {
+                const maxVal = topCostKols[0]?.totalCost || 1;
+                const ratio = Math.min(100, Math.max(5, (k.totalCost / maxVal) * 100));
+                const colors = ["#F59E0B", "#94A3B8", "#B45309", "var(--ink-soft)", "var(--ink-soft)"];
+                const rankLabels = ["1st", "2nd", "3rd", "4th", "5th"];
+                return (
+                  <div key={k.kol} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
+                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                        <span style={{ fontSize: 11, fontWeight: 800, color: colors[idx], width: 22 }}>{rankLabels[idx]}</span>
+                        <span onClick={() => onOpenProfile(k)} style={{ fontWeight: 600, color: "var(--ink)", cursor: "pointer", textDecoration: "underline" }} className="kt-hover-accent">
+                          {k.kol}
+                        </span>
+                      </div>
+                      <span style={{ fontSize: 11, color: "var(--accent)", fontWeight: 700 }}>
+                        {fmtVND(k.totalCost)}
+                      </span>
+                    </div>
+                    <div style={{ height: 4, background: "var(--line)", borderRadius: 2, overflow: "hidden" }}>
+                      <div style={{ width: `${ratio}%`, height: "100%", background: "var(--accent)", borderRadius: 2 }} />
+                    </div>
+                  </div>
+                );
+              })}
+              {topCostKols.length === 0 && <span style={{ fontSize: 12, color: "var(--ink-faint)" }}>Chưa có dữ liệu</span>}
+            </div>
+          </div>
+
+          {/* Section 3: Tier Distribution */}
+          <div style={{ borderTop: "1px dashed var(--line)", paddingTop: 16 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--accent)" }}><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+              Phân Bổ Phân Hạng Tier
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {tierStats.map(([tier, count]) => {
+                const total = uniqueKols.length || 1;
+                const ratio = (count / total) * 100;
+                return (
+                  <div key={tier} style={{ fontSize: 12 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
+                      <span style={{ fontWeight: 600, color: "var(--ink)" }}>{tier}</span>
+                      <span style={{ color: "var(--ink-soft)" }}><strong>{count}</strong> KOLs ({Math.round(ratio)}%)</span>
+                    </div>
+                    <div style={{ height: 6, background: "var(--line)", borderRadius: 3, overflow: "hidden" }}>
+                      <div style={{ width: `${ratio}%`, height: "100%", background: "var(--accent)", borderRadius: 3 }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+        </div>
+
       </div>
     </div>
   );
 };
 
-const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile }) => {
-  const [editing, setEditing] = useState(false);
+/* ================================================================
+   MEDIA PERFORMANCE VIEW (ADS PERFORMANCE OVERVIEW PAGE)
+================================================================ */
+const MediaPerformanceView = ({ rows, onOpenProfile, campaignLabels, search = "", filterCampaign = "all" }) => {
+
+  const filtered = useMemo(() => {
+    return rows.filter(r => {
+      if (filterCampaign !== "all" && resolveCampaignKey(r) !== filterCampaign) return false;
+      if (search.trim()) {
+        const q = search.toLowerCase();
+        const kolMatch = (r.kol || "").toLowerCase().includes(q);
+        const campMatch = (r.campaign || "").toLowerCase().includes(q);
+        if (!kolMatch && !campMatch) return false;
+      }
+      return true;
+    });
+  }, [rows, filterCampaign, search]);
+
+  const summary = useMemo(() => {
+    const totalSpend = filtered.reduce((s, r) => s + (Number(r.adSpend || r.spend) || 0), 0);
+    const totalImpressions = filtered.reduce((s, r) => s + (Number(r.impressions) || 0), 0);
+    const totalViews = filtered.reduce((s, r) => s + (Number(r.views) || 0), 0);
+    const total2s = filtered.reduce((s, r) => s + (Number(r.views2s) || 0), 0);
+    const total6s = filtered.reduce((s, r) => s + (Number(r.views6s || r.views) || 0), 0);
+    const avgCp6s = total6s > 0 ? Math.round(totalSpend / total6s) : 0;
+    const avgVr = totalImpressions > 0 ? ((total6s / totalImpressions) * 100).toFixed(2) + "%" : "—";
+    return { totalSpend, totalImpressions, totalViews, total2s, total6s, avgCp6s, avgVr };
+  }, [filtered]);
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
+      {/* Summary Header */}
+      <div style={{ background: "var(--card)", padding: "20px 20px 16px", borderBottom: "1px solid var(--line)", flexShrink: 0 }}>
+        <div style={{ fontSize: 13, fontWeight: 800, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 14, display: "flex", alignItems: "center", gap: 6 }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg>
+          HIỆU SUẤT MEDIA (ADS PERFORMANCE OVERVIEW)
+        </div>
+        <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
+          {[
+            { label: "Spend Ads (Ngân sách QC)", value: fmtVND(summary.totalSpend), color: "var(--accent)" },
+            { label: "Impression", value: summary.totalImpressions > 0 ? summary.totalImpressions.toLocaleString() : "—", color: "var(--ink)" },
+            { label: "Total Views", value: summary.totalViews > 0 ? summary.totalViews.toLocaleString() : "—", color: "var(--blue)" },
+            { label: "2s Views", value: summary.total2s > 0 ? summary.total2s.toLocaleString() : "—", color: "var(--ink-mid)" },
+            { label: "6s-Focused Views", value: summary.total6s > 0 ? summary.total6s.toLocaleString() : "—", color: "var(--blue)" },
+            { label: "CP 6s-Focused Views", value: summary.avgCp6s > 0 ? `${summary.avgCp6s} đ` : "—", color: "var(--ok)" },
+            { label: "VR (View Rate)", value: summary.avgVr, color: "#6366F1" },
+          ].map(s => (
+            <div key={s.label} className="kt-card" style={{ padding: "10px 16px", flex: "1 1 140px", minWidth: 140, boxSizing: "border-box" }}>
+              <div style={{ fontSize: 10, color: "var(--ink-soft)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap" }}>
+                {s.label}
+              </div>
+              <div className="kt-display" style={{ fontSize: 18, color: s.color, marginTop: 4 }}>{s.value}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 4 }}>
+          <span style={{ fontSize: 12, color: "var(--ink-soft)" }}>
+            Hiển thị: <strong>{filtered.length}</strong> kết quả
+          </span>
+        </div>
+      </div>
+
+      {/* Main Table */}
+      <div style={{ flex: 1, padding: "20px", display: "flex", flexDirection: "column", minHeight: 0 }}>
+        <div className="kt-card" style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, overflow: "hidden" }}>
+          <div style={{ flex: 1, overflow: "auto" }} className="kt-scrollbar">
+            <table className="kt-table kt-table-sticky" style={{ width: "100%", fontSize: 13 }}>
+              <thead>
+                <tr>
+                  <th>Dự án</th>
+                  <th>KOL / KOC</th>
+                  <th style={{ whiteSpace: "nowrap" }}>Ad Name</th>
+                  <th>Spend Ads</th>
+                  <th>Impression</th>
+                  <th>Total Views</th>
+                  <th>2s Views</th>
+                  <th>6s-Focused Views</th>
+                  <th>CP 6s-Focused Views</th>
+                  <th>VR</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((r, i) => {
+                  const spend = Number(r.adSpend || r.spend) || 0;
+                  const imp = Number(r.impressions) || 0;
+                  const totalV = Number(r.views) || 0;
+                  const v2s = Number(r.views2s) || 0;
+                  const v6s = Number(r.views6s || r.views) || 0;
+                  const cp6s = (v6s > 0 && spend > 0) ? Math.round(spend / v6s) : 0;
+                  const vr = r.vr ? r.vr : (imp > 0 && v6s > 0 ? ((v6s / imp) * 100).toFixed(2) + "%" : "—");
+                  return (
+                    <tr key={r.id || i} style={{ borderBottom: "1px solid var(--line)" }}>
+                      <td style={{ padding: "12px 14px", fontWeight: 600 }}>
+                        <CampaignDot campaign={r.campaign} labels={campaignLabels} />
+                      </td>
+                      <td style={{ padding: "12px 14px", fontWeight: 700, color: "var(--ink)", cursor: "pointer" }} onClick={() => onOpenProfile && onOpenProfile(r)}>
+                        {r.kol}
+                      </td>
+                      <td style={{ padding: "12px 14px", maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        <span className="kt-mono" style={{ fontSize: 11, color: "var(--ink-soft)" }}>{r.adName || "—"}</span>
+                      </td>
+                      <td style={{ padding: "12px 14px", fontWeight: 600, color: "var(--accent)" }}>{spend > 0 ? fmtVND(spend) : "—"}</td>
+                      <td style={{ padding: "12px 14px" }}>{imp > 0 ? imp.toLocaleString() : "—"}</td>
+                      <td style={{ padding: "12px 14px", fontWeight: 600, color: "var(--blue)" }}>{totalV > 0 ? totalV.toLocaleString() : "—"}</td>
+                      <td style={{ padding: "12px 14px" }}>{v2s > 0 ? v2s.toLocaleString() : "—"}</td>
+                      <td style={{ padding: "12px 14px", fontWeight: 600, color: "var(--blue)" }}>{v6s > 0 ? v6s.toLocaleString() : "—"}</td>
+                      <td style={{ padding: "12px 14px", fontWeight: 600, color: "var(--ok)" }}>{cp6s > 0 ? `${cp6s} đ` : "—"}</td>
+                      <td style={{ padding: "12px 14px", fontWeight: 600, color: "#6366F1" }}>{vr}</td>
+                    </tr>
+                  );
+                })}
+                {filtered.length === 0 && (
+                  <tr>
+                    <td colSpan="10" style={{ textAlign: "center", padding: "40px", color: "var(--ink-soft)" }}>
+                      Chưa có dữ liệu Hiệu suất Media nào.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpenRow }) => {
   const [form, setForm] = useState({
     kol: kol.kol || "", follower: kol.follower || "", type: kol.type || "",
-    location: kol.location || "", group: kol.group || "", link: kol.link || "",
+    group: kol.group || "", link: kol.link || "",
     phase: Array.from(kol.phases || []),
   });
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
   const togglePhase = (p) => setForm(f => ({
     ...f, phase: f.phase.includes(p) ? f.phase.filter(x => x !== p) : [...f.phase, p]
   }));
+
+  const [avatarUrl, setAvatarUrl] = useState(kol.avatarUrl || "");
+  const [avatarLoading, setAvatarLoading] = useState(false);
+
+  const fetchTikTokAvatar = async () => {
+    const link = form.link || kol.link || "";
+    if (!link) return;
+    setAvatarLoading(true);
+    try {
+      const tiktokUrl = encodeURIComponent(link.trim());
+      const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(`https://www.tiktok.com/oembed?url=${link.trim()}`)}` ;
+      const res = await fetch(proxyUrl);
+      const json = await res.json();
+      const imgUrl = json.thumbnail_url;
+      if (imgUrl) {
+        setAvatarUrl(imgUrl);
+      }
+    } catch (e) {
+      // fallback silently
+    }
+    setAvatarLoading(false);
+  };
+
+  const stats = useMemo(() => {
+    const details = kol.campaignDetails || [];
+    const cost = details.reduce((sum, c) => sum + (Number(c.cost) || 0), 0);
+    const views = details.reduce((sum, c) => sum + (Number(c.views || c.views6s) || 0), 0);
+    const likes = details.reduce((sum, c) => sum + (Number(c.likes) || 0), 0);
+    const comments = details.reduce((sum, c) => sum + (Number(c.comments) || 0), 0);
+    const shares = details.reduce((sum, c) => sum + (Number(c.shares) || 0), 0);
+    const saves = details.reduce((sum, c) => sum + (Number(c.saves) || 0), 0);
+    const totalEng = likes + comments + shares + saves;
+    return { cost, views, totalEng };
+  }, [kol.campaignDetails]);
 
   const handleSaveClick = () => {
     if (!form.kol.trim()) {
@@ -2298,63 +3263,103 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile }) => 
     }
     onSaveProfile(kol.kol, {
       kol: form.kol.trim(), follower: form.follower.trim(), type: form.type,
-      location: form.location.trim(), group: form.group.trim(), link: form.link.trim(),
+      group: form.group.trim(), link: form.link.trim(),
       phaseTags: form.phase.join(","),
+      avatarUrl: avatarUrl,
     });
     onClose();
   };
 
   return (
     <div className="kt-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="kt-modal kt-anim" style={{ maxWidth: 860, borderRadius: 2 }}>
+      <div className="kt-modal kt-anim" style={{ maxWidth: 980, width: "95%", borderRadius: 2 }}>
         <div style={{ padding: "18px 22px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 11, fontWeight: 600, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
-              {editing ? "CHỈNH SỬA HỒ SƠ KOL" : "HỒ SƠ CHI TIẾT KOL"}
+              HỒ SƠ CHI TIẾT KOL (CHỈNH SỬA TRỰC TIẾP)
             </div>
-            <div style={{ fontSize: 20, fontWeight: 800, color: "var(--ink)" }}>{editing ? form.kol || "—" : kol.kol}</div>
           </div>
-          {!editing && (
-            <button className="kt-btn kt-btn-ghost" onClick={() => setEditing(true)} style={{ padding: "6px 14px" }}>
-              ✏️ Chỉnh sửa hồ sơ
-            </button>
-          )}
           <button className="kt-btn kt-btn-ghost" onClick={onClose} style={{ padding: "6px 10px" }}>✕</button>
         </div>
 
         <div style={{ padding: "20px 22px", display: "flex", flexDirection: "column", gap: 18 }}>
-          {editing ? (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "0 16px", background: "var(--paper)", padding: "16px 16px 2px", borderRadius: 10 }}>
-              <div style={{ marginBottom: 14 }}>
-                <label className="kt-label">Tên KOL</label>
-                <input className="kt-input" value={form.kol} onChange={e => set("kol", e.target.value)} />
+          
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 20, alignItems: "stretch" }}>
+            {/* Left Column: Basic Info Card (Editable In-Place) */}
+            <div style={{ background: "var(--paper)", padding: 18, borderRadius: 12, border: "1px solid var(--line)", display: "flex", flexDirection: "column", gap: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                {/* Avatar */}
+                <div style={{ position: "relative", flexShrink: 0 }}>
+                  <div
+                    onClick={fetchTikTokAvatar}
+                    title="Bấm để lấy ảnh từ TikTok"
+                    style={{
+                      width: 52, height: 52, borderRadius: "50%", overflow: "hidden",
+                      background: avatarUrl ? "transparent" : "linear-gradient(135deg, var(--accent) 0%, #6858E0 100%)",
+                      color: "white", display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 20, fontWeight: 800, flexShrink: 0, cursor: "pointer",
+                      border: "2px solid var(--line)", transition: "opacity 0.15s",
+                      opacity: avatarLoading ? 0.5 : 1
+                    }}
+                  >
+                    {avatarUrl ? (
+                      <img src={avatarUrl} alt={form.kol} style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        onError={() => setAvatarUrl("")} />
+                    ) : avatarLoading ? (
+                      <span style={{ fontSize: 18 }}>⏳</span>
+                    ) : (
+                      (form.kol || "K").charAt(0).toUpperCase()
+                    )}
+                  </div>
+                  {/* Fetch button badge */}
+                  <div
+                    onClick={fetchTikTokAvatar}
+                    title="Lấy ảnh từ TikTok"
+                    style={{
+                      position: "absolute", bottom: -2, right: -2,
+                      width: 18, height: 18, borderRadius: "50%", cursor: "pointer",
+                      background: "var(--accent)", color: "white",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 9, border: "2px solid var(--card)"
+                    }}
+                  >
+                    {avatarLoading ? "…" : "↺"}
+                  </div>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <label className="kt-label" style={{ fontSize: 9, color: "var(--ink-soft)", textTransform: "uppercase", marginBottom: 2 }}>Tên KOL</label>
+                  <input className="kt-input" value={form.kol} onChange={e => set("kol", e.target.value)} style={{ fontWeight: 700, fontSize: 13, padding: "4px 8px", width: "100%", boxSizing: "border-box" }} />
+                </div>
               </div>
-              <div style={{ marginBottom: 14 }}>
-                <label className="kt-label">Followers</label>
-                <input className="kt-input" value={form.follower} onChange={e => set("follower", e.target.value)} placeholder="VD: 100K" />
+
+              <div style={{ borderTop: "1px dashed var(--line)", paddingTop: 10, display: "flex", flexDirection: "column", gap: 8 }}>
+                <div>
+                  <label className="kt-label" style={{ fontSize: 9, color: "var(--ink-soft)", textTransform: "uppercase", marginBottom: 2 }}>Phân hạng Tier</label>
+                  <select className="kt-select" value={form.type} onChange={e => set("type", e.target.value)} style={{ fontWeight: 600, fontSize: 12, padding: "4px 8px", width: "100%" }}>
+                    <option value="">—</option>
+                    {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </div>
+                
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                  <span style={{ color: "var(--ink-soft)", fontSize: 12 }}>Followers:</span>
+                  <input className="kt-input" value={form.follower} onChange={e => set("follower", e.target.value)} style={{ width: 120, textAlign: "right", padding: "3px 6px", fontSize: 12 }} />
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                  <span style={{ color: "var(--ink-soft)", fontSize: 12 }}>Nhóm:</span>
+                  <input className="kt-input" value={form.group} onChange={e => set("group", e.target.value)} style={{ width: 120, textAlign: "right", padding: "3px 6px", fontSize: 12 }} />
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                  <span style={{ color: "var(--ink-soft)", fontSize: 12 }}>Link TikTok:</span>
+                  <input className="kt-input" value={form.link} onChange={e => set("link", e.target.value)} style={{ width: 120, textAlign: "right", padding: "3px 6px", fontSize: 12 }} />
+                </div>
               </div>
-              <div style={{ marginBottom: 14 }}>
-                <label className="kt-label">Phân hạng Tier</label>
-                <select className="kt-select" value={form.type} onChange={e => set("type", e.target.value)}>
-                  <option value="">—</option>
-                  {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                </select>
-              </div>
-              <div style={{ marginBottom: 14 }}>
-                <label className="kt-label">Khu vực</label>
-                <input className="kt-input" value={form.location} onChange={e => set("location", e.target.value)} />
-              </div>
-              <div style={{ marginBottom: 14 }}>
-                <label className="kt-label">Nhóm</label>
-                <input className="kt-input" value={form.group} onChange={e => set("group", e.target.value)} />
-              </div>
-              <div style={{ marginBottom: 14 }}>
-                <label className="kt-label">Link TikTok</label>
-                <input className="kt-input" value={form.link} onChange={e => set("link", e.target.value)} />
-              </div>
-              <div style={{ gridColumn: "1 / -1", marginBottom: 14 }}>
-                <label className="kt-label">Thời điểm hợp tác</label>
-                <div style={{ display: "flex", gap: 8 }}>
+
+              <div style={{ borderTop: "1px dashed var(--line)", paddingTop: 10, marginTop: "auto" }}>
+                <div style={{ fontSize: 10, color: "var(--ink-soft)", fontWeight: 600, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.02em" }}>Thời điểm hợp tác</div>
+                <div style={{ display: "flex", gap: 6 }}>
                   {[
                     { key: "Phase 1", label: "Phase 1", color: "#D4826A", bg: "#FFAFA3" },
                     { key: "Phase 2", label: "Phase 2", color: "#4F83E1", bg: "#A2C2E8" },
@@ -2367,10 +3372,11 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile }) => 
                         onClick={() => togglePhase(p.key)}
                         className="kt-btn"
                         style={{
-                          padding: "7px 14px", fontSize: 12, fontWeight: 600,
+                          flex: 1, padding: "5px 4px", fontSize: 10, fontWeight: 600,
                           border: `1px solid ${active ? p.color : "var(--line)"}`,
                           background: active ? `${p.bg}22` : "var(--card)",
                           color: active ? p.color : "var(--ink-soft)",
+                          justifyContent: "center"
                         }}
                       >
                         {active ? "✓ " : ""}{p.label}
@@ -2380,81 +3386,94 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile }) => 
                 </div>
               </div>
             </div>
-          ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, background: "var(--paper)", padding: "12px 16px", borderRadius: 10 }}>
-              <div>
-                <div style={{ fontSize: 11, color: "var(--ink-soft)", marginBottom: 2 }}>Followers</div>
-                <strong style={{ fontSize: 14, color: "var(--ink)" }}>{kol.follower || "—"}</strong>
-              </div>
-              <div>
-                <div style={{ fontSize: 11, color: "var(--ink-soft)", marginBottom: 2 }}>Phân hạng Tier</div>
-                <strong style={{ fontSize: 14, color: "var(--ink)" }}>{kol.type || "—"}</strong>
-              </div>
-              <div>
-                <div style={{ fontSize: 11, color: "var(--ink-soft)", marginBottom: 2 }}>Khu vực</div>
-                <strong style={{ fontSize: 14, color: "var(--ink)" }}>{kol.location || "—"}</strong>
-              </div>
-              <div>
-                <div style={{ fontSize: 11, color: "var(--ink-soft)", marginBottom: 2 }}>TikTok Profile</div>
-                {kol.link ? (
-                  <a href={kol.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: "var(--accent)", fontWeight: 600, textDecoration: "none" }}>
-                    TikTok Link ↗
-                  </a>
-                ) : (
-                  <strong style={{ fontSize: 13, color: "var(--ink-soft)" }}>—</strong>
-                )}
-              </div>
-              <div style={{ gridColumn: "1 / -1", marginTop: 4 }}>
-                <div style={{ fontSize: 11, color: "var(--ink-soft)", marginBottom: 4 }}>Thời điểm hợp tác</div>
-                {kol.phases && kol.phases.size > 0 ? (
-                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                    {Array.from(kol.phases).map(p => (
-                      <span key={p} className="kt-badge" style={{ background: p === "Phase 1" ? "#FFAFA322" : "#A2C2E822", color: p === "Phase 1" ? "#D4826A" : "#4F83E1", border: `1px solid ${p === "Phase 1" ? "#FFAFA355" : "#4F83E155"}`, fontSize: 11 }}>
-                        {p}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <strong style={{ fontSize: 13, color: "var(--ink-soft)" }}>Chưa chọn</strong>
-                )}
+
+            {/* Right Column: Performance Summary Dashboard (4 Core KOL Cards) */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em" }}>Hiệu suất tổng hợp</div>
+              
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12, flex: 1 }}>
+                <div className="kt-card" style={{ padding: "14px", background: "var(--card)", border: "1px solid var(--line)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                  <div style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 600 }}>COST (NGÂN SÁCH)</div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: "var(--accent)", marginTop: 6 }}>{fmtVND(stats.cost)}</div>
+                </div>
+                <div className="kt-card" style={{ padding: "14px", background: "var(--card)", border: "1px solid var(--line)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                  <div style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 600 }}>FOLLOWER</div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: "var(--ink)", marginTop: 6 }}>{form.follower || "—"}</div>
+                </div>
+                <div className="kt-card" style={{ padding: "14px", background: "var(--card)", border: "1px solid var(--line)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                  <div style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 600 }}>VIEW (LƯỢT XEM)</div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: "var(--blue)", marginTop: 6 }}>{stats.views.toLocaleString()}</div>
+                </div>
+                <div className="kt-card" style={{ padding: "14px", background: "var(--card)", border: "1px solid var(--line)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                  <div style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 600 }}>TOTAL ENG. (LIKE, CMT, SHARE)</div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: "var(--ok)", marginTop: 6 }}>{stats.totalEng ? stats.totalEng.toLocaleString() : "—"}</div>
+                </div>
               </div>
             </div>
-          )}
-
+          </div>
 
           <div>
-            <div className="kt-label" style={{ marginBottom: 8, fontSize: 12 }}>Lịch sử Chiến dịch & Hiệu suất chi tiết</div>
-            <div style={{ overflowX: "auto", border: "1px solid var(--line)", borderRadius: 10 }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+            <div className="kt-label" style={{ marginBottom: 8, fontSize: 12 }}>CAMPAIGN HISTORY & DETAILED PERFORMANCE</div>
+            <div style={{ border: "1px solid var(--line)", borderRadius: 10, overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11, tableLayout: "auto" }}>
                 <thead>
                   <tr style={{ background: "var(--paper)", borderBottom: "1px solid var(--line)" }}>
-                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Chiến dịch</th>
-                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Món ăn</th>
-                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Ngân sách</th>
-                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Trạng thái</th>
-                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Views</th>
-                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Đơn hàng</th>
-                    <th style={{ padding: "10px 12px", textAlign: "left", fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", whiteSpace: "nowrap" }}>Doanh thu</th>
+                    <th style={{ padding: "8px 4px", textAlign: "left", fontSize: 9, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", wordBreak: "break-word" }}>Campaign</th>
+                    <th style={{ padding: "8px 4px", textAlign: "left", fontSize: 9, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", wordBreak: "break-word" }}>Dish</th>
+                    <th style={{ padding: "8px 4px", textAlign: "right", fontSize: 9, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", wordBreak: "break-word" }}>Budget</th>
+                    <th style={{ padding: "8px 4px", textAlign: "center", fontSize: 9, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", wordBreak: "break-word" }}>Status</th>
+                    <th style={{ padding: "8px 4px", textAlign: "center", fontSize: 9, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", wordBreak: "break-word" }}>Est. View</th>
+                    <th style={{ padding: "8px 4px", textAlign: "center", fontSize: 9, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", wordBreak: "break-word" }}>Est. Eng</th>
+                    <th style={{ padding: "8px 4px", textAlign: "center", fontSize: 9, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", wordBreak: "break-word" }}>View</th>
+                    <th style={{ padding: "8px 4px", textAlign: "center", fontSize: 9, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", wordBreak: "break-word" }}>Total Eng (L+C+S)</th>
+                    <th style={{ padding: "8px 4px", textAlign: "center", fontSize: 9, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", wordBreak: "break-word" }}>% View Achieved</th>
+                    <th style={{ padding: "8px 4px", textAlign: "center", fontSize: 9, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", wordBreak: "break-word" }}>% Eng Achieved</th>
+                    <th style={{ padding: "8px 4px", textAlign: "center", fontSize: 9, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", wordBreak: "break-word" }}>Paid Avg. View</th>
+                    <th style={{ padding: "8px 4px", textAlign: "center", fontSize: 9, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", wordBreak: "break-word" }}>Paid % Completed</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {kol.campaignDetails.map((c, i) => (
-                    <tr key={i} style={{ borderBottom: "1px solid var(--line)" }}>
-                      <td style={{ padding: "10px 12px", fontWeight: 600, whiteSpace: "nowrap" }}>
-                        <CampaignDot campaign={c.campaign} labels={campaignLabels} />
-                      </td>
-                      <td title={c.monAn} style={{ padding: "10px 12px", color: "var(--ink-soft)", maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {c.monAn || "—"}
-                      </td>
-                      <td style={{ padding: "10px 12px", fontWeight: 600, color: "var(--accent)", whiteSpace: "nowrap" }}>{fmtVND(c.cost)}</td>
-                      <td style={{ padding: "10px 12px", whiteSpace: "nowrap" }}>
-                        <StatusBadge statusKey={c.statusKey} />
-                      </td>
-                      <td style={{ padding: "10px 12px", whiteSpace: "nowrap" }}>{c.views ? c.views.toLocaleString() : "—"}</td>
-                      <td style={{ padding: "10px 12px", whiteSpace: "nowrap" }}>{c.conversions ? c.conversions.toLocaleString() : "—"}</td>
-                      <td style={{ padding: "10px 12px", fontWeight: 600, color: "var(--ok)", whiteSpace: "nowrap" }}>{fmtVND(c.revenue)}</td>
-                    </tr>
-                  ))}
+                  {(kol.campaignDetails || []).map((c, i) => {
+                    const totalEng = (Number(c.likes) || 0) + (Number(c.comments) || 0) + (Number(c.shares) || 0);
+                    
+                    const formatPercent = (v) => {
+                      if (v === undefined || v === null || v === "") return "—";
+                      const num = Number(v);
+                      if (isNaN(num)) return "—";
+                      return num.toFixed(1) + "%";
+                    };
+
+                    const viewAch = c.pctViewAchieved !== undefined && c.pctViewAchieved !== null && c.pctViewAchieved !== ""
+                      ? formatPercent(c.pctViewAchieved)
+                      : (c.estView > 0 && c.views > 0 ? ((c.views / c.estView) * 100).toFixed(1) + "%" : "—");
+
+                    const engAch = c.pctEngAchieved !== undefined && c.pctEngAchieved !== null && c.pctEngAchieved !== ""
+                      ? formatPercent(c.pctEngAchieved)
+                      : (c.estEng > 0 && totalEng > 0 ? ((totalEng / c.estEng) * 100).toFixed(1) + "%" : "—");
+
+                    return (
+                      <tr key={i} style={{ borderBottom: "1px solid var(--line)", cursor: "pointer" }} onClick={() => { if(onOpenRow) onOpenRow(c); }} className="kt-tr-hover">
+                        <td style={{ padding: "8px 4px", fontWeight: 600, whiteSpace: "nowrap", textAlign: "left" }}>
+                          <CampaignDot campaign={c.campaign} labels={campaignLabels} />
+                        </td>
+                        <td title={c.monAn} style={{ padding: "8px 4px", color: "var(--ink-soft)", maxWidth: 80, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "left" }}>
+                          {c.monAn || "—"}
+                        </td>
+                        <td style={{ padding: "8px 4px", fontWeight: 600, color: "var(--accent)", whiteSpace: "nowrap", textAlign: "right" }}>{fmtVND(c.cost)}</td>
+                        <td style={{ padding: "8px 4px", whiteSpace: "nowrap", textAlign: "center" }}>
+                          <StatusBadge statusKey={c.statusKey} />
+                        </td>
+                        <td style={{ padding: "8px 4px", whiteSpace: "nowrap", textAlign: "center" }}>{c.estView > 0 ? c.estView.toLocaleString() : "—"}</td>
+                        <td style={{ padding: "8px 4px", whiteSpace: "nowrap", textAlign: "center" }}>{c.estEng > 0 ? c.estEng.toLocaleString() : "—"}</td>
+                        <td style={{ padding: "8px 4px", whiteSpace: "nowrap", fontWeight: 600, color: "var(--blue)", textAlign: "center" }}>{c.views > 0 ? c.views.toLocaleString() : "—"}</td>
+                        <td style={{ padding: "8px 4px", whiteSpace: "nowrap", fontWeight: 600, color: "var(--ok)", textAlign: "center" }}>{totalEng > 0 ? totalEng.toLocaleString() : "—"}</td>
+                        <td style={{ padding: "8px 4px", whiteSpace: "nowrap", textAlign: "center" }}>{viewAch}</td>
+                        <td style={{ padding: "8px 4px", whiteSpace: "nowrap", textAlign: "center" }}>{engAch}</td>
+                        <td style={{ padding: "8px 4px", whiteSpace: "nowrap", textAlign: "center" }}>{c.paidAvgView > 0 ? c.paidAvgView.toLocaleString() : "—"}</td>
+                        <td style={{ padding: "8px 4px", whiteSpace: "nowrap", textAlign: "center" }}>{formatPercent(c.paidPctCompletedView)}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -2462,14 +3481,8 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile }) => 
         </div>
 
         <div style={{ padding: "14px 22px", borderTop: "1px solid var(--line)", display: "flex", justifyContent: "flex-end", gap: 8 }}>
-          {editing ? (
-            <>
-              <button className="kt-btn kt-btn-ghost" onClick={() => setEditing(false)}>Huỷ</button>
-              <button className="kt-btn kt-btn-primary" onClick={handleSaveClick}>💾 Lưu hồ sơ</button>
-            </>
-          ) : (
-            <button className="kt-btn kt-btn-ghost" onClick={onClose}>Đóng hồ sơ</button>
-          )}
+          <button className="kt-btn kt-btn-ghost" onClick={onClose}>Huỷ bỏ</button>
+          <button className="kt-btn kt-btn-primary" onClick={handleSaveClick}>💾 Lưu hồ sơ</button>
         </div>
       </div>
     </div>
@@ -2504,22 +3517,52 @@ export default function App() {
         }
         return r;
       });
-      return cleaned;
+
+      // Auto-migrate historical decimal ratios to raw percentage scale (runs once per client session)
+      const migrationVersion = "v6_unconditional";
+      const isMigrated = localStorage.getItem("kol_pct_migrated") === migrationVersion;
+      
+      let migrated = cleaned;
+      if (!isMigrated) {
+        migrated = cleaned.map(r => {
+          const updateVal = (val) => {
+            if (val === undefined || val === null || val === "") return val;
+            const num = Number(val);
+            if (isNaN(num)) return val;
+            // Since historical values in DB were unmultiplied decimal ratios (e.g. 0.7093, 8.5),
+            // we must scale them by 100 to align with the new raw percentage format.
+            return num * 100;
+          };
+
+          return {
+            ...r,
+            pctViewAchieved: updateVal(r.pctViewAchieved),
+            pctEngAchieved: updateVal(r.pctEngAchieved),
+            pctViewAchievedTotal: updateVal(r.pctViewAchievedTotal),
+            pctEngAchievedTotal: updateVal(r.pctEngAchievedTotal),
+            paidPctCompletedView: updateVal(r.paidPctCompletedView)
+          };
+        });
+        try {
+          localStorage.setItem("kol_pct_migrated", migrationVersion);
+          localStorage.setItem(LS_KEY, JSON.stringify(migrated));
+        } catch (e) {
+          console.error("Failed to write migrated data:", e);
+        }
+      }
+
+      return migrated;
     } catch {
       return SEED_DATA;
     }
   });
     const [campaignLabels, setCampaignLabels] = useState(() => {
-    try {
-      const s = localStorage.getItem("kol_campaign_labels");
-      if (s) return JSON.parse(s);
-    } catch {}
     return {
-      AM: "Campaign A",
-      AX: "Campaign B",
-      Vinegar: "Campaign C",
-      MSG: "Campaign D",
-      Blendy: "Campaign E"
+      AM: "AM",
+      AX: "AX",
+      Vinegar: "Vinegar",
+      MSG: "MGS",
+      Blendy: "Blendy"
     };
   });
 
@@ -2532,11 +3575,39 @@ const [view, setView] = useState("table");
   const [selected, setSelected] = useState(null);
   const [showNew, setShowNew] = useState(false);
   const [toast, setToast] = useState(null); // { msg, ok }
-  const importRef = useRef(null);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [loadingShare, setLoadingShare] = useState(false);
 
   useEffect(() => {
     localStorage.setItem(LS_KEY, JSON.stringify(data));
   }, [data]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const shareId = params.get("share");
+    if (shareId) {
+      setLoadingShare(true);
+      fetch(`https://dpaste.com/${shareId.trim()}.txt`)
+        .then(res => {
+          if (!res.ok) throw new Error("Không thể tải link chia sẻ.");
+          return res.json();
+        })
+        .then(sharedData => {
+          if (Array.isArray(sharedData)) {
+            rawSetData(sharedData);
+            showToast("📥 Đã đồng bộ dữ liệu trực tuyến thành công!");
+          } else {
+            showToast("⚠️ Dữ liệu chia sẻ không hợp lệ.", false);
+          }
+        })
+        .catch(err => {
+          showToast(`❌ Lỗi: ${err.message}`, false);
+        })
+        .finally(() => {
+          setLoadingShare(false);
+        });
+    }
+  }, []);
 
 
 
@@ -2621,9 +3692,7 @@ const [view, setView] = useState("table");
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleUndo, handleRedo]);
 
-  // Parse Excel or JSON → open wizard
-  const handleImport = useCallback((e) => {
-    const file = e.target.files[0];
+  const importSingleFile = useCallback((file) => {
     if (!file) return;
     const isExcel = /\.(xlsx|xls)$/i.test(file.name);
     const isCsv = /\.csv$/i.test(file.name);
@@ -2641,7 +3710,6 @@ const [view, setView] = useState("table");
             ? XLSX.read(readData, { type: "string" })
             : XLSX.read(readData, { type: "array" });
 
-          // Helper to identify KOL name column values robustly (KOL, KOC, Creator, Tên Kênh, Account, etc)
           const isKolHeaderValue = (val) => {
             if (val == null) return false;
             const kl = val.toString().toLowerCase().trim();
@@ -2649,28 +3717,17 @@ const [view, setView] = useState("table");
               "kol", "tên kol", "ten kol", "name", "influencer", "kol/koc", "koc", "creator", "kol name",
               "account", "tài khoản", "tai khoan", "channel", "user", "username", "kênh", "kenh", "tên kênh", "ten kenh"
             ];
-            
-            // Pass 1: Exact alias match
             if (kolAliases.includes(kl)) return true;
-
-            // Pass 2: Primary contains match
             if (kl.includes("kol") || kl.includes("koc") || kl.includes("influencer") || kl.includes("creator") || kl.includes("account") || kl.includes("username")) return true;
-
-            // Pass 3: Secondary contains match (excluding non-kol columns like món ăn, chi phí)
             const isExclude = kl.includes("món") || kl.includes("food") || kl.includes("nhóm") || kl.includes("chi phí") || kl.includes("link") || kl.includes("giá") || kl.includes("cost") || kl.includes("tiến độ");
             if ((kl.includes("tên") || kl.includes("ten") || kl.includes("name") || kl.includes("kênh") || kl.includes("kenh")) && !isExclude) return true;
-
             return false;
           };
 
-          // Read ALL sheets and combine dynamically
           const allSheets = wb.SheetNames
             .map(shName => {
               const ws = wb.Sheets[shName];
-              
-              // 1. Convert to 2D array to search for the header row index (up to first 25 rows)
               const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
-              
               let headerIdx = 0;
               for (let r = 0; r < Math.min(aoa.length, 25); r++) {
                 const row = aoa[r];
@@ -2682,18 +3739,13 @@ const [view, setView] = useState("table");
                   }
                 }
               }
-
-              // 2. Parse sheet JSON starting from the detected header row
               const json = XLSX.utils.sheet_to_json(ws, { range: headerIdx, defval: "" });
-              
-              // 3. Skip rows where KOL name column is empty
               const real = json.filter(r => {
                 const keys = Object.keys(r);
                 const matchedKey = keys.find(isKolHeaderValue);
                 const val = matchedKey ? r[matchedKey] : null;
                 return val && String(val).trim();
               });
-
               return { name: shName, rows: real };
             })
             .filter(s => s.rows.length > 0);
@@ -2702,7 +3754,6 @@ const [view, setView] = useState("table");
             const sheetsInfo = wb.SheetNames.slice(0, 3).map(name => {
               const ws = wb.Sheets[name];
               const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
-              // Grab the first non-empty row to see what headers or title text exists
               const firstNonEmpty = aoa.find(row => Array.isArray(row) && row.some(cell => cell != null && cell.toString().trim() !== "")) || [];
               const rowStr = firstNonEmpty.length ? firstNonEmpty.slice(0, 5).map(c => String(c).trim()).join(", ") : "empty";
               return `[${name}: ${rowStr.substring(0, 80)}]`;
@@ -2710,7 +3761,6 @@ const [view, setView] = useState("table");
             throw new Error("Không tìm thấy cột KOL. Chi tiết file: " + sheetsInfo);
           }
 
-          // Stamp each row with sheet name + row index
           const combined = [];
           allSheets.forEach(sh => {
             sh.rows.forEach((row, i) => {
@@ -2718,7 +3768,6 @@ const [view, setView] = useState("table");
             });
           });
 
-          // Union of all headers (excluding internals), deduplicated
           const headerSet = new Set();
           combined.forEach(r => Object.keys(r).forEach(k => {
             if (!k.startsWith("__") && k !== "No.") headerSet.add(k);
@@ -2745,8 +3794,6 @@ const [view, setView] = useState("table");
       } catch (err) {
         console.error(err);
         showToast("❌ Lỗi: " + err.message, false);
-      } finally {
-        e.target.value = "";
       }
     };
 
@@ -2760,20 +3807,34 @@ const [view, setView] = useState("table");
   }, []);
 
   const handleDownloadTemplate = () => {
-    const headers = [
-      "id", "campaign", "kol", "link", "follower", "type", "location", "group",
-      "cost", "addonFee", "statusKey", "mon an", "ngay gui script",
-      "ngay gui demo", "ngay air", "airedLink", "airedFb", "giftSent"
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'download_template', {
+        'event_category': 'Engagement',
+        'event_label': 'Download Template Files'
+      });
+    }
+
+    const unifiedHeaders = [
+      "Chiến dịch", "No.", "KOL", "Link", "Follower", "Type", "Location", "Group",
+      "Ext. Cost", "Add-on Fee", "Status", "Món ăn",
+      "Ngày gửi script", "Ngày gửi 1st demo", "Ngày Air", "Aired Link", "Aired Fb",
+      "Est Air", "Est View", "Est Eng", "View", "Like", "Comment", "Share", "Save",
+      "% View Đạt", "% T.Tác Đạt", "Avg. View", "% Xem hết",
+      "Reup Views", "Reup Engagement"
     ];
-    const example = [
-      "AM-1", "AM", "Tên KOL", "https://tiktok.com/@...", "100K", "Micro",
-      "Urban", "Female without kid", "10000000", "- Code ads",
-      "waiting_script", "Salad cá ngừ", "", "", "ASAP", "", "", ""
+
+    const unifiedData = [
+      ["Campaign_A", 1, "KOL Name A", "https://tiktok.com/@kolname_a", "200K", "Mid-tier", "HCM", "Female without kid", 15000000, "- Code showcase", "Aired", "Món ăn A", "01/07", "05/07", "10/07", "https://tiktok.com/@kolname_a/video/123", "", "10/07", 500000, 10000, 480000, 8500, 320, 150, 200, 0.96, 0.855, 45000, 0.623, 0, 0],
+      ["Campaign_A", 2, "KOL Name B", "https://tiktok.com/@kolname_b", "80K", "Micro", "HN", "Family", 8000000, "", "Confirmed demo", "Món ăn B", "12/07", "18/07", "ASAP", "", "", "25/07", 300000, 6000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      ["Campaign_A", 3, "KOL Name C", "https://tiktok.com/@kolname_c", "1.2M", "Macro", "HCM", "Gen Z", 35000000, "Livestream 1h", "Waiting script", "Món ăn C", "", "", "", "", "", "05/08", 1200000, 25000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      ["Campaign_A", 4, "KOL Name D", "https://tiktok.com/@kolname_d", "45K", "Nano", "DN", "Food Reviewer", 3000000, "", "Aired", "Món ăn D", "20/06", "25/06", "02/07", "https://tiktok.com/@kolname_d/video/456", "https://fb.com/...", "01/07", 100000, 2000, 150000, 3000, 150, 50, 80, 1.5, 1.5, 20000, 0.75, 10000, 500],
+      ["Campaign_A", 5, "KOL Name E", "https://tiktok.com/@kolname_e", "500K", "Mid-tier", "HCM", "Couple", 22000000, "", "Cancel", "Món ăn E", "10/06", "", "", "", "", "", 800000, 15000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      ["Campaign_B", 6, "KOL Name F", "https://tiktok.com/@kolname_f", "300K", "Mid-tier", "HN", "Food", 12000000, "", "Aired", "Món ăn F", "01/07", "05/07", "10/07", "https://tiktok.com/@kolname_f/video/123", "", "10/07", 200000, 5000, 250000, 4000, 100, 20, 50, 1.25, 0.8, 15000, 0.5, 0, 0]
     ];
-    const ws = XLSX.utils.aoa_to_sheet([headers, example]);
+    
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "KOL Tracker");
-    XLSX.writeFile(wb, "kol_tracker_template.xlsx");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([unifiedHeaders, ...unifiedData]), "Data");
+    XLSX.writeFile(wb, "KOL_Tracker_Template.xlsx");
   };
 
   // Export/backup the current live data (everything shown on screen right now)
@@ -2836,6 +3897,60 @@ const [view, setView] = useState("table");
   const handleAdd = (newRow) => {
     setData(d => [...d, newRow]);
   };
+
+  const getProfileForKol = (kolName) => {
+    if (!kolName) return null;
+    const name = kolName.trim();
+    const key = name.toLowerCase();
+    
+    const matchingRows = data.filter(r => (r.kol || "").trim().toLowerCase() === key);
+    if (!matchingRows.length) return null;
+
+    const profile = {
+      kol: matchingRows[0].kol.trim(),
+      follower: "",
+      type: "",
+      location: "",
+      group: "",
+      link: "",
+      campaigns: new Set(),
+      totalCost: 0,
+      totalViews: 0,
+      totalLikes: 0,
+      totalComments: 0,
+      totalSaves: 0,
+      totalShares: 0,
+      totalConversions: 0,
+      totalRevenue: 0,
+      phases: new Set(),
+      campaignDetails: []
+    };
+
+    matchingRows.forEach(r => {
+      const campaignKey = resolveCampaignKey(r);
+      if (campaignKey) profile.campaigns.add(campaignKey);
+      profile.totalCost += Number(r.cost) || 0;
+      profile.totalViews += Number(r.views) || 0;
+      profile.totalLikes += Number(r.likes) || 0;
+      profile.totalComments += Number(r.comments) || 0;
+      profile.totalSaves += Number(r.saves) || 0;
+      profile.totalShares += Number(r.shares) || 0;
+      profile.totalConversions += Number(r.conversions) || 0;
+      profile.totalRevenue += Number(r.revenue) || 0;
+
+      (r.phaseTags || "").split(",").map(s => s.trim()).filter(Boolean).forEach(p => profile.phases.add(p));
+      profile.campaignDetails.push(r);
+
+      if (!profile.follower && r.follower) profile.follower = r.follower;
+      if (!profile.type && r.type) profile.type = r.type;
+      if (!profile.location && r.location) profile.location = r.location;
+      if (!profile.group && r.group) profile.group = r.group;
+      if (!profile.link && r.link) profile.link = r.link;
+    });
+
+    return profile;
+  };
+
   // Editing a KOL "profile" (Hồ sơ KOL) means editing shared fields — name, follower,
   // tier, location, group, TikTok link — that are duplicated across every campaign
   // row for that KOL. We match rows by the original (pre-edit) name and apply the
@@ -2878,13 +3993,13 @@ const [view, setView] = useState("table");
     );
     if (clearAll) {
       setData([]);
-      const defLabels = { AM: "Campaign A", AX: "Campaign B", Vinegar: "Campaign C", MSG: "Campaign D", Blendy: "Campaign E" };
+      const defLabels = { AM: "AM", AX: "AX", Vinegar: "Vinegar", MSG: "MGS", Blendy: "Blendy" };
       setCampaignLabels(defLabels);
       localStorage.setItem("kol_campaign_labels", JSON.stringify(defLabels));
     } else {
       if (window.confirm("Bạn có chắc chắn muốn khôi phục lại 66 dòng dữ liệu mẫu ban đầu? Mọi chỉnh sửa hiện tại sẽ bị mất.")) {
         setData(SEED_DATA);
-        const defLabels = { AM: "Campaign A", AX: "Campaign B", Vinegar: "Campaign C", MSG: "Campaign D", Blendy: "Campaign E" };
+        const defLabels = { AM: "AM", AX: "AX", Vinegar: "Vinegar", MSG: "MGS", Blendy: "Blendy" };
         setCampaignLabels(defLabels);
         localStorage.setItem("kol_campaign_labels", JSON.stringify(defLabels));
       }
@@ -2908,81 +4023,83 @@ const [view, setView] = useState("table");
         boxShadow: "0 4px 20px rgba(72, 67, 92, 0.015)"
       }}>
         {/* Top Row: Brand Title + View Toggles + Action Buttons */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 14 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, overflowX: "auto", width: "100%", paddingBottom: 4 }} className="kt-scrollbar">
           {/* Group 1: Logo/Brand & View Toggles (Left aligned together) */}
-          <div style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 18, flexShrink: 0 }}>
             {/* Logo & Brand Name */}
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <div style={{
-                width: 36, height: 36, borderRadius: 10,
-                background: "linear-gradient(135deg, var(--accent) 0%, #6858E0 100%)",
+                width: 34, height: 34, borderRadius: 9,
+                background: "#EA9216",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                boxShadow: "0 4px 14px rgba(138, 123, 255, 0.2)",
+                boxShadow: "0 4px 12px rgba(234, 146, 22, 0.3)",
               }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                  <path d="M2 17l10 5 10-5" />
+                  <path d="M2 12l10 5 10-5" />
                 </svg>
               </div>
               <h1 style={{ 
-                fontSize: 22, 
+                fontSize: 18, 
                 color: "var(--ink)", 
                 margin: 0, 
                 fontWeight: 800, 
                 letterSpacing: "-0.03em",
-                fontFamily: "'Plus Jakarta Sans', sans-serif"
+                fontFamily: "'Questrial', sans-serif"
               }}>
-                KOL <span style={{ color: "var(--accent)" }}>Tracking</span>
+                KOL <span style={{ color: "#EA9216" }}>Tracking</span>
               </h1>
             </div>
             
             {/* View Toggle (Bảng, Kanban, Lịch) */}
-            <div style={{ display: "flex", gap: 4, background: "var(--paper)", padding: 4, borderRadius: 24 }}>
+            <div style={{ display: "flex", gap: 2, background: "var(--paper)", padding: 3, borderRadius: 20 }}>
               <button className={`kt-btn ${view === "table" ? "kt-btn-primary" : "kt-btn-ghost"}`}
-                style={{ padding: "6px 16px", fontSize: 12, borderRadius: 20 }}
+                style={{ padding: "5px 12px", fontSize: 11, borderRadius: 16 }}
                 onClick={() => setView("table")}>Bảng</button>
               <button className={`kt-btn ${view === "kanban" ? "kt-btn-primary" : "kt-btn-ghost"}`}
-                style={{ padding: "6px 16px", fontSize: 12, borderRadius: 20 }}
+                style={{ padding: "5px 12px", fontSize: 11, borderRadius: 16 }}
                 onClick={() => setView("kanban")}>Kanban</button>
               <button className={`kt-btn ${view === "calendar" ? "kt-btn-primary" : "kt-btn-ghost"}`}
-                style={{ padding: "6px 16px", fontSize: 12, borderRadius: 20 }}
+                style={{ padding: "5px 12px", fontSize: 11, borderRadius: 16 }}
                 onClick={() => setView("calendar")}>Lịch</button>
               <button className={`kt-btn ${view === "profile" ? "kt-btn-primary" : "kt-btn-ghost"}`}
-                style={{ padding: "6px 16px", fontSize: 12, borderRadius: 20 }}
+                style={{ padding: "5px 12px", fontSize: 11, borderRadius: 16 }}
                 onClick={() => setView("profile")}>Hồ sơ KOL</button>
             </div>
           </div>
-
+ 
           {/* Quick Actions (Add, Import, Undo/Redo) */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-            {/* Template / Import hidden file loader */}
-            <input ref={importRef} type="file" multiple accept=".xlsx,.xls,.json,application/json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-              style={{ display: "none" }} onChange={handleImport} />
-            
+          <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
             <button className="kt-btn kt-btn-ghost" onClick={handleDownloadTemplate}
-              title="Tải file Excel mẫu đúng định dạng" style={{ padding: "8px 14px" }}>
-              📄 Mẫu
+              title="Tải file Excel mẫu đúng định dạng" style={{ padding: "6px 10px", fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+              Mẫu
             </button>
-            <button className="kt-btn kt-btn-ghost" onClick={() => importRef.current?.click()}
-              title="Import file Excel (.xlsx) hoặc JSON" style={{ padding: "8px 14px" }}>
-              📥 Nhập
-            </button>
-            <button className="kt-btn kt-btn-ghost" onClick={() => setShowDualImport(true)}
-              title="Kéo thả 2 file INTERNAL + Social Outreach, tự nhận diện & merge dữ liệu" style={{ padding: "8px 14px" }}>
-              🔄 Cập nhật 2 file
+            <button className="kt-btn kt-btn-primary" onClick={() => setShowDualImport(true)}
+              title="Kéo thả các file Excel hoặc JSON để cập nhật" style={{ padding: "6px 12px", fontSize: 12, display: "flex", alignItems: "center", gap: 6, borderRadius: 16 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+              Cập nhật
             </button>
             <button className="kt-btn kt-btn-ghost" onClick={handleExportData}
-              title="Tải toàn bộ dữ liệu hiện tại trên web về máy (.xlsx)" style={{ padding: "8px 14px" }}>
-              💾 Lưu về máy
+              title="Tải toàn bộ dữ liệu hiện tại trên web về máy (.xlsx)" style={{ padding: "6px 10px", fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+              Lưu về máy
             </button>
-
+            <button className="kt-btn kt-btn-ghost" onClick={() => setShowShareModal(true)}
+              title="Chia sẻ dữ liệu online qua link trực tuyến" style={{ padding: "6px 10px", fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+              Chia sẻ online
+            </button>
+ 
             {/* Undo / Redo */}
-            <div style={{ display: "flex", gap: 2, border: "1px solid var(--line)", borderRadius: 24, overflow: "hidden", padding: 2, background: "var(--card)" }}>
+            <div style={{ display: "flex", gap: 1, border: "1px solid var(--line)", borderRadius: 20, overflow: "hidden", padding: 2, background: "var(--card)" }}>
               <button 
                 className="kt-btn kt-btn-ghost" 
                 onClick={handleUndo} 
                 disabled={history.length === 0}
                 title="Hoàn tác (Ctrl+Z)" 
-                style={{ padding: "6px 12px", border: "none", borderRadius: 20, opacity: history.length === 0 ? 0.35 : 1, cursor: history.length === 0 ? "not-allowed" : "pointer" }}
+                style={{ padding: "5px 8px", border: "none", borderRadius: 16, opacity: history.length === 0 ? 0.35 : 1, cursor: history.length === 0 ? "not-allowed" : "pointer" }}
               >
                 ↩️
               </button>
@@ -2991,17 +4108,17 @@ const [view, setView] = useState("table");
                 onClick={handleRedo} 
                 disabled={redoHistory.length === 0}
                 title="Làm lại (Ctrl+Y)" 
-                style={{ padding: "6px 12px", border: "none", borderRadius: 20, opacity: redoHistory.length === 0 ? 0.35 : 1, cursor: redoHistory.length === 0 ? "not-allowed" : "pointer" }}
+                style={{ padding: "5px 8px", border: "none", borderRadius: 16, opacity: redoHistory.length === 0 ? 0.35 : 1, cursor: redoHistory.length === 0 ? "not-allowed" : "pointer" }}
               >
                 ↪️
               </button>
             </div>
-
-            {/* Reset */}
-            <button className="kt-btn kt-btn-ghost" onClick={handleReset} title="Khôi phục gốc" style={{ padding: "8px 14px" }}>Reset</button>
-
+ 
+            {/* Reset / Đặt lại */}
+            <button className="kt-btn kt-btn-ghost" onClick={handleReset} title="Khôi phục dữ liệu ban đầu" style={{ padding: "6px 10px", fontSize: 12 }}>Đặt lại</button>
+ 
             {/* Main Add Button */}
-            <button className="kt-btn kt-btn-primary" onClick={() => setShowNew(true)}>+ Thêm KOL</button>
+            <button className="kt-btn kt-btn-primary" onClick={() => setShowNew(true)} style={{ padding: "6px 12px", fontSize: 12, borderRadius: 20 }}>+ Thêm KOL</button>
           </div>
         </div>
 
@@ -3016,22 +4133,22 @@ const [view, setView] = useState("table");
             {/* Campaign filter */}
             <select className="kt-select" value={filterCampaign} onChange={e => setFilterCampaign(e.target.value)}
               style={{ width: 180 }}>
-              <option value="all">📁 Tất cả Chiến dịch</option>
+              <option value="all">Tất cả Chiến dịch</option>
               {CAMPAIGNS.map(c => <option key={c.key} value={c.key}>{campaignLabels[c.key] || c.label}</option>)}
             </select>
 
              {/* Status filter */}
             <select className="kt-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
               style={{ width: 210 }}>
-              <option value="all">⚡ Tất cả Trạng thái</option>
-              <option value="in_progress">⚙️ Đang xử lý (Chưa lên sóng)</option>
+              <option value="all">Tất cả Trạng thái</option>
+              <option value="in_progress">Đang xử lý (Chưa lên sóng)</option>
               {STATUS_STAGES.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
             </select>
 
             {/* Type filter */}
             <select className="kt-select" value={filterType} onChange={e => setFilterType(e.target.value)}
               style={{ width: 150 }}>
-              <option value="all">👥 Tất cả Tiers</option>
+              <option value="all">Tất cả Tiers</option>
               {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
           </div>
@@ -3061,7 +4178,7 @@ const [view, setView] = useState("table");
           minHeight: 0,
           boxShadow: "0 8px 30px rgba(72, 67, 92, 0.015)"
         }}>
-          {view === "table" && <TableView rows={filtered} onOpen={r => setSelected(r)} campaignLabels={campaignLabels} />}
+          {view === "table" && <TableView rows={filtered} onOpen={r => setSelected(r)} onSave={(id, changes) => { setData(prev => prev.map(item => item.id === id ? { ...item, ...changes } : item)); }} campaignLabels={campaignLabels} />}
           {view === "kanban" && (
             <KanbanView 
               rows={filtered} 
@@ -3120,6 +4237,7 @@ const [view, setView] = useState("table");
           existingData={data}
           onClose={() => setShowDualImport(false)}
           onConfirm={handleDualFileMerge}
+          onImportSingle={importSingleFile}
         />
       )}
 
@@ -3129,59 +4247,7 @@ const [view, setView] = useState("table");
           onClose={() => setWizardData(null)}
           campaignLabels={campaignLabels}
           onConfirm={(importedRows) => {
-            let mergedCount = 0;
-            let addedCount = 0;
-            
-            const cleanName = (str) => {
-              if (!str) return "";
-              return str.toString().toLowerCase()
-                .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, "")
-                .replace(/đ/g, "d")
-                .replace(/Đ/g, "d")
-                .replace(/[^a-z0-9]/g, "");
-            };
-
-            const CUSTOM_INITIALS = {
-              "bbkbh": ["babykopo home", "baby kopo home"],
-              "bbk": ["babykopo home", "baby kopo home"],
-              "agt": ["ăn gì thương ơi", "an gi thuong oi"],
-              "agto": ["ăn gì thương ơi", "an gi thuong oi"],
-              "ttmt": ["thi thi miền tây", "thi thi mien tay"],
-              "mc": ["min cookie", "mincookie"],
-              "pha": ["pít ham ăn", "pit ham an"],
-              "ln": ["linh nấu", "linh nau"]
-            };
-
-            const getInitials = (name) => {
-              if (!name) return "";
-              const n = name.toString().toLowerCase()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-              const words = n.split(/\s+/).filter(Boolean);
-              return words.map(w => w[0]).join("");
-            };
-
-            const isMatch = (importedName, kolName) => {
-              if (!importedName || !kolName) return false;
-              const impClean = cleanName(importedName);
-              const kolClean = cleanName(kolName);
-
-              // 1. Direct match or substring
-              if (impClean === kolClean || kolClean.includes(impClean) || impClean.includes(kolClean)) return true;
-
-              // 2. Custom initials match
-              if (CUSTOM_INITIALS[impClean]) {
-                if (CUSTOM_INITIALS[impClean].some(alias => kolClean.includes(alias))) return true;
-              }
-
-              // 3. Dynamic initials match
-              const kolInitials = getInitials(kolName);
-              if (impClean === kolInitials) return true;
-
-              return false;
-            };
-
-                        // Collect dynamic campaign labels from imported rows
+            // Collect dynamic campaign labels from imported rows
             const newLabels = { ...campaignLabels };
             let hasNewLabel = false;
             importedRows.forEach(imp => {
@@ -3206,7 +4272,7 @@ const [view, setView] = useState("table");
               const impCampaign = resolveCampaignKey(imp);
               const matchIdx = updatedData.findIndex(existing => {
                 if (imp.id && existing.id === imp.id) return true;
-                if (!isMatch(imp.kol, existing.kol)) return false;
+                if (!isKolMatch(imp.kol, existing.kol)) return false;
                 const existingCampaign = resolveCampaignKey(existing);
                 if (!impCampaign || !existingCampaign) return false;
                 return existingCampaign === impCampaign;
@@ -3265,6 +4331,7 @@ const [view, setView] = useState("table");
           onClose={() => setSelectedProfile(null)}
           campaignLabels={campaignLabels}
           onSaveProfile={handleUpdateProfile}
+          onOpenRow={(row) => setSelectedRow(row)}
         />
       )}
 
@@ -3282,7 +4349,7 @@ const [view, setView] = useState("table");
         color: "var(--ink-soft)"
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <span>© 2026 TCV x Brand. All rights reserved.</span>
+          <span>© JB ver 0.2 (2026). All Rights Reserved.</span>
           <span style={{ color: "var(--line)" }}>|</span>
           <span>Dữ liệu chiến dịch: <strong>FY26</strong></span>
         </div>
@@ -3292,6 +4359,172 @@ const [view, setView] = useState("table");
           <span>Hệ thống quản lý KOL Tracking</span>
         </div>
       </div>
+
+      {/* ── LOADING SHARE OVERLAY ── */}
+      {loadingShare && (
+        <div className="kt-overlay" style={{ zIndex: 1000, background: "rgba(255, 255, 255, 0.8)", display: "flex", flexDirection: "column", gap: 16, alignItems: "center", justifyContent: "center" }}>
+          <div className="kt-spinner" style={{ width: 40, height: 40, border: "4px solid var(--line)", borderTopColor: "var(--accent)", borderRadius: "50%", animation: "kt-spin 1s linear infinite" }}></div>
+          <span style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>Đang đồng bộ dữ liệu chia sẻ...</span>
+        </div>
+      )}
+
+      {/* ── ONLINE SHARE MODAL ── */}
+      {showShareModal && (
+        <OnlineShareModal
+          data={data}
+          onClose={() => setShowShareModal(false)}
+          onExport={handleExportData}
+        />
+      )}
     </div>
   );
 }
+
+const OnlineShareModal = ({ data, onClose, onExport }) => {
+  const [shareId, setShareId] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch("https://dpaste.com/api/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        content: JSON.stringify(data),
+        expiry_days: "30",
+        syntax: "json"
+      })
+    })
+      .then(res => {
+        if (!res.ok) throw new Error("Không thể tạo link chia sẻ online");
+        return res.text();
+      })
+      .then(url => {
+        const id = url.trim().split("/").pop();
+        setShareId(id);
+      })
+      .catch(err => {
+        window.alert(`Lỗi chia sẻ: ${err.message}`);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [data]);
+
+  const shareUrl = shareId 
+    ? `${window.location.origin}${window.location.pathname}?share=${shareId}`
+    : "";
+
+  const handleCopy = () => {
+    if (!shareUrl) return;
+    navigator.clipboard.writeText(shareUrl)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      });
+  };
+
+  return (
+    <div className="kt-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="kt-modal kt-anim" style={{ maxWidth: 640, padding: "24px 30px", borderRadius: 12, background: "var(--card)" }}>
+        {/* Header */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+          <h2 style={{ fontSize: 20, fontWeight: 800, color: "var(--ink)", margin: 0, display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 22 }}>🔗</span> Chia sẻ dữ liệu online
+          </h2>
+          <button className="kt-btn kt-btn-ghost" onClick={onClose} style={{ padding: "6px 10px", borderRadius: "50%", minWidth: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+        </div>
+
+        {/* Content Card */}
+        <div style={{
+          background: "#F8FAFC",
+          border: "1px solid #E2E8F0",
+          borderRadius: 12,
+          padding: "20px 24px",
+          marginBottom: 18,
+          boxShadow: "inset 0 1px 2px rgba(0,0,0,0.01)"
+        }}>
+          <h3 style={{ fontSize: 16, fontWeight: 700, color: "#0F172A", margin: "0 0 6px 0" }}>Link chia sẻ</h3>
+          <p style={{ fontSize: 13, color: "#64748B", margin: "0 0 16px 0" }}>Sao chép link để người khác xem và lưu dữ liệu của bạn.</p>
+
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            <div style={{ flex: 1, minWidth: 0, background: "#FFFFFF", border: "1px solid #CBD5E1", borderRadius: 30, padding: "10px 18px", display: "flex", alignItems: "center" }}>
+              {loading ? (
+                <span style={{ fontSize: 13, color: "#94A3B8", fontStyle: "italic" }}>Đang tạo link chia sẻ online...</span>
+              ) : (
+                <input
+                  readOnly
+                  value={shareUrl}
+                  style={{ width: "100%", border: "none", background: "transparent", outline: "none", fontSize: 13, color: "#334155", fontFamily: "monospace" }}
+                  onClick={e => e.target.select()}
+                />
+              )}
+            </div>
+
+            <button
+              onClick={handleCopy}
+              className="kt-btn"
+              disabled={loading || !shareUrl}
+              style={{
+                background: copied ? "var(--ok)" : "#6366F1",
+                color: "#FFFFFF",
+                padding: "10px 20px",
+                borderRadius: 30,
+                fontWeight: 600,
+                fontSize: 13,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                border: "none",
+                cursor: loading || !shareUrl ? "not-allowed" : "pointer",
+                transition: "all 0.2s ease"
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                {copied ? (
+                  <path d="M20 6L9 17l-5-5" />
+                ) : (
+                  <>
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                  </>
+                )}
+              </svg>
+              {copied ? "Đã chép!" : "Sao chép"}
+            </button>
+          </div>
+        </div>
+
+        {/* Offline Export Link */}
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <button
+            onClick={onExport}
+            className="kt-btn kt-btn-ghost"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              fontSize: 13,
+              color: "#475569",
+              fontWeight: 600,
+              padding: "6px 12px",
+              background: "transparent",
+              border: "none"
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            Hoặc xuất file Excel / JSON để dùng offline.
+          </button>
+        </div>
+
+      </div>
+    </div>
+  );
+};
