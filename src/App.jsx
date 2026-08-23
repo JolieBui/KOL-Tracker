@@ -216,11 +216,13 @@ const GlobalStyle = () => (
 
     .kt-modal {
       background: var(--card);
-      border-radius: 20px;
+      border-radius: 24px;
       width: 100%;
       max-width: 700px;
       max-height: 90vh;
-      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
       box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
       border: 1px solid var(--rule);
       animation: kt-modal-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -781,9 +783,9 @@ const ImportWizard = ({ rawHeaders, rawRows, sheetInfo, fileName, onConfirm, onC
 
   return (
     <div className="kt-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="kt-modal kt-anim" style={{ maxWidth: 860, borderRadius: 2 }}>
+      <div className="kt-modal kt-anim" style={{ maxWidth: 860, borderRadius: 24 }}>
         {/* Header */}
-        <div style={{ padding: "18px 22px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ padding: "18px 22px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 11, fontWeight: 600, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
               Import Wizard
@@ -802,7 +804,7 @@ const ImportWizard = ({ rawHeaders, rawRows, sheetInfo, fileName, onConfirm, onC
           <button className="kt-btn kt-btn-ghost" onClick={onClose} style={{ padding: "6px 10px" }}>✕</button>
         </div>
 
-        <div style={{ padding: "18px 22px" }}>
+        <div style={{ padding: "18px 22px", overflowY: "auto", flex: 1, minHeight: 0 }} className="kt-scrollbar">
           {/* Column mapping table */}
           <div style={{ marginBottom: 18 }}>
             <div className="kt-label" style={{ marginBottom: 10 }}>Mapping cột — kiểm tra và chỉnh nếu cần</div>
@@ -866,7 +868,7 @@ const ImportWizard = ({ rawHeaders, rawRows, sheetInfo, fileName, onConfirm, onC
         </div>
 
         {/* Footer */}
-        <div style={{ padding: "14px 22px", borderTop: "1px solid var(--line)", display: "flex", gap: 8, justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ padding: "14px 22px", borderTop: "1px solid var(--line)", display: "flex", gap: 8, justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
           <span style={{ fontSize: 12, color: "var(--ink-soft)" }}>Sẽ import <strong>{rawRows.length}</strong> KOLs và thay thế toàn bộ dữ liệu hiện tại</span>
           <div style={{ display: "flex", gap: 8 }}>
             <button className="kt-btn kt-btn-ghost" onClick={onClose}>Huỷ</button>
@@ -1599,7 +1601,7 @@ const DualFileImportModal = ({ existingData, onConfirm, onClose, onImportSingle,
   return (
     <div className="kt-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="kt-modal kt-anim" style={{ maxWidth: 720 }}>
-        <div style={{ padding: "18px 22px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ padding: "18px 22px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 11, fontWeight: 600, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
               CẬP NHẬT DỮ LIỆU
@@ -1609,7 +1611,7 @@ const DualFileImportModal = ({ existingData, onConfirm, onClose, onImportSingle,
           <button className="kt-btn kt-btn-ghost" onClick={onClose} style={{ padding: "6px 10px" }}>✕</button>
         </div>
 
-        <div style={{ padding: "20px 22px", display: "flex", flexDirection: "column", gap: 16 }}>
+        <div style={{ padding: "20px 22px", display: "flex", flexDirection: "column", gap: 16, overflowY: "auto", flex: 1, minHeight: 0 }} className="kt-scrollbar">
           {step === "drop" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               {/* Drag drop area */}
@@ -1877,7 +1879,7 @@ const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCamp
     <div className="kt-overlay" style={{ zIndex: 110 }} onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="kt-modal kt-anim">
         {/* Header */}
-        <div style={{ padding: "18px 22px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ padding: "18px 22px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 11, fontWeight: 600, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em" }}>KOL Detail</div>
             <div style={{ fontSize: 17, fontWeight: 700, color: "var(--ink)" }}>{form.kol || "New KOL"}</div>
@@ -1887,7 +1889,7 @@ const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCamp
         </div>
 
         {/* Body */}
-        <div style={{ padding: "18px 22px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 20px" }}>
+        <div className="kt-scrollbar" style={{ padding: "18px 22px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 20px", overflowY: "auto", flex: 1, minHeight: 0 }}>
           <div>
             <div style={{ marginBottom: 14 }}>
               <label className="kt-label">Campaign</label>
@@ -1975,7 +1977,7 @@ const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCamp
         </div>
 
         {/* Footer */}
-        <div style={{ padding: "14px 22px", borderTop: "1px solid var(--line)", display: "flex", gap: 8, justifyContent: "space-between" }}>
+        <div style={{ padding: "14px 22px", borderTop: "1px solid var(--line)", display: "flex", gap: 8, justifyContent: "space-between", flexShrink: 0 }}>
           <button className="kt-btn kt-btn-danger" onClick={() => { if (window.confirm("Xoá KOL này?")) { onDelete(kol.id); onClose(); } }}>
             🗑 Xoá
           </button>
@@ -3278,8 +3280,8 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpe
 
   return (
     <div className="kt-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="kt-modal kt-anim" style={{ maxWidth: 980, width: "95%", borderRadius: 2 }}>
-        <div style={{ padding: "18px 22px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 10 }}>
+      <div className="kt-modal kt-anim" style={{ maxWidth: 980, width: "95%", borderRadius: 24 }}>
+        <div style={{ padding: "18px 22px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 11, fontWeight: 600, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
               HỒ SƠ CHI TIẾT KOL (CHỈNH SỬA TRỰC TIẾP)
@@ -3288,7 +3290,7 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpe
           <button className="kt-btn kt-btn-ghost" onClick={onClose} style={{ padding: "6px 10px" }}>✕</button>
         </div>
 
-        <div style={{ padding: "20px 22px", display: "flex", flexDirection: "column", gap: 18 }}>
+        <div style={{ padding: "20px 22px", display: "flex", flexDirection: "column", gap: 18, overflowY: "auto", flex: 1, minHeight: 0 }} className="kt-scrollbar">
           
           <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 20, alignItems: "stretch" }}>
             {/* Left Column: Basic Info Card (Editable In-Place) */}
@@ -3486,7 +3488,7 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpe
           </div>
         </div>
 
-        <div style={{ padding: "14px 22px", borderTop: "1px solid var(--line)", display: "flex", justifyContent: "flex-end", gap: 8 }}>
+        <div style={{ padding: "14px 22px", borderTop: "1px solid var(--line)", display: "flex", justifyContent: "flex-end", gap: 8, flexShrink: 0 }}>
           <button className="kt-btn kt-btn-ghost" onClick={onClose}>Huỷ bỏ</button>
           <button className="kt-btn kt-btn-primary" onClick={handleSaveClick}>💾 Lưu hồ sơ</button>
         </div>
@@ -4524,7 +4526,7 @@ const OnlineShareModal = ({ data, onClose, onExport }) => {
 
   return (
     <div className="kt-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="kt-modal kt-anim" style={{ maxWidth: 640, padding: "24px 30px", borderRadius: 12, background: "var(--card)" }}>
+      <div className="kt-modal kt-anim" style={{ maxWidth: 640, padding: "24px 30px", borderRadius: 24, background: "var(--card)" }}>
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
           <h2 style={{ fontSize: 20, fontWeight: 800, color: "var(--ink)", margin: 0, display: "flex", alignItems: "center", gap: 10 }}>
