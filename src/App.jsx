@@ -2362,7 +2362,7 @@ const KanbanColumn = ({ stage, cards, onOpen, onUpdateStatus, campaignLabels }) 
   );
 };
 
-const KanbanView = ({ rows, onOpen, onUpdateStatus, campaignLabels }) => (
+const KanbanView = ({ rows, onOpen, onUpdateStatus, campaignLabels, statusStages, statusMap }) => (
   <div style={{ display: "grid", gridTemplateColumns: `repeat(${statusStages.length}, minmax(0, 1fr))`, gap: 10, padding: 16, alignItems: "stretch", flex: 1, height: "100%", overflow: "hidden" }}>
     {statusStages.map(stage => {
       const cards = rows.filter(r => r.statusKey === stage.key);
@@ -4242,6 +4242,8 @@ const [view, setView] = useState("table");
           {view === "kanban" && (
             <KanbanView 
               rows={filtered} 
+              statusStages={statusStages}
+              statusMap={statusMap} 
               onOpen={r => setSelected(r)} 
               onUpdateStatus={(id, newStatus) => {
                 setData(prev => prev.map(item => item.id === id ? { ...item, statusKey: newStatus } : item));
