@@ -1849,20 +1849,8 @@ const StatusSettingsModal = ({ statuses, onSave, onClose }) => {
 ================================================================ */
 const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCampaigns }) => {
   const [form, setForm] = useState({ ...kol });
-  const [isNewCampaign, setIsNewCampaign] = useState(false);
-  const [newCampaign, setNewCampaign] = useState("");
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
-
-  const handleCampaignChange = (val) => {
-    if (val === "__new__") {
-      setIsNewCampaign(true);
-      set("campaign", newCampaign || "");
-    } else {
-      setIsNewCampaign(false);
-      set("campaign", val);
-    }
-  };
 
   const Field = ({ label, field, type = "text", options }) => (
     <div style={{ marginBottom: 14 }}>
@@ -1903,34 +1891,20 @@ const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCamp
           <div>
             <div style={{ marginBottom: 14 }}>
               <label className="kt-label">Campaign</label>
-              <select
-                className="kt-select"
-                value={isNewCampaign ? "__new__" : (form.campaign || "")}
-                onChange={e => handleCampaignChange(e.target.value)}
-              >
-                <option value="">—</option>
+              <input
+                list="campaigns-list"
+                className="kt-input"
+                placeholder="Chọn hoặc gõ tên dự án..."
+                value={form.campaign || ""}
+                onChange={e => set("campaign", e.target.value)}
+              />
+              <datalist id="campaigns-list">
                 {dynamicCampaigns.map(c => (
                   <option key={c.key} value={c.key}>
                     {c.label}
                   </option>
                 ))}
-                <option value="__new__" style={{ fontWeight: "bold", color: "var(--accent)" }}>
-                  ✍️ + Thêm dự án mới...
-                </option>
-              </select>
-              {isNewCampaign && (
-                <input
-                  className="kt-input"
-                  style={{ marginTop: 8 }}
-                  placeholder="Nhập tên dự án mới..."
-                  value={newCampaign}
-                  onChange={e => {
-                    const val = e.target.value;
-                    setNewCampaign(val);
-                    set("campaign", val);
-                  }}
-                />
-              )}
+              </datalist>
             </div>
             <Field label="Tên KOL" field="kol" />
             <Field label="Link TikTok" field="link" />
