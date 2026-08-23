@@ -3947,16 +3947,41 @@ const [view, setView] = useState("table");
     }
   };
 
+  const generateKOLId = (campaign, currentData) => {
+    const cleanCamp = campaign ? campaign.trim() : "AM";
+    const campaignRows = currentData.filter(r => r.campaign === cleanCamp);
+    const indices = campaignRows.map(r => {
+      if (!r.id) return 0;
+      const parts = r.id.split("-");
+      const num = parseInt(parts[parts.length - 1], 10);
+      return isNaN(num) ? 0 : num;
+    });
+    const maxIndex = indices.length > 0 ? Math.max(...indices) : 0;
+    return `${cleanCamp}-${maxIndex + 1}`;
+  };
+
   const handleSave = (updated) => {
     ensureCampaignLabel(updated.campaign);
-    setData(d => d.map(r => r.id === updated.id ? updated : r));
+    const oldRow = data.find(r => r.id === updated.id);
+    let finalRow = updated;
+    if (oldRow && oldRow.campaign !== updated.campaign) {
+      finalRow = {
+        ...updated,
+        id: generateKOLId(updated.campaign, data)
+      };
+    }
+    setData(d => d.map(r => r.id === updated.id ? finalRow : r));
   };
   const handleDelete = (id) => {
     setData(d => d.filter(r => r.id !== id));
   };
   const handleAdd = (newRow) => {
-    ensureCampaignLabel(newRow.campaign);
-    setData(d => [...d, newRow]);
+    const finalRow = {
+      ...newRow,
+      id: generateKOLId(newRow.campaign, data)
+    };
+    ensureCampaignLabel(finalRow.campaign);
+    setData(d => [...d, finalRow]);
   };
 
   const getProfileForKol = (kolName) => {
