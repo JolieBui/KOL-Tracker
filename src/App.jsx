@@ -4349,7 +4349,7 @@ const [view, setView] = useState("table");
         color: "var(--ink-soft)"
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <span>© JB ver 0.2 (2026). All Rights Reserved.</span>
+          <span>© JB 2026. All Rights Reserved.</span>
           <span style={{ color: "var(--line)" }}>|</span>
           <span>Dữ liệu chiến dịch: <strong>FY26</strong></span>
         </div>
