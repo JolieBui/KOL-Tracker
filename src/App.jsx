@@ -339,6 +339,17 @@ const DEFAULT_STATUS_STAGES = [
   { key: "aired",          label: "Đã lên sóng",         color: "#8A7BFF", soft: "#F4F2FF" },
 ];
 
+const PREDEFINED_COLORS = ["#FFAFA3", "#A2C2E8", "#A8C3A0", "#FFD175", "#C7B1E6", "#F4A261", "#E76F51", "#2A9D8F", "#E9C46A", "#264653"];
+const getCampaignColor = (key) => {
+  if (!key) return "#888";
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) {
+    hash = key.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return PREDEFINED_COLORS[Math.abs(hash) % PREDEFINED_COLORS.length];
+};
+
+
 const cleanName = (str) => {
   if (!str) return "";
   return str.toString().toLowerCase()
@@ -708,7 +719,7 @@ const FIELD_LABELS = {
   brandReup: "Brand Reup",
 };
 
-const applyMapping = (rawRows, mapping) => {
+const applyMapping = (rawRows, mapping, statusLabelToKey) => {
   return rawRows.map((row, idx) => {
     const out = emptyKOL();
     const sheetName = row.__sheet__ || "";
@@ -760,7 +771,7 @@ const applyMapping = (rawRows, mapping) => {
   });
 };
 
-const ImportWizard = ({ rawHeaders, rawRows, sheetInfo, fileName, onConfirm, onClose, campaignLabels }) => {
+const ImportWizard = ({ rawHeaders, rawRows, sheetInfo, fileName, onConfirm, onClose, campaignLabels, statusLabelToKey, statusMap }) => {
   const visibleHeaders = rawHeaders.filter(h => !h.startsWith("__"));
   const [mapping, setMapping] = useState(() => autoMapColumns(visibleHeaders));
   const previewRows = rawRows.slice(0, 3);
@@ -1491,7 +1502,7 @@ const mergeDualFiles = (internalMap, socialMap, mediaMap, existingData) => {
   return { toUpdate, toAdd, warnings };
 };
 
-const DualFileImportModal = ({ existingData, onConfirm, onClose, onImportSingle }) => {
+const DualFileImportModal = ({ existingData, onConfirm, onClose, onImportSingle, statusLabelToKey, statusMap }) => {
   const [step, setStep] = useState("drop"); // drop | error | preview
   const [error, setError] = useState("");
   const [dragOver, setDragOver] = useState(false);
@@ -1743,7 +1754,7 @@ const DualFileImportModal = ({ existingData, onConfirm, onClose, onImportSingle 
 
         {step === "preview" && (
           <div style={{ padding: "14px 22px", borderTop: "1px solid var(--line)", display: "flex", justifyContent: "flex-end", gap: 8 }}>
-            <button className="kt-btn kt-btn-ghost" onClick={() => { setStep("drop"); setResult(null); setRoles(null); }}>← Chọn lại file</button>
+            <button className="kt-btn kt-btn-ghost" onClick={() => { setStep("drop"); setResult(null); ; }}>← Chọn lại file</button>
             <button className="kt-btn kt-btn-primary" onClick={() => onConfirm(result)}>
               ✅ Xác nhận cập nhật {result.toUpdate.length + result.toAdd.length} dòng
             </button>
@@ -2028,7 +2039,7 @@ const StatsBar = ({ rows, currentStatus = "all", onCardClick }) => {
 /* ================================================================
    TABLE VIEW
 ================================================================ */
-const TableView = ({ rows, onOpen, onSave, campaignLabels, statusMap }) => {
+const TableView = ({ rows, onOpen, onSave, campaignLabels, statusMap, statusStages }) => {
   const [sortKey, setSortKey] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
 
@@ -2615,7 +2626,7 @@ const VIEWS_BUCKETS = [
   { key: "over200k",  label: "Trên 200K",    test: v => v >= 200000 },
 ];
 
-const ProfileView = ({ rows, onOpenProfile, campaignLabels }) => {
+const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, statusStages, statusMap }) => {
   const [search, setSearch] = useState("");
   const [filterCampaign, setFilterCampaign] = useState("all");
   const [filterTier, setFilterTier] = useState("all");
@@ -3543,6 +3554,26 @@ export default function App() {
       Blendy: "Blendy"
     };
   });
+
+  const [statusStages, setStatusStages] = useState(() => {
+    try {
+      const s = localStorage.getItem("kol_status_stages");
+      return s ? JSON.parse(s) : DEFAULT_STATUS_STAGES;
+    } catch {
+      return DEFAULT_STATUS_STAGES;
+    }
+  });
+
+  const statusMap = useMemo(() => Object.fromEntries(statusStages.map(s => [s.key, s])), [statusStages]);
+  const statusLabelToKey = useMemo(() => {
+    return Object.fromEntries([
+      ...statusStages.map(s => [s.label.toLowerCase(), s.key]),
+      ...statusStages.map(s => [s.key.toLowerCase(), s.key])
+    ]);
+  }, [statusStages]);
+  
+  const [showStatusSettings, setShowStatusSettings] = useState(false);
+
   const dynamicCampaigns = useMemo(() => {
     const uniqueKeys = Array.from(new Set(data.map(d => d.campaign).filter(Boolean)));
     return uniqueKeys.map(key => ({
@@ -4235,6 +4266,8 @@ const [view, setView] = useState("table");
         <DualFileImportModal
           existingData={data}
           statusLabelToKey={statusLabelToKey}
+          statusMap={statusMap}
+          statusLabelToKey={statusLabelToKey}
           onClose={() => setShowDualImport(false)}
           onConfirm={handleDualFileMerge}
           onImportSingle={importSingleFile}
@@ -4266,8 +4299,9 @@ const [view, setView] = useState("table");
               localStorage.setItem("kol_campaign_labels", JSON.stringify(newLabels));
             }
 
+            let mergedCount = 0;
+            let addedCount = 0;
             const updatedData = [...data];
-            
             importedRows.forEach(imp => {
               const impCampaign = resolveCampaignKey(imp);
               const matchIdx = updatedData.findIndex(existing => {
