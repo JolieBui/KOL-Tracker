@@ -328,7 +328,8 @@ const resolveCampaignKey = (row) => {
   return "";
 };
 
-const statusStages = [
+
+const DEFAULT_STATUS_STAGES = [
   { key: "waiting_food",   label: "Chờ duyệt món ăn",   color: "#E28B65", soft: "#FAF0EB" },
   { key: "waiting_script", label: "Chờ duyệt script",   color: "#B284A3", soft: "#FAF0F6" },
   { key: "doing_demo",     label: "Đang làm demo",       color: "#5E9BE2", soft: "#EBF3FC" },
@@ -337,74 +338,6 @@ const statusStages = [
   { key: "confirmed_demo", label: "Demo đã duyệt",       color: "#47B39C", soft: "#EBF8F5" },
   { key: "aired",          label: "Đã lên sóng",         color: "#8A7BFF", soft: "#F4F2FF" },
 ];
-const statusMap = Object.fromEntries(statusStages.map(s => [s.key, s]));
-// reverse: label → key  (also accept key directly)
-const statusLabelToKey = Object.fromEntries([
-  ...statusStages.map(s => [s.label.toLowerCase(), s.key]),
-  ...statusStages.map(s => [s.key.toLowerCase(), s.key]),
-  // common aliases for aired (đã lên sóng)
-  ["aired", "aired"],
-  ["đã lên sóng", "aired"],
-  ["da len song", "aired"],
-  ["lên sóng", "aired"],
-  ["len song", "aired"],
-  ["air", "aired"],
-  ["đã đăng", "aired"],
-  ["da dang", "aired"],
-  ["đã air", "aired"],
-  ["da air", "aired"],
-  ["done", "aired"],
-  ["hoàn thành", "aired"],
-  ["hoan thanh", "aired"],
-  // common aliases for waiting_script (chờ duyệt script)
-  ["chờ duyệt script", "waiting_script"],
-  ["cho duyet script", "waiting_script"],
-  ["waiting script", "waiting_script"],
-  ["script", "waiting_script"],
-  ["duyệt script", "waiting_script"],
-  ["duyet script", "waiting_script"],
-  // common aliases for doing_demo (đang làm demo)
-  ["đang làm demo", "doing_demo"],
-  ["dang lam demo", "doing_demo"],
-  ["doing demo", "doing_demo"],
-  ["làm demo", "doing_demo"],
-  ["lam demo", "doing_demo"],
-  ["quay clip", "doing_demo"],
-  ["quay video", "doing_demo"],
-  ["làm clip", "doing_demo"],
-  // common aliases for waiting_demo (chờ duyệt demo)
-  ["chờ duyệt demo", "waiting_demo"],
-  ["cho duyet demo", "waiting_demo"],
-  ["waiting demo", "waiting_demo"],
-  ["duyệt demo", "waiting_demo"],
-  ["duyet demo", "waiting_demo"],
-  ["feedback demo", "waiting_demo"],
-  // common aliases for revised_demo (demo đã chỉnh sửa)
-  ["demo đã chỉnh sửa", "revised_demo"],
-  ["demo da chinh sua", "revised_demo"],
-  ["revised demo", "revised_demo"],
-  ["sửa demo", "revised_demo"],
-  ["sua demo", "revised_demo"],
-  // common aliases for confirmed_demo (demo đã duyệt)
-  ["demo đã duyệt", "confirmed_demo"],
-  ["demo da duyet", "confirmed_demo"],
-  ["confirmed demo", "confirmed_demo"],
-  ["demo ok", "confirmed_demo"],
-  ["duyệt demo ok", "confirmed_demo"],
-  // common aliases for waiting_food (chờ duyệt món ăn)
-  ["chờ duyệt món", "waiting_food"],
-  ["chờ duyệt món ăn", "waiting_food"],
-  ["cho duyet mon an", "waiting_food"],
-  ["waiting food", "waiting_food"],
-  ["món ăn", "waiting_food"],
-  ["mon an", "waiting_food"],
-  // common aliases for waiting_demo (feedback / chờ duyệt demo)
-  ["waiting feedback demo", "waiting_demo"],
-  ["feedback demo", "waiting_demo"],
-  ["waiting fb demo", "waiting_demo"],
-  ["confirmed demo", "confirmed_demo"],
-  ["doing demo", "doing_demo"],
-]);
 
 const cleanName = (str) => {
   if (!str) return "";
