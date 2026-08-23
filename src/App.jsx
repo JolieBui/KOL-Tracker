@@ -4202,7 +4202,7 @@ const [view, setView] = useState("table");
           minHeight: 0,
           boxShadow: "0 8px 30px rgba(72, 67, 92, 0.015)"
         }}>
-          {view === "table" && <TableView rows={filtered} statusMap={statusMap} onOpen={r => setSelected(r)} onSave={(id, changes) => { setData(prev => prev.map(item => item.id === id ? { ...item, ...changes } : item)); }} campaignLabels={campaignLabels} />}
+          {view === "table" && <TableView rows={filtered} statusMap={statusMap} statusStages={statusStages} onOpen={r => setSelected(r)} onSave={(id, changes) => { setData(prev => prev.map(item => item.id === id ? { ...item, ...changes } : item)); }} campaignLabels={campaignLabels} />}
           {view === "kanban" && (
             <KanbanView 
               rows={filtered} 
@@ -4231,7 +4231,10 @@ const [view, setView] = useState("table");
             <ProfileView 
               rows={data} 
               onOpenProfile={k => setSelectedProfile(k)} 
-              campaignLabels={campaignLabels} 
+              campaignLabels={campaignLabels}
+              dynamicCampaigns={dynamicCampaigns}
+              statusStages={statusStages}
+              statusMap={statusMap}
             />
           )}
         </div>
