@@ -1849,7 +1849,20 @@ const StatusSettingsModal = ({ statuses, onSave, onClose }) => {
 ================================================================ */
 const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCampaigns }) => {
   const [form, setForm] = useState({ ...kol });
+  const [isNewCampaign, setIsNewCampaign] = useState(false);
+  const [newCampaign, setNewCampaign] = useState("");
+
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const handleCampaignChange = (val) => {
+    if (val === "__new__") {
+      setIsNewCampaign(true);
+      set("campaign", newCampaign || "");
+    } else {
+      setIsNewCampaign(false);
+      set("campaign", val);
+    }
+  };
 
   const Field = ({ label, field, type = "text", options }) => (
     <div style={{ marginBottom: 14 }}>
@@ -1888,7 +1901,37 @@ const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCamp
         {/* Body */}
         <div style={{ padding: "18px 22px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 20px" }}>
           <div>
-            <Field label="Campaign" field="campaign" type="select" options={dynamicCampaigns.map(c => c.key)} />
+            <div style={{ marginBottom: 14 }}>
+              <label className="kt-label">Campaign</label>
+              <select
+                className="kt-select"
+                value={isNewCampaign ? "__new__" : (form.campaign || "")}
+                onChange={e => handleCampaignChange(e.target.value)}
+              >
+                <option value="">—</option>
+                {dynamicCampaigns.map(c => (
+                  <option key={c.key} value={c.key}>
+                    {c.label}
+                  </option>
+                ))}
+                <option value="__new__" style={{ fontWeight: "bold", color: "var(--accent)" }}>
+                  ✍️ + Thêm dự án mới...
+                </option>
+              </select>
+              {isNewCampaign && (
+                <input
+                  className="kt-input"
+                  style={{ marginTop: 8 }}
+                  placeholder="Nhập tên dự án mới..."
+                  value={newCampaign}
+                  onChange={e => {
+                    const val = e.target.value;
+                    setNewCampaign(val);
+                    set("campaign", val);
+                  }}
+                />
+              )}
+            </div>
             <Field label="Tên KOL" field="kol" />
             <Field label="Link TikTok" field="link" />
             <Field label="Followers" field="follower" />
@@ -3905,13 +3948,25 @@ const [view, setView] = useState("table");
     });
   }, [data, filterCampaign, filterStatus, filterType, search]);
 
+  const ensureCampaignLabel = (campaignKey) => {
+    if (campaignKey && !campaignLabels[campaignKey]) {
+      setCampaignLabels(prev => {
+        const next = { ...prev, [campaignKey]: campaignKey };
+        localStorage.setItem("kol_campaign_labels", JSON.stringify(next));
+        return next;
+      });
+    }
+  };
+
   const handleSave = (updated) => {
+    ensureCampaignLabel(updated.campaign);
     setData(d => d.map(r => r.id === updated.id ? updated : r));
   };
   const handleDelete = (id) => {
     setData(d => d.filter(r => r.id !== id));
   };
   const handleAdd = (newRow) => {
+    ensureCampaignLabel(newRow.campaign);
     setData(d => [...d, newRow]);
   };
 
