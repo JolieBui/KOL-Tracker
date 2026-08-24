@@ -4850,16 +4850,28 @@ const [view, setView] = useState("table");
     return `${cleanCamp}-${maxIndex + 1}`;
   };
 
+  const SUPABASE_COLUMNS = [
+    "id", "campaign", "kol", "link", "follower", "type", "location", "group",
+    "cost", "addonFee", "statusKey", "monAn", "ngayGuiScript", "ngayGuiDemo",
+    "ngayAir", "airedLink", "airedFb", "giftSent", "estView", "estEng", "views",
+    "likes", "comments", "saves", "shares", "adSpend", "conversions", "addToCart",
+    "revenue", "reupViews", "reupEngagement", "totalViewCombined", "totalEngCombined",
+    "pctViewAchieved", "pctEngAchieved", "pctViewAchievedTotal", "pctEngAchievedTotal",
+    "paidAvgView", "paidPctCompletedView", "codeAds", "reupLink", "brandReup", "updatedAt"
+  ];
+
   const safeSupabaseUpsert = async (rowsOrRow) => {
     if (!supabaseClient || !rowsOrRow) return { error: null };
     const isSingle = !Array.isArray(rowsOrRow);
     const rows = isSingle ? [rowsOrRow] : rowsOrRow;
     if (rows.length === 0) return { error: null };
 
+    // Strict schema filtering to only send columns guaranteed to exist in Supabase
     let payload = rows.map(r => {
-      const clean = { ...r };
-      delete clean.__no__;
-      delete clean.__sheet__;
+      const clean = {};
+      SUPABASE_COLUMNS.forEach(col => {
+        if (r[col] !== undefined) clean[col] = r[col];
+      });
       return clean;
     });
 
@@ -4868,7 +4880,7 @@ const [view, setView] = useState("table");
       const { data: resData, error } = await supabaseClient.from("kols").upsert(isSingle ? payload[0] : payload);
       if (!error) return { data: resData, error: null };
 
-      const match = error.message && error.message.match(/Could not find the '(\w+)' column/i);
+      const match = (error.message || "").match(/Could not find the '(\w+)' column/i);
       if (match && match[1]) {
         const missingCol = match[1];
         payload = payload.map(r => {
