@@ -1883,14 +1883,36 @@ const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCamp
     setScannerLoading(true);
     try {
       const target = `https://urlebird.com/search/?q=${username}`;
-      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(target)}`;
+      let html = "";
       
-      const res = await fetch(proxyUrl);
-      if (!res.ok) throw new Error("Không thể kết nối tới máy chủ proxy.");
-      
-      const json = await res.json();
-      const html = json.contents;
-      if (!html) throw new Error("Không lấy được nội dung trang web.");
+      // Try AllOrigins
+      try {
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(target)}`;
+        const res = await fetch(proxyUrl);
+        if (res.ok) {
+          const json = await res.json();
+          html = json.contents || "";
+        }
+      } catch (e1) {
+        console.warn("Proxy AllOrigins failed, trying fallback...", e1);
+      }
+
+      // Try Codetabs if AllOrigins failed
+      if (!html) {
+        try {
+          const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(target)}`;
+          const res = await fetch(proxyUrl);
+          if (res.ok) {
+            html = await res.text();
+          }
+        } catch (e2) {
+          console.warn("Proxy Codetabs failed...", e2);
+        }
+      }
+
+      if (!html) {
+        throw new Error("Không thể kết nối đến các máy chủ proxy để lấy dữ liệu. Nếu bạn có cài Adblock hoặc Brave Shield, hãy tạm thời tắt đi và thử lại.");
+      }
 
       const userBlocks = html.match(/<div class="user my-2[^"]*">([\s\S]*?)<\/div>\s*<\/div>/g);
       if (!userBlocks || userBlocks.length === 0) {
@@ -3353,14 +3375,36 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpe
     setAvatarLoading(true);
     try {
       const target = `https://urlebird.com/search/?q=${username}`;
-      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(target)}`;
+      let html = "";
       
-      const res = await fetch(proxyUrl);
-      if (!res.ok) throw new Error("Không thể kết nối tới máy chủ proxy.");
-      
-      const json = await res.json();
-      const html = json.contents;
-      if (!html) throw new Error("Không lấy được nội dung trang web.");
+      // Try AllOrigins
+      try {
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(target)}`;
+        const res = await fetch(proxyUrl);
+        if (res.ok) {
+          const json = await res.json();
+          html = json.contents || "";
+        }
+      } catch (e1) {
+        console.warn("Proxy AllOrigins failed, trying fallback...", e1);
+      }
+
+      // Try Codetabs if AllOrigins failed
+      if (!html) {
+        try {
+          const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(target)}`;
+          const res = await fetch(proxyUrl);
+          if (res.ok) {
+            html = await res.text();
+          }
+        } catch (e2) {
+          console.warn("Proxy Codetabs failed...", e2);
+        }
+      }
+
+      if (!html) {
+        throw new Error("Không thể kết nối đến các máy chủ proxy để lấy dữ liệu. Nếu bạn có cài Adblock hoặc Brave Shield, hãy tạm thời tắt đi và thử lại.");
+      }
 
       const userBlocks = html.match(/<div class="user my-2[^"]*">([\s\S]*?)<\/div>\s*<\/div>/g);
       if (!userBlocks || userBlocks.length === 0) {
