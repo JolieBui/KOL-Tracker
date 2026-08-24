@@ -4852,28 +4852,6 @@ const [view, setView] = useState("table");
                 KOL <span style={{ color: "#EA9216" }}>Tracking</span>
               </h1>
             </div>
-
-            {/* Online Presence Users */}
-            {onlineUsers.length > 0 && (
-              <div style={{ display: "flex", alignItems: "center", gap: -6, marginRight: 8 }}>
-                {onlineUsers.map((u, i) => (
-                  <div
-                    key={i}
-                    title={u.name}
-                    style={{
-                      width: 24, height: 24, borderRadius: "50%",
-                      backgroundColor: u.color, color: "white",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 9, fontWeight: 700, border: "2px solid var(--card)",
-                      marginLeft: i > 0 ? -6 : 0, boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                      flexShrink: 0
-                    }}
-                  >
-                    {u.initials}
-                  </div>
-                ))}
-              </div>
-            )}
             
             {/* View Toggle (Bảng, Kanban, Lịch) */}
             <div style={{ display: "flex", gap: 2, background: "var(--paper)", padding: 3, borderRadius: 20 }}>
