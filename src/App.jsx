@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import * as XLSX from "xlsx";
+import { createClient } from "@supabase/supabase-js";
 
 /* ---------------- Design tokens (injected via <style>) ---------------- */
 const GlobalStyle = () => (
@@ -234,6 +235,123 @@ const GlobalStyle = () => (
     @keyframes kt-spin {
       from { transform: rotate(0deg); }
       to   { transform: rotate(360deg); }
+    }
+
+    /* ── RESPONSIVE RESPONSIVENESS (MOBILE & IPAD) ── */
+    .kt-modal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 20px;
+    }
+    .kt-filters-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      border-top: 1px dashed var(--line);
+      padding-top: 12px;
+    }
+    .kt-filter-input {
+      width: 240px;
+    }
+    .kt-filter-select {
+      width: auto;
+      min-width: 130px;
+    }
+    .kt-calendar-container {
+      display: flex;
+      gap: 16px;
+      flex: 1;
+      min-height: 0;
+      padding: 12px;
+    }
+    .kt-calendar-sidebar {
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      background: var(--card);
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      padding: 14px;
+    }
+    .kt-profile-split {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .kt-profile-sidebar {
+      width: 340px;
+      min-width: 340px;
+      border-left: 1px solid var(--line);
+      background: var(--card);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      overflow-y: auto;
+    }
+    .kt-profile-modal-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 20px;
+      align-items: stretch;
+    }
+    @media (max-width: 768px) {
+      .kt-profile-modal-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .kt-profile-split {
+        flex-direction: column-reverse !important;
+        overflow-y: auto !important;
+      }
+      .kt-profile-sidebar {
+        width: 100% !important;
+        min-width: 100% !important;
+        border-left: none !important;
+        border-bottom: 1px solid var(--line) !important;
+        box-sizing: border-box !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .kt-calendar-container {
+        flex-direction: column-reverse !important;
+        overflow-y: auto !important;
+      }
+      .kt-calendar-sidebar {
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .kt-modal {
+        max-height: 100vh !important;
+        border-radius: 0 !important;
+        height: 100% !important;
+        margin: 0 !important;
+      }
+      .kt-overlay {
+        padding: 0 !important;
+      }
+      .kt-modal-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0 !important;
+      }
+      .kt-filter-input, .kt-filter-select {
+        width: 100% !important;
+        flex: 1 1 100% !important;
+      }
+      .kt-header-row {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+      }
     }
 
     /* Table styling */
@@ -1799,7 +1917,7 @@ const CampaignDot = ({ campaign, labels }) => (
 /* ================================================================
    STATUS SETTINGS MODAL
 ================================================================ */
-const StatusSettingsModal = ({ statuses, onSave, onClose }) => {
+const StatusSettingsModal = ({ statuses, onSave, onClose, onReset }) => {
   const [list, setList] = useState(() => statuses.map(s => ({ ...s, originalKey: s.originalKey || s.key })));
 
   const handleChange = (idx, field, val) => {
@@ -1836,9 +1954,19 @@ const StatusSettingsModal = ({ statuses, onSave, onClose }) => {
           ))}
           <button className="kt-btn kt-btn-ghost" onClick={handleAdd} style={{ marginTop: 10, width: "100%", border: "1px dashed var(--line)" }}>+ Thêm trạng thái mới</button>
         </div>
-        <div style={{ marginTop: 20, display: "flex", justifyContent: "flex-end", gap: 10 }}>
-          <button className="kt-btn kt-btn-ghost" onClick={onClose}>Hủy</button>
-          <button className="kt-btn kt-btn-primary" onClick={() => onSave(list)}>Lưu thay đổi</button>
+        <div style={{ marginTop: 20, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <button 
+            className="kt-btn kt-btn-ghost" 
+            type="button"
+            onClick={() => { if(onReset) { onReset(); onClose(); } }} 
+            style={{ color: "#EF4444", border: "1px solid rgba(239, 68, 68, 0.2)", padding: "6px 12px", fontSize: 12 }}
+          >
+            ⚠️ Đặt lại dữ liệu ban đầu
+          </button>
+          <div style={{ display: "flex", gap: 10 }}>
+            <button className="kt-btn kt-btn-ghost" onClick={onClose}>Hủy</button>
+            <button className="kt-btn kt-btn-primary" onClick={() => onSave(list)}>Lưu thay đổi</button>
+          </div>
         </div>
       </div>
     </div>
@@ -2227,7 +2355,7 @@ const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCamp
         </div>
 
         {/* Body */}
-        <div className="kt-scrollbar" style={{ padding: "18px 22px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 20px", overflowY: "auto", flex: 1, minHeight: 0 }}>
+        <div className="kt-scrollbar kt-modal-grid" style={{ padding: "18px 22px", overflowY: "auto", flex: 1, minHeight: 0 }}>
           <div>
             <div style={{ marginBottom: 14 }}>
               <label className="kt-label">Campaign</label>
@@ -2721,7 +2849,7 @@ const KanbanColumn = ({ stage, cards, onOpen, onUpdateStatus, campaignLabels }) 
 };
 
 const KanbanView = ({ rows, onOpen, onUpdateStatus, campaignLabels, statusStages, statusMap }) => (
-  <div style={{ display: "grid", gridTemplateColumns: `repeat(${statusStages.length}, minmax(0, 1fr))`, gap: 10, padding: 16, alignItems: "stretch", flex: 1, height: "100%", overflow: "hidden" }}>
+  <div className="kt-scrollbar" style={{ display: "flex", gap: 12, padding: 16, alignItems: "stretch", flex: 1, height: "100%", overflowX: "auto", overflowY: "hidden" }}>
     {statusStages.map(stage => {
       const cards = rows.filter(r => r.statusKey === stage.key);
       return (
@@ -2855,7 +2983,7 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels }) => {
   const weekdays = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
 
   return (
-    <div style={{ display: "flex", gap: 16, flex: 1, minHeight: 0, padding: 12 }}>
+    <div className="kt-calendar-container">
       {/* Left panel: Calendar Grid */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "var(--card)", borderRadius: 12, border: "1px solid var(--line)", padding: 14, overflow: "hidden" }}>
         {/* Navigation */}
@@ -2957,7 +3085,7 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels }) => {
       </div>
 
       {/* Right panel: Unscheduled KOLs Sidebar */}
-      <div style={{ width: 220, display: "flex", flexDirection: "column", background: "var(--card)", borderRadius: 12, border: "1px solid var(--line)", padding: 14 }}>
+      <div className="kt-calendar-sidebar">
         <h3 style={{ fontSize: 12, fontWeight: 700, margin: "0 0 10px 0", color: "var(--ink)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span>📅 Chưa lên lịch</span>
           <span className="kt-badge" style={{ background: "var(--accent-bg)", color: "var(--accent)", fontSize: 10 }}>{unscheduled.length}</span>
@@ -3262,11 +3390,11 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
       </div>
 
       {/* ── SPLIT BODY ── */}
-      <div style={{ display: "flex", flex: 1, minHeight: 0, overflow: "hidden" }}>
+      <div className="kt-profile-split">
         
         {/* Left Column: KOL Cards Grid */}
         <div className="kt-scrollbar" style={{ flex: 1, padding: "20px", overflowY: "auto" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))", gap: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
             {filteredKols.map(k => {
               const campaignsArr = Array.from(k.campaigns);
               const phasesArr = Array.from(k.phases);
@@ -3348,7 +3476,7 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
         </div>
 
         {/* Right Column: Leaderboard Sidebar */}
-        <div className="kt-scrollbar" style={{ width: 340, minWidth: 340, borderLeft: "1px solid var(--line)", background: "var(--card)", padding: 20, display: "flex", flexDirection: "column", gap: 24, overflowY: "auto" }}>
+        <div className="kt-scrollbar kt-profile-sidebar">
           
           {/* Section 1: Views Leaderboard */}
           <div>
@@ -3774,7 +3902,7 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpe
 
         <div style={{ padding: "20px 22px", display: "flex", flexDirection: "column", gap: 18, overflowY: "auto", flex: 1, minHeight: 0 }} className="kt-scrollbar">
           
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 20, alignItems: "stretch" }}>
+          <div className="kt-profile-modal-grid">
             {/* Left Column: Basic Info Card (Editable In-Place) */}
             <div style={{ background: "var(--paper)", padding: 18, borderRadius: 12, border: "1px solid var(--line)", display: "flex", flexDirection: "column", gap: 12 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -4182,10 +4310,183 @@ const [view, setView] = useState("table");
     }
   }, []);
 
+  /* ================================================================
+     SUPABASE REAL-TIME DATABASE SYNC & PRESENCE SETUP
+  ================================================================ */
+  const [supabaseUrl, setSupabaseUrlState] = useState(() => localStorage.getItem("supabase_url") || "");
+  const [supabaseKey, setSupabaseKeyState] = useState(() => localStorage.getItem("supabase_key") || "");
+  const [supabaseNickname, setSupabaseNicknameState] = useState(() => localStorage.getItem("supabase_nickname") || "Ẩn danh");
+  const [isSupabaseConnected, setIsSupabaseConnected] = useState(false);
+  const [supabaseError, setSupabaseError] = useState(null);
+  const [onlineUsers, setOnlineUsers] = useState([]);
+  const [supabaseClient, setSupabaseClient] = useState(null);
+  const [showSupabaseSettings, setShowSupabaseSettings] = useState(false);
 
+  // Initialize Supabase Client
+  useEffect(() => {
+    if (!supabaseUrl || !supabaseKey) {
+      setIsSupabaseConnected(false);
+      setSupabaseClient(null);
+      setOnlineUsers([]);
+      return;
+    }
 
+    let active = true;
+    let client;
+    try {
+      client = createClient(supabaseUrl, supabaseKey);
+      setSupabaseClient(client);
+    } catch (e) {
+      setSupabaseError(e.message);
+      setIsSupabaseConnected(false);
+      return;
+    }
 
+    const initSupabase = async () => {
+      // 1. Fetch initial kols data
+      const { data: dbData, error: dbError } = await client.from("kols").select("*");
+      if (!active) return;
 
+      if (dbError) {
+        console.error("Supabase load error:", dbError);
+        setIsSupabaseConnected(false);
+        setSupabaseError("Không thể kết nối đến bảng 'kols'. Hãy chắc chắn bạn đã tạo bảng 'kols' và 'app_config' theo hướng dẫn SQL bên dưới.");
+        return;
+      }
+
+      rawSetData(dbData || []);
+      setIsSupabaseConnected(true);
+      setSupabaseError(null);
+
+      // 2. Fetch app_config for campaign labels & status stages
+      const { data: configData } = await client.from("app_config").select("*");
+      if (!active) return;
+
+      if (configData) {
+        const labels = configData.find(c => c.key === "campaign_labels");
+        if (labels && labels.value) {
+          setCampaignLabels(labels.value);
+          localStorage.setItem("kol_campaign_labels", JSON.stringify(labels.value));
+        }
+        const statuses = configData.find(c => c.key === "status_stages");
+        if (statuses && statuses.value) {
+          setStatusStages(statuses.value);
+          localStorage.setItem("kol_status_stages", JSON.stringify(statuses.value));
+        }
+      }
+    };
+
+    initSupabase();
+
+    // 3. Subscribe to real-time changes
+    const channel = client
+      .channel("schema-db-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "kols" },
+        payload => {
+          console.log("Realtime payload received:", payload);
+          if (payload.eventType === "INSERT") {
+            rawSetData(current => {
+              if (current.some(r => r.id === payload.new.id)) return current;
+              return [...current, payload.new];
+            });
+          } else if (payload.eventType === "UPDATE") {
+            rawSetData(current => current.map(r => r.id === payload.new.id ? payload.new : r));
+          } else if (payload.eventType === "DELETE") {
+            rawSetData(current => current.filter(r => r.id !== payload.old.id));
+          }
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "app_config" },
+        payload => {
+          console.log("Realtime app_config payload:", payload);
+          if (payload.eventType === "UPDATE" || payload.eventType === "INSERT") {
+            if (payload.new.key === "campaign_labels" && payload.new.value) {
+              setCampaignLabels(payload.new.value);
+              localStorage.setItem("kol_campaign_labels", JSON.stringify(payload.new.value));
+            }
+            if (payload.new.key === "status_stages" && payload.new.value) {
+              setStatusStages(payload.new.value);
+              localStorage.setItem("kol_status_stages", JSON.stringify(payload.new.value));
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    // 4. Subscribe to Real-time Presence
+    const presenceChannel = client.channel("presence-tcv-kols", {
+      config: {
+        presence: {
+          key: supabaseNickname.trim() || "Ẩn danh",
+        },
+      },
+    });
+
+    presenceChannel
+      .on("presence", { event: "sync" }, () => {
+        const state = presenceChannel.presenceState();
+        const users = Object.keys(state).map(key => {
+          const hash = Array.from(key).reduce((s, c) => s + c.charCodeAt(0), 0);
+          const colors = ["#F59E0B", "#10B981", "#3B82F6", "#EC4899", "#8B5CF6", "#EF4444", "#06B6D4"];
+          const color = colors[hash % colors.length];
+          return {
+            name: key,
+            initials: key.slice(0, 2).toUpperCase(),
+            color
+          };
+        });
+        setOnlineUsers(users);
+      })
+      .subscribe(async (status) => {
+        if (status === "SUBSCRIBED") {
+          await presenceChannel.track({
+            online_at: new Date().toISOString(),
+          });
+        }
+      });
+
+    return () => {
+      active = false;
+      channel.unsubscribe();
+      presenceChannel.unsubscribe();
+    };
+  }, [supabaseUrl, supabaseKey, supabaseNickname]);
+
+  const handleConnectSupabase = (url, key, nickname) => {
+    localStorage.setItem("supabase_url", url.trim());
+    localStorage.setItem("supabase_key", key.trim());
+    localStorage.setItem("supabase_nickname", nickname.trim());
+    setSupabaseUrlState(url.trim());
+    setSupabaseKeyState(key.trim());
+    setSupabaseNicknameState(nickname.trim());
+    showToast("⚡ Đang kết nối tới Supabase...");
+  };
+
+  const handleDisconnectSupabase = () => {
+    localStorage.removeItem("supabase_url");
+    localStorage.removeItem("supabase_key");
+    localStorage.removeItem("supabase_nickname");
+    setSupabaseUrlState("");
+    setSupabaseKeyState("");
+    setSupabaseNicknameState("Ẩn danh");
+    setIsSupabaseConnected(false);
+    setSupabaseError(null);
+    setOnlineUsers([]);
+    setSupabaseClient(null);
+
+    // Reset to local data
+    try {
+      const s = localStorage.getItem(LS_KEY);
+      rawSetData(s ? JSON.parse(s) : SEED_DATA);
+    } catch (e) {
+      rawSetData(SEED_DATA);
+    }
+    showToast("🔌 Đã ngắt kết nối. Quay về chế độ Offline LocalStorage.");
+  };
 
   const [wizardData, setWizardData] = useState(null); // { rawHeaders, rawRows, fileName }
   const [showDualImport, setShowDualImport] = useState(false);
@@ -4495,7 +4796,7 @@ const [view, setView] = useState("table");
     return `${cleanCamp}-${maxIndex + 1}`;
   };
 
-  const handleSave = (updated) => {
+  const handleSave = async (updated) => {
     ensureCampaignLabel(updated.campaign);
     const oldRow = data.find(r => r.id === updated.id);
     let finalRow = updated;
@@ -4504,19 +4805,34 @@ const [view, setView] = useState("table");
         ...updated,
         id: generateKOLId(updated.campaign, data)
       };
+      if (supabaseClient) {
+        await supabaseClient.from("kols").delete().eq("id", updated.id);
+      }
     }
     setData(d => d.map(r => r.id === updated.id ? finalRow : r));
+    if (supabaseClient) {
+      const { error } = await supabaseClient.from("kols").upsert(finalRow);
+      if (error) showToast("❌ Lỗi lưu dữ liệu: " + error.message, false);
+    }
   };
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     setData(d => d.filter(r => r.id !== id));
+    if (supabaseClient) {
+      const { error } = await supabaseClient.from("kols").delete().eq("id", id);
+      if (error) showToast("❌ Lỗi xóa dữ liệu: " + error.message, false);
+    }
   };
-  const handleAdd = (newRow) => {
+  const handleAdd = async (newRow) => {
     const finalRow = {
       ...newRow,
       id: generateKOLId(newRow.campaign, data)
     };
     ensureCampaignLabel(finalRow.campaign);
     setData(d => [...d, finalRow]);
+    if (supabaseClient) {
+      const { error } = await supabaseClient.from("kols").insert(finalRow);
+      if (error) showToast("❌ Lỗi thêm dữ liệu: " + error.message, false);
+    }
   };
 
   const getProfileForKol = (kolName) => {
@@ -4576,53 +4892,82 @@ const [view, setView] = useState("table");
   // tier, location, group, TikTok link — that are duplicated across every campaign
   // row for that KOL. We match rows by the original (pre-edit) name and apply the
   // new values to all of them, so table/kanban/profile views all stay consistent.
-  const handleUpdateProfile = (originalName, updates) => {
+  const handleUpdateProfile = async (originalName, updates) => {
     const key = (originalName || "").trim().toLowerCase();
+    const updatedRows = [];
     setData(d => d.map(r => {
       if ((r.kol || "").trim().toLowerCase() !== key) return r;
-      return { ...r, ...updates };
+      const updatedRow = { ...r, ...updates };
+      updatedRows.push(updatedRow);
+      return updatedRow;
     }));
     showToast("✅ Đã cập nhật hồ sơ KOL");
+    if (supabaseClient && updatedRows.length > 0) {
+      const { error } = await supabaseClient.from("kols").upsert(updatedRows);
+      if (error) showToast("❌ Lỗi đồng bộ hồ sơ: " + error.message, false);
+    }
   };
+
   // Commit the preview from DualFileImportModal: update matched rows in place
   // (by id) and append brand-new ones, in a single history-tracked setData call.
-  const handleDualFileMerge = (result) => {
+  const handleDualFileMerge = async (result) => {
+    let finalKols = [];
     setData(d => {
       const byId = Object.fromEntries(d.map(r => [r.id, r]));
       result.toUpdate.forEach(u => {
         byId[u.id] = { ...byId[u.id], ...u.changes, updatedAt: new Date().toISOString().slice(0, 10) };
       });
-      return [...Object.values(byId), ...result.toAdd];
+      finalKols = [...Object.values(byId), ...result.toAdd];
+      return finalKols;
     });
 
+    let nextLabels = campaignLabels;
     if (result.sheetLabels && Object.keys(result.sheetLabels).length) {
       setCampaignLabels(prev => {
-        const next = { ...prev, ...result.sheetLabels };
-        localStorage.setItem("kol_campaign_labels", JSON.stringify(next));
-        return next;
+        nextLabels = { ...prev, ...result.sheetLabels };
+        localStorage.setItem("kol_campaign_labels", JSON.stringify(nextLabels));
+        return nextLabels;
       });
     }
 
-    showToast(`✅ Đã cập nhật ${result.toUpdate.length} dòng, thêm ${result.toAdd.length} KOL mới`);
+    showToast();
     setShowDualImport(false);
+
+    if (supabaseClient) {
+      const { error } = await supabaseClient.from("kols").upsert(finalKols);
+      if (error) showToast("❌ Lỗi đồng bộ dữ liệu import: " + error.message, false);
+
+      if (result.sheetLabels && Object.keys(result.sheetLabels).length) {
+        await supabaseClient.from("app_config").upsert({ key: "campaign_labels", value: nextLabels });
+      }
+    }
   };
-  const handleReset = () => {
+
+  const handleReset = async () => {
     const clearAll = window.confirm(
-      "Bạn muốn thực hiện thao tác nào?\n\n" +
-      "- Bấm 'OK' để XÓA SẠCH toàn bộ dữ liệu hiện tại (về 0 KOLs).\n" +
-      "- Bấm 'Cancel' để KHÔI PHỤC lại 66 dòng dữ liệu mẫu ban đầu."
+      "Bạn muốn thực hiện thao tác nào?\n\n- Bấm 'OK' để XÓA SẠCH toàn bộ dữ liệu hiện tại (về 0 KOLs).\n- Bấm 'Cancel' để KHÔI PHỤC lại 66 dòng dữ liệu mẫu ban đầu."
     );
+    const defLabels = { AM: "AM", AX: "AX", Vinegar: "Vinegar", MSG: "MGS", Blendy: "Blendy" };
     if (clearAll) {
       setData([]);
-      const defLabels = { AM: "AM", AX: "AX", Vinegar: "Vinegar", MSG: "MGS", Blendy: "Blendy" };
       setCampaignLabels(defLabels);
       localStorage.setItem("kol_campaign_labels", JSON.stringify(defLabels));
+      if (supabaseClient) {
+        const { error: err1 } = await supabaseClient.from("kols").delete().neq("id", "");
+        const { error: err2 } = await supabaseClient.from("app_config").upsert({ key: "campaign_labels", value: defLabels });
+        if (err1 || err2) showToast("❌ Lỗi reset dữ liệu trên Database", false);
+      }
     } else {
       if (window.confirm("Bạn có chắc chắn muốn khôi phục lại 66 dòng dữ liệu mẫu ban đầu? Mọi chỉnh sửa hiện tại sẽ bị mất.")) {
         setData(SEED_DATA);
-        const defLabels = { AM: "AM", AX: "AX", Vinegar: "Vinegar", MSG: "MGS", Blendy: "Blendy" };
         setCampaignLabels(defLabels);
         localStorage.setItem("kol_campaign_labels", JSON.stringify(defLabels));
+        if (supabaseClient) {
+          await supabaseClient.from("kols").delete().neq("id", "");
+          const { error: err1 } = await supabaseClient.from("kols").insert(SEED_DATA);
+          const { error: err2 } = await supabaseClient.from("app_config").upsert({ key: "campaign_labels", value: defLabels });
+          if (err1 || err2) showToast("❌ Lỗi khôi phục dữ liệu mẫu trên Database", false);
+        }
       }
     }
   };
@@ -4644,7 +4989,7 @@ const [view, setView] = useState("table");
         boxShadow: "0 4px 20px rgba(72, 67, 92, 0.015)"
       }}>
         {/* Top Row: Brand Title + View Toggles + Action Buttons */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, overflowX: "auto", width: "100%", paddingBottom: 4 }} className="kt-scrollbar">
+        <div className="kt-scrollbar kt-header-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, overflowX: "auto", width: "100%", paddingBottom: 4 }}>
           {/* Group 1: Logo/Brand & View Toggles (Left aligned together) */}
           <div style={{ display: "flex", alignItems: "center", gap: 18, flexShrink: 0 }}>
             {/* Logo & Brand Name */}
@@ -4672,6 +5017,28 @@ const [view, setView] = useState("table");
                 KOL <span style={{ color: "#EA9216" }}>Tracking</span>
               </h1>
             </div>
+
+            {/* Online Presence Users */}
+            {onlineUsers.length > 0 && (
+              <div style={{ display: "flex", alignItems: "center", gap: -6, marginRight: 8 }}>
+                {onlineUsers.map((u, i) => (
+                  <div
+                    key={i}
+                    title={u.name}
+                    style={{
+                      width: 24, height: 24, borderRadius: "50%",
+                      backgroundColor: u.color, color: "white",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 9, fontWeight: 700, border: "2px solid var(--card)",
+                      marginLeft: i > 0 ? -6 : 0, boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                      flexShrink: 0
+                    }}
+                  >
+                    {u.initials}
+                  </div>
+                ))}
+              </div>
+            )}
             
             {/* View Toggle (Bảng, Kanban, Lịch) */}
             <div style={{ display: "flex", gap: 2, background: "var(--paper)", padding: 3, borderRadius: 20 }}>
@@ -4689,7 +5056,7 @@ const [view, setView] = useState("table");
                 onClick={() => setView("profile")}>Hồ sơ KOL</button>
             </div>
           </div>
- 
+
           {/* Quick Actions (Add, Import, Undo/Redo) */}
           <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
             <button className="kt-btn kt-btn-ghost" onClick={handleDownloadTemplate}
@@ -4705,18 +5072,19 @@ const [view, setView] = useState("table");
             <button className="kt-btn kt-btn-ghost" onClick={handleExportData}
               title="Tải toàn bộ dữ liệu hiện tại trên web về máy (.xlsx)" style={{ padding: "6px 10px", fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-              Lưu về máy
+              Xuất Excel
             </button>
             <button className="kt-btn kt-btn-ghost" onClick={() => setShowShareModal(true)}
               title="Chia sẻ dữ liệu online qua link trực tuyến" style={{ padding: "6px 10px", fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-              Chia sẻ online
+              Chia sẻ
             </button>
- 
+
             {/* Undo / Redo */}
             <div style={{ display: "flex", gap: 1, border: "1px solid var(--line)", borderRadius: 20, overflow: "hidden", padding: 2, background: "var(--card)" }}>
               <button 
                 className="kt-btn kt-btn-ghost" 
+                type="button"
                 onClick={handleUndo} 
                 disabled={history.length === 0}
                 title="Hoàn tác (Ctrl+Z)" 
@@ -4726,6 +5094,7 @@ const [view, setView] = useState("table");
               </button>
               <button 
                 className="kt-btn kt-btn-ghost" 
+                type="button"
                 onClick={handleRedo} 
                 disabled={redoHistory.length === 0}
                 title="Làm lại (Ctrl+Y)" 
@@ -4734,48 +5103,54 @@ const [view, setView] = useState("table");
                 ↪️
               </button>
             </div>
- 
-            
-            <button className="kt-btn kt-btn-ghost" onClick={() => setShowStatusSettings(true)}
-              title="Cài đặt hệ thống (Thêm/bớt Trạng thái)" style={{ padding: "6px 10px", fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-              Cài đặt
-            </button>
-            {/* Reset / Đặt lại */}
 
-            <button className="kt-btn kt-btn-ghost" onClick={handleReset} title="Khôi phục dữ liệu ban đầu" style={{ padding: "6px 10px", fontSize: 12 }}>Đặt lại</button>
- 
+            <button
+              className="kt-btn kt-btn-ghost"
+              type="button"
+              onClick={() => setShowSupabaseSettings(true)}
+              title="Đồng bộ cơ sở dữ liệu thời gian thực (Supabase)"
+              style={{
+                padding: "6px 10px", fontSize: 12, display: "flex", alignItems: "center", gap: 4,
+                border: isSupabaseConnected ? "1.5px solid #10B981" : "1.5px solid var(--line)"
+              }}
+            >
+              <span style={{ fontSize: 13 }}>☁️</span>
+              {isSupabaseConnected ? "Online" : "Offline"}
+            </button>
+
+            {/* Gear Settings Button (Icon only) */}
+            <button className="kt-btn kt-btn-ghost" type="button" onClick={() => setShowStatusSettings(true)}
+              title="Cài đặt hệ thống (Thêm/bớt Trạng thái)" style={{ padding: "6px 8px", fontSize: 12, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </button>
+
             {/* Main Add Button */}
-            <button className="kt-btn kt-btn-primary" onClick={() => setShowNew(true)} style={{ padding: "6px 12px", fontSize: 12, borderRadius: 20 }}>+ Thêm KOL</button>
+            <button className="kt-btn kt-btn-primary" type="button" onClick={() => setShowNew(true)} style={{ padding: "6px 12px", fontSize: 12, borderRadius: 20 }}>+ Thêm KOL</button>
           </div>
         </div>
 
         {/* Bottom Row: Filters (hidden on Hồ sơ KOL — ProfileView has its own) */}
         {view !== "profile" && (
-          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", borderTop: "1px dashed var(--line)", paddingTop: 12 }}>
+          <div className="kt-filters-bar">
             {/* Search */}
-            <input className="kt-input" placeholder="🔍 Tìm tên KOL, món ăn…"
-              value={search} onChange={e => setSearch(e.target.value)}
-              style={{ width: 240 }} />
+            <input className="kt-input kt-filter-input" placeholder="🔍 Tìm tên KOL, món ăn…"
+              value={search} onChange={e => setSearch(e.target.value)} />
 
             {/* Campaign filter */}
-            <select className="kt-select" value={filterCampaign} onChange={e => setFilterCampaign(e.target.value)}
-              style={{ width: 180 }}>
+            <select className="kt-select kt-filter-select" value={filterCampaign} onChange={e => setFilterCampaign(e.target.value)}>
               <option value="all">Tất cả Chiến dịch</option>
               {dynamicCampaigns.map(c => <option key={c.key} value={c.key}>{campaignLabels[c.key] || c.label}</option>)}
             </select>
 
              {/* Status filter */}
-            <select className="kt-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
-              style={{ width: 210 }}>
+            <select className="kt-select kt-filter-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
               <option value="all">Tất cả Trạng thái</option>
               <option value="in_progress">Đang xử lý (Chưa lên sóng)</option>
               {statusStages.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
             </select>
 
             {/* Type filter */}
-            <select className="kt-select" value={filterType} onChange={e => setFilterType(e.target.value)}
-              style={{ width: 150 }}>
+            <select className="kt-select kt-filter-select" value={filterType} onChange={e => setFilterType(e.target.value)}>
               <option value="all">Tất cả Tiers</option>
               {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
@@ -4983,6 +5358,7 @@ const [view, setView] = useState("table");
         <StatusSettingsModal
           statuses={statusStages}
           onClose={() => setShowStatusSettings(false)}
+          onReset={handleReset}
           onSave={(newList) => {
             // Update statusKey in database for renamed keys
             setData(prev => prev.map(item => {
@@ -5041,6 +5417,26 @@ const [view, setView] = useState("table");
           data={data}
           onClose={() => setShowShareModal(false)}
           onExport={handleExportData}
+        />
+      )}
+
+      {/* ── SUPABASE CONFIG MODAL ── */}
+      {showSupabaseSettings && (
+        <SupabaseConfigModal
+          initialUrl={supabaseUrl}
+          initialKey={supabaseKey}
+          initialNickname={supabaseNickname}
+          isConnected={isSupabaseConnected}
+          errorMsg={supabaseError}
+          onConnect={(url, key, nickname) => {
+            handleConnectSupabase(url, key, nickname);
+            setShowSupabaseSettings(false);
+          }}
+          onDisconnect={() => {
+            handleDisconnectSupabase();
+            setShowSupabaseSettings(false);
+          }}
+          onClose={() => setShowSupabaseSettings(false)}
         />
       )}
     </div>
@@ -5191,6 +5587,220 @@ const OnlineShareModal = ({ data, onClose, onExport }) => {
           </button>
         </div>
 
+      </div>
+    </div>
+  );
+};
+
+const SQL_SCRIPT = `-- 1. Tạo bảng cấu hình ứng dụng
+create table if not exists app_config (
+  key text primary key,
+  value jsonb
+);
+
+-- 2. Tạo bảng quản lý KOLs
+create table if not exists kols (
+  "id" text primary key,
+  "campaign" text,
+  "kol" text,
+  "link" text,
+  "follower" text,
+  "type" text,
+  "location" text,
+  "group" text,
+  "cost" numeric,
+  "addonFee" text,
+  "statusKey" text,
+  "monAn" text,
+  "ngayGuiScript" text,
+  "ngayGuiDemo" text,
+  "ngayAir" text,
+  "airedLink" text,
+  "airedFb" text,
+  "giftSent" text,
+  "estView" numeric,
+  "estEng" numeric,
+  "views" numeric,
+  "likes" numeric,
+  "comments" numeric,
+  "saves" numeric,
+  "shares" numeric,
+  "adSpend" numeric,
+  "conversions" numeric,
+  "addToCart" numeric,
+  "revenue" numeric,
+  "reupViews" numeric,
+  "reupEngagement" numeric,
+  "totalViewCombined" numeric,
+  "totalEngCombined" numeric,
+  "pctViewAchieved" numeric,
+  "pctEngAchieved" numeric,
+  "pctViewAchievedTotal" numeric,
+  "pctEngAchievedTotal" numeric,
+  "paidAvgView" numeric,
+  "paidPctCompletedView" numeric,
+  "codeAds" text,
+  "reupLink" text,
+  "brandReup" text,
+  "updatedAt" text
+);
+
+-- 3. Kích hoạt tính năng Realtime để đồng bộ trực tuyến
+alter table kols replica identity full;
+alter publication supabase_realtime add table kols;
+
+alter table app_config replica identity full;
+alter publication supabase_realtime add table app_config;`;
+
+const SupabaseConfigModal = ({ 
+  initialUrl, 
+  initialKey, 
+  initialNickname, 
+  isConnected, 
+  errorMsg, 
+  onConnect, 
+  onDisconnect, 
+  onClose 
+}) => {
+  const [url, setUrl] = useState(initialUrl);
+  const [key, setKey] = useState(initialKey);
+  const [nickname, setNickname] = useState(initialNickname);
+  const [copiedSql, setCopiedSql] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false);
+
+  const handleSave = (e) => {
+    e.preventDefault();
+    if (!url.trim() || !key.trim()) {
+      window.alert("Vui lòng điền đầy đủ URL và Key.");
+      return;
+    }
+    onConnect(url.trim(), key.trim(), nickname.trim() || "Ẩn danh");
+  };
+
+  const handleCopySql = () => {
+    navigator.clipboard.writeText(SQL_SCRIPT)
+      .then(() => {
+        setCopiedSql(true);
+        setTimeout(() => setCopiedSql(false), 2000);
+      });
+  };
+
+  return (
+    <div className="kt-overlay" style={{ zIndex: 110 }} onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="kt-modal kt-anim" style={{ maxWidth: 580, maxHeight: "90vh", display: "flex", flexDirection: "column" }}>
+        {/* Header */}
+        <div style={{ padding: "18px 22px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em" }}>Database Settings</div>
+            <div style={{ fontSize: 17, fontWeight: 700, color: "var(--ink)" }}>☁️ Đồng bộ cơ sở dữ liệu (Supabase)</div>
+          </div>
+          <button className="kt-btn kt-btn-ghost" onClick={onClose} style={{ padding: "6px 10px" }}>✕</button>
+        </div>
+
+        {/* Body */}
+        <div className="kt-scrollbar" style={{ padding: "18px 22px", overflowY: "auto", flex: 1, display: "flex", flexDirection: "column", gap: 18 }}>
+          
+          {/* Connection Status */}
+          <div style={{
+            padding: "12px 16px", borderRadius: 8,
+            border: isConnected ? "1px solid rgba(16, 185, 129, 0.2)" : errorMsg ? "1px solid rgba(239, 68, 68, 0.2)" : "1px solid var(--line)",
+            backgroundColor: isConnected ? "rgba(16, 185, 129, 0.05)" : errorMsg ? "rgba(239, 68, 68, 0.05)" : "var(--paper)",
+            fontSize: 13, color: "var(--ink)", display: "flex", flexDirection: "column", gap: 4
+          }}>
+            <div style={{ fontWeight: 700, display: "flex", alignItems: "center", gap: 6 }}>
+              <span>{isConnected ? "🟢 Đã kết nối trực tuyến!" : errorMsg ? "🔴 Lỗi kết nối" : "⚪ Trạng thái ngoại tuyến (Offline)"}</span>
+            </div>
+            <div style={{ fontSize: 11, color: "var(--ink-soft)" }}>
+              {isConnected 
+                ? "Dữ liệu đang được đồng bộ thời gian thực với Supabase. Bạn có thể cộng tác với người khác." 
+                : errorMsg 
+                  ? errorMsg 
+                  : "Ứng dụng đang lưu trữ cục bộ trong trình duyệt này (LocalStorage). Hãy nhập cấu hình dưới đây để chuyển sang trực tuyến."}
+            </div>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div>
+              <label className="kt-label" style={{ marginBottom: 4 }}>Supabase URL</label>
+              <input
+                className="kt-input"
+                value={url}
+                onChange={e => setUrl(e.target.value)}
+                placeholder="https://your-project.supabase.co"
+                style={{ width: "100%", boxSizing: "border-box" }}
+              />
+            </div>
+            <div>
+              <label className="kt-label" style={{ marginBottom: 4 }}>Supabase Anon Key</label>
+              <input
+                className="kt-input"
+                value={key}
+                onChange={e => setKey(e.target.value)}
+                placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                style={{ width: "100%", boxSizing: "border-box", fontFamily: "var(--kt-mono)", fontSize: 11 }}
+              />
+            </div>
+            <div>
+              <label className="kt-label" style={{ marginBottom: 4 }}>Biệt danh của bạn (Để hiện khi online)</label>
+              <input
+                className="kt-input"
+                value={nickname}
+                onChange={e => setNickname(e.target.value)}
+                placeholder="Tên hoặc biệt danh của bạn"
+                style={{ width: "100%", boxSizing: "border-box" }}
+              />
+            </div>
+
+            <div style={{ display: "flex", gap: 10, marginTop: 6 }}>
+              <button type="submit" className="kt-btn kt-btn-primary" style={{ flex: 1 }}>💾 Lưu & Kết nối</button>
+              {(initialUrl || initialKey) && (
+                <button type="button" onClick={onDisconnect} className="kt-btn kt-btn-danger" style={{ flex: 1, backgroundColor: "#EF4444", color: "white" }}>🔌 Ngắt kết nối</button>
+              )}
+            </div>
+          </form>
+
+          {/* Collapsible Setup Instructions */}
+          <div style={{ borderTop: "1px dashed var(--line)", paddingTop: 12, marginTop: 12 }}>
+            <button 
+              type="button" 
+              className="kt-btn kt-btn-ghost" 
+              onClick={() => setShowInstructions(!showInstructions)} 
+              style={{ width: "100%", justifyContent: "center", padding: "6px", display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--accent)" }}
+            >
+              {showInstructions ? "🙈 Ẩn hướng dẫn cài đặt" : "📖 Hiện hướng dẫn cài đặt database"}
+            </button>
+            
+            {showInstructions && (
+              <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 8, fontSize: 11, color: "var(--ink-mid)" }}>
+                <p style={{ margin: "0 0 4px 0", fontWeight: 700 }}>Các bước thiết lập Supabase:</p>
+                <ol style={{ margin: 0, paddingLeft: 16, display: "flex", flexDirection: "column", gap: 6 }}>
+                  <li>Truy cập <strong>supabase.com</strong> đăng ký và tạo một Project mới.</li>
+                  <li>Tìm mục <strong>SQL Editor</strong> ở cột bên trái của Supabase, tạo truy vấn mới và chạy đoạn mã bên dưới để khởi tạo bảng:
+                    <div style={{ marginTop: 6, marginBottom: 6 }}>
+                      <button 
+                        onClick={handleCopySql} 
+                        className="kt-btn" 
+                        type="button"
+                        style={{ padding: "3px 6px", fontSize: 9, backgroundColor: "var(--accent)", color: "white", border: "none", borderRadius: 4, cursor: "pointer", fontWeight: 600 }}
+                      >
+                        {copiedSql ? "✅ Đã sao chép!" : "📋 Sao chép mã SQL"}
+                      </button>
+                    </div>
+                    <pre style={{
+                      background: "#1E1E1E", color: "#D4D4D4", padding: 8, borderRadius: 6,
+                      fontSize: 9, overflowX: "auto", maxHeight: 120, overflowY: "auto",
+                      fontFamily: "var(--kt-mono)", margin: 0, border: "1px solid var(--line)"
+                    }}>
+                      {SQL_SCRIPT}
+                    </pre>
+                  </li>
+                  <li>Vào <strong>Project Settings → API</strong> của Supabase, copy <strong>Project URL</strong> và <strong>anon key</strong> rồi điền vào form cấu hình phía trên và bấm <strong>Lưu & Kết nối</strong>.</li>
+                </ol>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
