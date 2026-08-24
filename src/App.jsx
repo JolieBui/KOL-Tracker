@@ -3692,7 +3692,15 @@ export default function App() {
         }
       }
 
-      return migrated;
+      const synced = migrated.map(row => {
+        const link = row.airedLink ? row.airedLink.toString().trim() : "";
+        const isLinkAired = link && !["air", "aired", "—", "-"].includes(link.toLowerCase()) && (/^https?:\/\//i.test(link) || (link.includes(".") && !link.includes(" ")));
+        if (isLinkAired && row.statusKey !== "aired") {
+          return { ...row, statusKey: "aired" };
+        }
+        return row;
+      });
+      return synced;
     } catch {
       return SEED_DATA;
     }
@@ -3811,11 +3819,22 @@ const [view, setView] = useState("table");
   const setData = useCallback((nextVal) => {
     rawSetData(prev => {
       const resolved = typeof nextVal === 'function' ? nextVal(prev) : nextVal;
-      if (JSON.stringify(prev) !== JSON.stringify(resolved)) {
+      
+      // Auto-sync statusKey to 'aired' if airedLink is set and valid
+      const synced = resolved.map(row => {
+        const link = row.airedLink ? row.airedLink.toString().trim() : "";
+        const isLinkAired = link && !["air", "aired", "—", "-"].includes(link.toLowerCase()) && (/^https?:\/\//i.test(link) || (link.includes(".") && !link.includes(" ")));
+        if (isLinkAired && row.statusKey !== "aired") {
+          return { ...row, statusKey: "aired" };
+        }
+        return row;
+      });
+
+      if (JSON.stringify(prev) !== JSON.stringify(synced)) {
         setHistory(h => [...h, prev].slice(-50));
         setRedoHistory([]);
       }
-      return resolved;
+      return synced;
     });
   }, []);
 
