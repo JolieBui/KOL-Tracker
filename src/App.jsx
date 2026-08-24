@@ -1846,6 +1846,47 @@ const StatusSettingsModal = ({ statuses, onSave, onClose }) => {
 };
 
 /* ================================================================
+   JSONP PROXY HELPER FOR CORS/ADBLOCK BYPASS
+================================================================ */
+const fetchViaJSONP = (targetUrl) => {
+  return new Promise((resolve, reject) => {
+    const cbName = "allorigins_cb_" + Math.round(Math.random() * 1000000);
+    const script = document.createElement("script");
+    script.src = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}&callback=${cbName}`;
+    
+    const timer = setTimeout(() => {
+      cleanup();
+      reject(new Error("JSONP Request Timeout"));
+    }, 8000);
+
+    window[cbName] = (data) => {
+      clearTimeout(timer);
+      cleanup();
+      if (data && data.contents) {
+        resolve(data.contents);
+      } else {
+        reject(new Error("Empty contents in JSONP"));
+      }
+    };
+    
+    const cleanup = () => {
+      try {
+        delete window[cbName];
+      } catch (e) {}
+      script.remove();
+    };
+    
+    script.onerror = (err) => {
+      clearTimeout(timer);
+      cleanup();
+      reject(err);
+    };
+    
+    document.body.appendChild(script);
+  });
+};
+
+/* ================================================================
    DETAIL MODAL
 ================================================================ */
 const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCampaigns }) => {
@@ -1918,6 +1959,19 @@ const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCamp
         }
       }
 
+      // Try Countik via AllOrigins JSONP (CORS & Adblock bypass!)
+      if (!htmlOrJson) {
+        try {
+          const contents = await fetchViaJSONP(countikTarget);
+          if (contents && contents.includes("followerCount")) {
+            htmlOrJson = contents;
+            isCountik = true;
+          }
+        } catch (eJsonp) {
+          console.warn("Countik AllOrigins JSONP failed, trying next...", eJsonp);
+        }
+      }
+
       // Backup: Try Urlebird search via AllOrigins
       if (!htmlOrJson) {
         try {
@@ -1944,6 +1998,19 @@ const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCamp
           }
         } catch (e4) {
           console.warn("Urlebird Codetabs failed...", e4);
+        }
+      }
+
+      // Backup: Try Urlebird via AllOrigins JSONP
+      if (!htmlOrJson) {
+        try {
+          const urlebirdTarget = `https://urlebird.com/search/?q=${username}`;
+          const contents = await fetchViaJSONP(urlebirdTarget);
+          if (contents) {
+            htmlOrJson = contents;
+          }
+        } catch (eJsonp2) {
+          console.warn("Urlebird AllOrigins JSONP failed...", eJsonp2);
         }
       }
 
@@ -3481,6 +3548,19 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpe
         }
       }
 
+      // Try Countik via AllOrigins JSONP (CORS & Adblock bypass!)
+      if (!htmlOrJson) {
+        try {
+          const contents = await fetchViaJSONP(countikTarget);
+          if (contents && contents.includes("followerCount")) {
+            htmlOrJson = contents;
+            isCountik = true;
+          }
+        } catch (eJsonp) {
+          console.warn("Countik AllOrigins JSONP failed, trying next...", eJsonp);
+        }
+      }
+
       // Backup: Try Urlebird search via AllOrigins
       if (!htmlOrJson) {
         try {
@@ -3507,6 +3587,19 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpe
           }
         } catch (e4) {
           console.warn("Urlebird Codetabs failed...", e4);
+        }
+      }
+
+      // Backup: Try Urlebird via AllOrigins JSONP
+      if (!htmlOrJson) {
+        try {
+          const urlebirdTarget = `https://urlebird.com/search/?q=${username}`;
+          const contents = await fetchViaJSONP(urlebirdTarget);
+          if (contents) {
+            htmlOrJson = contents;
+          }
+        } catch (eJsonp2) {
+          console.warn("Urlebird AllOrigins JSONP failed...", eJsonp2);
         }
       }
 
