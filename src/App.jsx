@@ -5777,7 +5777,11 @@ alter table kols add column if not exists "impressions" numeric;
 alter table kols add column if not exists "views2s" numeric;
 alter table kols add column if not exists "views6s" numeric;
 
--- 4. Kích hoạt tính năng Realtime để đồng bộ trực tuyến
+-- 4. Tắt Row Level Security (cho phép ứng dụng đọc/ghi dữ liệu)
+alter table kols disable row level security;
+alter table app_config disable row level security;
+
+-- 5. Kích hoạt tính năng Realtime để đồng bộ trực tuyến
 alter table kols replica identity full;
 alter publication supabase_realtime add table kols;
 
