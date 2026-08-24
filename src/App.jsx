@@ -4408,7 +4408,27 @@ const [view, setView] = useState("table");
         return;
       }
 
-      rawSetData(dbData || []);
+      if (dbData && dbData.length > 0) {
+        rawSetData(dbData);
+        try { localStorage.setItem(LS_KEY, JSON.stringify(dbData)); } catch (e) {}
+      } else {
+        try {
+          const s = localStorage.getItem(LS_KEY);
+          if (s) {
+            const localList = JSON.parse(s);
+            if (localList && localList.length > 0) {
+              rawSetData(localList);
+              safeSupabaseUpsert(localList);
+            } else {
+              rawSetData([]);
+            }
+          } else {
+            rawSetData([]);
+          }
+        } catch (e) {
+          rawSetData([]);
+        }
+      }
       setIsSupabaseConnected(true);
       setSupabaseError(null);
 
