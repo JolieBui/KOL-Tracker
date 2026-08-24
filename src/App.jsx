@@ -1850,8 +1850,76 @@ const StatusSettingsModal = ({ statuses, onSave, onClose }) => {
 ================================================================ */
 const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCampaigns }) => {
   const [form, setForm] = useState({ ...kol });
+  const [scannerLoading, setScannerLoading] = useState(false);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const fetchTikTokProfileData = async () => {
+    const link = form.link || "";
+    if (!link) {
+      window.alert("Vui lòng điền link TikTok của KOL trước khi quét.");
+      return;
+    }
+    
+    let username = "";
+    let cleaned = link.trim().split("?")[0].split("#")[0];
+    const atMatch = cleaned.match(/@([a-zA-Z0-9_\.]+)/);
+    if (atMatch) {
+      username = atMatch[1];
+    } else {
+      const parts = cleaned.split("/");
+      for (let i = parts.length - 1; i >= 0; i--) {
+        const part = parts[i];
+        if (part.startsWith("@")) { username = part.replace("@", ""); break; }
+        if (part && !part.includes(".") && part !== "user") { username = part; break; }
+      }
+    }
+    
+    if (!username) {
+      window.alert("Không tìm thấy tên tài khoản TikTok hợp lệ trong đường dẫn.");
+      return;
+    }
+
+    setScannerLoading(true);
+    try {
+      const target = `https://urlebird.com/search/?q=${username}`;
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(target)}`;
+      
+      const res = await fetch(proxyUrl);
+      if (!res.ok) throw new Error("Không thể kết nối tới máy chủ proxy.");
+      
+      const json = await res.json();
+      const html = json.contents;
+      if (!html) throw new Error("Không lấy được nội dung trang web.");
+
+      const userBlocks = html.match(/<div class="user my-2[^"]*">([\s\S]*?)<\/div>\s*<\/div>/g);
+      if (!userBlocks || userBlocks.length === 0) {
+        throw new Error("Không tìm thấy tài khoản TikTok tương ứng trên hệ thống lưu trữ.");
+      }
+
+      const block = userBlocks[0];
+      const avatarMatch = block.match(/data-src="([^"]+)"/) || block.match(/src="([^"]+)"/);
+      const imgUrl = avatarMatch ? avatarMatch[1] : "";
+
+      const followersMatch = block.match(/<span class="followers">([^<]+)<\/span>/);
+      const followersText = followersMatch ? followersMatch[1] : "";
+      const followersValue = followersText.replace(/followers/i, "").trim();
+
+      if (imgUrl) set("avatarUrl", imgUrl);
+      if (followersValue) set("follower", followersValue);
+      
+      // Update form name if empty
+      const nameMatch = block.match(/<span>([^<]+)<\/span>/);
+      if (nameMatch && nameMatch[1] && !form.kol) {
+        set("kol", nameMatch[1].trim());
+      }
+      
+      window.alert("Quét và cập nhật thông tin thành công!");
+    } catch (e) {
+      window.alert("Không thể quét tài khoản TikTok này. Lỗi: " + e.message);
+    }
+    setScannerLoading(false);
+  };
 
   const Field = ({ label, field, type = "text", options }) => (
     <div style={{ marginBottom: 14 }}>
@@ -1908,7 +1976,31 @@ const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCamp
               </datalist>
             </div>
             <Field label="Tên KOL" field="kol" />
-            <Field label="Link TikTok" field="link" />
+            
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <label className="kt-label" style={{ marginBottom: 0 }}>Link TikTok</label>
+                <button
+                  type="button"
+                  onClick={fetchTikTokProfileData}
+                  disabled={scannerLoading}
+                  style={{
+                    background: "none", border: "none", color: "var(--accent)",
+                    fontSize: 11, fontWeight: 600, cursor: "pointer", padding: "0 4px",
+                    display: "flex", alignItems: "center", gap: 4
+                  }}
+                >
+                  {scannerLoading ? "⏳ Đang quét..." : "🔍 Quét Thông tin"}
+                </button>
+              </div>
+              <input
+                className="kt-input"
+                value={form.link || ""}
+                onChange={e => set("link", e.target.value)}
+                placeholder="https://www.tiktok.com/@username"
+              />
+            </div>
+
             <Field label="Followers" field="follower" />
             <Field label="Loại" field="type" type="select" options={["", ...TYPES]} />
             <Field label="Địa điểm" field="location" />
@@ -3234,19 +3326,61 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpe
 
   const fetchTikTokAvatar = async () => {
     const link = form.link || kol.link || "";
-    if (!link) return;
+    if (!link) {
+      window.alert("Vui lòng điền link TikTok của KOL trước khi quét.");
+      return;
+    }
+    
+    let username = "";
+    let cleaned = link.trim().split("?")[0].split("#")[0];
+    const atMatch = cleaned.match(/@([a-zA-Z0-9_\.]+)/);
+    if (atMatch) {
+      username = atMatch[1];
+    } else {
+      const parts = cleaned.split("/");
+      for (let i = parts.length - 1; i >= 0; i--) {
+        const part = parts[i];
+        if (part.startsWith("@")) { username = part.replace("@", ""); break; }
+        if (part && !part.includes(".") && part !== "user") { username = part; break; }
+      }
+    }
+    
+    if (!username) {
+      window.alert("Không tìm thấy tên tài khoản TikTok hợp lệ trong đường dẫn.");
+      return;
+    }
+
     setAvatarLoading(true);
     try {
-      const tiktokUrl = encodeURIComponent(link.trim());
-      const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(`https://www.tiktok.com/oembed?url=${link.trim()}`)}` ;
+      const target = `https://urlebird.com/search/?q=${username}`;
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(target)}`;
+      
       const res = await fetch(proxyUrl);
+      if (!res.ok) throw new Error("Không thể kết nối tới máy chủ proxy.");
+      
       const json = await res.json();
-      const imgUrl = json.thumbnail_url;
-      if (imgUrl) {
-        setAvatarUrl(imgUrl);
+      const html = json.contents;
+      if (!html) throw new Error("Không lấy được nội dung trang web.");
+
+      const userBlocks = html.match(/<div class="user my-2[^"]*">([\s\S]*?)<\/div>\s*<\/div>/g);
+      if (!userBlocks || userBlocks.length === 0) {
+        throw new Error("Không tìm thấy tài khoản TikTok tương ứng trên hệ thống lưu trữ.");
       }
+
+      const block = userBlocks[0];
+      const avatarMatch = block.match(/data-src="([^"]+)"/) || block.match(/src="([^"]+)"/);
+      const imgUrl = avatarMatch ? avatarMatch[1] : "";
+
+      const followersMatch = block.match(/<span class="followers">([^<]+)<\/span>/);
+      const followersText = followersMatch ? followersMatch[1] : "";
+      const followersValue = followersText.replace(/followers/i, "").trim();
+
+      if (imgUrl) setAvatarUrl(imgUrl);
+      if (followersValue) set("follower", followersValue);
+      
+      window.alert("Quét và cập nhật thông tin thành công!");
     } catch (e) {
-      // fallback silently
+      window.alert("Không thể quét tài khoản TikTok này. Lỗi: " + e.message);
     }
     setAvatarLoading(false);
   };
