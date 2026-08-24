@@ -3787,6 +3787,11 @@ const [view, setView] = useState("table");
           if (Array.isArray(sharedData)) {
             rawSetData(sharedData);
             showToast("📥 Đã đồng bộ dữ liệu trực tuyến thành công!");
+            
+            // Clear the ?share parameter from URL so reload loads from localstorage
+            const urlObj = new URL(window.location.href);
+            urlObj.searchParams.delete("share");
+            window.history.replaceState({}, "", urlObj.toString());
           } else {
             showToast("⚠️ Dữ liệu chia sẻ không hợp lệ.", false);
           }
