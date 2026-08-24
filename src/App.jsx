@@ -1630,41 +1630,55 @@ const DualFileImportModal = ({ existingData, onConfirm, onClose, onImportSingle,
   const [socialFile, setSocialFile] = useState(null); // { name, wb }
   const [result, setResult] = useState(null); // { toUpdate, toAdd, warnings }
   const fileRef = useRef(null);
+  const internalFileRef = useRef(null);
+  const socialFileRef = useRef(null);
 
-  const processFiles = async (fileList, statusLabelToKey) => {
+  const readFileObject = (file) => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const wb = XLSX.read(ev.target.result, { type: "array", cellDates: true });
+        resolve({ name: file.name, wb });
+      } catch (err) { reject(err); }
+    };
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file);
+  });
+
+  const processFiles = async (fileList, targetSlot = null) => {
     const files = Array.from(fileList).filter(f => /\.(xlsx|xls|csv|json)$/i.test(f.name));
     if (files.length === 0) return;
 
     try {
-      const parsed = await Promise.all(files.map(f => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          try {
-            const wb = XLSX.read(ev.target.result, { type: "array", cellDates: true });
-            resolve({ name: f.name, wb });
-          } catch (err) { reject(err); }
-        };
-        reader.onerror = reject;
-        reader.readAsArrayBuffer(f);
-      })));
+      const parsed = await Promise.all(files.map(readFileObject));
+
+      if (targetSlot === "internal") {
+        setInternalFile(parsed[0]);
+        return;
+      }
+      if (targetSlot === "social") {
+        setSocialFile(parsed[0]);
+        return;
+      }
 
       let newInternal = internalFile;
       let newSocial = socialFile;
 
-      if (parsed.length === 1 && !internalFile && !socialFile) {
-        // Unified file upload
-        newInternal = parsed[0];
-        newSocial = parsed[0];
-      } else {
-        parsed.forEach(p => {
-          const roles = detectFileRole(p.wb, p.name);
-          if (roles.includes("internal")) {
-            newInternal = p;
-          } else if (roles.includes("social")) {
-            newSocial = p;
-          }
-        });
-      }
+      parsed.forEach(p => {
+        const roles = detectFileRole(p.wb, p.name);
+        if (roles.includes("internal") && !roles.includes("social")) {
+          newInternal = p;
+        } else if (roles.includes("social") && !roles.includes("internal")) {
+          newSocial = p;
+        } else if (roles.includes("internal")) {
+          newInternal = p;
+        } else if (roles.includes("social")) {
+          newSocial = p;
+        } else {
+          if (!newInternal) newInternal = p;
+          else if (!newSocial) newSocial = p;
+        }
+      });
 
       setInternalFile(newInternal);
       setSocialFile(newSocial);
@@ -1674,10 +1688,17 @@ const DualFileImportModal = ({ existingData, onConfirm, onClose, onImportSingle,
     }
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = (e, targetSlot = null) => {
     e.preventDefault();
+    e.stopPropagation();
     setDragOver(false);
-    if (e.dataTransfer.files && e.dataTransfer.files.length) processFiles(e.dataTransfer.files, statusLabelToKey);
+    if (e.dataTransfer.files && e.dataTransfer.files.length) processFiles(e.dataTransfer.files, targetSlot);
+  };
+
+  const handleSwap = () => {
+    const temp = internalFile;
+    setInternalFile(socialFile);
+    setSocialFile(temp);
   };
 
   const handleMergeAndProceed = () => {
@@ -1736,66 +1757,99 @@ const DualFileImportModal = ({ existingData, onConfirm, onClose, onImportSingle,
               <div
                 onDragOver={e => { e.preventDefault(); setDragOver(true); }}
                 onDragLeave={() => setDragOver(false)}
-                onDrop={handleDrop}
+                onDrop={e => handleDrop(e)}
                 onClick={() => fileRef.current?.click()}
                 style={{
                   border: `2px dashed ${dragOver ? "var(--accent)" : "var(--line)"}`,
-                  borderRadius: 12, padding: "30px 20px", textAlign: "center", cursor: "pointer",
+                  borderRadius: 12, padding: "26px 20px", textAlign: "center", cursor: "pointer",
                   background: dragOver ? "var(--accent-bg)" : "var(--paper)", transition: "all 0.15s"
                 }}
               >
-                <div style={{ fontSize: 32, marginBottom: 8 }}>📂</div>
+                <div style={{ fontSize: 28, marginBottom: 6 }}>📂</div>
                 <div style={{ fontWeight: 700, color: "var(--ink)", fontSize: 14 }}>Kéo thả file Excel vào đây (hoặc bấm để chọn)</div>
                 <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 4 }}>
-                  Có thể kéo thả từng file hoặc cả 2 file cùng lúc
+                  Tự động nhận diện File Kế hoạch (Internal) và File Báo cáo (Social Outreach)
                 </div>
                 <input ref={fileRef} type="file" multiple accept=".xlsx,.xls,.csv,.json" style={{ display: "none" }}
-                  onChange={e => e.target.files.length && processFiles(e.target.files, statusLabelToKey)} />
+                  onChange={e => e.target.files.length && processFiles(e.target.files)} />
               </div>
 
               {/* Status slots */}
-              <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+              <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
                 {/* Slot 1: Internal File */}
-                <div style={{
-                  flex: "1 1 200px", borderRadius: 10, padding: 12,
-                  border: `1px ${internalFile ? "solid var(--line)" : "dashed #CCD3DC"}`,
-                  background: internalFile ? "var(--card)" : "#FAFAFB",
-                  display: "flex", alignItems: "center", gap: 10
-                }}>
+                <div 
+                  onClick={() => internalFileRef.current?.click()}
+                  onDragOver={e => e.preventDefault()}
+                  onDrop={e => handleDrop(e, "internal")}
+                  style={{
+                    flex: "1 1 200px", borderRadius: 10, padding: 12, cursor: "pointer",
+                    border: `1.5px ${internalFile ? "solid #10B981" : "dashed #CCD3DC"}`,
+                    background: internalFile ? "rgba(16, 185, 129, 0.04)" : "#FAFAFB",
+                    display: "flex", alignItems: "center", gap: 10, transition: "all 0.15s"
+                  }}
+                  title="Bấm để chọn riêng file Kế hoạch (Internal/Execution)"
+                >
                   <div style={{ fontSize: 20 }}>📈</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 10, color: "var(--ink-soft)", fontWeight: 700, textTransform: "uppercase" }}>File Kế hoạch (Execution/Internal)</div>
+                    <div style={{ fontSize: 10, color: internalFile ? "#059669" : "var(--ink-soft)", fontWeight: 700, textTransform: "uppercase" }}>
+                      1. File Kế hoạch (INTERNAL) {internalFile && "✓"}
+                    </div>
                     <div style={{ fontSize: 12, fontWeight: 600, color: internalFile ? "var(--ink)" : "var(--ink-soft)", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
-                      {internalFile ? internalFile.name : "Chưa tải lên"}
+                      {internalFile ? internalFile.name : "Bấm để chọn file..."}
                     </div>
                   </div>
                   {internalFile && (
                     <button className="kt-btn kt-btn-ghost" onClick={(e) => { e.stopPropagation(); setInternalFile(null); }} style={{ padding: "4px 8px", color: "var(--danger)" }}>✕</button>
                   )}
+                  <input ref={internalFileRef} type="file" accept=".xlsx,.xls,.csv,.json" style={{ display: "none" }}
+                    onChange={e => e.target.files.length && processFiles(e.target.files, "internal")} />
                 </div>
 
+                {/* Swap Button */}
+                {(internalFile || socialFile) && (
+                  <button 
+                    type="button"
+                    onClick={handleSwap} 
+                    title="Hoán đổi vị trí 2 file nếu nhận diện nhầm"
+                    className="kt-btn kt-btn-ghost"
+                    style={{ padding: "8px 10px", fontSize: 14, borderRadius: 20, border: "1px solid var(--line)" }}
+                  >
+                    ⇄
+                  </button>
+                )}
+
                 {/* Slot 2: Social File */}
-                <div style={{
-                  flex: "1 1 200px", borderRadius: 10, padding: 12,
-                  border: `1px ${socialFile ? "solid var(--line)" : "dashed #CCD3DC"}`,
-                  background: socialFile ? "var(--card)" : "#FAFAFB",
-                  display: "flex", alignItems: "center", gap: 10
-                }}>
+                <div 
+                  onClick={() => socialFileRef.current?.click()}
+                  onDragOver={e => e.preventDefault()}
+                  onDrop={e => handleDrop(e, "social")}
+                  style={{
+                    flex: "1 1 200px", borderRadius: 10, padding: 12, cursor: "pointer",
+                    border: `1.5px ${socialFile ? "solid #3B82F6" : "dashed #CCD3DC"}`,
+                    background: socialFile ? "rgba(59, 130, 246, 0.04)" : "#FAFAFB",
+                    display: "flex", alignItems: "center", gap: 10, transition: "all 0.15s"
+                  }}
+                  title="Bấm để chọn riêng file Báo cáo (Social Outreach)"
+                >
                   <div style={{ fontSize: 20 }}>📊</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 10, color: "var(--ink-soft)", fontWeight: 700, textTransform: "uppercase" }}>File Báo cáo (Social Outreach)</div>
+                    <div style={{ fontSize: 10, color: socialFile ? "#2563EB" : "var(--ink-soft)", fontWeight: 700, textTransform: "uppercase" }}>
+                      2. File Báo cáo (SOCIAL OUTREACH) {socialFile && "✓"}
+                    </div>
                     <div style={{ fontSize: 12, fontWeight: 600, color: socialFile ? "var(--ink)" : "var(--ink-soft)", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
-                      {socialFile ? socialFile.name : "Chưa tải lên"}
+                      {socialFile ? socialFile.name : "Bấm để chọn file..."}
                     </div>
                   </div>
                   {socialFile && (
                     <button className="kt-btn kt-btn-ghost" onClick={(e) => { e.stopPropagation(); setSocialFile(null); }} style={{ padding: "4px 8px", color: "var(--danger)" }}>✕</button>
                   )}
+                  <input ref={socialFileRef} type="file" accept=".xlsx,.xls,.csv,.json" style={{ display: "none" }}
+                    onChange={e => e.target.files.length && processFiles(e.target.files, "social")} />
                 </div>
               </div>
 
               {/* Action Button */}
-              <div style={{ marginTop: 8, display: "flex", justifyContent: "center" }}>
+              <div style={{ marginTop: 6, display: "flex", justifyContent: "center" }}>
                 <button
                   className="kt-btn kt-btn-primary"
                   disabled={!internalFile && !socialFile}
