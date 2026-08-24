@@ -1857,7 +1857,7 @@ const fetchViaJSONP = (targetUrl, domain = "api.allorigins.win") => {
     const timer = setTimeout(() => {
       cleanup();
       reject(new Error(`JSONP Request Timeout for domain: ${domain}`));
-    }, 8000);
+    }, 3500);
 
     window[cbName] = (data) => {
       clearTimeout(timer);
@@ -1884,6 +1884,191 @@ const fetchViaJSONP = (targetUrl, domain = "api.allorigins.win") => {
     
     document.body.appendChild(script);
   });
+};
+
+/* ================================================================
+   PARALLEL SCANNING HELPERS (PROMISE RACE/ANY FOR HIGHEST SPEED)
+================================================================ */
+const raceCountik = (username) => {
+  const countikTarget = `https://countik.com/api/userinfo?username=${username}`;
+  const promises = [];
+
+  // 1. Direct fetch
+  promises.push(
+    fetch(countikTarget)
+      .then(res => {
+        if (!res.ok) throw new Error("direct failed");
+        return res.text();
+      })
+      .then(text => {
+        if (text.includes("followerCount")) return { text, isCountik: true };
+        throw new Error("invalid json");
+      })
+  );
+
+  // 2. AllOrigins api.allorigins.win (Fetch)
+  promises.push(
+    fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(countikTarget)}`)
+      .then(res => {
+        if (!res.ok) throw new Error("allorigins fetch failed");
+        return res.json();
+      })
+      .then(json => {
+        if (json.contents && json.contents.includes("followerCount")) {
+          return { text: json.contents, isCountik: true };
+        }
+        throw new Error("invalid json");
+      })
+  );
+
+  // 3. AllOrigins allorigins.win (Fetch)
+  promises.push(
+    fetch(`https://allorigins.win/get?url=${encodeURIComponent(countikTarget)}`)
+      .then(res => {
+        if (!res.ok) throw new Error("allorigins fetch failed");
+        return res.json();
+      })
+      .then(json => {
+        if (json.contents && json.contents.includes("followerCount")) {
+          return { text: json.contents, isCountik: true };
+        }
+        throw new Error("invalid json");
+      })
+  );
+
+  // 4. Codetabs Fetch
+  promises.push(
+    fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(countikTarget)}`)
+      .then(res => {
+        if (!res.ok) throw new Error("codetabs failed");
+        return res.text();
+      })
+      .then(text => {
+        if (text.includes("followerCount")) return { text, isCountik: true };
+        throw new Error("invalid json");
+      })
+  );
+
+  // 5. JSONP api.allorigins.win
+  promises.push(
+    fetchViaJSONP(countikTarget, "api.allorigins.win")
+      .then(contents => {
+        if (contents && contents.includes("followerCount")) {
+          return { text: contents, isCountik: true };
+        }
+        throw new Error("invalid json");
+      })
+  );
+
+  // 6. JSONP allorigins.me
+  promises.push(
+    fetchViaJSONP(countikTarget, "allorigins.me")
+      .then(contents => {
+        if (contents && contents.includes("followerCount")) {
+          return { text: contents, isCountik: true };
+        }
+        throw new Error("invalid json");
+      })
+  );
+
+  // 7. JSONP allorigins.org
+  promises.push(
+    fetchViaJSONP(countikTarget, "allorigins.org")
+      .then(contents => {
+        if (contents && contents.includes("followerCount")) {
+          return { text: contents, isCountik: true };
+        }
+        throw new Error("invalid json");
+      })
+  );
+
+  // 8. Heroku CORS Anywhere
+  promises.push(
+    fetch(`https://cors-anywhere.herokuapp.com/${countikTarget}`)
+      .then(res => {
+        if (!res.ok) throw new Error("heroku failed");
+        return res.text();
+      })
+      .then(text => {
+        if (text.includes("followerCount")) return { text, isCountik: true };
+        throw new Error("invalid json");
+      })
+  );
+
+  return Promise.any(promises);
+};
+
+const raceUrlebird = (username) => {
+  const urlebirdTarget = `https://urlebird.com/search/?q=${username}`;
+  const promises = [];
+
+  // 1. AllOrigins Fetch
+  promises.push(
+    fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(urlebirdTarget)}`)
+      .then(res => {
+        if (!res.ok) throw new Error("allorigins fetch failed");
+        return res.json();
+      })
+      .then(json => {
+        if (json.contents) return { text: json.contents, isCountik: false };
+        throw new Error("empty contents");
+      })
+  );
+
+  // 2. Codetabs Fetch
+  promises.push(
+    fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(urlebirdTarget)}`)
+      .then(res => {
+        if (!res.ok) throw new Error("codetabs failed");
+        return res.text();
+      })
+      .then(text => {
+        if (text) return { text, isCountik: false };
+        throw new Error("empty");
+      })
+  );
+
+  // 3. JSONP api.allorigins.win
+  promises.push(
+    fetchViaJSONP(urlebirdTarget, "api.allorigins.win")
+      .then(contents => {
+        if (contents) return { text: contents, isCountik: false };
+        throw new Error("empty");
+      })
+  );
+
+  // 4. JSONP allorigins.me
+  promises.push(
+    fetchViaJSONP(urlebirdTarget, "allorigins.me")
+      .then(contents => {
+        if (contents) return { text: contents, isCountik: false };
+        throw new Error("empty");
+      })
+  );
+
+  // 5. JSONP allorigins.org
+  promises.push(
+    fetchViaJSONP(urlebirdTarget, "allorigins.org")
+      .then(contents => {
+        if (contents) return { text: contents, isCountik: false };
+        throw new Error("empty");
+      })
+  );
+
+  // 6. Heroku CORS Anywhere
+  promises.push(
+    fetch(`https://cors-anywhere.herokuapp.com/${urlebirdTarget}`)
+      .then(res => {
+        if (!res.ok) throw new Error("heroku failed");
+        return res.text();
+      })
+      .then(text => {
+        if (text) return { text, isCountik: false };
+        throw new Error("empty");
+      })
+  );
+
+  return Promise.any(promises);
 };
 
 /* ================================================================
@@ -1925,212 +2110,31 @@ const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCamp
     setScannerLoading(true);
     setScanError(null);
     try {
-      const countikTarget = `https://countik.com/api/userinfo?username=${username}`;
-      const urlebirdTarget = `https://urlebird.com/search/?q=${username}`;
-      let htmlOrJson = "";
-      let isCountik = false;
-      const errors = [];
-
-      // 1. Try Countik directly
+      let result;
       try {
-        const res = await fetch(countikTarget);
-        if (res.ok) {
-          const text = await res.text();
-          if (text.includes("followerCount")) {
-            htmlOrJson = text;
-            isCountik = true;
-          }
-        }
-      } catch (eDirect) {
-        errors.push("Direct Fetch: " + eDirect.message);
-      }
-
-      // 2. Try Countik via AllOrigins Fetch (api.allorigins.win)
-      if (!htmlOrJson) {
+        result = await raceCountik(username);
+      } catch (eCountikAll) {
+        console.warn("All Countik parallel queries failed, racing Urlebird...", eCountikAll);
         try {
-          const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(countikTarget)}`);
-          if (res.ok) {
-            const json = await res.json();
-            if (json.contents && json.contents.includes("followerCount")) {
-              htmlOrJson = json.contents;
-              isCountik = true;
-            }
-          }
-        } catch (e1) {
-          errors.push("Countik AllOrigins (Fetch api.allorigins.win): " + e1.message);
+          result = await raceUrlebird(username);
+        } catch (eUrlebirdAll) {
+          console.error("All scanner queries failed:", eUrlebirdAll);
+          throw new Error(
+            "Không thể kết nối tự động đến máy chủ quét dữ liệu do bị chặn bởi Adblock hoặc Tường lửa mạng của bạn."
+          );
         }
       }
 
-      // 3. Try Countik via AllOrigins Fetch (allorigins.win)
-      if (!htmlOrJson) {
-        try {
-          const res = await fetch(`https://allorigins.win/get?url=${encodeURIComponent(countikTarget)}`);
-          if (res.ok) {
-            const json = await res.json();
-            if (json.contents && json.contents.includes("followerCount")) {
-              htmlOrJson = json.contents;
-              isCountik = true;
-            }
-          }
-        } catch (e1b) {
-          errors.push("Countik AllOrigins (Fetch allorigins.win): " + e1b.message);
-        }
-      }
+      const { text, isCountik } = result;
 
-      // 4. Try Countik via Codetabs
-      if (!htmlOrJson) {
-        try {
-          const res = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(countikTarget)}`);
-          if (res.ok) {
-            const text = await res.text();
-            if (text.includes("followerCount")) {
-              htmlOrJson = text;
-              isCountik = true;
-            }
-          }
-        } catch (e2) {
-          errors.push("Countik Codetabs (Fetch): " + e2.message);
-        }
-      }
-
-      // 5. Try Countik via AllOrigins JSONP (api.allorigins.win)
-      if (!htmlOrJson) {
-        try {
-          const contents = await fetchViaJSONP(countikTarget, "api.allorigins.win");
-          if (contents && contents.includes("followerCount")) {
-            htmlOrJson = contents;
-            isCountik = true;
-          }
-        } catch (eJsonp) {
-          errors.push("Countik AllOrigins (JSONP api.allorigins.win): " + eJsonp.message);
-        }
-      }
-
-      // 6. Try Countik via AllOrigins JSONP (allorigins.me)
-      if (!htmlOrJson) {
-        try {
-          const contents = await fetchViaJSONP(countikTarget, "allorigins.me");
-          if (contents && contents.includes("followerCount")) {
-            htmlOrJson = contents;
-            isCountik = true;
-          }
-        } catch (eJsonp2) {
-          errors.push("Countik AllOrigins (JSONP allorigins.me): " + eJsonp2.message);
-        }
-      }
-
-      // 7. Try Countik via AllOrigins JSONP (allorigins.org)
-      if (!htmlOrJson) {
-        try {
-          const contents = await fetchViaJSONP(countikTarget, "allorigins.org");
-          if (contents && contents.includes("followerCount")) {
-            htmlOrJson = contents;
-            isCountik = true;
-          }
-        } catch (eJsonp3) {
-          errors.push("Countik AllOrigins (JSONP allorigins.org): " + eJsonp3.message);
-        }
-      }
-
-      // 8. Try Urlebird via AllOrigins (Fetch)
-      if (!htmlOrJson) {
-        try {
-          const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(urlebirdTarget)}`);
-          if (res.ok) {
-            const json = await res.json();
-            htmlOrJson = json.contents || "";
-          }
-        } catch (e3) {
-          errors.push("Urlebird AllOrigins (Fetch): " + e3.message);
-        }
-      }
-
-      // 9. Try Urlebird via Codetabs (Fetch)
-      if (!htmlOrJson) {
-        try {
-          const res = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(urlebirdTarget)}`);
-          if (res.ok) {
-            htmlOrJson = await res.text();
-          }
-        } catch (e4) {
-          errors.push("Urlebird Codetabs (Fetch): " + e4.message);
-        }
-      }
-
-      // 10. Try Urlebird via AllOrigins JSONP (api.allorigins.win)
-      if (!htmlOrJson) {
-        try {
-          const contents = await fetchViaJSONP(urlebirdTarget, "api.allorigins.win");
-          if (contents) {
-            htmlOrJson = contents;
-          }
-        } catch (eJsonp4) {
-          errors.push("Urlebird AllOrigins (JSONP api.allorigins.win): " + eJsonp4.message);
-        }
-      }
-
-      // 11. Try Urlebird via AllOrigins JSONP (allorigins.me)
-      if (!htmlOrJson) {
-        try {
-          const contents = await fetchViaJSONP(urlebirdTarget, "allorigins.me");
-          if (contents) {
-            htmlOrJson = contents;
-          }
-        } catch (eJsonp5) {
-          errors.push("Urlebird AllOrigins (JSONP allorigins.me): " + eJsonp5.message);
-        }
-      }
-
-      // 12. Try Urlebird via AllOrigins JSONP (allorigins.org)
-      if (!htmlOrJson) {
-        try {
-          const contents = await fetchViaJSONP(urlebirdTarget, "allorigins.org");
-          if (contents) {
-            htmlOrJson = contents;
-          }
-        } catch (eJsonp6) {
-          errors.push("Urlebird AllOrigins (JSONP allorigins.org): " + eJsonp6.message);
-        }
-      }
-
-      // 13. Ultimate fallback: Try Heroku CORS Anywhere (requires user to have clicked corsdemo)
-      if (!htmlOrJson) {
-        try {
-          const res = await fetch(`https://cors-anywhere.herokuapp.com/${countikTarget}`);
-          if (res.ok) {
-            const text = await res.text();
-            if (text.includes("followerCount")) {
-              htmlOrJson = text;
-              isCountik = true;
-            }
-          }
-        } catch (eHeroku) {
-          errors.push("Heroku CORS Anywhere: " + eHeroku.message);
-        }
-      }
-
-      // 14. Ultimate fallback: Try Urlebird search via Heroku CORS Anywhere
-      if (!htmlOrJson) {
-        try {
-          const res = await fetch(`https://cors-anywhere.herokuapp.com/${urlebirdTarget}`);
-          if (res.ok) {
-            htmlOrJson = await res.text();
-          }
-        } catch (eHeroku2) {
-          errors.push("Heroku CORS Anywhere (Urlebird): " + eHeroku2.message);
-        }
-      }
-
-      console.warn("TikTok Profile Scanner Debug Logs:", errors);
-
-      if (!htmlOrJson) {
+      if (!text) {
         throw new Error(
           "Không thể kết nối tự động đến máy chủ quét dữ liệu do bị chặn bởi Adblock hoặc Tường lửa mạng của bạn."
         );
       }
 
       if (isCountik) {
-        const parsed = JSON.parse(htmlOrJson);
+        const parsed = JSON.parse(text);
         if (parsed.status === "success") {
           const imgUrl = parsed.avatar || "";
           const followersNum = parsed.followerCount || 0;
@@ -2165,7 +2169,7 @@ const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCamp
       }
 
       // Fallback: parse Urlebird html
-      const userBlocks = htmlOrJson.match(/<div class="user my-2[^"]*">([\s\S]*?)<\/div>\s*<\/div>/g);
+      const userBlocks = text.match(/<div class="user my-2[^"]*">([\s\S]*?)<\/div>\s*<\/div>/g);
       if (!userBlocks || userBlocks.length === 0) {
         throw new Error("Không tìm thấy tài khoản TikTok tương ứng trên hệ thống lưu trữ.");
       }
@@ -3661,212 +3665,31 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpe
     setAvatarLoading(true);
     setScanError(null);
     try {
-      const countikTarget = `https://countik.com/api/userinfo?username=${username}`;
-      const urlebirdTarget = `https://urlebird.com/search/?q=${username}`;
-      let htmlOrJson = "";
-      let isCountik = false;
-      const errors = [];
-
-      // 1. Try Countik directly
+      let result;
       try {
-        const res = await fetch(countikTarget);
-        if (res.ok) {
-          const text = await res.text();
-          if (text.includes("followerCount")) {
-            htmlOrJson = text;
-            isCountik = true;
-          }
-        }
-      } catch (eDirect) {
-        errors.push("Direct Fetch: " + eDirect.message);
-      }
-
-      // 2. Try Countik via AllOrigins Fetch (api.allorigins.win)
-      if (!htmlOrJson) {
+        result = await raceCountik(username);
+      } catch (eCountikAll) {
+        console.warn("All Countik parallel queries failed, racing Urlebird...", eCountikAll);
         try {
-          const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(countikTarget)}`);
-          if (res.ok) {
-            const json = await res.json();
-            if (json.contents && json.contents.includes("followerCount")) {
-              htmlOrJson = json.contents;
-              isCountik = true;
-            }
-          }
-        } catch (e1) {
-          errors.push("Countik AllOrigins (Fetch api.allorigins.win): " + e1.message);
+          result = await raceUrlebird(username);
+        } catch (eUrlebirdAll) {
+          console.error("All scanner queries failed:", eUrlebirdAll);
+          throw new Error(
+            "Không thể kết nối tự động đến máy chủ quét dữ liệu do bị chặn bởi Adblock hoặc Tường lửa mạng của bạn."
+          );
         }
       }
 
-      // 3. Try Countik via AllOrigins Fetch (allorigins.win)
-      if (!htmlOrJson) {
-        try {
-          const res = await fetch(`https://allorigins.win/get?url=${encodeURIComponent(countikTarget)}`);
-          if (res.ok) {
-            const json = await res.json();
-            if (json.contents && json.contents.includes("followerCount")) {
-              htmlOrJson = json.contents;
-              isCountik = true;
-            }
-          }
-        } catch (e1b) {
-          errors.push("Countik AllOrigins (Fetch allorigins.win): " + e1b.message);
-        }
-      }
+      const { text, isCountik } = result;
 
-      // 4. Try Countik via Codetabs
-      if (!htmlOrJson) {
-        try {
-          const res = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(countikTarget)}`);
-          if (res.ok) {
-            const text = await res.text();
-            if (text.includes("followerCount")) {
-              htmlOrJson = text;
-              isCountik = true;
-            }
-          }
-        } catch (e2) {
-          errors.push("Countik Codetabs (Fetch): " + e2.message);
-        }
-      }
-
-      // 5. Try Countik via AllOrigins JSONP (api.allorigins.win)
-      if (!htmlOrJson) {
-        try {
-          const contents = await fetchViaJSONP(countikTarget, "api.allorigins.win");
-          if (contents && contents.includes("followerCount")) {
-            htmlOrJson = contents;
-            isCountik = true;
-          }
-        } catch (eJsonp) {
-          errors.push("Countik AllOrigins (JSONP api.allorigins.win): " + eJsonp.message);
-        }
-      }
-
-      // 6. Try Countik via AllOrigins JSONP (allorigins.me)
-      if (!htmlOrJson) {
-        try {
-          const contents = await fetchViaJSONP(countikTarget, "allorigins.me");
-          if (contents && contents.includes("followerCount")) {
-            htmlOrJson = contents;
-            isCountik = true;
-          }
-        } catch (eJsonp2) {
-          errors.push("Countik AllOrigins (JSONP allorigins.me): " + eJsonp2.message);
-        }
-      }
-
-      // 7. Try Countik via AllOrigins JSONP (allorigins.org)
-      if (!htmlOrJson) {
-        try {
-          const contents = await fetchViaJSONP(countikTarget, "allorigins.org");
-          if (contents && contents.includes("followerCount")) {
-            htmlOrJson = contents;
-            isCountik = true;
-          }
-        } catch (eJsonp3) {
-          errors.push("Countik AllOrigins (JSONP allorigins.org): " + eJsonp3.message);
-        }
-      }
-
-      // 8. Try Urlebird via AllOrigins (Fetch)
-      if (!htmlOrJson) {
-        try {
-          const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(urlebirdTarget)}`);
-          if (res.ok) {
-            const json = await res.json();
-            htmlOrJson = json.contents || "";
-          }
-        } catch (e3) {
-          errors.push("Urlebird AllOrigins (Fetch): " + e3.message);
-        }
-      }
-
-      // 9. Try Urlebird via Codetabs (Fetch)
-      if (!htmlOrJson) {
-        try {
-          const res = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(urlebirdTarget)}`);
-          if (res.ok) {
-            htmlOrJson = await res.text();
-          }
-        } catch (e4) {
-          errors.push("Urlebird Codetabs (Fetch): " + e4.message);
-        }
-      }
-
-      // 10. Try Urlebird via AllOrigins JSONP (api.allorigins.win)
-      if (!htmlOrJson) {
-        try {
-          const contents = await fetchViaJSONP(urlebirdTarget, "api.allorigins.win");
-          if (contents) {
-            htmlOrJson = contents;
-          }
-        } catch (eJsonp4) {
-          errors.push("Urlebird AllOrigins (JSONP api.allorigins.win): " + eJsonp4.message);
-        }
-      }
-
-      // 11. Try Urlebird via AllOrigins JSONP (allorigins.me)
-      if (!htmlOrJson) {
-        try {
-          const contents = await fetchViaJSONP(urlebirdTarget, "allorigins.me");
-          if (contents) {
-            htmlOrJson = contents;
-          }
-        } catch (eJsonp5) {
-          errors.push("Urlebird AllOrigins (JSONP allorigins.me): " + eJsonp5.message);
-        }
-      }
-
-      // 12. Try Urlebird via AllOrigins JSONP (allorigins.org)
-      if (!htmlOrJson) {
-        try {
-          const contents = await fetchViaJSONP(urlebirdTarget, "allorigins.org");
-          if (contents) {
-            htmlOrJson = contents;
-          }
-        } catch (eJsonp6) {
-          errors.push("Urlebird AllOrigins (JSONP allorigins.org): " + eJsonp6.message);
-        }
-      }
-
-      // 13. Ultimate fallback: Try Heroku CORS Anywhere (requires user to have clicked corsdemo)
-      if (!htmlOrJson) {
-        try {
-          const res = await fetch(`https://cors-anywhere.herokuapp.com/${countikTarget}`);
-          if (res.ok) {
-            const text = await res.text();
-            if (text.includes("followerCount")) {
-              htmlOrJson = text;
-              isCountik = true;
-            }
-          }
-        } catch (eHeroku) {
-          errors.push("Heroku CORS Anywhere: " + eHeroku.message);
-        }
-      }
-
-      // 14. Ultimate fallback: Try Urlebird search via Heroku CORS Anywhere
-      if (!htmlOrJson) {
-        try {
-          const res = await fetch(`https://cors-anywhere.herokuapp.com/${urlebirdTarget}`);
-          if (res.ok) {
-            htmlOrJson = await res.text();
-          }
-        } catch (eHeroku2) {
-          errors.push("Heroku CORS Anywhere (Urlebird): " + eHeroku2.message);
-        }
-      }
-
-      console.warn("TikTok Avatar Scanner Debug Logs:", errors);
-
-      if (!htmlOrJson) {
+      if (!text) {
         throw new Error(
           "Không thể kết nối tự động đến máy chủ quét dữ liệu do bị chặn bởi Adblock hoặc Tường lửa mạng của bạn."
         );
       }
 
       if (isCountik) {
-        const parsed = JSON.parse(htmlOrJson);
+        const parsed = JSON.parse(text);
         if (parsed.status === "success") {
           const imgUrl = parsed.avatar || "";
           const followersNum = parsed.followerCount || 0;
@@ -3898,7 +3721,7 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpe
       }
 
       // Fallback: parse Urlebird html
-      const userBlocks = htmlOrJson.match(/<div class="user my-2[^"]*">([\s\S]*?)<\/div>\s*<\/div>/g);
+      const userBlocks = text.match(/<div class="user my-2[^"]*">([\s\S]*?)<\/div>\s*<\/div>/g);
       if (!userBlocks || userBlocks.length === 0) {
         throw new Error("Không tìm thấy tài khoản TikTok tương ứng trên hệ thống lưu trữ.");
       }
