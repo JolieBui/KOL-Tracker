@@ -1857,7 +1857,7 @@ const fetchViaJSONP = (targetUrl, domain = "api.allorigins.win") => {
     const timer = setTimeout(() => {
       cleanup();
       reject(new Error(`JSONP Request Timeout for domain: ${domain}`));
-    }, 3500);
+    }, 2500);
 
     window[cbName] = (data) => {
       clearTimeout(timer);
@@ -1889,9 +1889,12 @@ const fetchViaJSONP = (targetUrl, domain = "api.allorigins.win") => {
 /* ================================================================
    PARALLEL SCANNING HELPERS (PROMISE RACE/ANY FOR HIGHEST SPEED)
 ================================================================ */
-const raceCountik = (username) => {
+const raceTikTok = (username) => {
   const countikTarget = `https://countik.com/api/userinfo?username=${username}`;
+  const urlebirdTarget = `https://urlebird.com/search/?q=${username}`;
   const promises = [];
+
+  // --- COUNTIK ENDPOINTS ---
 
   // 1. Direct fetch
   promises.push(
@@ -1995,14 +1998,9 @@ const raceCountik = (username) => {
       })
   );
 
-  return Promise.any(promises);
-};
+  // --- URLEBIRD ENDPOINTS ---
 
-const raceUrlebird = (username) => {
-  const urlebirdTarget = `https://urlebird.com/search/?q=${username}`;
-  const promises = [];
-
-  // 1. AllOrigins Fetch
+  // 9. AllOrigins Fetch
   promises.push(
     fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(urlebirdTarget)}`)
       .then(res => {
@@ -2015,7 +2013,7 @@ const raceUrlebird = (username) => {
       })
   );
 
-  // 2. Codetabs Fetch
+  // 10. Codetabs Fetch
   promises.push(
     fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(urlebirdTarget)}`)
       .then(res => {
@@ -2028,7 +2026,7 @@ const raceUrlebird = (username) => {
       })
   );
 
-  // 3. JSONP api.allorigins.win
+  // 11. JSONP api.allorigins.win
   promises.push(
     fetchViaJSONP(urlebirdTarget, "api.allorigins.win")
       .then(contents => {
@@ -2037,7 +2035,7 @@ const raceUrlebird = (username) => {
       })
   );
 
-  // 4. JSONP allorigins.me
+  // 12. JSONP allorigins.me
   promises.push(
     fetchViaJSONP(urlebirdTarget, "allorigins.me")
       .then(contents => {
@@ -2046,7 +2044,7 @@ const raceUrlebird = (username) => {
       })
   );
 
-  // 5. JSONP allorigins.org
+  // 13. JSONP allorigins.org
   promises.push(
     fetchViaJSONP(urlebirdTarget, "allorigins.org")
       .then(contents => {
@@ -2055,7 +2053,7 @@ const raceUrlebird = (username) => {
       })
   );
 
-  // 6. Heroku CORS Anywhere
+  // 14. Heroku CORS Anywhere
   promises.push(
     fetch(`https://cors-anywhere.herokuapp.com/${urlebirdTarget}`)
       .then(res => {
@@ -2112,17 +2110,12 @@ const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCamp
     try {
       let result;
       try {
-        result = await raceCountik(username);
-      } catch (eCountikAll) {
-        console.warn("All Countik parallel queries failed, racing Urlebird...", eCountikAll);
-        try {
-          result = await raceUrlebird(username);
-        } catch (eUrlebirdAll) {
-          console.error("All scanner queries failed:", eUrlebirdAll);
-          throw new Error(
-            "Không thể kết nối tự động đến máy chủ quét dữ liệu do bị chặn bởi Adblock hoặc Tường lửa mạng của bạn."
-          );
-        }
+        result = await raceTikTok(username);
+      } catch (eAll) {
+        console.error("All scanner queries failed:", eAll);
+        throw new Error(
+          "Không thể kết nối tự động đến máy chủ quét dữ liệu do bị chặn bởi Adblock hoặc Tường lửa mạng của bạn."
+        );
       }
 
       const { text, isCountik } = result;
@@ -3667,17 +3660,12 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpe
     try {
       let result;
       try {
-        result = await raceCountik(username);
-      } catch (eCountikAll) {
-        console.warn("All Countik parallel queries failed, racing Urlebird...", eCountikAll);
-        try {
-          result = await raceUrlebird(username);
-        } catch (eUrlebirdAll) {
-          console.error("All scanner queries failed:", eUrlebirdAll);
-          throw new Error(
-            "Không thể kết nối tự động đến máy chủ quét dữ liệu do bị chặn bởi Adblock hoặc Tường lửa mạng của bạn."
-          );
-        }
+        result = await raceTikTok(username);
+      } catch (eAll) {
+        console.error("All scanner queries failed:", eAll);
+        throw new Error(
+          "Không thể kết nối tự động đến máy chủ quét dữ liệu do bị chặn bởi Adblock hoặc Tường lửa mạng của bạn."
+        );
       }
 
       const { text, isCountik } = result;
