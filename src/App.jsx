@@ -1565,7 +1565,7 @@ const DualFileImportModal = ({ existingData, onConfirm, onClose, onImportSingle,
   const handleMergeAndProceed = () => {
     if (!internalFile && !socialFile) return;
     try {
-      const internalMap = internalFile ? parseInternalWorkbook(internalFile.wb) : {};
+      const internalMap = internalFile ? parseInternalWorkbook(internalFile.wb, statusLabelToKey) : {};
       const socialMap = socialFile ? parseSocialWorkbook(socialFile.wb) : {};
       const merged = mergeDualFiles(internalMap, socialMap, null, existingData);
 
