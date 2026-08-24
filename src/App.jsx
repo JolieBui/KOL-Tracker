@@ -1892,6 +1892,7 @@ const fetchViaJSONP = (targetUrl, domain = "api.allorigins.win") => {
 const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCampaigns }) => {
   const [form, setForm] = useState({ ...kol });
   const [scannerLoading, setScannerLoading] = useState(false);
+  const [scanError, setScanError] = useState(null);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -1922,6 +1923,7 @@ const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCamp
     }
 
     setScannerLoading(true);
+    setScanError(null);
     try {
       const countikTarget = `https://countik.com/api/userinfo?username=${username}`;
       const urlebirdTarget = `https://urlebird.com/search/?q=${username}`;
@@ -2091,16 +2093,39 @@ const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCamp
         }
       }
 
+      // 13. Ultimate fallback: Try Heroku CORS Anywhere (requires user to have clicked corsdemo)
+      if (!htmlOrJson) {
+        try {
+          const res = await fetch(`https://cors-anywhere.herokuapp.com/${countikTarget}`);
+          if (res.ok) {
+            const text = await res.text();
+            if (text.includes("followerCount")) {
+              htmlOrJson = text;
+              isCountik = true;
+            }
+          }
+        } catch (eHeroku) {
+          errors.push("Heroku CORS Anywhere: " + eHeroku.message);
+        }
+      }
+
+      // 14. Ultimate fallback: Try Urlebird search via Heroku CORS Anywhere
+      if (!htmlOrJson) {
+        try {
+          const res = await fetch(`https://cors-anywhere.herokuapp.com/${urlebirdTarget}`);
+          if (res.ok) {
+            htmlOrJson = await res.text();
+          }
+        } catch (eHeroku2) {
+          errors.push("Heroku CORS Anywhere (Urlebird): " + eHeroku2.message);
+        }
+      }
+
       console.warn("TikTok Profile Scanner Debug Logs:", errors);
 
       if (!htmlOrJson) {
         throw new Error(
-          "Không thể kết nối đến các máy chủ quét dữ liệu công cộng.\n\n" +
-          "Lý do: Trình chặn quảng cáo (Adblock, Brave Shield) hoặc Tường lửa mạng của bạn đã chặn kết nối đến các tên miền proxy.\n\n" +
-          "Cách khắc phục:\n" +
-          "1. Tạm thời tắt chặn quảng cáo (Adblock) trên trang này.\n" +
-          "2. Đảm bảo bạn không sử dụng mạng công ty/VPN có tường lửa chặn proxy.\n" +
-          "3. Nếu vẫn không được, bạn vui lòng nhập thủ công số Followers."
+          "Không thể kết nối tự động đến máy chủ quét dữ liệu do bị chặn bởi Adblock hoặc Tường lửa mạng của bạn."
         );
       }
 
@@ -2130,6 +2155,7 @@ const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCamp
           if (parsed.nickname && !form.kol) {
             set("kol", parsed.nickname.trim());
           }
+          setScanError(null);
           window.alert("Quét và cập nhật thông tin thành công!");
           setScannerLoading(false);
           return;
@@ -2160,9 +2186,11 @@ const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCamp
         set("kol", nameMatch[1].trim());
       }
       
+      setScanError(null);
       window.alert("Quét và cập nhật thông tin thành công!");
     } catch (e) {
-      window.alert("Không thể quét tài khoản TikTok này. Lỗi: " + e.message);
+      console.error("Scan error details:", e);
+      setScanError(e.message);
     }
     setScannerLoading(false);
   };
@@ -2242,9 +2270,42 @@ const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCamp
               <input
                 className="kt-input"
                 value={form.link || ""}
-                onChange={e => set("link", e.target.value)}
+                onChange={e => {
+                  set("link", e.target.value);
+                  if (scanError) setScanError(null);
+                }}
                 placeholder="https://www.tiktok.com/@username"
               />
+              {scanError && (
+                <div style={{
+                  marginTop: 8, padding: "10px 12px", borderRadius: 8,
+                  backgroundColor: "rgba(224, 86, 86, 0.08)", border: "1px solid rgba(224, 86, 86, 0.2)",
+                  fontSize: 11, color: "#d93f3f", lineHeight: "1.5"
+                }}>
+                  <div style={{ fontWeight: 700, marginBottom: 4, display: "flex", alignItems: "center", gap: 4 }}>
+                    <span>⚠️ Không thể kết nối tự động</span>
+                  </div>
+                  <div>Do máy chủ bị chặn bởi Adblock hoặc mạng của bạn.</div>
+                  <div style={{ marginTop: 6, display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+                    <a
+                      href="https://cors-anywhere.herokuapp.com/corsdemo"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="kt-btn"
+                      style={{
+                        padding: "4px 8px", fontSize: 10, height: "auto", textDecoration: "none",
+                        backgroundColor: "#d93f3f", color: "white", borderRadius: 4, display: "inline-block",
+                        fontWeight: 600
+                      }}
+                    >
+                      🚀 Kích hoạt Quét Dự Phòng (Heroku)
+                    </a>
+                  </div>
+                  <div style={{ marginTop: 6, fontSize: 9, color: "var(--ink-soft)" }}>
+                    * Nhấn nút màu đỏ ở trên, sau đó click "Request temporary access..." ở tab mới rồi quay lại đây Quét lại là được!
+                  </div>
+                </div>
+              )}
             </div>
 
             <Field label="Followers" field="follower" />
@@ -3569,6 +3630,7 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpe
 
   const [avatarUrl, setAvatarUrl] = useState(kol.avatarUrl || "");
   const [avatarLoading, setAvatarLoading] = useState(false);
+  const [scanError, setScanError] = useState(null);
 
   const fetchTikTokAvatar = async () => {
     const link = form.link || kol.link || "";
@@ -3597,6 +3659,7 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpe
     }
 
     setAvatarLoading(true);
+    setScanError(null);
     try {
       const countikTarget = `https://countik.com/api/userinfo?username=${username}`;
       const urlebirdTarget = `https://urlebird.com/search/?q=${username}`;
@@ -3766,16 +3829,39 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpe
         }
       }
 
+      // 13. Ultimate fallback: Try Heroku CORS Anywhere (requires user to have clicked corsdemo)
+      if (!htmlOrJson) {
+        try {
+          const res = await fetch(`https://cors-anywhere.herokuapp.com/${countikTarget}`);
+          if (res.ok) {
+            const text = await res.text();
+            if (text.includes("followerCount")) {
+              htmlOrJson = text;
+              isCountik = true;
+            }
+          }
+        } catch (eHeroku) {
+          errors.push("Heroku CORS Anywhere: " + eHeroku.message);
+        }
+      }
+
+      // 14. Ultimate fallback: Try Urlebird search via Heroku CORS Anywhere
+      if (!htmlOrJson) {
+        try {
+          const res = await fetch(`https://cors-anywhere.herokuapp.com/${urlebirdTarget}`);
+          if (res.ok) {
+            htmlOrJson = await res.text();
+          }
+        } catch (eHeroku2) {
+          errors.push("Heroku CORS Anywhere (Urlebird): " + eHeroku2.message);
+        }
+      }
+
       console.warn("TikTok Avatar Scanner Debug Logs:", errors);
 
       if (!htmlOrJson) {
         throw new Error(
-          "Không thể kết nối đến các máy chủ quét dữ liệu công cộng.\n\n" +
-          "Lý do: Trình chặn quảng cáo (Adblock, Brave Shield) hoặc Tường lửa mạng của bạn đã chặn kết nối đến các tên miền proxy.\n\n" +
-          "Cách khắc phục:\n" +
-          "1. Tạm thời tắt chặn quảng cáo (Adblock) trên trang này.\n" +
-          "2. Đảm bảo bạn không sử dụng mạng công ty/VPN có tường lửa chặn proxy.\n" +
-          "3. Nếu vẫn không được, bạn vui lòng nhập thủ công số Followers."
+          "Không thể kết nối tự động đến máy chủ quét dữ liệu do bị chặn bởi Adblock hoặc Tường lửa mạng của bạn."
         );
       }
 
@@ -3802,6 +3888,7 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpe
           if (imgUrl) setAvatarUrl(imgUrl);
           if (followersNum) set("follower", formatFollowers(followersNum));
           
+          setScanError(null);
           window.alert("Quét và cập nhật thông tin thành công!");
           setAvatarLoading(false);
           return;
@@ -3827,9 +3914,11 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpe
       if (imgUrl) setAvatarUrl(imgUrl);
       if (followersValue) set("follower", followersValue);
       
+      setScanError(null);
       window.alert("Quét và cập nhật thông tin thành công!");
     } catch (e) {
-      window.alert("Không thể quét tài khoản TikTok này. Lỗi: " + e.message);
+      console.error("Profile scan error details:", e);
+      setScanError(e.message);
     }
     setAvatarLoading(false);
   };
@@ -3943,8 +4032,36 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpe
 
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
                   <span style={{ color: "var(--ink-soft)", fontSize: 12 }}>Link TikTok:</span>
-                  <input className="kt-input" value={form.link} onChange={e => set("link", e.target.value)} style={{ width: 120, textAlign: "right", padding: "3px 6px", fontSize: 12 }} />
+                  <input className="kt-input" value={form.link} onChange={e => {
+                    set("link", e.target.value);
+                    if (scanError) setScanError(null);
+                  }} style={{ width: 120, textAlign: "right", padding: "3px 6px", fontSize: 12 }} />
                 </div>
+                {scanError && (
+                  <div style={{
+                    padding: "8px 10px", borderRadius: 8,
+                    backgroundColor: "rgba(224, 86, 86, 0.08)", border: "1px solid rgba(224, 86, 86, 0.2)",
+                    fontSize: 10, color: "#d93f3f", lineHeight: "1.4"
+                  }}>
+                    <div style={{ fontWeight: 700, marginBottom: 2 }}>⚠️ Lỗi Quét tự động</div>
+                    <div>Proxy bị chặn bởi mạng / Adblock.</div>
+                    <div style={{ marginTop: 6 }}>
+                      <a
+                        href="https://cors-anywhere.herokuapp.com/corsdemo"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="kt-btn"
+                        style={{
+                          padding: "3px 6px", fontSize: 9, height: "auto", textDecoration: "none",
+                          backgroundColor: "#d93f3f", color: "white", borderRadius: 4, display: "inline-block",
+                          fontWeight: 600
+                        }}
+                      >
+                        🚀 Kích hoạt Quét Dự Phòng (Heroku)
+                      </a>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div style={{ borderTop: "1px dashed var(--line)", paddingTop: 10, marginTop: "auto" }}>
