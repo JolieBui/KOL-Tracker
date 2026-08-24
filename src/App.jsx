@@ -4796,6 +4796,40 @@ const [view, setView] = useState("table");
     return `${cleanCamp}-${maxIndex + 1}`;
   };
 
+  const safeSupabaseUpsert = async (rowsOrRow) => {
+    if (!supabaseClient || !rowsOrRow) return { error: null };
+    const isSingle = !Array.isArray(rowsOrRow);
+    const rows = isSingle ? [rowsOrRow] : rowsOrRow;
+    if (rows.length === 0) return { error: null };
+
+    let payload = rows.map(r => {
+      const clean = { ...r };
+      delete clean.__no__;
+      delete clean.__sheet__;
+      return clean;
+    });
+
+    let attempts = 0;
+    while (attempts < 5) {
+      const { data: resData, error } = await supabaseClient.from("kols").upsert(isSingle ? payload[0] : payload);
+      if (!error) return { data: resData, error: null };
+
+      const match = error.message && error.message.match(/Could not find the '(\w+)' column/i);
+      if (match && match[1]) {
+        const missingCol = match[1];
+        payload = payload.map(r => {
+          const next = { ...r };
+          delete next[missingCol];
+          return next;
+        });
+        attempts++;
+      } else {
+        return { error };
+      }
+    }
+    return { error: null };
+  };
+
   const handleSave = async (updated) => {
     ensureCampaignLabel(updated.campaign);
     const oldRow = data.find(r => r.id === updated.id);
@@ -4811,7 +4845,7 @@ const [view, setView] = useState("table");
     }
     setData(d => d.map(r => r.id === updated.id ? finalRow : r));
     if (supabaseClient) {
-      const { error } = await supabaseClient.from("kols").upsert(finalRow);
+      const { error } = await safeSupabaseUpsert(finalRow);
       if (error) showToast("❌ Lỗi lưu dữ liệu: " + error.message, false);
     }
   };
@@ -4830,7 +4864,7 @@ const [view, setView] = useState("table");
     ensureCampaignLabel(finalRow.campaign);
     setData(d => [...d, finalRow]);
     if (supabaseClient) {
-      const { error } = await supabaseClient.from("kols").insert(finalRow);
+      const { error } = await safeSupabaseUpsert(finalRow);
       if (error) showToast("❌ Lỗi thêm dữ liệu: " + error.message, false);
     }
   };
@@ -4903,7 +4937,7 @@ const [view, setView] = useState("table");
     }));
     showToast("✅ Đã cập nhật hồ sơ KOL");
     if (supabaseClient && updatedRows.length > 0) {
-      const { error } = await supabaseClient.from("kols").upsert(updatedRows);
+      const { error } = await safeSupabaseUpsert(updatedRows);
       if (error) showToast("❌ Lỗi đồng bộ hồ sơ: " + error.message, false);
     }
   };
@@ -4930,11 +4964,11 @@ const [view, setView] = useState("table");
       });
     }
 
-    showToast();
+    showToast(`✅ Đã cập nhật ${result.toUpdate.length} dòng, thêm ${result.toAdd.length} KOL mới`);
     setShowDualImport(false);
 
     if (supabaseClient) {
-      const { error } = await supabaseClient.from("kols").upsert(finalKols);
+      const { error } = await safeSupabaseUpsert(finalKols);
       if (error) showToast("❌ Lỗi đồng bộ dữ liệu import: " + error.message, false);
 
       if (result.sheetLabels && Object.keys(result.sheetLabels).length) {
@@ -4964,7 +4998,7 @@ const [view, setView] = useState("table");
         localStorage.setItem("kol_campaign_labels", JSON.stringify(defLabels));
         if (supabaseClient) {
           await supabaseClient.from("kols").delete().neq("id", "");
-          const { error: err1 } = await supabaseClient.from("kols").insert(SEED_DATA);
+          const { error: err1 } = await safeSupabaseUpsert(SEED_DATA);
           const { error: err2 } = await supabaseClient.from("app_config").upsert({ key: "campaign_labels", value: defLabels });
           if (err1 || err2) showToast("❌ Lỗi khôi phục dữ liệu mẫu trên Database", false);
         }
@@ -5603,6 +5637,7 @@ create table if not exists kols (
   "id" text primary key,
   "campaign" text,
   "kol" text,
+  "adName" text,
   "link" text,
   "follower" text,
   "type" text,
@@ -5618,6 +5653,10 @@ create table if not exists kols (
   "airedLink" text,
   "airedFb" text,
   "giftSent" text,
+  "phaseTags" text,
+  "impressions" numeric,
+  "views2s" numeric,
+  "views6s" numeric,
   "estView" numeric,
   "estEng" numeric,
   "views" numeric,
@@ -5645,7 +5684,14 @@ create table if not exists kols (
   "updatedAt" text
 );
 
--- 3. Kích hoạt tính năng Realtime để đồng bộ trực tuyến
+-- 3. Bổ sung các cột mới (cho database đã tạo trước đó)
+alter table kols add column if not exists "adName" text;
+alter table kols add column if not exists "phaseTags" text;
+alter table kols add column if not exists "impressions" numeric;
+alter table kols add column if not exists "views2s" numeric;
+alter table kols add column if not exists "views6s" numeric;
+
+-- 4. Kích hoạt tính năng Realtime để đồng bộ trực tuyến
 alter table kols replica identity full;
 alter publication supabase_realtime add table kols;
 
