@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import * as XLSX from "xlsx";
-import { createClient } from "@supabase/supabase-js";
 
 /* ---------------- Design tokens (injected via <style>) ---------------- */
 const GlobalStyle = () => (
@@ -4364,203 +4363,7 @@ const [view, setView] = useState("table");
     }
   }, []);
 
-  /* ================================================================
-     SUPABASE REAL-TIME DATABASE SYNC & PRESENCE SETUP
-  ================================================================ */
-  const [supabaseUrl, setSupabaseUrlState] = useState(() => localStorage.getItem("supabase_url") || "");
-  const [supabaseKey, setSupabaseKeyState] = useState(() => localStorage.getItem("supabase_key") || "");
-  const [supabaseNickname, setSupabaseNicknameState] = useState(() => localStorage.getItem("supabase_nickname") || "Ẩn danh");
-  const [isSupabaseConnected, setIsSupabaseConnected] = useState(false);
-  const [supabaseError, setSupabaseError] = useState(null);
-  const [onlineUsers, setOnlineUsers] = useState([]);
-  const [supabaseClient, setSupabaseClient] = useState(null);
-  const [showSupabaseSettings, setShowSupabaseSettings] = useState(false);
 
-  // Initialize Supabase Client
-  useEffect(() => {
-    if (!supabaseUrl || !supabaseKey) {
-      setIsSupabaseConnected(false);
-      setSupabaseClient(null);
-      setOnlineUsers([]);
-      return;
-    }
-
-    let active = true;
-    let client;
-    try {
-      client = createClient(supabaseUrl, supabaseKey);
-      setSupabaseClient(client);
-    } catch (e) {
-      setSupabaseError(e.message);
-      setIsSupabaseConnected(false);
-      return;
-    }
-
-    const initSupabase = async () => {
-      // 1. Fetch initial kols data
-      const { data: dbData, error: dbError } = await client.from("kols").select("*");
-      if (!active) return;
-
-      if (dbError) {
-        console.error("Supabase load error:", dbError);
-        setIsSupabaseConnected(false);
-        setSupabaseError("Không thể kết nối đến bảng 'kols'. Hãy chắc chắn bạn đã tạo bảng 'kols' và 'app_config' theo hướng dẫn SQL bên dưới.");
-        return;
-      }
-
-      if (dbData && dbData.length > 0) {
-        rawSetData(dbData);
-        try { localStorage.setItem(LS_KEY, JSON.stringify(dbData)); } catch (e) {}
-      } else {
-        try {
-          const s = localStorage.getItem(LS_KEY);
-          if (s) {
-            const localList = JSON.parse(s);
-            if (localList && localList.length > 0) {
-              rawSetData(localList);
-              safeSupabaseUpsert(localList);
-            } else {
-              rawSetData([]);
-            }
-          } else {
-            rawSetData([]);
-          }
-        } catch (e) {
-          rawSetData([]);
-        }
-      }
-      setIsSupabaseConnected(true);
-      setSupabaseError(null);
-
-      // 2. Fetch app_config for campaign labels & status stages
-      const { data: configData } = await client.from("app_config").select("*");
-      if (!active) return;
-
-      if (configData) {
-        const labels = configData.find(c => c.key === "campaign_labels");
-        if (labels && labels.value) {
-          setCampaignLabels(labels.value);
-          localStorage.setItem("kol_campaign_labels", JSON.stringify(labels.value));
-        }
-        const statuses = configData.find(c => c.key === "status_stages");
-        if (statuses && statuses.value) {
-          setStatusStages(statuses.value);
-          localStorage.setItem("kol_status_stages", JSON.stringify(statuses.value));
-        }
-      }
-    };
-
-    initSupabase();
-
-    // 3. Subscribe to real-time changes
-    const channel = client
-      .channel("schema-db-changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "kols" },
-        payload => {
-          console.log("Realtime payload received:", payload);
-          if (payload.eventType === "INSERT") {
-            rawSetData(current => {
-              if (current.some(r => r.id === payload.new.id)) return current;
-              return [...current, payload.new];
-            });
-          } else if (payload.eventType === "UPDATE") {
-            rawSetData(current => current.map(r => r.id === payload.new.id ? payload.new : r));
-          } else if (payload.eventType === "DELETE") {
-            rawSetData(current => current.filter(r => r.id !== payload.old.id));
-          }
-        }
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "app_config" },
-        payload => {
-          console.log("Realtime app_config payload:", payload);
-          if (payload.eventType === "UPDATE" || payload.eventType === "INSERT") {
-            if (payload.new.key === "campaign_labels" && payload.new.value) {
-              setCampaignLabels(payload.new.value);
-              localStorage.setItem("kol_campaign_labels", JSON.stringify(payload.new.value));
-            }
-            if (payload.new.key === "status_stages" && payload.new.value) {
-              setStatusStages(payload.new.value);
-              localStorage.setItem("kol_status_stages", JSON.stringify(payload.new.value));
-            }
-          }
-        }
-      )
-      .subscribe();
-
-    // 4. Subscribe to Real-time Presence
-    const presenceChannel = client.channel("presence-tcv-kols", {
-      config: {
-        presence: {
-          key: supabaseNickname.trim() || "Ẩn danh",
-        },
-      },
-    });
-
-    presenceChannel
-      .on("presence", { event: "sync" }, () => {
-        const state = presenceChannel.presenceState();
-        const users = Object.keys(state).map(key => {
-          const hash = Array.from(key).reduce((s, c) => s + c.charCodeAt(0), 0);
-          const colors = ["#F59E0B", "#10B981", "#3B82F6", "#EC4899", "#8B5CF6", "#EF4444", "#06B6D4"];
-          const color = colors[hash % colors.length];
-          return {
-            name: key,
-            initials: key.slice(0, 2).toUpperCase(),
-            color
-          };
-        });
-        setOnlineUsers(users);
-      })
-      .subscribe(async (status) => {
-        if (status === "SUBSCRIBED") {
-          await presenceChannel.track({
-            online_at: new Date().toISOString(),
-          });
-        }
-      });
-
-    return () => {
-      active = false;
-      channel.unsubscribe();
-      presenceChannel.unsubscribe();
-    };
-  }, [supabaseUrl, supabaseKey, supabaseNickname]);
-
-  const handleConnectSupabase = (url, key, nickname) => {
-    localStorage.setItem("supabase_url", url.trim());
-    localStorage.setItem("supabase_key", key.trim());
-    localStorage.setItem("supabase_nickname", nickname.trim());
-    setSupabaseUrlState(url.trim());
-    setSupabaseKeyState(key.trim());
-    setSupabaseNicknameState(nickname.trim());
-    showToast("⚡ Đang kết nối tới Supabase...");
-  };
-
-  const handleDisconnectSupabase = () => {
-    localStorage.removeItem("supabase_url");
-    localStorage.removeItem("supabase_key");
-    localStorage.removeItem("supabase_nickname");
-    setSupabaseUrlState("");
-    setSupabaseKeyState("");
-    setSupabaseNicknameState("Ẩn danh");
-    setIsSupabaseConnected(false);
-    setSupabaseError(null);
-    setOnlineUsers([]);
-    setSupabaseClient(null);
-
-    // Reset to local data
-    try {
-      const s = localStorage.getItem(LS_KEY);
-      rawSetData(s ? JSON.parse(s) : SEED_DATA);
-    } catch (e) {
-      rawSetData(SEED_DATA);
-    }
-    showToast("🔌 Đã ngắt kết nối. Quay về chế độ Offline LocalStorage.");
-  };
 
   const [wizardData, setWizardData] = useState(null); // { rawHeaders, rawRows, fileName }
   const [showDualImport, setShowDualImport] = useState(false);
@@ -4870,52 +4673,6 @@ const [view, setView] = useState("table");
     return `${cleanCamp}-${maxIndex + 1}`;
   };
 
-  const SUPABASE_COLUMNS = [
-    "id", "campaign", "kol", "link", "follower", "type", "location", "group",
-    "cost", "addonFee", "statusKey", "monAn", "ngayGuiScript", "ngayGuiDemo",
-    "ngayAir", "airedLink", "airedFb", "giftSent", "estView", "estEng", "views",
-    "likes", "comments", "saves", "shares", "adSpend", "conversions", "addToCart",
-    "revenue", "reupViews", "reupEngagement", "totalViewCombined", "totalEngCombined",
-    "pctViewAchieved", "pctEngAchieved", "pctViewAchievedTotal", "pctEngAchievedTotal",
-    "paidAvgView", "paidPctCompletedView", "codeAds", "reupLink", "brandReup", "updatedAt"
-  ];
-
-  const safeSupabaseUpsert = async (rowsOrRow) => {
-    if (!supabaseClient || !rowsOrRow) return { error: null };
-    const isSingle = !Array.isArray(rowsOrRow);
-    const rows = isSingle ? [rowsOrRow] : rowsOrRow;
-    if (rows.length === 0) return { error: null };
-
-    // Strict schema filtering to only send columns guaranteed to exist in Supabase
-    let payload = rows.map(r => {
-      const clean = {};
-      SUPABASE_COLUMNS.forEach(col => {
-        if (r[col] !== undefined) clean[col] = r[col];
-      });
-      return clean;
-    });
-
-    let attempts = 0;
-    while (attempts < 5) {
-      const { data: resData, error } = await supabaseClient.from("kols").upsert(isSingle ? payload[0] : payload);
-      if (!error) return { data: resData, error: null };
-
-      const match = (error.message || "").match(/Could not find the '(\w+)' column/i);
-      if (match && match[1]) {
-        const missingCol = match[1];
-        payload = payload.map(r => {
-          const next = { ...r };
-          delete next[missingCol];
-          return next;
-        });
-        attempts++;
-      } else {
-        return { error };
-      }
-    }
-    return { error: null };
-  };
-
   const handleSave = async (updated) => {
     ensureCampaignLabel(updated.campaign);
     const oldRow = data.find(r => r.id === updated.id);
@@ -4925,23 +4682,16 @@ const [view, setView] = useState("table");
         ...updated,
         id: generateKOLId(updated.campaign, data)
       };
-      if (supabaseClient) {
-        await supabaseClient.from("kols").delete().eq("id", updated.id);
-      }
     }
     setData(d => d.map(r => r.id === updated.id ? finalRow : r));
-    if (supabaseClient) {
-      const { error } = await safeSupabaseUpsert(finalRow);
-      if (error) showToast("❌ Lỗi lưu dữ liệu: " + error.message, false);
-    }
+    showToast("✅ Đã lưu thay đổi");
   };
+
   const handleDelete = async (id) => {
     setData(d => d.filter(r => r.id !== id));
-    if (supabaseClient) {
-      const { error } = await supabaseClient.from("kols").delete().eq("id", id);
-      if (error) showToast("❌ Lỗi xóa dữ liệu: " + error.message, false);
-    }
+    showToast("🗑️ Đã xóa KOL");
   };
+
   const handleAdd = async (newRow) => {
     const finalRow = {
       ...newRow,
@@ -4949,10 +4699,7 @@ const [view, setView] = useState("table");
     };
     ensureCampaignLabel(finalRow.campaign);
     setData(d => [...d, finalRow]);
-    if (supabaseClient) {
-      const { error } = await safeSupabaseUpsert(finalRow);
-      if (error) showToast("❌ Lỗi thêm dữ liệu: " + error.message, false);
-    }
+    showToast("✅ Đã thêm KOL mới");
   };
 
   const getProfileForKol = (kolName) => {
@@ -5008,28 +4755,15 @@ const [view, setView] = useState("table");
     return profile;
   };
 
-  // Editing a KOL "profile" (Hồ sơ KOL) means editing shared fields — name, follower,
-  // tier, location, group, TikTok link — that are duplicated across every campaign
-  // row for that KOL. We match rows by the original (pre-edit) name and apply the
-  // new values to all of them, so table/kanban/profile views all stay consistent.
   const handleUpdateProfile = async (originalName, updates) => {
     const key = (originalName || "").trim().toLowerCase();
-    const updatedRows = [];
     setData(d => d.map(r => {
       if ((r.kol || "").trim().toLowerCase() !== key) return r;
-      const updatedRow = { ...r, ...updates };
-      updatedRows.push(updatedRow);
-      return updatedRow;
+      return { ...r, ...updates };
     }));
     showToast("✅ Đã cập nhật hồ sơ KOL");
-    if (supabaseClient && updatedRows.length > 0) {
-      const { error } = await safeSupabaseUpsert(updatedRows);
-      if (error) showToast("❌ Lỗi đồng bộ hồ sơ: " + error.message, false);
-    }
   };
 
-  // Commit the preview from DualFileImportModal: update matched rows in place
-  // (by id) and append brand-new ones, in a single history-tracked setData call.
   const handleDualFileMerge = async (result) => {
     let finalKols = [];
     setData(d => {
@@ -5041,10 +4775,9 @@ const [view, setView] = useState("table");
       return finalKols;
     });
 
-    let nextLabels = campaignLabels;
     if (result.sheetLabels && Object.keys(result.sheetLabels).length) {
       setCampaignLabels(prev => {
-        nextLabels = { ...prev, ...result.sheetLabels };
+        const nextLabels = { ...prev, ...result.sheetLabels };
         localStorage.setItem("kol_campaign_labels", JSON.stringify(nextLabels));
         return nextLabels;
       });
@@ -5052,15 +4785,6 @@ const [view, setView] = useState("table");
 
     showToast(`✅ Đã cập nhật ${result.toUpdate.length} dòng, thêm ${result.toAdd.length} KOL mới`);
     setShowDualImport(false);
-
-    if (supabaseClient) {
-      const { error } = await safeSupabaseUpsert(finalKols);
-      if (error) showToast("❌ Lỗi đồng bộ dữ liệu import: " + error.message, false);
-
-      if (result.sheetLabels && Object.keys(result.sheetLabels).length) {
-        await supabaseClient.from("app_config").upsert({ key: "campaign_labels", value: nextLabels });
-      }
-    }
   };
 
   const handleReset = async () => {
@@ -5072,22 +4796,13 @@ const [view, setView] = useState("table");
       setData([]);
       setCampaignLabels(defLabels);
       localStorage.setItem("kol_campaign_labels", JSON.stringify(defLabels));
-      if (supabaseClient) {
-        const { error: err1 } = await supabaseClient.from("kols").delete().neq("id", "");
-        const { error: err2 } = await supabaseClient.from("app_config").upsert({ key: "campaign_labels", value: defLabels });
-        if (err1 || err2) showToast("❌ Lỗi reset dữ liệu trên Database", false);
-      }
+      showToast("🗑️ Đã xóa sạch dữ liệu");
     } else {
       if (window.confirm("Bạn có chắc chắn muốn khôi phục lại 66 dòng dữ liệu mẫu ban đầu? Mọi chỉnh sửa hiện tại sẽ bị mất.")) {
         setData(SEED_DATA);
         setCampaignLabels(defLabels);
         localStorage.setItem("kol_campaign_labels", JSON.stringify(defLabels));
-        if (supabaseClient) {
-          await supabaseClient.from("kols").delete().neq("id", "");
-          const { error: err1 } = await safeSupabaseUpsert(SEED_DATA);
-          const { error: err2 } = await supabaseClient.from("app_config").upsert({ key: "campaign_labels", value: defLabels });
-          if (err1 || err2) showToast("❌ Lỗi khôi phục dữ liệu mẫu trên Database", false);
-        }
+        showToast("🔄 Đã khôi phục dữ liệu mẫu ban đầu");
       }
     }
   };
@@ -5223,20 +4938,6 @@ const [view, setView] = useState("table");
                 ↪️
               </button>
             </div>
-
-            <button
-              className="kt-btn kt-btn-ghost"
-              type="button"
-              onClick={() => setShowSupabaseSettings(true)}
-              title="Đồng bộ cơ sở dữ liệu thời gian thực (Supabase)"
-              style={{
-                padding: "6px 10px", fontSize: 12, display: "flex", alignItems: "center", gap: 4,
-                border: isSupabaseConnected ? "1.5px solid #10B981" : "1.5px solid var(--line)"
-              }}
-            >
-              <span style={{ fontSize: 13 }}>☁️</span>
-              {isSupabaseConnected ? "Online" : "Offline"}
-            </button>
 
             {/* Gear Settings Button (Icon only) */}
             <button className="kt-btn kt-btn-ghost" type="button" onClick={() => setShowStatusSettings(true)}
@@ -5539,26 +5240,6 @@ const [view, setView] = useState("table");
           onExport={handleExportData}
         />
       )}
-
-      {/* ── SUPABASE CONFIG MODAL ── */}
-      {showSupabaseSettings && (
-        <SupabaseConfigModal
-          initialUrl={supabaseUrl}
-          initialKey={supabaseKey}
-          initialNickname={supabaseNickname}
-          isConnected={isSupabaseConnected}
-          errorMsg={supabaseError}
-          onConnect={(url, key, nickname) => {
-            handleConnectSupabase(url, key, nickname);
-            setShowSupabaseSettings(false);
-          }}
-          onDisconnect={() => {
-            handleDisconnectSupabase();
-            setShowSupabaseSettings(false);
-          }}
-          onClose={() => setShowSupabaseSettings(false)}
-        />
-      )}
     </div>
   );
 }
@@ -5707,236 +5388,6 @@ const OnlineShareModal = ({ data, onClose, onExport }) => {
           </button>
         </div>
 
-      </div>
-    </div>
-  );
-};
-
-const SQL_SCRIPT = `-- 1. Tạo bảng cấu hình ứng dụng
-create table if not exists app_config (
-  key text primary key,
-  value jsonb
-);
-
--- 2. Tạo bảng quản lý KOLs
-create table if not exists kols (
-  "id" text primary key,
-  "campaign" text,
-  "kol" text,
-  "adName" text,
-  "link" text,
-  "follower" text,
-  "type" text,
-  "location" text,
-  "group" text,
-  "cost" numeric,
-  "addonFee" text,
-  "statusKey" text,
-  "monAn" text,
-  "ngayGuiScript" text,
-  "ngayGuiDemo" text,
-  "ngayAir" text,
-  "airedLink" text,
-  "airedFb" text,
-  "giftSent" text,
-  "phaseTags" text,
-  "impressions" numeric,
-  "views2s" numeric,
-  "views6s" numeric,
-  "estView" numeric,
-  "estEng" numeric,
-  "views" numeric,
-  "likes" numeric,
-  "comments" numeric,
-  "saves" numeric,
-  "shares" numeric,
-  "adSpend" numeric,
-  "conversions" numeric,
-  "addToCart" numeric,
-  "revenue" numeric,
-  "reupViews" numeric,
-  "reupEngagement" numeric,
-  "totalViewCombined" numeric,
-  "totalEngCombined" numeric,
-  "pctViewAchieved" numeric,
-  "pctEngAchieved" numeric,
-  "pctViewAchievedTotal" numeric,
-  "pctEngAchievedTotal" numeric,
-  "paidAvgView" numeric,
-  "paidPctCompletedView" numeric,
-  "codeAds" text,
-  "reupLink" text,
-  "brandReup" text,
-  "updatedAt" text
-);
-
--- 3. Bổ sung các cột mới (cho database đã tạo trước đó)
-alter table kols add column if not exists "adName" text;
-alter table kols add column if not exists "phaseTags" text;
-alter table kols add column if not exists "impressions" numeric;
-alter table kols add column if not exists "views2s" numeric;
-alter table kols add column if not exists "views6s" numeric;
-
--- 4. Tắt Row Level Security (cho phép ứng dụng đọc/ghi dữ liệu)
-alter table kols disable row level security;
-alter table app_config disable row level security;
-
--- 5. Kích hoạt tính năng Realtime để đồng bộ trực tuyến
-alter table kols replica identity full;
-alter publication supabase_realtime add table kols;
-
-alter table app_config replica identity full;
-alter publication supabase_realtime add table app_config;`;
-
-const SupabaseConfigModal = ({ 
-  initialUrl, 
-  initialKey, 
-  initialNickname, 
-  isConnected, 
-  errorMsg, 
-  onConnect, 
-  onDisconnect, 
-  onClose 
-}) => {
-  const [url, setUrl] = useState(initialUrl);
-  const [key, setKey] = useState(initialKey);
-  const [nickname, setNickname] = useState(initialNickname);
-  const [copiedSql, setCopiedSql] = useState(false);
-  const [showInstructions, setShowInstructions] = useState(false);
-
-  const handleSave = (e) => {
-    e.preventDefault();
-    if (!url.trim() || !key.trim()) {
-      window.alert("Vui lòng điền đầy đủ URL và Key.");
-      return;
-    }
-    onConnect(url.trim(), key.trim(), nickname.trim() || "Ẩn danh");
-  };
-
-  const handleCopySql = () => {
-    navigator.clipboard.writeText(SQL_SCRIPT)
-      .then(() => {
-        setCopiedSql(true);
-        setTimeout(() => setCopiedSql(false), 2000);
-      });
-  };
-
-  return (
-    <div className="kt-overlay" style={{ zIndex: 110 }} onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="kt-modal kt-anim" style={{ maxWidth: 580, maxHeight: "90vh", display: "flex", flexDirection: "column" }}>
-        {/* Header */}
-        <div style={{ padding: "18px 22px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em" }}>Database Settings</div>
-            <div style={{ fontSize: 17, fontWeight: 700, color: "var(--ink)" }}>☁️ Đồng bộ cơ sở dữ liệu (Supabase)</div>
-          </div>
-          <button className="kt-btn kt-btn-ghost" onClick={onClose} style={{ padding: "6px 10px" }}>✕</button>
-        </div>
-
-        {/* Body */}
-        <div className="kt-scrollbar" style={{ padding: "18px 22px", overflowY: "auto", flex: 1, display: "flex", flexDirection: "column", gap: 18 }}>
-          
-          {/* Connection Status */}
-          <div style={{
-            padding: "12px 16px", borderRadius: 8,
-            border: isConnected ? "1px solid rgba(16, 185, 129, 0.2)" : errorMsg ? "1px solid rgba(239, 68, 68, 0.2)" : "1px solid var(--line)",
-            backgroundColor: isConnected ? "rgba(16, 185, 129, 0.05)" : errorMsg ? "rgba(239, 68, 68, 0.05)" : "var(--paper)",
-            fontSize: 13, color: "var(--ink)", display: "flex", flexDirection: "column", gap: 4
-          }}>
-            <div style={{ fontWeight: 700, display: "flex", alignItems: "center", gap: 6 }}>
-              <span>{isConnected ? "🟢 Đã kết nối trực tuyến!" : errorMsg ? "🔴 Lỗi kết nối" : "⚪ Trạng thái ngoại tuyến (Offline)"}</span>
-            </div>
-            <div style={{ fontSize: 11, color: "var(--ink-soft)" }}>
-              {isConnected 
-                ? "Dữ liệu đang được đồng bộ thời gian thực với Supabase. Bạn có thể cộng tác với người khác." 
-                : errorMsg 
-                  ? errorMsg 
-                  : "Ứng dụng đang lưu trữ cục bộ trong trình duyệt này (LocalStorage). Hãy nhập cấu hình dưới đây để chuyển sang trực tuyến."}
-            </div>
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <div>
-              <label className="kt-label" style={{ marginBottom: 4 }}>Supabase URL</label>
-              <input
-                className="kt-input"
-                value={url}
-                onChange={e => setUrl(e.target.value)}
-                placeholder="https://your-project.supabase.co"
-                style={{ width: "100%", boxSizing: "border-box" }}
-              />
-            </div>
-            <div>
-              <label className="kt-label" style={{ marginBottom: 4 }}>Supabase Anon Key</label>
-              <input
-                className="kt-input"
-                value={key}
-                onChange={e => setKey(e.target.value)}
-                placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                style={{ width: "100%", boxSizing: "border-box", fontFamily: "var(--kt-mono)", fontSize: 11 }}
-              />
-            </div>
-            <div>
-              <label className="kt-label" style={{ marginBottom: 4 }}>Biệt danh của bạn (Để hiện khi online)</label>
-              <input
-                className="kt-input"
-                value={nickname}
-                onChange={e => setNickname(e.target.value)}
-                placeholder="Tên hoặc biệt danh của bạn"
-                style={{ width: "100%", boxSizing: "border-box" }}
-              />
-            </div>
-
-            <div style={{ display: "flex", gap: 10, marginTop: 6 }}>
-              <button type="submit" className="kt-btn kt-btn-primary" style={{ flex: 1 }}>💾 Lưu & Kết nối</button>
-              {(initialUrl || initialKey) && (
-                <button type="button" onClick={onDisconnect} className="kt-btn kt-btn-danger" style={{ flex: 1, backgroundColor: "#EF4444", color: "white" }}>🔌 Ngắt kết nối</button>
-              )}
-            </div>
-          </form>
-
-          {/* Collapsible Setup Instructions */}
-          <div style={{ borderTop: "1px dashed var(--line)", paddingTop: 12, marginTop: 12 }}>
-            <button 
-              type="button" 
-              className="kt-btn kt-btn-ghost" 
-              onClick={() => setShowInstructions(!showInstructions)} 
-              style={{ width: "100%", justifyContent: "center", padding: "6px", display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--accent)" }}
-            >
-              {showInstructions ? "🙈 Ẩn hướng dẫn cài đặt" : "📖 Hiện hướng dẫn cài đặt database"}
-            </button>
-            
-            {showInstructions && (
-              <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 8, fontSize: 11, color: "var(--ink-mid)" }}>
-                <p style={{ margin: "0 0 4px 0", fontWeight: 700 }}>Các bước thiết lập Supabase:</p>
-                <ol style={{ margin: 0, paddingLeft: 16, display: "flex", flexDirection: "column", gap: 6 }}>
-                  <li>Truy cập <strong>supabase.com</strong> đăng ký và tạo một Project mới.</li>
-                  <li>Tìm mục <strong>SQL Editor</strong> ở cột bên trái của Supabase, tạo truy vấn mới và chạy đoạn mã bên dưới để khởi tạo bảng:
-                    <div style={{ marginTop: 6, marginBottom: 6 }}>
-                      <button 
-                        onClick={handleCopySql} 
-                        className="kt-btn" 
-                        type="button"
-                        style={{ padding: "3px 6px", fontSize: 9, backgroundColor: "var(--accent)", color: "white", border: "none", borderRadius: 4, cursor: "pointer", fontWeight: 600 }}
-                      >
-                        {copiedSql ? "✅ Đã sao chép!" : "📋 Sao chép mã SQL"}
-                      </button>
-                    </div>
-                    <pre style={{
-                      background: "#1E1E1E", color: "#D4D4D4", padding: 8, borderRadius: 6,
-                      fontSize: 9, overflowX: "auto", maxHeight: 120, overflowY: "auto",
-                      fontFamily: "var(--kt-mono)", margin: 0, border: "1px solid var(--line)"
-                    }}>
-                      {SQL_SCRIPT}
-                    </pre>
-                  </li>
-                  <li>Vào <strong>Project Settings → API</strong> của Supabase, copy <strong>Project URL</strong> và <strong>anon key</strong> rồi điền vào form cấu hình phía trên và bấm <strong>Lưu & Kết nối</strong>.</li>
-                </ol>
-              </div>
-            )}
-          </div>
-        </div>
       </div>
     </div>
   );
