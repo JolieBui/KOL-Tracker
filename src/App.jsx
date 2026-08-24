@@ -1882,39 +1882,111 @@ const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCamp
 
     setScannerLoading(true);
     try {
-      const target = `https://urlebird.com/search/?q=${username}`;
-      let html = "";
-      
-      // Try AllOrigins
+      const countikTarget = `https://countik.com/api/userinfo?username=${username}`;
+      let htmlOrJson = "";
+      let isCountik = false;
+
+      // Try Countik via AllOrigins
       try {
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(target)}`;
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(countikTarget)}`;
         const res = await fetch(proxyUrl);
         if (res.ok) {
           const json = await res.json();
-          html = json.contents || "";
+          if (json.contents && json.contents.includes("followerCount")) {
+            htmlOrJson = json.contents;
+            isCountik = true;
+          }
         }
       } catch (e1) {
-        console.warn("Proxy AllOrigins failed, trying fallback...", e1);
+        console.warn("Countik AllOrigins failed, trying fallback...", e1);
       }
 
-      // Try Codetabs if AllOrigins failed
-      if (!html) {
+      // Try Countik via Codetabs
+      if (!htmlOrJson) {
         try {
-          const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(target)}`;
+          const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(countikTarget)}`;
           const res = await fetch(proxyUrl);
           if (res.ok) {
-            html = await res.text();
+            const text = await res.text();
+            if (text.includes("followerCount")) {
+              htmlOrJson = text;
+              isCountik = true;
+            }
           }
         } catch (e2) {
-          console.warn("Proxy Codetabs failed...", e2);
+          console.warn("Countik Codetabs failed...", e2);
         }
       }
 
-      if (!html) {
+      // Backup: Try Urlebird search via AllOrigins
+      if (!htmlOrJson) {
+        try {
+          const urlebirdTarget = `https://urlebird.com/search/?q=${username}`;
+          const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(urlebirdTarget)}`;
+          const res = await fetch(proxyUrl);
+          if (res.ok) {
+            const json = await res.json();
+            htmlOrJson = json.contents || "";
+          }
+        } catch (e3) {
+          console.warn("Urlebird AllOrigins failed...", e3);
+        }
+      }
+
+      // Backup: Try Urlebird search via Codetabs
+      if (!htmlOrJson) {
+        try {
+          const urlebirdTarget = `https://urlebird.com/search/?q=${username}`;
+          const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(urlebirdTarget)}`;
+          const res = await fetch(proxyUrl);
+          if (res.ok) {
+            htmlOrJson = await res.text();
+          }
+        } catch (e4) {
+          console.warn("Urlebird Codetabs failed...", e4);
+        }
+      }
+
+      if (!htmlOrJson) {
         throw new Error("Không thể kết nối đến các máy chủ proxy để lấy dữ liệu. Nếu bạn có cài Adblock hoặc Brave Shield, hãy tạm thời tắt đi và thử lại.");
       }
 
-      const userBlocks = html.match(/<div class="user my-2[^"]*">([\s\S]*?)<\/div>\s*<\/div>/g);
+      if (isCountik) {
+        const parsed = JSON.parse(htmlOrJson);
+        if (parsed.status === "success") {
+          const imgUrl = parsed.avatar || "";
+          const followersNum = parsed.followerCount || 0;
+          
+          const formatFollowers = (num) => {
+            if (!num || isNaN(num)) return "";
+            const n = Number(num);
+            if (n >= 1000000) {
+              const val = n / 1000000;
+              return val.toFixed(val % 1 === 0 ? 0 : 1) + "M";
+            }
+            if (n >= 1000) {
+              const val = n / 1000;
+              return val.toFixed(val % 1 === 0 ? 0 : 1) + "K";
+            }
+            return n.toString();
+          };
+
+          if (imgUrl) set("avatarUrl", imgUrl);
+          if (followersNum) set("follower", formatFollowers(followersNum));
+          
+          if (parsed.nickname && !form.kol) {
+            set("kol", parsed.nickname.trim());
+          }
+          window.alert("Quét và cập nhật thông tin thành công!");
+          setScannerLoading(false);
+          return;
+        } else {
+          throw new Error("Tài khoản TikTok không tồn tại hoặc bị chặn.");
+        }
+      }
+
+      // Fallback: parse Urlebird html
+      const userBlocks = htmlOrJson.match(/<div class="user my-2[^"]*">([\s\S]*?)<\/div>\s*<\/div>/g);
       if (!userBlocks || userBlocks.length === 0) {
         throw new Error("Không tìm thấy tài khoản TikTok tương ứng trên hệ thống lưu trữ.");
       }
@@ -1930,7 +2002,6 @@ const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCamp
       if (imgUrl) set("avatarUrl", imgUrl);
       if (followersValue) set("follower", followersValue);
       
-      // Update form name if empty
       const nameMatch = block.match(/<span>([^<]+)<\/span>/);
       if (nameMatch && nameMatch[1] && !form.kol) {
         set("kol", nameMatch[1].trim());
@@ -3374,39 +3445,108 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpe
 
     setAvatarLoading(true);
     try {
-      const target = `https://urlebird.com/search/?q=${username}`;
-      let html = "";
-      
-      // Try AllOrigins
+      const countikTarget = `https://countik.com/api/userinfo?username=${username}`;
+      let htmlOrJson = "";
+      let isCountik = false;
+
+      // Try Countik via AllOrigins
       try {
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(target)}`;
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(countikTarget)}`;
         const res = await fetch(proxyUrl);
         if (res.ok) {
           const json = await res.json();
-          html = json.contents || "";
+          if (json.contents && json.contents.includes("followerCount")) {
+            htmlOrJson = json.contents;
+            isCountik = true;
+          }
         }
       } catch (e1) {
-        console.warn("Proxy AllOrigins failed, trying fallback...", e1);
+        console.warn("Countik AllOrigins failed, trying fallback...", e1);
       }
 
-      // Try Codetabs if AllOrigins failed
-      if (!html) {
+      // Try Countik via Codetabs
+      if (!htmlOrJson) {
         try {
-          const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(target)}`;
+          const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(countikTarget)}`;
           const res = await fetch(proxyUrl);
           if (res.ok) {
-            html = await res.text();
+            const text = await res.text();
+            if (text.includes("followerCount")) {
+              htmlOrJson = text;
+              isCountik = true;
+            }
           }
         } catch (e2) {
-          console.warn("Proxy Codetabs failed...", e2);
+          console.warn("Countik Codetabs failed...", e2);
         }
       }
 
-      if (!html) {
+      // Backup: Try Urlebird search via AllOrigins
+      if (!htmlOrJson) {
+        try {
+          const urlebirdTarget = `https://urlebird.com/search/?q=${username}`;
+          const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(urlebirdTarget)}`;
+          const res = await fetch(proxyUrl);
+          if (res.ok) {
+            const json = await res.json();
+            htmlOrJson = json.contents || "";
+          }
+        } catch (e3) {
+          console.warn("Urlebird AllOrigins failed...", e3);
+        }
+      }
+
+      // Backup: Try Urlebird search via Codetabs
+      if (!htmlOrJson) {
+        try {
+          const urlebirdTarget = `https://urlebird.com/search/?q=${username}`;
+          const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(urlebirdTarget)}`;
+          const res = await fetch(proxyUrl);
+          if (res.ok) {
+            htmlOrJson = await res.text();
+          }
+        } catch (e4) {
+          console.warn("Urlebird Codetabs failed...", e4);
+        }
+      }
+
+      if (!htmlOrJson) {
         throw new Error("Không thể kết nối đến các máy chủ proxy để lấy dữ liệu. Nếu bạn có cài Adblock hoặc Brave Shield, hãy tạm thời tắt đi và thử lại.");
       }
 
-      const userBlocks = html.match(/<div class="user my-2[^"]*">([\s\S]*?)<\/div>\s*<\/div>/g);
+      if (isCountik) {
+        const parsed = JSON.parse(htmlOrJson);
+        if (parsed.status === "success") {
+          const imgUrl = parsed.avatar || "";
+          const followersNum = parsed.followerCount || 0;
+          
+          const formatFollowers = (num) => {
+            if (!num || isNaN(num)) return "";
+            const n = Number(num);
+            if (n >= 1000000) {
+              const val = n / 1000000;
+              return val.toFixed(val % 1 === 0 ? 0 : 1) + "M";
+            }
+            if (n >= 1000) {
+              const val = n / 1000;
+              return val.toFixed(val % 1 === 0 ? 0 : 1) + "K";
+            }
+            return n.toString();
+          };
+
+          if (imgUrl) setAvatarUrl(imgUrl);
+          if (followersNum) set("follower", formatFollowers(followersNum));
+          
+          window.alert("Quét và cập nhật thông tin thành công!");
+          setAvatarLoading(false);
+          return;
+        } else {
+          throw new Error("Tài khoản TikTok không tồn tại hoặc bị chặn.");
+        }
+      }
+
+      // Fallback: parse Urlebird html
+      const userBlocks = htmlOrJson.match(/<div class="user my-2[^"]*">([\s\S]*?)<\/div>\s*<\/div>/g);
       if (!userBlocks || userBlocks.length === 0) {
         throw new Error("Không tìm thấy tài khoản TikTok tương ứng trên hệ thống lưu trữ.");
       }
