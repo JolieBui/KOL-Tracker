@@ -2824,33 +2824,33 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
             onChange={e => setSearch(e.target.value)}
             style={{ flex: "0 0 140px", width: 140 }}
           />
-          <select className="kt-select" value={filterCampaign} onChange={e => setFilterCampaign(e.target.value)} style={{ flex: "0 0 120px", width: 120 }}>
+          <select className="kt-select" value={filterCampaign} onChange={e => setFilterCampaign(e.target.value)} style={{ flex: "0 0 auto", minWidth: 130, width: "auto" }}>
             <option value="all">Tất cả Dự án</option>
             {dynamicCampaigns.map(c => <option key={c.key} value={c.key}>{campaignLabels[c.key] || c.label}</option>)}
           </select>
-          <select className="kt-select" value={filterTier} onChange={e => setFilterTier(e.target.value)} style={{ flex: "0 0 110px", width: 110 }}>
+          <select className="kt-select" value={filterTier} onChange={e => setFilterTier(e.target.value)} style={{ flex: "0 0 auto", minWidth: 120, width: "auto" }}>
             <option value="all">Tất cả Tier</option>
             {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
           </select>
 
-          <select className="kt-select" value={filterPhase} onChange={e => setFilterPhase(e.target.value)} style={{ flex: "0 0 130px", width: 130 }}>
+          <select className="kt-select" value={filterPhase} onChange={e => setFilterPhase(e.target.value)} style={{ flex: "0 0 auto", minWidth: 145, width: "auto" }}>
             <option value="all">Tất cả Thời điểm</option>
             <option value="Phase 1">Phase 1</option>
             <option value="Phase 2">Phase 2</option>
           </select>
-          <select className="kt-select" value={filterCost} onChange={e => setFilterCost(e.target.value)} style={{ flex: "0 0 120px", width: 120 }}>
+          <select className="kt-select" value={filterCost} onChange={e => setFilterCost(e.target.value)} style={{ flex: "0 0 auto", minWidth: 135, width: "auto" }}>
             <option value="all">Tất cả Chi phí</option>
             {COST_BUCKETS.map(b => <option key={b.key} value={b.key}>{b.label}</option>)}
           </select>
-          <select className="kt-select" value={filterViews} onChange={e => setFilterViews(e.target.value)} style={{ flex: "0 0 120px", width: 120 }}>
+          <select className="kt-select" value={filterViews} onChange={e => setFilterViews(e.target.value)} style={{ flex: "0 0 auto", minWidth: 130, width: "auto" }}>
             <option value="all">Tất cả Views</option>
             {VIEWS_BUCKETS.map(b => <option key={b.key} value={b.key}>{b.label}</option>)}
           </select>
-          <select className="kt-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ flex: "0 0 130px", width: 130 }}>
+          <select className="kt-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ flex: "0 0 auto", minWidth: 140, width: "auto" }}>
             <option value="all">Tất cả Tiến độ</option>
             {statusStages.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
           </select>
-          <select className="kt-select" value={sortOrder} onChange={e => setSortOrder(e.target.value)} style={{ flex: "0 0 150px", width: 150, background: "var(--surface)", border: "1px solid var(--line)" }}>
+          <select className="kt-select" value={sortOrder} onChange={e => setSortOrder(e.target.value)} style={{ flex: "0 0 auto", minWidth: 160, width: "auto", background: "var(--surface)", border: "1px solid var(--line)" }}>
             <option value="default">Sắp xếp: Mặc định (A-Z)</option>
             <option value="costAsc">Chi phí: Thấp ➝ Cao</option>
             <option value="costDesc">Chi phí: Cao ➝ Thấp</option>
