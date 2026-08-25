@@ -4712,9 +4712,9 @@ const MEDIA_PLAN_DATA = {
   ]
 };
 
-const PlanView = () => {
+const PlanView = ({ rows = [], onOpen, onNavigateToTable, campaignLabels = {} }) => {
   const [selectedBrand, setSelectedBrand] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("progress"); // "progress" | "brief" | "kpis"
 
   const formatVnd = (num) => {
     if (!num || isNaN(num)) return "0 ₫";
@@ -4726,11 +4726,37 @@ const PlanView = () => {
     return Number(num).toLocaleString("vi-VN");
   };
 
+  // Calculate live execution stats per brand from `rows`
+  const getBrandActuals = (brandId) => {
+    const brandKols = rows.filter(r => {
+      const c = (r.campaign || "").toString().trim().toUpperCase();
+      if (brandId === "am") return c === "AM" || /AM|AJI.*MAYO/i.test(c);
+      if (brandId === "ax") return c === "AX" || /AX|AJI.*XOT/i.test(c);
+      if (brandId === "vinegar") return /GIAM|VINEGAR/i.test(c);
+      if (brandId === "msg") return /MSG|BOT.*NGOT/i.test(c);
+      return false;
+    });
+
+    const totalCost = brandKols.reduce((sum, r) => sum + (Number(r.extCost) || 0) + (Number(r.addOnFee) || 0), 0);
+    const totalViews = brandKols.reduce((sum, r) => sum + (Number(r.views) || 0), 0);
+    const totalEstViews = brandKols.reduce((sum, r) => sum + (Number(r.estView) || 0), 0);
+    const airedCount = brandKols.filter(r => r.statusKey === "aired" || r.status === "Đã lên sóng" || Number(r.views) > 0).length;
+
+    return {
+      kols: brandKols,
+      kolCount: brandKols.length,
+      airedCount,
+      totalCost,
+      totalViews,
+      totalEstViews
+    };
+  };
+
   const handleExportPlan = () => {
-    const rows = [];
+    const exportRows = [];
     MEDIA_PLAN_DATA.brands.forEach(brand => {
       brand.kpis.forEach(k => {
-        rows.push({
+        exportRows.push({
           "Chiến dịch (Brand)": brand.name,
           "Giai đoạn (Phase)": k.phase,
           "Khu vực (Geo)": k.geo,
@@ -4747,7 +4773,7 @@ const PlanView = () => {
         });
       });
       if (brand.totalKpi) {
-        rows.push({
+        exportRows.push({
           "Chiến dịch (Brand)": brand.name + " (TỔNG)",
           "Giai đoạn (Phase)": "Tổng cộng",
           "Khu vực (Geo)": "Toàn chiến dịch",
@@ -4765,7 +4791,7 @@ const PlanView = () => {
       }
     });
 
-    const ws = XLSX.utils.json_to_sheet(rows);
+    const ws = XLSX.utils.json_to_sheet(exportRows);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Media Plan FY26");
     XLSX.writeFile(wb, `TCV_Media_Plan_FY26_${new Date().toISOString().slice(0, 10)}.xlsx`);
@@ -4775,28 +4801,33 @@ const PlanView = () => {
     ? MEDIA_PLAN_DATA.brands 
     : MEDIA_PLAN_DATA.brands.filter(b => b.id === selectedBrand);
 
+  // Overall totals
+  const overallActualCost = rows.reduce((sum, r) => sum + (Number(r.extCost) || 0) + (Number(r.addOnFee) || 0), 0);
+  const overallActualViews = rows.reduce((sum, r) => sum + (Number(r.views) || 0), 0);
+  const overallAiredKols = rows.filter(r => r.statusKey === "aired" || r.status === "Đã lên sóng" || Number(r.views) > 0).length;
+
   return (
-    <div className="kt-scrollbar" style={{ flex: 1, overflowY: "auto", padding: "20px 24px", display: "flex", flexDirection: "column", gap: 20 }}>
+    <div className="kt-scrollbar" style={{ flex: 1, overflowY: "auto", padding: "20px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
       
-      {/* Top Banner & Overview Metrics */}
+      {/* Top Banner & Strategy Summary */}
       <div style={{
         background: "linear-gradient(135deg, #1E293B 0%, #0F172A 100%)",
-        borderRadius: 18,
-        padding: "22px 28px",
+        borderRadius: 16,
+        padding: "20px 24px",
         color: "#FFFFFF",
-        boxShadow: "0 10px 25px -5px rgba(15, 23, 42, 0.25)",
+        boxShadow: "0 8px 24px rgba(15, 23, 42, 0.2)",
         display: "flex",
         flexDirection: "column",
-        gap: 18
+        gap: 16
       }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12 }}>
           <div>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 20, background: "rgba(234, 146, 22, 0.2)", color: "#FB923C", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "3px 8px", borderRadius: 16, background: "rgba(234, 146, 22, 0.2)", color: "#FB923C", fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6 }}>
               🎯 FY26 Media & KOL Outreach Strategy
             </div>
-            <h2 style={{ margin: 0, fontSize: 22, fontWeight: 800, letterSpacing: "-0.02em" }}>Kế hoạch & Định hướng Target KOL (Media Plan)</h2>
-            <div style={{ fontSize: 13, color: "#94A3B8", marginTop: 4 }}>
-              Chiến lược phân bổ ngân sách, mục tiêu 6s views, chân dung Target Audience và danh mục SKU trọng điểm cho 4 Brand.
+            <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, letterSpacing: "-0.01em" }}>Kế hoạch & Định hướng Target KOL (Media Plan)</h2>
+            <div style={{ fontSize: 12.5, color: "#94A3B8", marginTop: 3 }}>
+              Chiến lược phân bổ ngân sách, mục tiêu 6s views, chân dung Target Audience và theo dõi tiến độ thực tế 4 Brand.
             </div>
           </div>
 
@@ -4807,18 +4838,18 @@ const PlanView = () => {
               background: "linear-gradient(135deg, #EA9216 0%, #D97706 100%)",
               color: "#FFFFFF",
               border: "none",
-              padding: "8px 16px",
-              borderRadius: 12,
+              padding: "7px 14px",
+              borderRadius: 10,
               fontWeight: 700,
-              fontSize: 12,
+              fontSize: 11.5,
               display: "flex",
               alignItems: "center",
-              gap: 8,
-              boxShadow: "0 4px 12px rgba(234, 146, 22, 0.35)",
+              gap: 6,
+              boxShadow: "0 4px 12px rgba(234, 146, 22, 0.3)",
               cursor: "pointer"
             }}
           >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
               <polyline points="7 10 12 15 17 10" />
               <line x1="12" y1="15" x2="12" y2="3" />
@@ -4827,292 +4858,491 @@ const PlanView = () => {
           </button>
         </div>
 
-        {/* 4 Key Summary Stats */}
+        {/* 4 Summary Stat Cards */}
         <div style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-          gap: 14,
+          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+          gap: 12,
           borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-          paddingTop: 16
+          paddingTop: 14
         }}>
-          <div style={{ background: "rgba(255, 255, 255, 0.05)", padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(255, 255, 255, 0.08)" }}>
-            <div style={{ fontSize: 11, color: "#94A3B8", fontWeight: 600 }}>💰 TỔNG NGÂN SÁCH PLAN</div>
-            <div style={{ fontSize: 20, fontWeight: 800, color: "#FBBF24", marginTop: 4 }}>{formatVnd(MEDIA_PLAN_DATA.summary.totalBudget)}</div>
-            <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>4 Chiến dịch trọng điểm</div>
+          <div style={{ background: "rgba(255, 255, 255, 0.04)", padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.06)" }}>
+            <div style={{ fontSize: 10.5, color: "#94A3B8", fontWeight: 600 }}>💰 TỔNG NGÂN SÁCH PLAN</div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: "#FBBF24", marginTop: 2 }}>{formatVnd(MEDIA_PLAN_DATA.summary.totalBudget)}</div>
+            <div style={{ fontSize: 10.5, color: "#64748B", marginTop: 2 }}>Thực tế: {formatVnd(overallActualCost)}</div>
           </div>
 
-          <div style={{ background: "rgba(255, 255, 255, 0.05)", padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(255, 255, 255, 0.08)" }}>
-            <div style={{ fontSize: 11, color: "#94A3B8", fontWeight: 600 }}>👁️ MỤC TIÊU 6S VIEWS</div>
-            <div style={{ fontSize: 20, fontWeight: 800, color: "#38BDF8", marginTop: 4 }}>{formatNumber(MEDIA_PLAN_DATA.summary.total6sViews)}</div>
-            <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>CPView TB: ~{MEDIA_PLAN_DATA.summary.avgUnitCost} ₫</div>
+          <div style={{ background: "rgba(255, 255, 255, 0.04)", padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.06)" }}>
+            <div style={{ fontSize: 10.5, color: "#94A3B8", fontWeight: 600 }}>👁️ MỤC TIÊU 6S VIEWS</div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: "#38BDF8", marginTop: 2 }}>{formatNumber(MEDIA_PLAN_DATA.summary.total6sViews)}</div>
+            <div style={{ fontSize: 10.5, color: "#64748B", marginTop: 2 }}>Thực tế: {formatNumber(overallActualViews)} views</div>
           </div>
 
-          <div style={{ background: "rgba(255, 255, 255, 0.05)", padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(255, 255, 255, 0.08)" }}>
-            <div style={{ fontSize: 11, color: "#94A3B8", fontWeight: 600 }}>📢 TỔNG IMPRESSIONS</div>
-            <div style={{ fontSize: 20, fontWeight: 800, color: "#4ADE80", marginTop: 4 }}>{formatNumber(MEDIA_PLAN_DATA.summary.totalImpression)}</div>
-            <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>CPM TB: {formatNumber(MEDIA_PLAN_DATA.summary.avgCpm)} ₫</div>
+          <div style={{ background: "rgba(255, 255, 255, 0.04)", padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.06)" }}>
+            <div style={{ fontSize: 10.5, color: "#94A3B8", fontWeight: 600 }}>📢 TỔNG IMPRESSIONS</div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: "#4ADE80", marginTop: 2 }}>{formatNumber(MEDIA_PLAN_DATA.summary.totalImpression)}</div>
+            <div style={{ fontSize: 10.5, color: "#64748B", marginTop: 2 }}>CPM TB: {formatNumber(MEDIA_PLAN_DATA.summary.avgCpm)} ₫</div>
           </div>
 
-          <div style={{ background: "rgba(255, 255, 255, 0.05)", padding: "12px 16px", borderRadius: 12, border: "1px solid rgba(255, 255, 255, 0.08)" }}>
-            <div style={{ fontSize: 11, color: "#94A3B8", fontWeight: 600 }}>👥 QUY MÔ KOL / VIEW RATE</div>
-            <div style={{ fontSize: 20, fontWeight: 800, color: "#C084FC", marginTop: 4 }}>{MEDIA_PLAN_DATA.summary.totalKolsRange}</div>
-            <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>VR trung bình: {MEDIA_PLAN_DATA.summary.avgVr}</div>
+          <div style={{ background: "rgba(255, 255, 255, 0.04)", padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(255, 255, 255, 0.06)" }}>
+            <div style={{ fontSize: 10.5, color: "#94A3B8", fontWeight: 600 }}>👥 QUY MÔ KOL / LÊN SÓNG</div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: "#C084FC", marginTop: 2 }}>{MEDIA_PLAN_DATA.summary.totalKolsRange}</div>
+            <div style={{ fontSize: 10.5, color: "#64748B", marginTop: 2 }}>Đã lên sóng: {overallAiredKols} / {rows.length} KOLs</div>
           </div>
         </div>
       </div>
 
-      {/* Brand Navigation Filter Tabs */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8, overflowX: "auto", paddingBottom: 4 }}>
-        <button
-          onClick={() => setSelectedBrand("all")}
-          className="kt-btn"
-          style={{
-            padding: "8px 18px",
-            borderRadius: 20,
-            fontSize: 12,
-            fontWeight: 700,
-            cursor: "pointer",
-            border: selectedBrand === "all" ? "1.5px solid var(--accent)" : "1px solid var(--line)",
-            backgroundColor: selectedBrand === "all" ? "var(--accent)" : "var(--card)",
-            color: selectedBrand === "all" ? "#FFFFFF" : "var(--ink)",
-            boxShadow: selectedBrand === "all" ? "0 4px 12px rgba(234, 146, 22, 0.2)" : "none"
-          }}
-        >
-          🌟 Tất cả Brand ({MEDIA_PLAN_DATA.brands.length})
-        </button>
-
-        {MEDIA_PLAN_DATA.brands.map(b => {
-          const isSelected = selectedBrand === b.id;
-          return (
-            <button
-              key={b.id}
-              onClick={() => setSelectedBrand(b.id)}
-              className="kt-btn"
-              style={{
-                padding: "8px 16px",
-                borderRadius: 20,
-                fontSize: 12,
-                fontWeight: 700,
-                cursor: "pointer",
-                border: isSelected ? `1.5px solid ${b.color}` : "1px solid var(--line)",
-                backgroundColor: isSelected ? b.color : "var(--card)",
-                color: isSelected ? "#FFFFFF" : "var(--ink)",
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                boxShadow: isSelected ? `0 4px 12px ${b.color}33` : "none"
-              }}
-            >
-              <span>{b.icon}</span>
-              <span>{b.name}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Brand Target & Strategy Cards */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-        {filteredBrands.map(brand => (
-          <div 
-            key={brand.id}
+      {/* Control Bar: Interactive Sub-Tabs & Brand Filters */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, borderBottom: "1px solid var(--line)", paddingBottom: 10 }}>
+        
+        {/* Mode Tabs */}
+        <div style={{ display: "flex", gap: 3, background: "var(--paper)", padding: 3, borderRadius: 16, border: "1px solid var(--line)" }}>
+          <button
+            onClick={() => setActiveTab("progress")}
+            className="kt-btn"
             style={{
-              background: "var(--card)",
-              borderRadius: 18,
-              border: "1px solid var(--line)",
-              overflow: "hidden",
-              boxShadow: "0 4px 20px rgba(0,0,0,0.03)",
-              display: "flex",
-              flexDirection: "column"
+              padding: "5px 12px",
+              borderRadius: 14,
+              fontSize: 11.5,
+              fontWeight: 700,
+              border: "none",
+              backgroundColor: activeTab === "progress" ? "var(--accent)" : "transparent",
+              color: activeTab === "progress" ? "#FFFFFF" : "var(--ink-mid)"
             }}
           >
-            {/* Brand Card Header */}
-            <div style={{
-              padding: "16px 22px",
-              borderBottom: "1px solid var(--line)",
-              backgroundColor: brand.bgColor,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: 10
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ fontSize: 24 }}>{brand.icon}</span>
-                <div>
-                  <div style={{ fontSize: 18, fontWeight: 800, color: "var(--ink)", display: "flex", alignItems: "center", gap: 8 }}>
-                    {brand.name}
-                    <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 12, backgroundColor: brand.color, color: "white" }}>
-                      {brand.tag}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 2 }}>
-                    Quy mô dự kiến: <strong>{brand.kolAllocation || "Chiến dịch 2 Phase"}</strong>
-                  </div>
-                </div>
-              </div>
+            📊 Tiến độ Thực tế vs Kế hoạch
+          </button>
+          <button
+            onClick={() => setActiveTab("brief")}
+            className="kt-btn"
+            style={{
+              padding: "5px 12px",
+              borderRadius: 14,
+              fontSize: 11.5,
+              fontWeight: 700,
+              border: "none",
+              backgroundColor: activeTab === "brief" ? "var(--accent)" : "transparent",
+              color: activeTab === "brief" ? "#FFFFFF" : "var(--ink-mid)"
+            }}
+          >
+            🎯 Chân dung Target & SKU
+          </button>
+          <button
+            onClick={() => setActiveTab("kpis")}
+            className="kt-btn"
+            style={{
+              padding: "5px 12px",
+              borderRadius: 14,
+              fontSize: 11.5,
+              fontWeight: 700,
+              border: "none",
+              backgroundColor: activeTab === "kpis" ? "var(--accent)" : "transparent",
+              color: activeTab === "kpis" ? "#FFFFFF" : "var(--ink-mid)"
+            }}
+          >
+            📋 Bảng Phân bổ KPIs Media
+          </button>
+        </div>
 
-              {brand.totalKpi && (
-                <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                  <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 10, color: "var(--ink-soft)", textTransform: "uppercase", fontWeight: 700 }}>Tổng Budget</div>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: brand.color }}>{formatVnd(brand.totalKpi.budget)}</div>
-                  </div>
-                  <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: 10, color: "var(--ink-soft)", textTransform: "uppercase", fontWeight: 700 }}>Mục tiêu 6s Views</div>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: "var(--ink)" }}>{formatNumber(brand.totalKpi.view6s)}</div>
-                  </div>
-                </div>
-              )}
-            </div>
+        {/* Brand Filter Pills */}
+        <div style={{ display: "flex", gap: 4, overflowX: "auto" }}>
+          <button
+            onClick={() => setSelectedBrand("all")}
+            className="kt-btn"
+            style={{
+              padding: "4px 10px",
+              borderRadius: 14,
+              fontSize: 11,
+              fontWeight: 600,
+              border: selectedBrand === "all" ? "1px solid var(--accent)" : "1px solid var(--line)",
+              backgroundColor: selectedBrand === "all" ? "var(--accent)" : "var(--card)",
+              color: selectedBrand === "all" ? "#FFFFFF" : "var(--ink)"
+            }}
+          >
+            Tất cả
+          </button>
+          {MEDIA_PLAN_DATA.brands.map(b => {
+            const isSelected = selectedBrand === b.id;
+            return (
+              <button
+                key={b.id}
+                onClick={() => setSelectedBrand(b.id)}
+                className="kt-btn"
+                style={{
+                  padding: "4px 10px",
+                  borderRadius: 14,
+                  fontSize: 11,
+                  fontWeight: 600,
+                  border: isSelected ? `1px solid ${b.color}` : "1px solid var(--line)",
+                  backgroundColor: isSelected ? b.color : "var(--card)",
+                  color: isSelected ? "#FFFFFF" : "var(--ink)"
+                }}
+              >
+                {b.name}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
-            {/* Brand Strategy Body Grid */}
-            <div style={{ padding: "20px 22px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 20 }}>
-              
-              {/* Box 1: Target Audience & Geographic Breakdown */}
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                <div style={{ fontSize: 13, fontWeight: 800, color: "var(--ink)", textTransform: "uppercase", letterSpacing: "0.03em", display: "flex", alignItems: "center", gap: 6 }}>
-                  <span>🎯</span> Chân dung Target Audience & Địa bàn
+      {/* ── TAB 1: TIẾN ĐỘ THỰC TẾ VS KẾ HOẠCH (PLAN VS ACTUAL) ── */}
+      {activeTab === "progress" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {filteredBrands.map(brand => {
+            const actuals = getBrandActuals(brand.id);
+            const plannedBudget = brand.totalKpi ? brand.totalKpi.budget : 0;
+            const plannedViews = brand.totalKpi ? brand.totalKpi.view6s : 0;
+            
+            const budgetPct = plannedBudget > 0 ? Math.min(100, Math.round((actuals.totalCost / plannedBudget) * 100)) : 0;
+            const viewsPct = plannedViews > 0 ? Math.round((actuals.totalViews / plannedViews) * 100) : 0;
+
+            return (
+              <div
+                key={brand.id}
+                style={{
+                  background: "var(--card)",
+                  borderRadius: 14,
+                  border: "1px solid var(--line)",
+                  overflow: "hidden",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
+                }}
+              >
+                {/* Brand Header */}
+                <div style={{
+                  padding: "14px 18px",
+                  backgroundColor: brand.bgColor,
+                  borderBottom: "1px solid var(--line)",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  gap: 10
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontSize: 20 }}>{brand.icon}</span>
+                    <div>
+                      <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)", display: "flex", alignItems: "center", gap: 6 }}>
+                        {brand.name}
+                        <span style={{ fontSize: 10, fontWeight: 700, padding: "1px 6px", borderRadius: 10, backgroundColor: brand.color, color: "white" }}>
+                          {brand.tag}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 1 }}>
+                        Target: <strong>{brand.kolAllocation || "Chiến dịch 2 Phase"}</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => onNavigateToTable && onNavigateToTable(brand.tag)}
+                    className="kt-btn kt-btn-ghost"
+                    style={{ fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 12, border: "1px solid var(--line)" }}
+                  >
+                    Xem {actuals.kolCount} KOL trong Bảng ↗
+                  </button>
                 </div>
 
-                <div style={{ background: "var(--paper)", padding: "14px 16px", borderRadius: 12, display: "flex", flexDirection: "column", gap: 8, fontSize: 12 }}>
-                  <div>
-                    <span style={{ color: "var(--ink-soft)", fontWeight: 600 }}>Độ tuổi & Giới tính: </span>
-                    <strong style={{ color: "var(--ink)" }}>{brand.targetAudience.core}</strong>
-                    {brand.targetAudience.sub && <span style={{ color: "var(--ink-mid)" }}> ({brand.targetAudience.sub})</span>}
+                {/* Progress Indicators */}
+                <div style={{ padding: "16px 18px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, borderBottom: "1px solid var(--line)" }}>
+                  
+                  {/* Budget Progress */}
+                  <div style={{ background: "var(--paper)", padding: "12px 14px", borderRadius: 10, display: "flex", flexDirection: "column", gap: 6 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 700 }}>
+                      <span style={{ color: "var(--ink-soft)" }}>Chi phí thực tế / Budget Plan</span>
+                      <span style={{ color: brand.color }}>{budgetPct}%</span>
+                    </div>
+                    <div style={{ height: 6, background: "var(--line)", borderRadius: 3, overflow: "hidden" }}>
+                      <div style={{ height: "100%", width: `${budgetPct}%`, background: brand.color, borderRadius: 3 }} />
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10.5, color: "var(--ink)" }}>
+                      <strong>{formatVnd(actuals.totalCost)}</strong>
+                      <span style={{ color: "var(--ink-soft)" }}>Plan: {formatVnd(plannedBudget)}</span>
+                    </div>
                   </div>
-                  <div>
-                    <span style={{ color: "var(--ink-soft)", fontWeight: 600 }}>Phân khúc thu nhập: </span>
-                    <strong style={{ color: "var(--ink)" }}>{brand.targetAudience.socialClass}</strong>
+
+                  {/* Views Progress */}
+                  <div style={{ background: "var(--paper)", padding: "12px 14px", borderRadius: 10, display: "flex", flexDirection: "column", gap: 6 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 700 }}>
+                      <span style={{ color: "var(--ink-soft)" }}>Views đạt được / KPI Plan</span>
+                      <span style={{ color: viewsPct >= 100 ? "var(--ok)" : "var(--accent)" }}>{viewsPct}%</span>
+                    </div>
+                    <div style={{ height: 6, background: "var(--line)", borderRadius: 3, overflow: "hidden" }}>
+                      <div style={{ height: "100%", width: `${Math.min(100, viewsPct)}%`, background: viewsPct >= 100 ? "var(--ok)" : "var(--accent)", borderRadius: 3 }} />
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10.5, color: "var(--ink)" }}>
+                      <strong>{formatNumber(actuals.totalViews)} views</strong>
+                      <span style={{ color: "var(--ink-soft)" }}>Plan: {formatNumber(plannedViews)}</span>
+                    </div>
                   </div>
-                  <div>
-                    <span style={{ color: "var(--ink-soft)", fontWeight: 600 }}>Địa bàn mục tiêu: </span>
-                    <strong style={{ color: brand.color }}>{brand.targetAudience.location}</strong>
+
+                  {/* KOL Execution Count */}
+                  <div style={{ background: "var(--paper)", padding: "12px 14px", borderRadius: 10, display: "flex", flexDirection: "column", gap: 6 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 700 }}>
+                      <span style={{ color: "var(--ink-soft)" }}>Tiến độ lên sóng (Air status)</span>
+                      <span style={{ color: "var(--ink)" }}>{actuals.airedCount} / {actuals.kolCount} KOLs</span>
+                    </div>
+                    <div style={{ height: 6, background: "var(--line)", borderRadius: 3, overflow: "hidden" }}>
+                      <div style={{
+                        height: "100%",
+                        width: `${actuals.kolCount > 0 ? (actuals.airedCount / actuals.kolCount) * 100 : 0}%`,
+                        background: "var(--ok)",
+                        borderRadius: 3
+                      }} />
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10.5, color: "var(--ink)" }}>
+                      <span>Đã lên sóng: <strong>{actuals.airedCount}</strong></span>
+                      <span style={{ color: "var(--ink-soft)" }}>Đang sản xuất: {actuals.kolCount - actuals.airedCount}</span>
+                    </div>
                   </div>
-                  {brand.targetAudience.notes && (
-                    <div style={{ borderTop: "1px dashed var(--line)", paddingTop: 6, color: "var(--ink-soft)", fontStyle: "italic" }}>
-                      💡 {brand.targetAudience.notes}
+
+                </div>
+
+                {/* List of KOLs actively in this plan */}
+                <div style={{ padding: "14px 18px" }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", marginBottom: 8 }}>
+                    Danh sách KOL đang thực hiện ({actuals.kolCount}):
+                  </div>
+
+                  {actuals.kolCount > 0 ? (
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 8 }}>
+                      {actuals.kols.map(k => {
+                        const isAired = k.statusKey === "aired" || k.status === "Đã lên sóng" || Number(k.views) > 0;
+                        return (
+                          <div
+                            key={k.id}
+                            onClick={() => onOpen && onOpen(k)}
+                            style={{
+                              padding: "8px 10px",
+                              borderRadius: 8,
+                              background: "var(--paper)",
+                              border: "1px solid var(--line)",
+                              cursor: "pointer",
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                              transition: "all 0.1s ease"
+                            }}
+                            onMouseEnter={e => {
+                              e.currentTarget.style.borderColor = brand.color;
+                              e.currentTarget.style.background = "var(--card)";
+                            }}
+                            onMouseLeave={e => {
+                              e.currentTarget.style.borderColor = "var(--line)";
+                              e.currentTarget.style.background = "var(--paper)";
+                            }}
+                          >
+                            <div style={{ minWidth: 0, flex: 1 }}>
+                              <div style={{ fontWeight: 700, fontSize: 11.5, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                {k.kol}
+                              </div>
+                              <div style={{ fontSize: 10, color: "var(--ink-soft)", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                {k.monAn ? `🍲 ${k.monAn}` : (k.type || "Micro")}
+                              </div>
+                            </div>
+                            <span style={{
+                              fontSize: 9,
+                              fontWeight: 700,
+                              padding: "2px 6px",
+                              borderRadius: 6,
+                              backgroundColor: isAired ? "rgba(16, 185, 129, 0.15)" : "rgba(234, 146, 22, 0.15)",
+                              color: isAired ? "#10B981" : "#EA9216",
+                              flexShrink: 0
+                            }}>
+                              {isAired ? "Đã lên sóng" : "Chờ lên sóng"}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div style={{ textAlign: "center", padding: "16px", color: "var(--ink-soft)", fontSize: 11 }}>
+                      Chưa có KOL nào được gán vào chiến dịch này. Nhấn <strong>+ Thêm KOL</strong> để bắt đầu.
                     </div>
                   )}
                 </div>
 
-                {/* Groups / Context (if available) */}
-                {brand.groupsContext && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>Phân nhóm bối cảnh (Group Context):</div>
-                    {brand.groupsContext.map((g, idx) => (
-                      <div key={idx} style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: 8, padding: "8px 12px", fontSize: 11 }}>
-                        <strong style={{ color: "var(--ink)", display: "block", marginBottom: 2 }}>{g.group}</strong>
-                        <span style={{ color: "#475569" }}>{g.context}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* ── TAB 2: CHÂN DUNG TARGET & SKU (MEDIA BRIEF GUIDELINES) ── */}
+      {activeTab === "brief" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {filteredBrands.map(brand => (
+            <div 
+              key={brand.id}
+              style={{
+                background: "var(--card)",
+                borderRadius: 14,
+                border: "1px solid var(--line)",
+                overflow: "hidden"
+              }}
+            >
+              <div style={{
+                padding: "14px 18px",
+                backgroundColor: brand.bgColor,
+                borderBottom: "1px solid var(--line)",
+                display: "flex",
+                alignItems: "center",
+                gap: 8
+              }}>
+                <span style={{ fontSize: 20 }}>{brand.icon}</span>
+                <div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)" }}>{brand.name} ({brand.tag})</div>
+                  <div style={{ fontSize: 11, color: "var(--ink-soft)" }}>Quy mô: {brand.kolAllocation}</div>
+                </div>
+              </div>
+
+              <div style={{ padding: "16px 18px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
+                
+                {/* Target Audience */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink)", textTransform: "uppercase" }}>
+                    🎯 Target Audience & Địa bàn
+                  </div>
+                  <div style={{ background: "var(--paper)", padding: "12px 14px", borderRadius: 8, fontSize: 11.5, display: "flex", flexDirection: "column", gap: 6 }}>
+                    <div><strong>Độ tuổi/Giới tính: </strong>{brand.targetAudience.core}</div>
+                    <div><strong>Phân khúc thu nhập: </strong>{brand.targetAudience.socialClass}</div>
+                    <div><strong>Địa bàn: </strong><span style={{ color: brand.color, fontWeight: 700 }}>{brand.targetAudience.location}</span></div>
+                    {brand.targetAudience.notes && <div style={{ color: "var(--ink-soft)", fontStyle: "italic", borderTop: "1px dashed var(--line)", paddingTop: 4 }}>💡 {brand.targetAudience.notes}</div>}
+                  </div>
+
+                  {brand.groupsContext && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 4, marginTop: 4 }}>
+                      <div style={{ fontSize: 10.5, fontWeight: 700, color: "var(--ink-soft)" }}>PHÂN NHÓM BỐI CẢNH (GROUP CONTEXT):</div>
+                      {brand.groupsContext.map((g, idx) => (
+                        <div key={idx} style={{ background: "var(--paper)", padding: "6px 10px", borderRadius: 6, fontSize: 11 }}>
+                          <strong>{g.group}: </strong><span style={{ color: "var(--ink-mid)" }}>{g.context}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Criteria & SKUs */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink)", textTransform: "uppercase" }}>
+                    ⭐ Tiêu chí chọn KOL & SKU
+                  </div>
+
+                  <div style={{ background: "var(--paper)", padding: "12px 14px", borderRadius: 8, fontSize: 11.5 }}>
+                    <div style={{ fontWeight: 700, color: "var(--ink-soft)", marginBottom: 4 }}>TIÊU CHÍ CHỌN KOL:</div>
+                    <ul style={{ margin: 0, paddingLeft: 16, display: "flex", flexDirection: "column", gap: 3 }}>
+                      {brand.kolCriteria.map((c, idx) => (
+                        <li key={idx}><strong>{c}</strong></li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <div style={{ fontSize: 10.5, fontWeight: 700, color: "var(--ink-soft)" }}>DANH MỤC SKU ĐỊNH HƯỚNG:</div>
+                    {brand.skus.map((sku, idx) => (
+                      <div key={idx} style={{ background: "var(--paper)", padding: "6px 10px", borderRadius: 6, fontSize: 11, display: "flex", alignItems: "center", gap: 6 }}>
+                        <span style={{ padding: "1px 5px", borderRadius: 4, fontSize: 9.5, fontWeight: 700, backgroundColor: sku.type === "Chính" ? "var(--accent)" : "var(--ink-soft)", color: "white" }}>
+                          {sku.type}
+                        </span>
+                        <strong>{sku.name}: </strong>
+                        <span style={{ color: "var(--ink-soft)" }}>{sku.desc}</span>
                       </div>
                     ))}
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── TAB 3: BẢNG PHÂN BỔ KPIS MEDIA CHI TIẾT ── */}
+      {activeTab === "kpis" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {filteredBrands.map(brand => (
+            <div 
+              key={brand.id}
+              style={{
+                background: "var(--card)",
+                borderRadius: 14,
+                border: "1px solid var(--line)",
+                overflow: "hidden"
+              }}
+            >
+              <div style={{
+                padding: "12px 18px",
+                backgroundColor: brand.bgColor,
+                borderBottom: "1px solid var(--line)",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center"
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, fontWeight: 800, fontSize: 14, color: "var(--ink)" }}>
+                  <span>{brand.icon}</span>
+                  <span>{brand.name} ({brand.tag})</span>
+                </div>
+                {brand.totalKpi && (
+                  <div style={{ fontSize: 12, fontWeight: 700, color: brand.color }}>
+                    Budget: {formatVnd(brand.totalKpi.budget)} | 6s Views: {formatNumber(brand.totalKpi.view6s)}
                   </div>
                 )}
               </div>
 
-              {/* Box 2: KOL Selection Criteria & SKUs */}
-              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                <div style={{ fontSize: 13, fontWeight: 800, color: "var(--ink)", textTransform: "uppercase", letterSpacing: "0.03em", display: "flex", alignItems: "center", gap: 6 }}>
-                  <span>⭐</span> Tiêu chí chọn KOL & SKU Trọng tâm
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>Tiêu chí chọn KOL:</div>
-                  <ul style={{ margin: 0, paddingLeft: 16, display: "flex", flexDirection: "column", gap: 4, fontSize: 12, color: "var(--ink)" }}>
-                    {brand.kolCriteria.map((c, idx) => (
-                      <li key={idx}><strong>{c}</strong></li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>Danh mục SKU & Món ăn định hướng:</div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                    {brand.skus.map((sku, idx) => (
-                      <div key={idx} style={{ display: "flex", alignItems: "flex-start", gap: 8, background: "var(--paper)", padding: "8px 12px", borderRadius: 8, fontSize: 12 }}>
-                        <span style={{
-                          padding: "1px 6px",
-                          borderRadius: 4,
-                          fontSize: 10,
-                          fontWeight: 700,
-                          backgroundColor: sku.type === "Chính" ? "var(--accent)" : "var(--ink-soft)",
-                          color: "white",
-                          flexShrink: 0
-                        }}>
-                          {sku.type}
-                        </span>
-                        <div>
-                          <strong style={{ color: "var(--ink)" }}>{sku.name}</strong>
-                          <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 1 }}>{sku.desc}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            {/* Brand Media KPIs Table */}
-            <div style={{ padding: "0 22px 20px 22px" }}>
-              <div style={{ fontSize: 12, fontWeight: 800, color: "var(--ink)", textTransform: "uppercase", marginBottom: 8, display: "flex", alignItems: "center", gap: 6 }}>
-                <span>📊</span> Chi tiết KPIs & Phân bổ Media
-              </div>
-
-              <div style={{ border: "1px solid var(--line)", borderRadius: 10, overflowX: "auto" }}>
+              <div style={{ padding: "12px 16px", overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11, textAlign: "left" }}>
                   <thead>
                     <tr style={{ background: "var(--paper)", borderBottom: "1px solid var(--line)", color: "var(--ink-soft)" }}>
-                      <th style={{ padding: "8px 12px" }}>Phase / Thời gian</th>
-                      <th style={{ padding: "8px 12px" }}>Khu vực (Geo)</th>
-                      <th style={{ padding: "8px 12px", textAlign: "right" }}>Đơn giá (CPV 6s)</th>
-                      <th style={{ padding: "8px 12px", textAlign: "right" }}>Ngân sách (VNĐ)</th>
-                      <th style={{ padding: "8px 12px", textAlign: "right" }}>Impression</th>
-                      <th style={{ padding: "8px 12px", textAlign: "right" }}>CPM (VNĐ)</th>
-                      <th style={{ padding: "8px 12px", textAlign: "right" }}>6s Views</th>
-                      <th style={{ padding: "8px 12px", textAlign: "right" }}>Tỷ lệ xem (VR)</th>
-                      <th style={{ padding: "8px 12px", textAlign: "right" }}>Unique Reach</th>
-                      <th style={{ padding: "8px 12px", textAlign: "right" }}>% Pool</th>
-                      <th style={{ padding: "8px 12px", textAlign: "right" }}>Frequency</th>
+                      <th style={{ padding: "8px 10px" }}>Phase / Thời gian</th>
+                      <th style={{ padding: "8px 10px" }}>Khu vực (Geo)</th>
+                      <th style={{ padding: "8px 10px", textAlign: "right" }}>Đơn giá (CPV 6s)</th>
+                      <th style={{ padding: "8px 10px", textAlign: "right" }}>Ngân sách (VNĐ)</th>
+                      <th style={{ padding: "8px 10px", textAlign: "right" }}>Impression</th>
+                      <th style={{ padding: "8px 10px", textAlign: "right" }}>CPM (VNĐ)</th>
+                      <th style={{ padding: "8px 10px", textAlign: "right" }}>6s Views</th>
+                      <th style={{ padding: "8px 10px", textAlign: "right" }}>Tỷ lệ xem (VR)</th>
+                      <th style={{ padding: "8px 10px", textAlign: "right" }}>Unique Reach</th>
+                      <th style={{ padding: "8px 10px", textAlign: "right" }}>% Pool</th>
+                      <th style={{ padding: "8px 10px", textAlign: "right" }}>Frequency</th>
                     </tr>
                   </thead>
                   <tbody>
                     {brand.kpis.map((k, idx) => (
-                      <tr key={idx} style={{ borderBottom: "1px solid var(--line)", background: idx % 2 === 0 ? "transparent" : "rgba(0,0,0,0.01)" }}>
-                        <td style={{ padding: "8px 12px", fontWeight: 600, color: "var(--ink)" }}>{k.phase}</td>
-                        <td style={{ padding: "8px 12px", color: "var(--ink-mid)" }}>{k.geo}</td>
-                        <td style={{ padding: "8px 12px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{k.unitCost} ₫</td>
-                        <td style={{ padding: "8px 12px", textAlign: "right", fontWeight: 700, color: brand.color, fontFamily: "var(--kt-mono)" }}>{formatNumber(k.budget)} ₫</td>
-                        <td style={{ padding: "8px 12px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(k.impression)}</td>
-                        <td style={{ padding: "8px 12px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(k.cpm)} ₫</td>
-                        <td style={{ padding: "8px 12px", textAlign: "right", fontWeight: 700, color: "var(--ink)", fontFamily: "var(--kt-mono)" }}>{formatNumber(k.view6s)}</td>
-                        <td style={{ padding: "8px 12px", textAlign: "right", fontWeight: 600, color: "var(--ok)", fontFamily: "var(--kt-mono)" }}>{k.vr}</td>
-                        <td style={{ padding: "8px 12px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(k.reach)}</td>
-                        <td style={{ padding: "8px 12px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{k.pctPool}</td>
-                        <td style={{ padding: "8px 12px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{k.freq}</td>
+                      <tr key={idx} style={{ borderBottom: "1px solid var(--line)" }}>
+                        <td style={{ padding: "8px 10px", fontWeight: 600, color: "var(--ink)" }}>{k.phase}</td>
+                        <td style={{ padding: "8px 10px", color: "var(--ink-mid)" }}>{k.geo}</td>
+                        <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{k.unitCost} ₫</td>
+                        <td style={{ padding: "8px 10px", textAlign: "right", fontWeight: 700, color: brand.color, fontFamily: "var(--kt-mono)" }}>{formatNumber(k.budget)} ₫</td>
+                        <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(k.impression)}</td>
+                        <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(k.cpm)} ₫</td>
+                        <td style={{ padding: "8px 10px", textAlign: "right", fontWeight: 700, color: "var(--ink)", fontFamily: "var(--kt-mono)" }}>{formatNumber(k.view6s)}</td>
+                        <td style={{ padding: "8px 10px", textAlign: "right", fontWeight: 600, color: "var(--ok)", fontFamily: "var(--kt-mono)" }}>{k.vr}</td>
+                        <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(k.reach)}</td>
+                        <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{k.pctPool}</td>
+                        <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{k.freq}</td>
                       </tr>
                     ))}
                     {brand.totalKpi && (
                       <tr style={{ background: brand.bgColor, fontWeight: 700, borderTop: "2px solid var(--line)" }}>
-                        <td style={{ padding: "8px 12px", color: brand.color }} colSpan={2}>TỔNG CỘNG ({brand.tag})</td>
-                        <td style={{ padding: "8px 12px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{brand.totalKpi.unitCost} ₫</td>
-                        <td style={{ padding: "8px 12px", textAlign: "right", color: brand.color, fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.budget)} ₫</td>
-                        <td style={{ padding: "8px 12px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.impression)}</td>
-                        <td style={{ padding: "8px 12px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.cpm)} ₫</td>
-                        <td style={{ padding: "8px 12px", textAlign: "right", color: "var(--ink)", fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.view6s)}</td>
-                        <td style={{ padding: "8px 12px", textAlign: "right", color: "var(--ok)", fontFamily: "var(--kt-mono)" }}>{brand.totalKpi.vr}</td>
-                        <td style={{ padding: "8px 12px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.reach)}</td>
-                        <td style={{ padding: "8px 12px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{brand.totalKpi.pctPool}</td>
-                        <td style={{ padding: "8px 12px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{brand.totalKpi.freq}</td>
+                        <td style={{ padding: "8px 10px", color: brand.color }} colSpan={2}>TỔNG CỘNG ({brand.tag})</td>
+                        <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{brand.totalKpi.unitCost} ₫</td>
+                        <td style={{ padding: "8px 10px", textAlign: "right", color: brand.color, fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.budget)} ₫</td>
+                        <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.impression)}</td>
+                        <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.cpm)} ₫</td>
+                        <td style={{ padding: "8px 10px", textAlign: "right", color: "var(--ink)", fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.view6s)}</td>
+                        <td style={{ padding: "8px 10px", textAlign: "right", color: "var(--ok)", fontFamily: "var(--kt-mono)" }}>{brand.totalKpi.vr}</td>
+                        <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.reach)}</td>
+                        <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{brand.totalKpi.pctPool}</td>
+                        <td style={{ padding: "8px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{brand.totalKpi.freq}</td>
                       </tr>
                     )}
                   </tbody>
                 </table>
               </div>
-            </div>
 
-          </div>
-        ))}
-      </div>
+            </div>
+          ))}
+        </div>
+      )}
 
     </div>
   );
@@ -5948,7 +6178,17 @@ const [view, setView] = useState("table");
               statusMap={statusMap}
             />
           )}
-          {view === "plan" && <PlanView />}
+          {view === "plan" && (
+            <PlanView 
+              rows={data} 
+              onOpen={r => setSelected(r)}
+              onNavigateToTable={(campaignKey) => {
+                setFilterCampaign(campaignKey);
+                setView("table");
+              }}
+              campaignLabels={campaignLabels}
+            />
+          )}
         </div>
       </div>
 
