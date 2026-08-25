@@ -3913,8 +3913,8 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
                       <strong style={{ color: "var(--ink)" }}>{k.displayViews ? k.displayViews.toLocaleString() : "—"}</strong>
                     </div>
                     <div>
-                      <div style={{ color: "var(--ink-soft)" }}>Đơn hàng</div>
-                      <strong style={{ color: "var(--ok)" }}>{k.displayConversions ? k.displayConversions.toLocaleString() : "—"}</strong>
+                      <div style={{ color: "var(--ink-soft)" }}>Tương tác</div>
+                      <strong style={{ color: "var(--ok)" }}>{k.displayEng ? k.displayEng.toLocaleString() : "—"}</strong>
                     </div>
                   </div>
 
