@@ -4775,7 +4775,7 @@ const PlanView = () => {
   // ── EMPTY STATE (NO FILE UPLOADED) ──
   if (!planData || !planData.brands || planData.brands.length === 0) {
     return (
-      <div style={{ flex: 1, padding: "30px 20px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--card)" }}>
+      <div style={{ flex: 1, padding: "40px 24px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--card)" }}>
         <input 
           type="file" 
           ref={fileInputRef} 
@@ -4791,43 +4791,53 @@ const PlanView = () => {
             if (e.dataTransfer.files?.[0]) parsePlanFile(e.dataTransfer.files[0]);
           }}
           style={{
-            maxWidth: 520,
+            maxWidth: 580,
             width: "100%",
-            border: "2px dashed var(--rule)",
-            borderRadius: 16,
-            padding: "36px 28px",
+            border: "2px dashed var(--accent)",
+            borderRadius: 20,
+            padding: "40px 32px",
             textAlign: "center",
             background: "var(--paper)",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: 12
+            gap: 16,
+            boxShadow: "0 8px 30px rgba(234, 146, 22, 0.05)"
           }}
         >
-          <div style={{ fontSize: 36 }}>📋</div>
-          <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "var(--ink)" }}>
-            Chưa có Kế hoạch Media nào được tải lên
-          </h3>
-          <p style={{ margin: 0, fontSize: 12, color: "var(--ink-soft)", lineHeight: 1.5 }}>
-            Kéo thả hoặc bấm nút bên dưới để tải lên file Excel (.xlsx / .csv) chứa bảng kế hoạch phân bổ Media & KPIs.
-          </p>
+          <div style={{ width: 64, height: 64, borderRadius: "50%", background: "var(--accent-bg)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30 }}>
+            📋
+          </div>
 
-          <div style={{ display: "flex", gap: 10, marginTop: 10, flexWrap: "wrap", justifyContent: "center" }}>
+          <div>
+            <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "var(--ink)", letterSpacing: "-0.02em" }}>
+              Tải lên Kế hoạch Media & KPIs
+            </h3>
+            <p style={{ margin: "6px 0 0", fontSize: 13, color: "var(--ink-soft)", lineHeight: 1.5 }}>
+              Kéo thả file Excel vào đây hoặc chọn file từ máy tính để phân tích và quản lý KPIs kế hoạch.
+            </p>
+          </div>
+
+          <div style={{ display: "flex", gap: 12, marginTop: 6, flexWrap: "wrap", justifyContent: "center" }}>
             <button 
               onClick={() => fileInputRef.current?.click()}
               className="kt-btn kt-btn-primary"
-              style={{ padding: "8px 16px", fontSize: 12, borderRadius: 12, fontWeight: 700 }}
+              style={{ padding: "10px 20px", fontSize: 13, borderRadius: 14, fontWeight: 700, boxShadow: "0 4px 14px rgba(234, 146, 22, 0.3)" }}
             >
-              📥 Chọn file Excel Kế hoạch (.xlsx)
+              📥 Chọn file Excel (.xlsx)
             </button>
 
             <button 
               onClick={handleDownloadPlanTemplate}
               className="kt-btn kt-btn-ghost"
-              style={{ padding: "8px 16px", fontSize: 12, borderRadius: 12, border: "1px solid var(--line)" }}
+              style={{ padding: "10px 18px", fontSize: 13, borderRadius: 14, background: "var(--card)", border: "1px solid var(--line)", fontWeight: 600 }}
             >
-              📄 Tải file Kế hoạch mẫu
+              📄 Tải file Mẫu chuẩn
             </button>
+          </div>
+
+          <div style={{ fontSize: 11, color: "var(--ink-faint)", marginTop: 4 }}>
+            Hỗ trợ định dạng: <strong>.xlsx, .xls, .csv</strong> • Tự động nhận diện Brand, Phase, Ngân sách, 6s Views, Reach & Impressions
           </div>
         </div>
       </div>
@@ -4841,7 +4851,7 @@ const PlanView = () => {
     : brandsList.filter(b => b.id === selectedBrand);
 
   return (
-    <div className="kt-scrollbar" style={{ flex: 1, overflowY: "auto", padding: "16px 20px", display: "flex", flexDirection: "column", gap: 16, background: "var(--card)" }}>
+    <div className="kt-scrollbar" style={{ flex: 1, overflowY: "auto", padding: "20px 24px", display: "flex", flexDirection: "column", gap: 18, background: "var(--paper)" }}>
       
       <input 
         type="file" 
@@ -4851,14 +4861,30 @@ const PlanView = () => {
         onChange={e => e.target.files?.[0] && parsePlanFile(e.target.files[0])} 
       />
 
-      {/* ── TOP HEADER & ACTIONS ── */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, borderBottom: "1px solid var(--line)", paddingBottom: 12 }}>
-        <div>
-          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "var(--ink)", display: "flex", alignItems: "center", gap: 8 }}>
-            <span>📋</span> Kế hoạch & Phân bổ Media
-          </h2>
-          <div style={{ fontSize: 11.5, color: "var(--ink-soft)", marginTop: 3 }}>
-            Dữ liệu từ file: <strong>{planData.fileName || "Media_Plan.xlsx"}</strong> ({brandsList.length} Chiến dịch)
+      {/* ── TOP HEADER & ACTIONS BAR ── */}
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        flexWrap: "wrap",
+        gap: 12,
+        background: "var(--card)",
+        padding: "14px 18px",
+        borderRadius: 16,
+        border: "1px solid var(--line)",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: "var(--accent-bg)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
+            📋
+          </div>
+          <div>
+            <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "var(--ink)", letterSpacing: "-0.02em" }}>
+              Kế hoạch & Phân bổ Media KPIs
+            </h2>
+            <div style={{ fontSize: 11.5, color: "var(--ink-soft)", marginTop: 2 }}>
+              Nguồn file: <strong style={{ color: "var(--ink)" }}>{planData.fileName || "Media_Plan.xlsx"}</strong> • Đang hiển thị <strong>{brandsList.length} Chiến dịch</strong>
+            </div>
           </div>
         </div>
 
@@ -4866,64 +4892,131 @@ const PlanView = () => {
           <button 
             onClick={() => fileInputRef.current?.click()}
             className="kt-btn kt-btn-ghost"
-            style={{ padding: "6px 12px", fontSize: 11.5, borderRadius: 12, border: "1px solid var(--line)" }}
+            style={{ padding: "7px 14px", fontSize: 12, borderRadius: 12, border: "1px solid var(--line)", background: "var(--paper)", fontWeight: 600 }}
           >
             📥 Tải file khác
           </button>
           <button 
             onClick={handleExportCurrentPlan}
-            className="kt-btn kt-btn-ghost"
-            style={{ padding: "6px 12px", fontSize: 11.5, borderRadius: 12, border: "1px solid var(--line)" }}
+            className="kt-btn kt-btn-primary"
+            style={{ padding: "7px 14px", fontSize: 12, borderRadius: 12, fontWeight: 700 }}
           >
-            Xuất Excel
+            📊 Xuất Excel
           </button>
           <button 
             onClick={handleClearPlan}
             className="kt-btn kt-btn-ghost"
-            style={{ padding: "6px 12px", fontSize: 11.5, borderRadius: 12, border: "1px solid var(--danger)", color: "var(--danger)" }}
+            style={{ padding: "7px 12px", fontSize: 12, borderRadius: 12, border: "1px solid #FCA5A5", color: "var(--danger)", background: "#FEF2F2", fontWeight: 600 }}
           >
             🗑️ Xóa
           </button>
         </div>
       </div>
 
-      {/* ── TOP 4 SUMMARY STATS ── */}
+      {/* ── 4 HIGHLIGHTED SUMMARY STAT CARDS ── */}
       <div style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-        gap: 10
+        gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
+        gap: 12
       }}>
-        <div style={{ background: "var(--paper)", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--line)" }}>
-          <div style={{ fontSize: 10.5, color: "var(--ink-soft)", fontWeight: 600, textTransform: "uppercase" }}>💰 Tổng Ngân Sách Plan</div>
-          <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)", marginTop: 3 }}>{formatVnd(planSummary.totalBudget)}</div>
-          <div style={{ fontSize: 10, color: "var(--ink-soft)", marginTop: 2 }}>{brandsList.length} Chiến dịch</div>
+        {/* Card 1: Budget */}
+        <div style={{
+          background: "var(--card)",
+          padding: "14px 18px",
+          borderRadius: 14,
+          border: "1px solid var(--line)",
+          borderLeft: "4px solid #EA9216",
+          boxShadow: "0 2px 10px rgba(0,0,0,0.02)"
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 700, textTransform: "uppercase" }}>Tổng Ngân Sách</span>
+            <span style={{ fontSize: 14 }}>💰</span>
+          </div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: "#D97706", marginTop: 6, fontFamily: "var(--kt-mono)" }}>
+            {formatVnd(planSummary.totalBudget)}
+          </div>
+          <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 3 }}>
+            Phân bổ cho {brandsList.length} Chiến dịch
+          </div>
         </div>
 
-        <div style={{ background: "var(--paper)", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--line)" }}>
-          <div style={{ fontSize: 10.5, color: "var(--ink-soft)", fontWeight: 600, textTransform: "uppercase" }}>👁️ Mục Tiêu 6s Views</div>
-          <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)", marginTop: 3 }}>{formatNumber(planSummary.total6sViews)}</div>
-          <div style={{ fontSize: 10, color: "var(--ink-soft)", marginTop: 2 }}>CPView TB: ~{planSummary.avgUnitCost || 0} ₫</div>
+        {/* Card 2: 6s Views */}
+        <div style={{
+          background: "var(--card)",
+          padding: "14px 18px",
+          borderRadius: 14,
+          border: "1px solid var(--line)",
+          borderLeft: "4px solid #10B981",
+          boxShadow: "0 2px 10px rgba(0,0,0,0.02)"
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 700, textTransform: "uppercase" }}>Mục tiêu 6s Views</span>
+            <span style={{ fontSize: 14 }}>👁️</span>
+          </div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: "#059669", marginTop: 6, fontFamily: "var(--kt-mono)" }}>
+            {formatNumber(planSummary.total6sViews)}
+          </div>
+          <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 3 }}>
+            CPView TB: <strong>~{planSummary.avgUnitCost || 0} ₫</strong>
+          </div>
         </div>
 
-        <div style={{ background: "var(--paper)", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--line)" }}>
-          <div style={{ fontSize: 10.5, color: "var(--ink-soft)", fontWeight: 600, textTransform: "uppercase" }}>📢 Tổng Impressions</div>
-          <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)", marginTop: 3 }}>{formatNumber(planSummary.totalImpression)}</div>
-          <div style={{ fontSize: 10, color: "var(--ink-soft)", marginTop: 2 }}>CPM TB: {formatNumber(planSummary.avgCpm || 0)} ₫</div>
+        {/* Card 3: Impression */}
+        <div style={{
+          background: "var(--card)",
+          padding: "14px 18px",
+          borderRadius: 14,
+          border: "1px solid var(--line)",
+          borderLeft: "4px solid #3B82F6",
+          boxShadow: "0 2px 10px rgba(0,0,0,0.02)"
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 700, textTransform: "uppercase" }}>Tổng Impressions</span>
+            <span style={{ fontSize: 14 }}>📢</span>
+          </div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: "#2563EB", marginTop: 6, fontFamily: "var(--kt-mono)" }}>
+            {formatNumber(planSummary.totalImpression)}
+          </div>
+          <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 3 }}>
+            CPM TB: <strong>{formatNumber(planSummary.avgCpm || 0)} ₫</strong>
+          </div>
         </div>
 
-        <div style={{ background: "var(--paper)", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--line)" }}>
-          <div style={{ fontSize: 10.5, color: "var(--ink-soft)", fontWeight: 600, textTransform: "uppercase" }}>📊 View Rate Trung Bình</div>
-          <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)", marginTop: 3 }}>{planSummary.avgVr || "0%"}</div>
-          <div style={{ fontSize: 10, color: "var(--ink-soft)", marginTop: 2 }}>Tỷ lệ xem 6s/Impression</div>
+        {/* Card 4: View Rate */}
+        <div style={{
+          background: "var(--card)",
+          padding: "14px 18px",
+          borderRadius: 14,
+          border: "1px solid var(--line)",
+          borderLeft: "4px solid #8B5CF6",
+          boxShadow: "0 2px 10px rgba(0,0,0,0.02)"
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 700, textTransform: "uppercase" }}>Tỷ Lệ Xem (VR)</span>
+            <span style={{ fontSize: 14 }}>🎯</span>
+          </div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: "#7C3AED", marginTop: 6, fontFamily: "var(--kt-mono)" }}>
+            {planSummary.avgVr || "0%"}
+          </div>
+          <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 3 }}>
+            Tỷ lệ xem 6s / Impression
+          </div>
         </div>
       </div>
 
       {/* ── BRAND FILTER PILLS ── */}
-      <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 2 }}>
+      <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 2 }}>
         <button
           onClick={() => setSelectedBrand("all")}
           className={`kt-btn ${selectedBrand === "all" ? "kt-btn-primary" : "kt-btn-ghost"}`}
-          style={{ padding: "4px 12px", borderRadius: 14, fontSize: 11, fontWeight: 600 }}
+          style={{
+            padding: "6px 16px",
+            borderRadius: 20,
+            fontSize: 12,
+            fontWeight: 700,
+            background: selectedBrand === "all" ? "var(--accent)" : "var(--card)",
+            boxShadow: selectedBrand === "all" ? "0 2px 8px rgba(234, 146, 22, 0.3)" : "none"
+          }}
         >
           Tất cả ({brandsList.length})
         </button>
@@ -4935,7 +5028,14 @@ const PlanView = () => {
               key={b.id}
               onClick={() => setSelectedBrand(b.id)}
               className={`kt-btn ${isSelected ? "kt-btn-primary" : "kt-btn-ghost"}`}
-              style={{ padding: "4px 12px", borderRadius: 14, fontSize: 11, fontWeight: 600 }}
+              style={{
+                padding: "6px 16px",
+                borderRadius: 20,
+                fontSize: 12,
+                fontWeight: 700,
+                background: isSelected ? "var(--accent)" : "var(--card)",
+                boxShadow: isSelected ? "0 2px 8px rgba(234, 146, 22, 0.3)" : "none"
+              }}
             >
               {b.name}
             </button>
@@ -4943,92 +5043,169 @@ const PlanView = () => {
         })}
       </div>
 
-      {/* ── BRAND TABLES ── */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        {filteredBrands.map(brand => (
-          <div
-            key={brand.id}
-            style={{
-              background: "var(--card)",
-              borderRadius: 12,
-              border: "1px solid var(--line)",
-              overflow: "hidden"
-            }}
-          >
-            <div style={{
-              padding: "10px 16px",
-              background: "var(--paper)",
-              borderBottom: "1px solid var(--line)",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: 8
-            }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>
-                {brand.name}
+      {/* ── BRAND CARDS & HIGH-CONTRAST TABLES ── */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+        {filteredBrands.map((brand, bIdx) => {
+          const brandColors = ["#EA580C", "#D97706", "#059669", "#7C3AED", "#2563EB"];
+          const themeColor = brandColors[bIdx % brandColors.length];
+
+          return (
+            <div
+              key={brand.id}
+              style={{
+                background: "var(--card)",
+                borderRadius: 16,
+                border: "1px solid var(--line)",
+                overflow: "hidden",
+                boxShadow: "0 4px 16px rgba(0,0,0,0.025)"
+              }}
+            >
+              {/* Brand Card Header */}
+              <div style={{
+                padding: "14px 20px",
+                background: "var(--card)",
+                borderBottom: "1px solid var(--line)",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 10
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: "50%",
+                    backgroundColor: themeColor,
+                    display: "inline-block"
+                  }} />
+                  <span style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)", letterSpacing: "-0.01em" }}>
+                    {brand.name}
+                  </span>
+                  <span style={{ fontSize: 11, padding: "2px 8px", borderRadius: 12, background: "var(--paper)", color: "var(--ink-soft)", fontWeight: 600 }}>
+                    {brand.kpis?.length || 0} Giai đoạn
+                  </span>
+                </div>
+
+                {brand.totalKpi && (
+                  <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+                    <div style={{ fontSize: 12, background: "#FFFBEB", border: "1px solid #FDE68A", padding: "4px 10px", borderRadius: 8 }}>
+                      <span style={{ color: "#92400E", fontWeight: 600 }}>Budget: </span>
+                      <strong style={{ color: "#B45309", fontFamily: "var(--kt-mono)" }}>{formatVnd(brand.totalKpi.budget)}</strong>
+                    </div>
+                    <div style={{ fontSize: 12, background: "#ECFDF5", border: "1px solid #A7F3D0", padding: "4px 10px", borderRadius: 8 }}>
+                      <span style={{ color: "#065F46", fontWeight: 600 }}>6s Views: </span>
+                      <strong style={{ color: "#047857", fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.view6s)}</strong>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {brand.totalKpi && (
-                <div style={{ fontSize: 11, color: "var(--ink-soft)" }}>
-                  Budget: <strong style={{ color: "var(--ink)" }}>{formatVnd(brand.totalKpi.budget)}</strong> | 6s Views: <strong style={{ color: "var(--ink)" }}>{formatNumber(brand.totalKpi.view6s)}</strong>
-                </div>
-              )}
-            </div>
-
-            <div style={{ padding: "12px 16px", overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 10.5, textAlign: "left" }}>
-                <thead>
-                  <tr style={{ background: "var(--paper)", borderBottom: "1px solid var(--line)", color: "var(--ink-soft)" }}>
-                    <th style={{ padding: "6px 10px" }}>Phase / Thời gian</th>
-                    <th style={{ padding: "6px 10px" }}>Khu vực (Geo)</th>
-                    <th style={{ padding: "6px 10px", textAlign: "right" }}>CPV 6s</th>
-                    <th style={{ padding: "6px 10px", textAlign: "right" }}>Ngân sách (VNĐ)</th>
-                    <th style={{ padding: "6px 10px", textAlign: "right" }}>Impression</th>
-                    <th style={{ padding: "6px 10px", textAlign: "right" }}>CPM</th>
-                    <th style={{ padding: "6px 10px", textAlign: "right" }}>6s Views</th>
-                    <th style={{ padding: "6px 10px", textAlign: "right" }}>VR</th>
-                    <th style={{ padding: "6px 10px", textAlign: "right" }}>Reach</th>
-                    <th style={{ padding: "6px 10px", textAlign: "right" }}>% Pool</th>
-                    <th style={{ padding: "6px 10px", textAlign: "right" }}>Freq</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(brand.kpis || []).map((k, idx) => (
-                    <tr key={idx} style={{ borderBottom: "1px solid var(--line)" }}>
-                      <td style={{ padding: "6px 10px", fontWeight: 600, color: "var(--ink)" }}>{k.phase}</td>
-                      <td style={{ padding: "6px 10px", color: "var(--ink-mid)" }}>{k.geo}</td>
-                      <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{k.unitCost ? `${k.unitCost} ₫` : "—"}</td>
-                      <td style={{ padding: "6px 10px", textAlign: "right", fontWeight: 600, color: "var(--ink)", fontFamily: "var(--kt-mono)" }}>{formatNumber(k.budget)} ₫</td>
-                      <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(k.impression)}</td>
-                      <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(k.cpm)} ₫</td>
-                      <td style={{ padding: "6px 10px", textAlign: "right", fontWeight: 600, color: "var(--ink)", fontFamily: "var(--kt-mono)" }}>{formatNumber(k.view6s)}</td>
-                      <td style={{ padding: "6px 10px", textAlign: "right", color: "var(--ok)", fontFamily: "var(--kt-mono)" }}>{k.vr || "—"}</td>
-                      <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(k.reach)}</td>
-                      <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{k.pctPool || "—"}</td>
-                      <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{k.freq || "—"}</td>
+              {/* Table */}
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, textAlign: "left" }}>
+                  <thead>
+                    <tr style={{ background: "var(--paper)", borderBottom: "1px solid var(--line)", color: "var(--ink-soft)", fontWeight: 700, fontSize: 11 }}>
+                      <th style={{ padding: "10px 14px" }}>Phase / Thời gian</th>
+                      <th style={{ padding: "10px 14px" }}>Khu vực (Geo)</th>
+                      <th style={{ padding: "10px 14px", textAlign: "right" }}>CPV 6s</th>
+                      <th style={{ padding: "10px 14px", textAlign: "right", color: "#B45309" }}>Ngân sách (VNĐ)</th>
+                      <th style={{ padding: "10px 14px", textAlign: "right" }}>Impression</th>
+                      <th style={{ padding: "10px 14px", textAlign: "right" }}>CPM</th>
+                      <th style={{ padding: "10px 14px", textAlign: "right", color: "#047857" }}>6s Views</th>
+                      <th style={{ padding: "10px 14px", textAlign: "right", color: "#6D28D9" }}>VR</th>
+                      <th style={{ padding: "10px 14px", textAlign: "right" }}>Reach</th>
+                      <th style={{ padding: "10px 14px", textAlign: "right" }}>% Pool</th>
+                      <th style={{ padding: "10px 14px", textAlign: "right" }}>Freq</th>
                     </tr>
-                  ))}
-                  {brand.totalKpi && (
-                    <tr style={{ background: "var(--paper)", fontWeight: 700 }}>
-                      <td style={{ padding: "6px 10px", color: "var(--ink)" }} colSpan={2}>TỔNG CỘNG ({brand.name})</td>
-                      <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{brand.totalKpi.unitCost ? `${brand.totalKpi.unitCost} ₫` : "—"}</td>
-                      <td style={{ padding: "6px 10px", textAlign: "right", color: "var(--accent)", fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.budget)} ₫</td>
-                      <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.impression)}</td>
-                      <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.cpm)} ₫</td>
-                      <td style={{ padding: "6px 10px", textAlign: "right", color: "var(--ink)", fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.view6s)}</td>
-                      <td style={{ padding: "6px 10px", textAlign: "right", color: "var(--ok)", fontFamily: "var(--kt-mono)" }}>{brand.totalKpi.vr || "—"}</td>
-                      <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.reach)}</td>
-                      <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>—</td>
-                      <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{brand.totalKpi.freq || "—"}</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {(brand.kpis || []).map((k, idx) => (
+                      <tr 
+                        key={idx} 
+                        style={{ 
+                          borderBottom: "1px solid var(--line)",
+                          background: idx % 2 === 0 ? "var(--card)" : "#FAFAFA"
+                        }}
+                      >
+                        <td style={{ padding: "10px 14px", fontWeight: 700, color: "var(--ink)" }}>{k.phase}</td>
+                        <td style={{ padding: "10px 14px", color: "var(--ink-mid)" }}>{k.geo}</td>
+                        <td style={{ padding: "10px 14px", textAlign: "right", fontFamily: "var(--kt-mono)", color: "var(--ink-soft)" }}>
+                          {k.unitCost ? `${k.unitCost} ₫` : "—"}
+                        </td>
+                        <td style={{ padding: "10px 14px", textAlign: "right", fontWeight: 800, color: "#D97706", fontFamily: "var(--kt-mono)" }}>
+                          {formatNumber(k.budget)} ₫
+                        </td>
+                        <td style={{ padding: "10px 14px", textAlign: "right", fontFamily: "var(--kt-mono)", color: "var(--ink)" }}>
+                          {formatNumber(k.impression)}
+                        </td>
+                        <td style={{ padding: "10px 14px", textAlign: "right", fontFamily: "var(--kt-mono)", color: "var(--ink-soft)" }}>
+                          {formatNumber(k.cpm)} ₫
+                        </td>
+                        <td style={{ padding: "10px 14px", textAlign: "right", fontWeight: 800, color: "#059669", fontFamily: "var(--kt-mono)" }}>
+                          {formatNumber(k.view6s)}
+                        </td>
+                        <td style={{ padding: "10px 14px", textAlign: "right", fontWeight: 700, color: "#7C3AED", fontFamily: "var(--kt-mono)" }}>
+                          {k.vr ? (
+                            <span style={{ background: "#F5F3FF", padding: "2px 6px", borderRadius: 4, border: "1px solid #DDD6FE" }}>
+                              {k.vr}
+                            </span>
+                          ) : "—"}
+                        </td>
+                        <td style={{ padding: "10px 14px", textAlign: "right", fontFamily: "var(--kt-mono)", color: "var(--ink-mid)" }}>
+                          {formatNumber(k.reach)}
+                        </td>
+                        <td style={{ padding: "10px 14px", textAlign: "right", fontFamily: "var(--kt-mono)", color: "var(--ink-soft)" }}>
+                          {k.pctPool || "—"}
+                        </td>
+                        <td style={{ padding: "10px 14px", textAlign: "right", fontFamily: "var(--kt-mono)", color: "var(--ink-soft)" }}>
+                          {k.freq || "—"}
+                        </td>
+                      </tr>
+                    ))}
 
-          </div>
-        ))}
+                    {/* Total Summary Footer Row */}
+                    {brand.totalKpi && (
+                      <tr style={{ background: "#FDF9F0", borderTop: "2px solid #FDE68A", fontWeight: 800 }}>
+                        <td style={{ padding: "12px 14px", color: "var(--ink)" }} colSpan={2}>
+                          🌟 TỔNG CỘNG ({brand.name})
+                        </td>
+                        <td style={{ padding: "12px 14px", textAlign: "right", fontFamily: "var(--kt-mono)", color: "var(--ink-soft)" }}>
+                          {brand.totalKpi.unitCost ? `${brand.totalKpi.unitCost} ₫` : "—"}
+                        </td>
+                        <td style={{ padding: "12px 14px", textAlign: "right", color: "#B45309", fontFamily: "var(--kt-mono)", fontSize: 13 }}>
+                          {formatNumber(brand.totalKpi.budget)} ₫
+                        </td>
+                        <td style={{ padding: "12px 14px", textAlign: "right", fontFamily: "var(--kt-mono)", color: "var(--ink)" }}>
+                          {formatNumber(brand.totalKpi.impression)}
+                        </td>
+                        <td style={{ padding: "12px 14px", textAlign: "right", fontFamily: "var(--kt-mono)", color: "var(--ink-soft)" }}>
+                          {formatNumber(brand.totalKpi.cpm)} ₫
+                        </td>
+                        <td style={{ padding: "12px 14px", textAlign: "right", color: "#047857", fontFamily: "var(--kt-mono)", fontSize: 13 }}>
+                          {formatNumber(brand.totalKpi.view6s)}
+                        </td>
+                        <td style={{ padding: "12px 14px", textAlign: "right", color: "#6D28D9", fontFamily: "var(--kt-mono)" }}>
+                          {brand.totalKpi.vr || "—"}
+                        </td>
+                        <td style={{ padding: "12px 14px", textAlign: "right", fontFamily: "var(--kt-mono)", color: "var(--ink)" }}>
+                          {formatNumber(brand.totalKpi.reach)}
+                        </td>
+                        <td style={{ padding: "12px 14px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>
+                          —
+                        </td>
+                        <td style={{ padding: "12px 14px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>
+                          {brand.totalKpi.freq || "—"}
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+          );
+        })}
       </div>
 
     </div>
