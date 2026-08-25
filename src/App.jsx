@@ -4542,178 +4542,22 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpe
 };
 
 /* ================================================================
-   PLAN VIEW (KẾ HOẠCH & CHIẾN LƯỢC MEDIA TARGETING)
+   PLAN VIEW (KẾ HOẠCH & CHIẾN LƯỢC MEDIA TARGETING - TẢI LÊN FILE)
 ================================================================ */
-const MEDIA_PLAN_DATA = {
-  summary: {
-    totalBudget: 500347305,
-    totalImpression: 30514873,
-    total6sViews: 6876664,
-    avgUnitCost: 73,
-    avgCpm: 16397,
-    avgVr: "22,54%",
-    totalPool: 28872000,
-    totalKolsRange: "35 – 40 KOLs"
-  },
-  brands: [
-    {
-      id: "msg",
-      name: "Bột Ngọt (MSG)",
-      tag: "Bột Ngọt",
-      icon: "🍲",
-      color: "#EA580C",
-      bgColor: "#FFF7ED",
-      borderColor: "#FDBA74",
-      targetAudience: {
-        core: "Nữ 30 – 39 tuổi",
-        sub: "Nữ 20 – 29 tuổi",
-        socialClass: "Class ABC",
-        location: "100% tại 6 Key Cities: Hà Nội, TP.HCM, Đà Nẵng, Cần Thơ, Hải Phòng, Đồng Nai",
-        notes: "Mẹ nội trợ gia đình, phụ nữ nấu nướng thường xuyên, chăm sóc bữa cơm nhà"
-      },
-      phases: [
-        { name: "Phase 1", time: "May - Jun'26", budget: 154707165 },
-        { name: "Phase 2", time: "Dec'26 - Jan'27", budget: 154707165 }
-      ],
-      kolCriteria: [
-        "KOL/KOC mảng Family Cooking, Mẹ nội trợ truyền thống",
-        "Tập trung lượng người theo dõi tại 6 thành phố trọng điểm",
-        "Nội dung mộc mạc, gần gũi, hướng dẫn nêm nếm món ngon cho bữa cơm gia đình"
-      ],
-      skus: [
-        { name: "Bột ngọt AJINOMOTO®", type: "Chính", desc: "Gia vị nêm nếm quốc dân cho mọi bữa cơm gia đình đậm đà, chuẩn vị ngọt thịt tự nhiên" }
-      ],
-      creativeContext: "Bữa cơm gia đình thuần Việt đầm ấm, bí quyết nêm nếm món canh ngọt thanh, món kho đậm đà chuẩn vị mẹ nấu.",
-      kpis: [
-        { phase: "Phase 1 (May - Jun'26)", geo: "6 Key Cities", unitCost: 65, budget: 154707165, impression: 10614557, cpm: 14575, view6s: 2380110, cpv: 65, vr: "22,42%", reach: 6640100, pool: 28870000, pctPool: "23,00%", freq: 1.60 },
-        { phase: "Phase 2 (Dec'26 - Jan'27)", geo: "6 Key Cities", unitCost: 75, budget: 154707165, impression: 9530529, cpm: 16233, view6s: 2062762, cpv: 75, vr: "21,64%", reach: 6351400, pool: 28870000, pctPool: "22,00%", freq: 1.50 }
-      ],
-      totalKpi: { unitCost: 70, budget: 309414330, impression: 20145085, cpm: 15359, view6s: 4442872, cpv: 70, vr: "22,05%", reach: 7910380, pool: 28870000, pctPool: "27,40%", freq: 2.547 }
-    },
-    {
-      id: "ax",
-      name: "Aji-Xốt (AX)",
-      tag: "Aji-Xốt",
-      icon: "🥗",
-      color: "#D97706",
-      bgColor: "#FEF3C7",
-      borderColor: "#FCD34D",
-      targetAudience: {
-        core: "Nữ 25 – 45 tuổi",
-        sub: "",
-        socialClass: "Class ABC",
-        location: "Focus Province 60% & Potential Province 40%",
-        notes: "Người trẻ, nội trợ hiện đại thích món ăn nhanh, tiện lợi hoặc eat-clean"
-      },
-      phases: [
-        { name: "Plan", time: "Jun - Aug'26", budget: 84782609 },
-        { name: "Execution (Jul-Aug)", time: "Jul - Aug'26", budget: 26167757 }
-      ],
-      kolAllocation: "12 – 13 KOLs (9 – 10 KOL Focus Province 60% + 3 KOL Potential Province 40%)",
-      kolCriteria: [
-        "Food creators trẻ, người yêu thích nấu ăn healthy / eat-clean / món ăn tiện lợi",
-        "Có gu ẩm thực hiện đại, thích biến tấu salad, đồ nướng, gỏi cuốn",
-        "Phân bổ: 9–10 KOL Focus Province (60%) + 3 KOL Potential Province (40%)"
-      ],
-      skus: [
-        { name: "Xốt mè rang “Aji-Xốt”", type: "Chính", desc: "Món chủ đạo cho Salad, đồ nướng, gỏi cuốn, chấm trực tiếp" },
-        { name: "Xốt phô mai cay “Aji-Xốt”", type: "Phụ", desc: "Chấm gà rán, đồ chiên giòn, món cay béo ngậy" },
-        { name: "Xốt phô mai Caesar “Aji-Xốt”", type: "Phụ", desc: "Salad phương Tây, bánh mì kẹp, pasta" },
-        { name: "Xốt phô mai hương trứng muối “Aji-Xốt”", type: "Phụ", desc: "Món xào, sốt chấm hải sản, món ăn vặt béo thơm" }
-      ],
-      creativeContext: "Tiện lợi, 'bật nắp là ngon', biến tấu món ăn phong cách nhà hàng ngay tại bếp nhà.",
-      kpis: [
-        { phase: "Jul - Aug'26", geo: "Focus Province 60% (9-10 KOL)", unitCost: 85, budget: 20934206, impression: 1121125, cpm: 18673, view6s: 246285, cpv: 85, vr: "21,97%", reach: 1808080, pool: 22601000, pctPool: "8,00%", freq: 0.62 },
-        { phase: "Jul - Aug'26", geo: "Potential Province 40% (3 KOL)", unitCost: 85, budget: 5233551, impression: 276688, cpm: 18915, view6s: 61571, cpv: 85, vr: "22,25%", reach: 1066070, pool: 6271000, pctPool: "17,00%", freq: 0.26 }
-      ],
-      totalKpi: { unitCost: 85, budget: 26167757, impression: 1397813, cpm: 18721, view6s: 307856, cpv: 85, vr: "22,02%", reach: 2874150, pool: 28872000, pctPool: "9,95%", freq: 0.486 }
-    },
-    {
-      id: "am",
-      name: "Aji-Mayo (AM)",
-      tag: "Aji-Mayo",
-      icon: "🥪",
-      color: "#059669",
-      bgColor: "#ECFDF5",
-      borderColor: "#A7F3D0",
-      targetAudience: {
-        core: "Nữ 25 – 45 tuổi",
-        sub: "",
-        socialClass: "Class ABC, Toàn quốc (Nationwide)",
-        location: "Khu vực Đô thị (Urban ~90%) & Nông thôn / Ngoại ô (Rural ~10%)",
-        notes: "Mẹ có con nhỏ & Phụ nữ độc thân/chưa có con"
-      },
-      phases: [
-        { name: "Plan Phase 1", time: "Jun - Aug'26", budget: 135652174 },
-        { name: "Plan Phase 2", time: "Dec'26 - Jan'27", budget: 203478261 }
-      ],
-      kolAllocation: "10 – 12 KOLs (Phase 1: 8–10 KOL Urban 90% + 1–2 KOL Rural 10%)",
-      groupsContext: [
-        {
-          group: "Group 1: Moms with kids (Mẹ có con)",
-          context: "Bối cảnh tập trung vào gia đình & trẻ nhỏ. Món ăn kích thích bé ăn rau củ, chấm sốt béo thơm, tạo hình món ăn hấp dẫn."
-        },
-        {
-          group: "Group 2: Females without kids (Nữ chưa con)",
-          context: "Không gian sáng tạo mở rộng, tươi mới, món ăn trendy, lifestyle cá nhân, món ăn nhanh, bánh mì, sandwich, snack tiện lợi."
-        },
-        {
-          group: "Group Sub-urban & Rural (Nông thôn / Ngoại ô)",
-          context: "Bối cảnh gia đình ấm cúng, món ăn trẻ em yêu thích, gia tăng điểm chạm kích cầu tiêu dùng thực tế."
-        }
-      ],
-      skus: [
-        { name: "Xốt Mayonnaise Aji-mayo® Vị Nguyên Bản", type: "Chính", desc: "Vị béo ngậy chua ngọt hài hòa chuẩn công thức Nhật" },
-        { name: "Xốt Mayonnaise Aji-mayo® Giảm 30% Chất Béo", type: "Chính", desc: "Dành cho người ăn kiêng, thanh nhẹ, giữ dáng" }
-      ],
-      creativeContext: "Chấm mọi món chiên/nướng/hấp, trộn salad giòn ngọt béo mịn, trang trí món ăn sinh động.",
-      kpis: [
-        { phase: "Phase 1 (Jul - Aug)", geo: "Urban 90% (8-10 KOL)", unitCost: 75, budget: 113626957, impression: 6629344, cpm: 17140, view6s: 1515026, cpv: 75, vr: "22,85%", reach: 3563750, pool: 14255000, pctPool: "25,00%", freq: 1.86 },
-        { phase: "Phase 1 (Jul - Aug)", geo: "Rural 10% (1-2 KOL)", unitCost: 80, budget: 12625217, impression: 701596, cpm: 17995, view6s: 157815, cpv: 80, vr: "22,49%", reach: 1516200, pool: 4332000, pctPool: "35,00%", freq: 0.46 }
-      ],
-      totalKpi: { unitCost: 75, budget: 126252174, impression: 7330940, cpm: 17222, view6s: 1672841, cpv: 75, vr: "22,82%", reach: 5079950, pool: 18587000, pctPool: "27,33%", freq: 1.44 }
-    },
-    {
-      id: "vinegar",
-      name: "Giấm (Vinegar)",
-      tag: "Giấm",
-      icon: "🍶",
-      color: "#7C3AED",
-      bgColor: "#F5F3FF",
-      borderColor: "#DDD6FE",
-      targetAudience: {
-        core: "Nữ 26 – 35 tuổi",
-        sub: "",
-        socialClass: "Class ABC, đã kết hôn",
-        location: "4 Key Cities 60% (HN, ĐN, HCM, Cần Thơ) + Other Provinces 40% (Nghệ An, HP, Hải Dương, Thanh Hóa, Đắk Lắk, Đồng Nai, Kiên Giang). Ratio: 60% Miền Bắc & 40% miền khác",
-        notes: "Nội trợ quan tâm sức khỏe, vệ sinh an toàn thực phẩm (Health & Hygiene concerns)"
-      },
-      phases: [
-        { name: "Plan", time: "Jun - Jul'26", budget: 84782609 },
-        { name: "Execution (Jul'26)", time: "Jul'26", budget: 38513044 }
-      ],
-      kolAllocation: "9 – 10 KOLs (60% Key Cities + 40% Other Provinces)",
-      kolCriteria: [
-        "KOL/KOC nội trợ am hiểu ẩm thực truyền thống, khéo tay, quan tâm nguồn gốc tự nhiên",
-        "Vị trí: Ưu tiên 60% Miền Bắc & 40% các tỉnh còn lại",
-        "Nội dung chia sẻ mẹo nấu món thanh mát giải nhiệt, món gỏi nộm giòn chua dịu, tốt cho tiêu hóa"
-      ],
-      skus: [
-        { name: "AJINOMOTO® Giấm gạo lên men", type: "Chính", desc: "Lên men tự nhiên, chua thanh dịu cho các món nộm rau muống, nộm hoa chuối, ngâm chua ngọt" },
-        { name: "AJINOMOTO® Giấm táo lên men", type: "Chính", desc: "Lên men từ táo tự nhiên, thơm dịu, làm mì lạnh, bún bò nhúng giấm, nước sốt healthy" }
-      ],
-      creativeContext: "Vị chua thanh mát lành, bí quyết món gỏi nộm giòn ngon không gắt và các món giải nhiệt mùa hè.",
-      kpis: [
-        { phase: "Jul'26", geo: "Key Cities 60% (9 KOL)", unitCost: 85, budget: 30810435, impression: 1641035, cpm: 18775, view6s: 362476, cpv: 85, vr: "22,09%", reach: 2350000, pool: 3834000, pctPool: "61,29%", freq: 0.70 },
-        { phase: "Jul'26", geo: "Other 40%", unitCost: 85, budget: 7702609, impression: 406042, cpm: 18970, view6s: 90619, cpv: 85, vr: "22,32%", reach: 990000, pool: 1061000, pctPool: "93,31%", freq: 0.41 }
-      ],
-      totalKpi: { unitCost: 85, budget: 38513044, impression: 1641035, cpm: 23469, view6s: 453095, cpv: 85, vr: "27,61%", reach: 3340000, pool: 4895000, pctPool: "68,23%", freq: 0.491 }
-    }
-  ]
-};
+const LS_PLAN_KEY = "kol_uploaded_plan_data";
 
 const PlanView = () => {
+  const [planData, setPlanData] = useState(() => {
+    try {
+      const saved = localStorage.getItem(LS_PLAN_KEY);
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
   const [selectedBrand, setSelectedBrand] = useState("all");
+  const fileInputRef = useRef(null);
 
   const formatVnd = (num) => {
     if (!num || isNaN(num)) return "0 ₫";
@@ -4725,59 +4569,273 @@ const PlanView = () => {
     return Number(num).toLocaleString("vi-VN");
   };
 
-  const brandsList = MEDIA_PLAN_DATA?.brands || [];
-  const planSummary = MEDIA_PLAN_DATA?.summary || {};
+  // Helper to parse uploaded Excel / CSV file
+  const parsePlanFile = (file) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const firstSheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[firstSheetName];
+        const rawJson = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
-  const handleExportPlan = () => {
-    try {
-      const exportRows = [];
-      brandsList.forEach(brand => {
-        (brand.kpis || []).forEach(k => {
-          exportRows.push({
-            "Chiến dịch (Brand)": brand.name || "",
-            "Giai đoạn (Phase)": k.phase || "",
-            "Khu vực (Geo)": k.geo || "",
-            "Đơn giá (CPV 6s)": k.unitCost || 0,
-            "Ngân sách (Budget)": k.budget || 0,
-            "Hiển thị (Impression)": k.impression || 0,
-            "CPM (VNĐ)": k.cpm || 0,
-            "6s Focused Views": k.view6s || 0,
-            "Tỷ lệ xem (VR)": k.vr || "",
-            "Unique Reach": k.reach || 0,
-            "Target Pool": k.pool || 0,
-            "% Pool Reach": k.pctPool || "",
-            "Tần suất (Frequency)": k.freq || 0
-          });
-        });
-        if (brand.totalKpi) {
-          exportRows.push({
-            "Chiến dịch (Brand)": (brand.name || "") + " (TỔNG)",
-            "Giai đoạn (Phase)": "Tổng cộng",
-            "Khu vực (Geo)": "Toàn chiến dịch",
-            "Đơn giá (CPV 6s)": brand.totalKpi.unitCost || 0,
-            "Ngân sách (Budget)": brand.totalKpi.budget || 0,
-            "Hiển thị (Impression)": brand.totalKpi.impression || 0,
-            "CPM (VNĐ)": brand.totalKpi.cpm || 0,
-            "6s Focused Views": brand.totalKpi.view6s || 0,
-            "Tỷ lệ xem (VR)": brand.totalKpi.vr || "",
-            "Unique Reach": brand.totalKpi.reach || 0,
-            "Target Pool": brand.totalKpi.pool || 0,
-            "% Pool Reach": brand.totalKpi.pctPool || "",
-            "Tần suất (Frequency)": brand.totalKpi.freq || 0
-          });
+        if (!rawJson || rawJson.length === 0) {
+          window.alert("File Excel trống hoặc không có dữ liệu hợp lệ.");
+          return;
         }
-      });
 
-      const ws = XLSX.utils.json_to_sheet(exportRows);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Media Plan FY26");
-      XLSX.writeFile(wb, `TCV_Media_Plan_FY26_${new Date().toISOString().slice(0, 10)}.xlsx`);
-    } catch (err) {
-      console.error("Export plan error:", err);
-      window.alert("Không thể xuất file Excel Media Plan.");
+        // Group rows by Brand / Chiến dịch
+        const brandMap = {};
+        let totalBudget = 0;
+        let totalImpression = 0;
+        let total6sViews = 0;
+
+        rawJson.forEach((row, idx) => {
+          // Normalize column names
+          const keys = Object.keys(row);
+          const findVal = (patterns) => {
+            for (const p of patterns) {
+              const k = keys.find(key => key.toLowerCase().trim().includes(p));
+              if (k) return row[k];
+            }
+            return "";
+          };
+
+          const brandName = findVal(["chiến dịch", "brand", "campaign", "nhãn hàng", "tên brand"]) || `Chiến dịch ${idx + 1}`;
+          // Ignore overall summary rows if present in raw
+          if (brandName.toLowerCase().includes("tổng cộng") || brandName.toLowerCase().includes("(tổng)")) return;
+
+          const phase = findVal(["giai đoạn", "phase", "thời gian", "tháng", "time"]) || "Phase 1";
+          const geo = findVal(["khu vực", "geo", "địa bàn", "tỉnh", "thành phố", "location"]) || "Toàn quốc";
+          const unitCost = Number(String(findVal(["đơn giá", "unit cost", "cpv 6s", "cpv"]) || 0).replace(/[^\d]/g, "")) || 0;
+          const budget = Number(String(findVal(["ngân sách", "budget", "chi phí", "cost"]) || 0).replace(/[^\d]/g, "")) || 0;
+          const impression = Number(String(findVal(["hiển thị", "impression", "imp"]) || 0).replace(/[^\d]/g, "")) || 0;
+          const cpm = Number(String(findVal(["cpm"]) || 0).replace(/[^\d]/g, "")) || 0;
+          const view6s = Number(String(findVal(["6s focused", "6s view", "view6s", "view 6s", "views", "lượt xem"]) || 0).replace(/[^\d]/g, "")) || 0;
+          const vr = String(findVal(["tỷ lệ xem", "view rate", "vr"]) || "");
+          const reach = Number(String(findVal(["reach", "tiếp cận", "unique reach"]) || 0).replace(/[^\d]/g, "")) || 0;
+          const pool = Number(String(findVal(["pool", "target pool", "quy mô pool"]) || 0).replace(/[^\d]/g, "")) || 0;
+          const pctPool = String(findVal(["% pool", "% reach", "pool reach"]) || "");
+          const freq = Number(String(findVal(["tần suất", "freq", "frequency"]) || 0).replace(/[^\d.]/g, "")) || 0;
+
+          if (!brandMap[brandName]) {
+            brandMap[brandName] = {
+              id: `brand_${Object.keys(brandMap).length + 1}`,
+              name: brandName,
+              kpis: []
+            };
+          }
+
+          brandMap[brandName].kpis.push({
+            phase,
+            geo,
+            unitCost,
+            budget,
+            impression,
+            cpm: cpm || (impression > 0 ? Math.round((budget / impression) * 1000) : 0),
+            view6s,
+            vr: vr || (impression > 0 && view6s > 0 ? (Math.round((view6s / impression) * 10000) / 100).toFixed(2) + "%" : ""),
+            reach,
+            pool,
+            pctPool,
+            freq
+          });
+
+          totalBudget += budget;
+          totalImpression += impression;
+          total6sViews += view6s;
+        });
+
+        const brands = Object.values(brandMap).map(b => {
+          const bBudget = b.kpis.reduce((s, k) => s + (k.budget || 0), 0);
+          const bImp = b.kpis.reduce((s, k) => s + (k.impression || 0), 0);
+          const bView = b.kpis.reduce((s, k) => s + (k.view6s || 0), 0);
+          const bReach = b.kpis.reduce((s, k) => s + (k.reach || 0), 0);
+          
+          return {
+            ...b,
+            totalKpi: {
+              unitCost: bView > 0 ? Math.round(bBudget / bView) : 0,
+              budget: bBudget,
+              impression: bImp,
+              cpm: bImp > 0 ? Math.round((bBudget / bImp) * 1000) : 0,
+              view6s: bView,
+              vr: bImp > 0 ? (Math.round((bView / bImp) * 10000) / 100).toFixed(2) + "%" : "0%",
+              reach: bReach,
+              pool: 0,
+              pctPool: "",
+              freq: bReach > 0 ? (Math.round((bImp / bReach) * 100) / 100) : 0
+            }
+          };
+        });
+
+        const parsedResult = {
+          fileName: file.name,
+          uploadedAt: new Date().toISOString(),
+          summary: {
+            totalBudget,
+            totalImpression,
+            total6sViews,
+            avgCpm: totalImpression > 0 ? Math.round((totalBudget / totalImpression) * 1000) : 0,
+            avgUnitCost: total6sViews > 0 ? Math.round(totalBudget / total6sViews) : 0,
+            avgVr: totalImpression > 0 ? (Math.round((total6sViews / totalImpression) * 10000) / 100).toFixed(2) + "%" : "0%"
+          },
+          brands
+        };
+
+        setPlanData(parsedResult);
+        localStorage.setItem(LS_PLAN_KEY, JSON.stringify(parsedResult));
+      } catch (err) {
+        console.error("Failed to parse plan file:", err);
+        window.alert("Không thể đọc file Excel này. Vui lòng kiểm tra định dạng file.");
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  const handleDownloadPlanTemplate = () => {
+    const templateHeaders = [
+      "Chiến dịch (Brand)", "Giai đoạn (Phase)", "Khu vực (Geo)", "Đơn giá (CPV 6s)",
+      "Ngân sách (Budget)", "Hiển thị (Impression)", "CPM (VNĐ)", "6s Focused Views",
+      "Tỷ lệ xem (VR)", "Unique Reach", "Target Pool", "% Pool Reach", "Tần suất (Frequency)"
+    ];
+
+    const templateRows = [
+      ["Bột Ngọt", "Phase 1 (May - Jun'26)", "6 Key Cities", 65, 154707165, 10614557, 14575, 2380110, "22.42%", 6640100, 28870000, "23.00%", 1.6],
+      ["Bột Ngọt", "Phase 2 (Dec'26 - Jan'27)", "6 Key Cities", 75, 154707165, 9530529, 16233, 2062762, "21.64%", 6351400, 28870000, "22.00%", 1.5],
+      ["Aji-Xốt", "Jul - Aug'26", "Focus Province 60%", 85, 20934206, 1121125, 18673, 246285, "21.97%", 1808080, 22601000, "8.00%", 0.62],
+      ["Aji-Xốt", "Jul - Aug'26", "Potential Province 40%", 85, 5233551, 276688, 18915, 61571, "22.25%", 1066070, 6271000, "17.00%", 0.26],
+      ["Aji-Mayo", "Phase 1 (Jul - Aug)", "Urban 90%", 75, 113626957, 6629344, 17140, 1515026, "22.85%", 3563750, 14255000, "25.00%", 1.86],
+      ["Aji-Mayo", "Phase 1 (Jul - Aug)", "Rural 10%", 80, 12625217, 701596, 17995, 157815, "22.49%", 1516200, 4332000, "35.00%", 0.46],
+      ["Giấm", "Jul'26", "Key Cities 60%", 85, 30810435, 1641035, 18775, 362476, "22.09%", 2350000, 3834000, "61.29%", 0.7],
+      ["Giấm", "Jul'26", "Other 40%", 85, 7702609, 406042, 18970, 90619, "22.32%", 990000, 1061000, "93.31%", 0.41]
+    ];
+
+    const ws = XLSX.utils.aoa_to_sheet([templateHeaders, ...templateRows]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Media Plan");
+    XLSX.writeFile(wb, "Mau_Ke_Hoach_Media_Plan.xlsx");
+  };
+
+  const handleExportCurrentPlan = () => {
+    if (!planData || !planData.brands) return;
+    const exportRows = [];
+    planData.brands.forEach(brand => {
+      (brand.kpis || []).forEach(k => {
+        exportRows.push({
+          "Chiến dịch (Brand)": brand.name,
+          "Giai đoạn (Phase)": k.phase,
+          "Khu vực (Geo)": k.geo,
+          "Đơn giá (CPV 6s)": k.unitCost,
+          "Ngân sách (Budget)": k.budget,
+          "Hiển thị (Impression)": k.impression,
+          "CPM (VNĐ)": k.cpm,
+          "6s Focused Views": k.view6s,
+          "Tỷ lệ xem (VR)": k.vr,
+          "Unique Reach": k.reach,
+          "Target Pool": k.pool,
+          "% Pool Reach": k.pctPool,
+          "Tần suất (Frequency)": k.freq
+        });
+      });
+      if (brand.totalKpi) {
+        exportRows.push({
+          "Chiến dịch (Brand)": brand.name + " (TỔNG)",
+          "Giai đoạn (Phase)": "Tổng cộng",
+          "Khu vực (Geo)": "Toàn chiến dịch",
+          "Đơn giá (CPV 6s)": brand.totalKpi.unitCost,
+          "Ngân sách (Budget)": brand.totalKpi.budget,
+          "Hiển thị (Impression)": brand.totalKpi.impression,
+          "CPM (VNĐ)": brand.totalKpi.cpm,
+          "6s Focused Views": brand.totalKpi.view6s,
+          "Tỷ lệ xem (VR)": brand.totalKpi.vr,
+          "Unique Reach": brand.totalKpi.reach,
+          "Target Pool": brand.totalKpi.pool,
+          "% Pool Reach": brand.totalKpi.pctPool,
+          "Tần suất (Frequency)": brand.totalKpi.freq
+        });
+      }
+    });
+
+    const ws = XLSX.utils.json_to_sheet(exportRows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Media Plan");
+    XLSX.writeFile(wb, `Media_Plan_Export_${new Date().toISOString().slice(0, 10)}.xlsx`);
+  };
+
+  const handleClearPlan = () => {
+    if (window.confirm("Bạn có chắc muốn xóa dữ liệu kế hoạch đã tải lên?")) {
+      setPlanData(null);
+      localStorage.removeItem(LS_PLAN_KEY);
+      setSelectedBrand("all");
     }
   };
 
+  // ── EMPTY STATE (NO FILE UPLOADED) ──
+  if (!planData || !planData.brands || planData.brands.length === 0) {
+    return (
+      <div style={{ flex: 1, padding: "30px 20px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--card)" }}>
+        <input 
+          type="file" 
+          ref={fileInputRef} 
+          accept=".xlsx, .xls, .csv" 
+          style={{ display: "none" }} 
+          onChange={e => e.target.files?.[0] && parsePlanFile(e.target.files[0])} 
+        />
+
+        <div 
+          onDragOver={e => e.preventDefault()}
+          onDrop={e => {
+            e.preventDefault();
+            if (e.dataTransfer.files?.[0]) parsePlanFile(e.dataTransfer.files[0]);
+          }}
+          style={{
+            maxWidth: 520,
+            width: "100%",
+            border: "2px dashed var(--rule)",
+            borderRadius: 16,
+            padding: "36px 28px",
+            textAlign: "center",
+            background: "var(--paper)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 12
+          }}
+        >
+          <div style={{ fontSize: 36 }}>📋</div>
+          <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "var(--ink)" }}>
+            Chưa có Kế hoạch Media nào được tải lên
+          </h3>
+          <p style={{ margin: 0, fontSize: 12, color: "var(--ink-soft)", lineHeight: 1.5 }}>
+            Kéo thả hoặc bấm nút bên dưới để tải lên file Excel (.xlsx / .csv) chứa bảng kế hoạch phân bổ Media & KPIs.
+          </p>
+
+          <div style={{ display: "flex", gap: 10, marginTop: 10, flexWrap: "wrap", justifyContent: "center" }}>
+            <button 
+              onClick={() => fileInputRef.current?.click()}
+              className="kt-btn kt-btn-primary"
+              style={{ padding: "8px 16px", fontSize: 12, borderRadius: 12, fontWeight: 700 }}
+            >
+              📥 Chọn file Excel Kế hoạch (.xlsx)
+            </button>
+
+            <button 
+              onClick={handleDownloadPlanTemplate}
+              className="kt-btn kt-btn-ghost"
+              style={{ padding: "8px 16px", fontSize: 12, borderRadius: 12, border: "1px solid var(--line)" }}
+            >
+              📄 Tải file Kế hoạch mẫu
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const brandsList = planData.brands || [];
+  const planSummary = planData.summary || {};
   const filteredBrands = selectedBrand === "all" 
     ? brandsList 
     : brandsList.filter(b => b.id === selectedBrand);
@@ -4785,41 +4843,51 @@ const PlanView = () => {
   return (
     <div className="kt-scrollbar" style={{ flex: 1, overflowY: "auto", padding: "16px 20px", display: "flex", flexDirection: "column", gap: 16, background: "var(--card)" }}>
       
-      {/* ── TOP HEADER & EXPORT ── */}
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        accept=".xlsx, .xls, .csv" 
+        style={{ display: "none" }} 
+        onChange={e => e.target.files?.[0] && parsePlanFile(e.target.files[0])} 
+      />
+
+      {/* ── TOP HEADER & ACTIONS ── */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, borderBottom: "1px solid var(--line)", paddingBottom: 12 }}>
         <div>
           <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "var(--ink)", display: "flex", alignItems: "center", gap: 8 }}>
-            <span>📋</span> Kế hoạch & Định hướng Target KOL (FY26)
+            <span>📋</span> Kế hoạch & Phân bổ Media
           </h2>
           <div style={{ fontSize: 11.5, color: "var(--ink-soft)", marginTop: 3 }}>
-            Chiến lược Target Audience, Tiêu chí chọn KOL, SKU định hướng và Bảng phân bổ Media KPIs cho 4 Brand.
+            Dữ liệu từ file: <strong>{planData.fileName || "Media_Plan.xlsx"}</strong> ({brandsList.length} Chiến dịch)
           </div>
         </div>
 
-        <button 
-          onClick={handleExportPlan}
-          className="kt-btn kt-btn-ghost"
-          style={{
-            padding: "6px 12px",
-            fontSize: 11.5,
-            fontWeight: 600,
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            borderRadius: 14,
-            border: "1px solid var(--line)"
-          }}
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <polyline points="7 10 12 15 17 10" />
-            <line x1="12" y1="15" x2="12" y2="3" />
-          </svg>
-          Xuất Excel Media Plan
-        </button>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <button 
+            onClick={() => fileInputRef.current?.click()}
+            className="kt-btn kt-btn-ghost"
+            style={{ padding: "6px 12px", fontSize: 11.5, borderRadius: 12, border: "1px solid var(--line)" }}
+          >
+            📥 Tải file khác
+          </button>
+          <button 
+            onClick={handleExportCurrentPlan}
+            className="kt-btn kt-btn-ghost"
+            style={{ padding: "6px 12px", fontSize: 11.5, borderRadius: 12, border: "1px solid var(--line)" }}
+          >
+            Xuất Excel
+          </button>
+          <button 
+            onClick={handleClearPlan}
+            className="kt-btn kt-btn-ghost"
+            style={{ padding: "6px 12px", fontSize: 11.5, borderRadius: 12, border: "1px solid var(--danger)", color: "var(--danger)" }}
+          >
+            🗑️ Xóa
+          </button>
+        </div>
       </div>
 
-      {/* ── TOP 4 SUMMARY STATS (MINIMAL CARDS) ── */}
+      {/* ── TOP 4 SUMMARY STATS ── */}
       <div style={{
         display: "grid",
         gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
@@ -4828,25 +4896,25 @@ const PlanView = () => {
         <div style={{ background: "var(--paper)", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--line)" }}>
           <div style={{ fontSize: 10.5, color: "var(--ink-soft)", fontWeight: 600, textTransform: "uppercase" }}>💰 Tổng Ngân Sách Plan</div>
           <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)", marginTop: 3 }}>{formatVnd(planSummary.totalBudget)}</div>
-          <div style={{ fontSize: 10, color: "var(--ink-soft)", marginTop: 2 }}>4 Chiến dịch trọng điểm</div>
+          <div style={{ fontSize: 10, color: "var(--ink-soft)", marginTop: 2 }}>{brandsList.length} Chiến dịch</div>
         </div>
 
         <div style={{ background: "var(--paper)", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--line)" }}>
           <div style={{ fontSize: 10.5, color: "var(--ink-soft)", fontWeight: 600, textTransform: "uppercase" }}>👁️ Mục Tiêu 6s Views</div>
           <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)", marginTop: 3 }}>{formatNumber(planSummary.total6sViews)}</div>
-          <div style={{ fontSize: 10, color: "var(--ink-soft)", marginTop: 2 }}>CPView TB: ~{planSummary.avgUnitCost || 73} ₫</div>
+          <div style={{ fontSize: 10, color: "var(--ink-soft)", marginTop: 2 }}>CPView TB: ~{planSummary.avgUnitCost || 0} ₫</div>
         </div>
 
         <div style={{ background: "var(--paper)", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--line)" }}>
           <div style={{ fontSize: 10.5, color: "var(--ink-soft)", fontWeight: 600, textTransform: "uppercase" }}>📢 Tổng Impressions</div>
           <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)", marginTop: 3 }}>{formatNumber(planSummary.totalImpression)}</div>
-          <div style={{ fontSize: 10, color: "var(--ink-soft)", marginTop: 2 }}>CPM TB: {formatNumber(planSummary.avgCpm)} ₫</div>
+          <div style={{ fontSize: 10, color: "var(--ink-soft)", marginTop: 2 }}>CPM TB: {formatNumber(planSummary.avgCpm || 0)} ₫</div>
         </div>
 
         <div style={{ background: "var(--paper)", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--line)" }}>
-          <div style={{ fontSize: 10.5, color: "var(--ink-soft)", fontWeight: 600, textTransform: "uppercase" }}>👥 Quy Mô KOL / View Rate</div>
-          <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)", marginTop: 3 }}>{planSummary.totalKolsRange || "35 – 40 KOLs"}</div>
-          <div style={{ fontSize: 10, color: "var(--ink-soft)", marginTop: 2 }}>VR trung bình: {planSummary.avgVr || "22,54%"}</div>
+          <div style={{ fontSize: 10.5, color: "var(--ink-soft)", fontWeight: 600, textTransform: "uppercase" }}>📊 View Rate Trung Bình</div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)", marginTop: 3 }}>{planSummary.avgVr || "0%"}</div>
+          <div style={{ fontSize: 10, color: "var(--ink-soft)", marginTop: 2 }}>Tỷ lệ xem 6s/Impression</div>
         </div>
       </div>
 
@@ -4855,14 +4923,9 @@ const PlanView = () => {
         <button
           onClick={() => setSelectedBrand("all")}
           className={`kt-btn ${selectedBrand === "all" ? "kt-btn-primary" : "kt-btn-ghost"}`}
-          style={{
-            padding: "4px 12px",
-            borderRadius: 14,
-            fontSize: 11,
-            fontWeight: 600
-          }}
+          style={{ padding: "4px 12px", borderRadius: 14, fontSize: 11, fontWeight: 600 }}
         >
-          Tất cả Brand ({brandsList.length})
+          Tất cả ({brandsList.length})
         </button>
 
         {brandsList.map(b => {
@@ -4872,24 +4935,15 @@ const PlanView = () => {
               key={b.id}
               onClick={() => setSelectedBrand(b.id)}
               className={`kt-btn ${isSelected ? "kt-btn-primary" : "kt-btn-ghost"}`}
-              style={{
-                padding: "4px 12px",
-                borderRadius: 14,
-                fontSize: 11,
-                fontWeight: 600,
-                display: "flex",
-                alignItems: "center",
-                gap: 5
-              }}
+              style={{ padding: "4px 12px", borderRadius: 14, fontSize: 11, fontWeight: 600 }}
             >
-              <span>{b.icon}</span>
-              <span>{b.name}</span>
+              {b.name}
             </button>
           );
         })}
       </div>
 
-      {/* ── BRAND CARDS LIST ── */}
+      {/* ── BRAND TABLES ── */}
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         {filteredBrands.map(brand => (
           <div
@@ -4901,7 +4955,6 @@ const PlanView = () => {
               overflow: "hidden"
             }}
           >
-            {/* Header */}
             <div style={{
               padding: "10px 16px",
               background: "var(--paper)",
@@ -4912,14 +4965,8 @@ const PlanView = () => {
               flexWrap: "wrap",
               gap: 8
             }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 18 }}>{brand.icon}</span>
-                <span style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>{brand.name}</span>
-                {brand.kolAllocation && (
-                  <span style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 500 }}>
-                    • {brand.kolAllocation}
-                  </span>
-                )}
+              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>
+                {brand.name}
               </div>
 
               {brand.totalKpi && (
@@ -4929,132 +4976,55 @@ const PlanView = () => {
               )}
             </div>
 
-            {/* Content Body Grid */}
-            <div style={{ padding: "14px 16px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 }}>
-              
-              {/* Target Audience */}
-              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>
-                  🎯 Target Audience & Địa bàn
-                </div>
-
-                <div style={{ background: "var(--paper)", padding: "10px 12px", borderRadius: 8, fontSize: 11, display: "flex", flexDirection: "column", gap: 4, lineHeight: 1.4 }}>
-                  <div><strong>Độ tuổi: </strong>{brand.targetAudience?.core || "—"} {brand.targetAudience?.sub && `(${brand.targetAudience.sub})`}</div>
-                  <div><strong>Phân khúc: </strong>{brand.targetAudience?.socialClass || "—"}</div>
-                  <div><strong>Địa bàn: </strong>{brand.targetAudience?.location || "—"}</div>
-                  {brand.targetAudience?.notes && (
-                    <div style={{ color: "var(--ink-soft)", borderTop: "1px dashed var(--line)", paddingTop: 4, marginTop: 2, fontStyle: "italic" }}>
-                      💡 {brand.targetAudience.notes}
-                    </div>
-                  )}
-                </div>
-
-                {brand.groupsContext && Array.isArray(brand.groupsContext) && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 4, marginTop: 2 }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: "var(--ink-soft)" }}>PHÂN NHÓM BỐI CẢNH (GROUP CONTEXT):</div>
-                    {brand.groupsContext.map((g, idx) => (
-                      <div key={idx} style={{ background: "var(--paper)", padding: "6px 10px", borderRadius: 6, fontSize: 10.5 }}>
-                        <strong>{g.group}: </strong><span style={{ color: "var(--ink-soft)" }}>{g.context}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Criteria & SKUs */}
-              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>
-                  ⭐ Tiêu chí chọn KOL & SKU Định hướng
-                </div>
-
-                <div style={{ background: "var(--paper)", padding: "10px 12px", borderRadius: 8, fontSize: 11 }}>
-                  <div style={{ fontWeight: 700, color: "var(--ink-soft)", marginBottom: 4, fontSize: 10 }}>TIÊU CHÍ CHỌN KOL:</div>
-                  <ul style={{ margin: 0, paddingLeft: 16, display: "flex", flexDirection: "column", gap: 3 }}>
-                    {(brand.kolCriteria || []).map((c, idx) => (
-                      <li key={idx}><span>{c}</span></li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: "var(--ink-soft)" }}>DANH MỤC SKU:</div>
-                  {(brand.skus || []).map((sku, idx) => (
-                    <div key={idx} style={{ background: "var(--paper)", padding: "6px 10px", borderRadius: 6, fontSize: 10.5, display: "flex", alignItems: "center", gap: 6 }}>
-                      <span style={{
-                        padding: "1px 5px",
-                        borderRadius: 4,
-                        fontSize: 9,
-                        fontWeight: 700,
-                        backgroundColor: sku.type === "Chính" ? "var(--accent)" : "var(--line)",
-                        color: sku.type === "Chính" ? "white" : "var(--ink-mid)"
-                      }}>
-                        {sku.type}
-                      </span>
-                      <strong>{sku.name}: </strong>
-                      <span style={{ color: "var(--ink-soft)" }}>{sku.desc}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-            </div>
-
-            {/* Media KPIs Table */}
-            <div style={{ padding: "0 16px 14px 16px" }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", marginBottom: 6 }}>
-                📊 Bảng Phân Bổ KPIs Media
-              </div>
-
-              <div style={{ border: "1px solid var(--line)", borderRadius: 8, overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 10.5, textAlign: "left" }}>
-                  <thead>
-                    <tr style={{ background: "var(--paper)", borderBottom: "1px solid var(--line)", color: "var(--ink-soft)" }}>
-                      <th style={{ padding: "6px 10px" }}>Phase / Thời gian</th>
-                      <th style={{ padding: "6px 10px" }}>Khu vực (Geo)</th>
-                      <th style={{ padding: "6px 10px", textAlign: "right" }}>CPV 6s</th>
-                      <th style={{ padding: "6px 10px", textAlign: "right" }}>Ngân sách (VNĐ)</th>
-                      <th style={{ padding: "6px 10px", textAlign: "right" }}>Impression</th>
-                      <th style={{ padding: "6px 10px", textAlign: "right" }}>CPM</th>
-                      <th style={{ padding: "6px 10px", textAlign: "right" }}>6s Views</th>
-                      <th style={{ padding: "6px 10px", textAlign: "right" }}>VR</th>
-                      <th style={{ padding: "6px 10px", textAlign: "right" }}>Reach</th>
-                      <th style={{ padding: "6px 10px", textAlign: "right" }}>% Pool</th>
-                      <th style={{ padding: "6px 10px", textAlign: "right" }}>Freq</th>
+            <div style={{ padding: "12px 16px", overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 10.5, textAlign: "left" }}>
+                <thead>
+                  <tr style={{ background: "var(--paper)", borderBottom: "1px solid var(--line)", color: "var(--ink-soft)" }}>
+                    <th style={{ padding: "6px 10px" }}>Phase / Thời gian</th>
+                    <th style={{ padding: "6px 10px" }}>Khu vực (Geo)</th>
+                    <th style={{ padding: "6px 10px", textAlign: "right" }}>CPV 6s</th>
+                    <th style={{ padding: "6px 10px", textAlign: "right" }}>Ngân sách (VNĐ)</th>
+                    <th style={{ padding: "6px 10px", textAlign: "right" }}>Impression</th>
+                    <th style={{ padding: "6px 10px", textAlign: "right" }}>CPM</th>
+                    <th style={{ padding: "6px 10px", textAlign: "right" }}>6s Views</th>
+                    <th style={{ padding: "6px 10px", textAlign: "right" }}>VR</th>
+                    <th style={{ padding: "6px 10px", textAlign: "right" }}>Reach</th>
+                    <th style={{ padding: "6px 10px", textAlign: "right" }}>% Pool</th>
+                    <th style={{ padding: "6px 10px", textAlign: "right" }}>Freq</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(brand.kpis || []).map((k, idx) => (
+                    <tr key={idx} style={{ borderBottom: "1px solid var(--line)" }}>
+                      <td style={{ padding: "6px 10px", fontWeight: 600, color: "var(--ink)" }}>{k.phase}</td>
+                      <td style={{ padding: "6px 10px", color: "var(--ink-mid)" }}>{k.geo}</td>
+                      <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{k.unitCost ? `${k.unitCost} ₫` : "—"}</td>
+                      <td style={{ padding: "6px 10px", textAlign: "right", fontWeight: 600, color: "var(--ink)", fontFamily: "var(--kt-mono)" }}>{formatNumber(k.budget)} ₫</td>
+                      <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(k.impression)}</td>
+                      <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(k.cpm)} ₫</td>
+                      <td style={{ padding: "6px 10px", textAlign: "right", fontWeight: 600, color: "var(--ink)", fontFamily: "var(--kt-mono)" }}>{formatNumber(k.view6s)}</td>
+                      <td style={{ padding: "6px 10px", textAlign: "right", color: "var(--ok)", fontFamily: "var(--kt-mono)" }}>{k.vr || "—"}</td>
+                      <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(k.reach)}</td>
+                      <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{k.pctPool || "—"}</td>
+                      <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{k.freq || "—"}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {(brand.kpis || []).map((k, idx) => (
-                      <tr key={idx} style={{ borderBottom: "1px solid var(--line)" }}>
-                        <td style={{ padding: "6px 10px", fontWeight: 600, color: "var(--ink)" }}>{k.phase}</td>
-                        <td style={{ padding: "6px 10px", color: "var(--ink-mid)" }}>{k.geo}</td>
-                        <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{k.unitCost} ₫</td>
-                        <td style={{ padding: "6px 10px", textAlign: "right", fontWeight: 600, color: "var(--ink)", fontFamily: "var(--kt-mono)" }}>{formatNumber(k.budget)} ₫</td>
-                        <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(k.impression)}</td>
-                        <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(k.cpm)} ₫</td>
-                        <td style={{ padding: "6px 10px", textAlign: "right", fontWeight: 600, color: "var(--ink)", fontFamily: "var(--kt-mono)" }}>{formatNumber(k.view6s)}</td>
-                        <td style={{ padding: "6px 10px", textAlign: "right", color: "var(--ok)", fontFamily: "var(--kt-mono)" }}>{k.vr}</td>
-                        <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(k.reach)}</td>
-                        <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{k.pctPool}</td>
-                        <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{k.freq}</td>
-                      </tr>
-                    ))}
-                    {brand.totalKpi && (
-                      <tr style={{ background: "var(--paper)", fontWeight: 700 }}>
-                        <td style={{ padding: "6px 10px", color: "var(--ink)" }} colSpan={2}>TỔNG CỘNG ({brand.tag})</td>
-                        <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{brand.totalKpi.unitCost} ₫</td>
-                        <td style={{ padding: "6px 10px", textAlign: "right", color: "var(--accent)", fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.budget)} ₫</td>
-                        <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.impression)}</td>
-                        <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.cpm)} ₫</td>
-                        <td style={{ padding: "6px 10px", textAlign: "right", color: "var(--ink)", fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.view6s)}</td>
-                        <td style={{ padding: "6px 10px", textAlign: "right", color: "var(--ok)", fontFamily: "var(--kt-mono)" }}>{brand.totalKpi.vr}</td>
-                        <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.reach)}</td>
-                        <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{brand.totalKpi.pctPool}</td>
-                        <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{brand.totalKpi.freq}</td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                  ))}
+                  {brand.totalKpi && (
+                    <tr style={{ background: "var(--paper)", fontWeight: 700 }}>
+                      <td style={{ padding: "6px 10px", color: "var(--ink)" }} colSpan={2}>TỔNG CỘNG ({brand.name})</td>
+                      <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{brand.totalKpi.unitCost ? `${brand.totalKpi.unitCost} ₫` : "—"}</td>
+                      <td style={{ padding: "6px 10px", textAlign: "right", color: "var(--accent)", fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.budget)} ₫</td>
+                      <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.impression)}</td>
+                      <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.cpm)} ₫</td>
+                      <td style={{ padding: "6px 10px", textAlign: "right", color: "var(--ink)", fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.view6s)}</td>
+                      <td style={{ padding: "6px 10px", textAlign: "right", color: "var(--ok)", fontFamily: "var(--kt-mono)" }}>{brand.totalKpi.vr || "—"}</td>
+                      <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{formatNumber(brand.totalKpi.reach)}</td>
+                      <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>—</td>
+                      <td style={{ padding: "6px 10px", textAlign: "right", fontFamily: "var(--kt-mono)" }}>{brand.totalKpi.freq || "—"}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
 
           </div>
