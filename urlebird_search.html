@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Search </title>
+
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="description" content="Search ">
+		<meta name="keywords" content="tiktok search, tiktok lookup, tiktok finder, tiktok search viewer">
+
+		<link rel="manifest" href="https://urlebird.com/manifest.json">
+
+		<link rel="canonical" href="https://urlebird.com/search/">
+		<meta name="robots" content="max-image-preview:large">
+
+		<link rel="preconnect" href="//code.jquery.com">
+		<link rel="preconnect" href="//cdnjs.cloudflare.com">
+		<link rel="preconnect" href="//stackpath.bootstrapcdn.com">
+		<link rel="preconnect" href="//kit.fontawesome.com">
+		<link rel="preconnect" href="//googletagmanager.com">
+
+		<link rel="dns-prefetch" href="//code.jquery.com">
+		<link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+		<link rel="dns-prefetch" href="//stackpath.bootstrapcdn.com">
+		<link rel="dns-prefetch" href="//kit.fontawesome.com">
+		<link rel="dns-prefetch" href="//googletagmanager.com">
+
+		<link rel="alternate" href="https://urlebird.com/search/?q=annhien.boibo" hreflang="x-default">
+		<link rel="alternate" href="https://urlebird.com/search/?q=annhien.boibo" hreflang="en">
+		<link rel="alternate" href="https://urlebird.com/ru/search/?q=annhien.boibo" hreflang="ru">
+		<link rel="alternate" href="https://urlebird.com/ua/search/?q=annhien.boibo" hreflang="uk">
+		<link rel="alternate" href="https://urlebird.com/es/search/?q=annhien.boibo" hreflang="es">
+		<link rel="alternate" href="https://urlebird.com/it/search/?q=annhien.boibo" hreflang="it">
+		<link rel="alternate" href="https://urlebird.com/de/search/?q=annhien.boibo" hreflang="de">
+		<link rel="alternate" href="https://urlebird.com/fr/search/?q=annhien.boibo" hreflang="fr">
+		<link rel="alternate" href="https://urlebird.com/pt/search/?q=annhien.boibo" hreflang="pt">
+		<link rel="alternate" href="https://urlebird.com/jp/search/?q=annhien.boibo" hreflang="ja-JP">
+		<link rel="alternate" href="https://urlebird.com/tw/search/?q=annhien.boibo" hreflang="zh-TW">
+		<link rel="alternate" href="https://urlebird.com/id/search/?q=annhien.boibo" hreflang="id">
+
+		<link rel="icon" type="image/webp" href="https://urlebird.com/tml/images/icons/48x48.webp" sizes="48x48">
+		<link rel="icon" type="image/webp" href="https://urlebird.com/tml/images/icons/64x64.webp" sizes="64x64">
+		<link rel="icon" type="image/webp" href="https://urlebird.com/tml/images/icons/72x72.webp" sizes="72x72">
+		<link rel="icon" type="image/webp" href="https://urlebird.com/tml/images/icons/152x152.webp" sizes="152x152">
+		<link rel="icon" type="image/webp" href="https://urlebird.com/tml/images/icons/180x180.webp" sizes="180x180">
+		<link rel="icon" type="image/webp" href="https://urlebird.com/tml/images/icons/256x256.webp" sizes="256x256">
+		<link rel="apple-touch-icon" type="image/webp" href="https://urlebird.com/tml/images/icons/180x180.webp" sizes="180x180">
+
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+		<link rel="stylesheet" href="https://urlebird.com/tml/css/styles.css?v=2.1">
+
+		<!-- Quantcast Choice. Consent Manager Tag v2.0 (for TCF 2.0) -->
+ 		<script src="https://urlebird.com/tml/js/cm.js?v=6"></script>
+		<!-- End Quantcast Choice. Consent Manager Tag v2.0 (for TCF 2.0) -->
+		
+
+
+	</head>
+	<body>
+				<!-- header hidden collapse for mobile -->
+
+		<div class="collapse" id="navbarToggleExternalContent">
+			<div class="bg-black p-3">
+				<div class="navbar-collapse" id="navbarNavDropdown">
+					<ul class="navbar-nav">
+						<li class="nav-item active"><a class="link" href="https://urlebird.com/">Home</a></li>
+						<li class="nav-item"><a class="link" href="https://urlebird.com/trending/">Trending</a></li>
+						<li class="nav-item"><a class="link" href="https://urlebird.com/videos/popular/">Videos</a></li>
+						<li class="nav-item"><a class="link" href="https://urlebird.com/users/popular/">Users</a></li>
+						<li class="nav-item"><a class="link" href="https://urlebird.com/hashtags/popular/">Hashtags</a></li>
+						<li class="nav-item"><a class="link" href="https://urlebird.com/music/popular/">Music</a></li>			
+						<li class="nav-item"><a class="link" href="https://urlebird.com/anonymous/">Anonymous</a></li>				
+						<li class="nav-item"><a class="link" href="https://urlebird.com/snap/">Downloader</a></li>
+						<li class="nav-item">
+							<form id="search" class="my-2" action="https://urlebird.com/search/" method="GET">
+								<div class="h-100">
+									<div class="d-flex h-100">
+										<div class="searchbar">
+											<input class="search" type="text" name="q" placeholder=" Search @user or #hash">
+											<a href="#" class="search-icon" id="a_search"><i class="fa fa-search"></i></a>
+										</div>
+									</div>
+								</div>
+							</form>
+						</li>
+						<li class="nav-item">
+							<div class="dropdown my-2">
+								<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									Language <i class="fas fa-globe-americas"></i>
+								</button>
+									<div class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+										<a class="dropdown-item" href="https://urlebird.com/search/?q=annhien.boibo">🇺🇸 English</a>
+										<a class="dropdown-item" href="https://urlebird.com/es/search/?q=annhien.boibo">🇪🇸 Español</a>
+										<a class="dropdown-item" href="https://urlebird.com/it/search/?q=annhien.boibo">🇮🇹 Italiano</a>
+										<a class="dropdown-item" href="https://urlebird.com/de/search/?q=annhien.boibo">🇩🇪 Deutsch</a>
+										<a class="dropdown-item" href="https://urlebird.com/fr/search/?q=annhien.boibo">🇫🇷 Français</a>
+										<a class="dropdown-item" href="https://urlebird.com/pt/search/?q=annhien.boibo">🇵🇹 Português</a>
+										<a class="dropdown-item" href="https://urlebird.com/jp/search/?q=annhien.boibo">🇯🇵 日本語</a>
+										<a class="dropdown-item" href="https://urlebird.com/tw/search/?q=annhien.boibo">🇹🇼 中文</a>
+										<a class="dropdown-item" href="https://urlebird.com/id/search/?q=annhien.boibo">🇮🇩 Bahasa</a>
+										<a class="dropdown-item" href="https://urlebird.com/ru/search/?q=annhien.boibo">ru Русский</a>
+										<a class="dropdown-item" href="https://urlebird.com/ua/search/?q=annhien.boibo">🇺🇦 Українська</a>										
+									</div>
+							</div>
+						</li>		 
+					</ul>
+				</div>	
+			</div>
+		</div>
+		<!-- /end/ header collapse for mobile -->
+		
+		<nav class="navbar navbar-expand-lg navbar-dark bg-black">
+			<div class="container-fluid">
+				<a href="https://urlebird.com/" class="navbar-left"><img src="https://urlebird.com/tml/images/logo.png" class="logo" alt="Urlebird TikTok Viewer"></a>
+				<div class="mr-auto d-lg-none">
+					<div class="dropdown my-2">
+						<button class="btn btn-secondary dropdown-toggle lang-btn" type="button" id="dropdownMenuButton2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							<span class="size-23px">🇺🇸 <span class="w-35px"><i class="fas fa-language"></i></span></span>
+						</button>
+						<div class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
+							<a class="dropdown-item" href="https://urlebird.com/search/?q=annhien.boibo">🇺🇸 English</a>
+							<a class="dropdown-item" href="https://urlebird.com/es/search/?q=annhien.boibo">🇪🇸 Español</a>
+							<a class="dropdown-item" href="https://urlebird.com/it/search/?q=annhien.boibo">🇮🇹 Italiano</a>
+							<a class="dropdown-item" href="https://urlebird.com/de/search/?q=annhien.boibo">🇩🇪 Deutsch</a>
+							<a class="dropdown-item" href="https://urlebird.com/fr/search/?q=annhien.boibo">🇫🇷 Français</a>
+							<a class="dropdown-item" href="https://urlebird.com/pt/search/?q=annhien.boibo">🇵🇹 Português</a>
+							<a class="dropdown-item" href="https://urlebird.com/jp/search/?q=annhien.boibo">🇯🇵 日本語</a>
+							<a class="dropdown-item" href="https://urlebird.com/tw/search/?q=annhien.boibo">🇹🇼 中文</a>
+							<a class="dropdown-item" href="https://urlebird.com/id/search/?q=annhien.boibo">🇮🇩 Bahasa</a>							
+							<a class="dropdown-item" href="https://urlebird.com/ru/search/?q=annhien.boibo">ru Русский</a>
+							<a class="dropdown-item" href="https://urlebird.com/ua/search/?q=annhien.boibo">🇺🇦 Українська</a>
+						</div>
+					</div>
+				</div>
+				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse">
+						<!-- for desktop change language in header -->
+							<div>
+								<div class="dropdown">
+									<button class="btn btn-secondary dropdown-toggle lang-btn" type="button" id="dropdownMenuButton3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+										<span>🇺🇸 <span class="w-35px"><i class="fas fa-language"></i></span></span>
+									</button>
+									<div class="dropdown-menu" aria-labelledby="dropdownMenuButton3">
+										<a class="dropdown-item" href="https://urlebird.com/search/?q=annhien.boibo">🇺🇸 English</a>
+										<a class="dropdown-item" href="https://urlebird.com/es/search/?q=annhien.boibo">🇪🇸 Español</a>
+										<a class="dropdown-item" href="https://urlebird.com/it/search/?q=annhien.boibo">🇮🇹 Italiano</a>
+										<a class="dropdown-item" href="https://urlebird.com/de/search/?q=annhien.boibo">🇩🇪 Deutsch</a>
+										<a class="dropdown-item" href="https://urlebird.com/fr/search/?q=annhien.boibo">🇫🇷 Français</a>
+										<a class="dropdown-item" href="https://urlebird.com/pt/search/?q=annhien.boibo">🇵🇹 Português</a>
+										<a class="dropdown-item" href="https://urlebird.com/jp/search/?q=annhien.boibo">🇯🇵 日本語</a>
+										<a class="dropdown-item" href="https://urlebird.com/tw/search/?q=annhien.boibo">🇹🇼 中文</a>
+										<a class="dropdown-item" href="https://urlebird.com/id/search/?q=annhien.boibo">🇮🇩 Bahasa</a>												
+										<a class="dropdown-item" href="https://urlebird.com/ru/search/?q=annhien.boibo">ru Русский</a>
+										<a class="dropdown-item" href="https://urlebird.com/ua/search/?q=annhien.boibo">🇺🇦 Українська</a>
+									</div>
+								</div>
+							</div>
+						<!-- /end/ for desktop change language in header -->
+					<ul class="navbar-nav mr-auto">
+						<li class="nav-item text-nowrap"><a class="link" href="https://urlebird.com/trending/">Trending</a></li>
+						<li class="nav-item text-nowrap"><a class="link" href="https://urlebird.com/videos/popular/">Videos</a></li>
+						<li class="nav-item text-nowrap"><a class="link" href="https://urlebird.com/users/popular/">Users</a></li>
+						<li class="nav-item text-nowrap"><a class="link" href="https://urlebird.com/hashtags/popular/">Hashtags</a></li>
+						<li class="nav-item text-nowrap"><a class="link" href="https://urlebird.com/music/popular/">Music</a></li>		
+						<li class="nav-item text-nowrap"><a class="link" href="https://urlebird.com/snap/">Downloader</a></li>										
+					</ul>
+					<ul class="navbar-nav search">	
+						<li class="nav-item active">
+							<form id="search2" action="https://urlebird.com/search/" method="GET">
+							<div class="container">
+								<div class="d-flex">
+									<div class="searchbar">
+										<input class="search" type="text" name="q" placeholder="Search @user or #hash">
+										<a href="#" class="search-icon" id="a_search2"><i class="fa fa-search"></i></a>
+									</div>
+								</div>
+							</div>
+							</form>
+						</li>
+					</ul>					
+				</div>
+			</div>
+		</nav>
+		<div class="main">
+			<div class="container-fluid text-center pt-3">
+				<div class="row">
+					<div class="col-md-12 text-center">
+						<div class="d-flex mb-2 justify-content-center">
+							<div class="p-1 ml-3">
+								<h1 class="font-weight-normal">Search Results for <b></b></h1>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="container-fluid text-center my-3 pt-4">
+					<div class="row">
+						<div class="col-md-6 mt-md-0 mt-3 copyright text-center">
+							<h3 class="font-weight-bold">#️⃣ Hashtags</h3>
+							
+						</div>
+						<hr class="clearfix w-100 d-md-none pb-1">
+						<div class="col-md-6 mb-md-0 mb-3 text-center">
+							<h3 class="font-weight-bold">🦄Users</h3>
+							<div class="row ml-2">
+								<div class="user my-2 col-md-6 col-sm-5">
+									<div class="img"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAEALAAAAAABAAEAAAICTAEAOw==" data-src="https://p16-va.tiktokcdn.com/tos-alisg-avt-0068/43c95159539bf73e9dede5f392ceca42~tplv-tiktokx-cropcenter:720:720.webp" alt="AnNhiên ❤️ BốiBối" class="lazyload"></div>
+									<div class="info text-truncate">
+										<a href="https://urlebird.com/user/annhien_boiboi/" class="uri">@annhien_boiboi</a>
+										<span>AnNhiên ❤️ BốiBối</span>
+										<span class="followers">10.6M followers</span>
+									</div>
+								</div>
+							</div>
+						</div>					
+					</div>
+				</div>				
+				<div class="row">
+					<!--
+					<div class="col-md-12 text-center mb-3">
+						
+					</div>
+					-->
+					<div class="col-md-12 text-center">
+						<h2>Videos</h2>
+					</div>
+					<div id="thumbs" class="col-md-12 text-center text-md-left p-0 pl-md-5 pl-0">
+						<div class="thumb wc">
+							<div class="author text-right">
+								<a href="https://urlebird.com/user/annhien_boiboi/"><img src="https://p16-va.tiktokcdn.com/tos-alisg-avt-0068/43c95159539bf73e9dede5f392ceca42~tplv-tiktokx-cropcenter:100:100.jpeg" alt="annhien_boiboi"></a>
+							</div>
+							<div class="img"><img src="https://i.axod.net/pcbq6L2SwIcDbfBVtFfluewx3RH1xn-xYSD7iRkGD36t4FQO1rJTRkl6wo2FqcFCAy2NuTs9CqmmTRnICQ8MJlpmnj4Nio5L38H48oK0FFL1cU4mUDdrN0MWnatzqSLntfdbq_b2eifCmIJ0BP9d7_4dCmrMK8lO8GvdBpM.jpeg" class="img-fluid" alt="@AnNhi&ecirc;n ❤️ BốiBối"></div>
+							<div class="stats">
+								<div class="flex items-center mb-1"><span><i class="fas fa-clock" aria-hidden="true"></i> 5 days ago</span></div>								
+								<div class="flex items-center mb-1"><span><i class="fas fa-play" aria-hidden="true"></i> 1.01M</span></div>									
+								<div class="flex items-center mb-1"><span><i class="fas fa-heart" aria-hidden="true"></i> 108.42K</span></div>
+								<div class="flex items-center mb-1"><span><i class="fas fa-comment" aria-hidden="true"></i> 568</span></div>																						
+							</div>			
+							<div class="info3">
+								<div class="author-name"><a href="https://urlebird.com/user/annhien_boiboi/">@annhien_boiboi</a></div>	
+								<a href="https://urlebird.com/video/hẹn-mọi-người-tối-nay-vào-lúc-600-tối-tại-phố-đi-bộ-nguyễn-huệ-n-7675238882266418450/"><span>Hẹn mọi người tối nay v&amp;agrave;o l&amp;uacute;c 6.00 tối...</span></a>
+							</div>
+							<a href="https://urlebird.com/video/hẹn-mọi-người-tối-nay-vào-lúc-600-tối-tại-phố-đi-bộ-nguyễn-huệ-n-7675238882266418450/"><div class="overlay-s"></div></a>
+							<div class="overlay-shadow"></div>
+						</div><div class="d-block d-md-none text-center mt-1 mb-1"><div id="frame" style="width: 300px; margin: 0 auto; "><iframe data-aa="2374085" src="//ad.a-ads.com/2374085?size=300x250" style="width:300px; height:250px; border:0px; padding:0; overflow:hidden; background-color: transparent;"></iframe><a style="display: block; text-align: right; font-size: 12px" id="frame-link" href="https://aads.com/campaigns/new/?source_id=2374085&source_type=ad_unit&partner=2374085">Advertise here</a></div></div><div class="thumb wc">
+							<div class="author text-right">
+								<a href="https://urlebird.com/user/annhien_boiboi/"><img src="https://p16-va.tiktokcdn.com/tos-alisg-avt-0068/43c95159539bf73e9dede5f392ceca42~tplv-tiktokx-cropcenter:100:100.jpeg" alt="annhien_boiboi"></a>
+							</div>
+							<div class="img"><img src="https://i.axod.net/pcYa6L2SwIcTUffuZmwtOakhiZLdkItOLa1-PKuHUzn9A-_Y_LtmdJyp4uqJDLgTh3K4aoa31RRzJQFF9iIBCDKEfqeSfxmYnMrJLcYFJDoNnaqBz2Ki2AmHXI5XXHFydOC1RtM-gT0PHjLOnNrME07zei48Am5z6z1m3ck.jpeg" class="img-fluid" alt="@AnNhi&ecirc;n ❤️ BốiBối"></div>
+							<div class="stats">
+								<div class="flex items-center mb-1"><span><i class="fas fa-clock" aria-hidden="true"></i> 1 week ago</span></div>								
+								<div class="flex items-center mb-1"><span><i class="fas fa-play" aria-hidden="true"></i> 564.16K</span></div>									
+								<div class="flex items-center mb-1"><span><i class="fas fa-heart" aria-hidden="true"></i> 48.18K</span></div>
+								<div class="flex items-center mb-1"><span><i class="fas fa-comment" aria-hidden="true"></i> 172</span></div>																						
+							</div>			
+							<div class="info3">
+								<div class="author-name"><a href="https://urlebird.com/user/annhien_boiboi/">@annhien_boiboi</a></div>	
+								<a href="https://urlebird.com/video/khi-nhà-có-con-gái-7673022315214408978/"><span>Khi nh&agrave; c&oacute; con g&aacute;i</span></a>
+							</div>
+							<a href="https://urlebird.com/video/khi-nhà-có-con-gái-7673022315214408978/"><div class="overlay-s"></div></a>
+							<div class="overlay-shadow"></div>
+						</div><div class="thumb wc">
+							<div class="author text-right">
+								<a href="https://urlebird.com/user/annhien_boiboi/"><img src="https://p16-va.tiktokcdn.com/tos-alisg-avt-0068/43c95159539bf73e9dede5f392ceca42~tplv-tiktokx-cropcenter:100:100.jpeg" alt="annhien_boiboi"></a>
+							</div>
+							<div class="img"><img src="https://i.axod.net/pcaA7P2CwAcyZXALT5hnD16jUg8xKkGSJzxMWuNPS_gtqwk-U01Rji_J70_ueiGrHJHBKjUp0tgqnbpLS0ek3ChaapQhfeOz9xfX2XobohAl52t279YhPQ23nkA2-UfnsP2l1obdpokjnqH3fLcOtVl0K9q60-Clucz9fTBQ.jpeg" class="img-fluid" alt="@AnNhi&ecirc;n ❤️ BốiBối"></div>
+							<div class="stats">
+								<div class="flex items-center mb-1"><span><i class="fas fa-clock" aria-hidden="true"></i> 3 weeks ago</span></div>								
+								<div class="flex items-center mb-1"><span><i class="fas fa-play" aria-hidden="true"></i> 3.07M</span></div>									
+								<div class="flex items-center mb-1"><span><i class="fas fa-heart" aria-hidden="true"></i> 155.93K</span></div>
+								<div class="flex items-center mb-1"><span><i class="fas fa-comment" aria-hidden="true"></i> 1.25K</span></div>																						
+							</div>			
+							<div class="info3">
+								<div class="author-name"><a href="https://urlebird.com/user/annhien_boiboi/">@annhien_boiboi</a></div>	
+								<a href="https://urlebird.com/video/lâu-lâu-2-ba-con-đi-tiệc-nhay-quá-trời-nhay-7669404104111820039/"><span>L&amp;acirc;u l&amp;acirc;u 2 ba con đi tiệc nhay qu&amp;aac...</span></a>
+							</div>
+							<a href="https://urlebird.com/video/lâu-lâu-2-ba-con-đi-tiệc-nhay-quá-trời-nhay-7669404104111820039/"><div class="overlay-s"></div></a>
+							<div class="overlay-shadow"></div>
+						</div><div class="d-block d-md-none text-center mt-1 mb-1"><div id="frame" style="width: 300px; margin: 0 auto; "><iframe data-aa="2374085" src="//ad.a-ads.com/2374085?size=300x250" style="width:300px; height:250px; border:0px; padding:0; overflow:hidden; background-color: transparent;"></iframe><a style="display: block; text-align: right; font-size: 12px" id="frame-link" href="https://aads.com/campaigns/new/?source_id=2374085&source_type=ad_unit&partner=2374085">Advertise here</a></div></div><div class="thumb wc">
+							<div class="author text-right">
+								<a href="https://urlebird.com/user/nganchi_miu/"><img src="https://p16-va.tiktokcdn.com/tos-alisg-avt-0068/b6e0f60c12a2b1f910f52326b4406aad~tplv-tiktokx-cropcenter:100:100.jpeg" alt="nganchi_miu"></a>
+							</div>
+							<div class="img"><img src="https://i.axod.net/pcYY7L2CwIcDUbdMUdK7NqNW-1VyoIxySL3o6IyVNwq8-ri8RHci1Udep1ftblD0C4GNk3V5a1uG4arAhXMCDlqGoqbwUSJP1ZJv7dSFHOYt3J5h5zV7iBdT2r092uxIK38KjwfVHvjTvmXnTLd7O_FVSQpgKTkmUIAZoP2qDA.jpeg" class="img-fluid" alt="@Nguyễn Ngọc Ng&acirc;n Chi"></div>
+							<div class="stats">
+								<div class="flex items-center mb-1"><span><i class="fas fa-clock" aria-hidden="true"></i> 4 months ago</span></div>								
+								<div class="flex items-center mb-1"><span><i class="fas fa-play" aria-hidden="true"></i> 332.77K</span></div>									
+								<div class="flex items-center mb-1"><span><i class="fas fa-heart" aria-hidden="true"></i> 9.71K</span></div>
+								<div class="flex items-center mb-1"><span><i class="fas fa-comment" aria-hidden="true"></i> 36</span></div>																						
+							</div>			
+							<div class="info3">
+								<div class="author-name"><a href="https://urlebird.com/user/nganchi_miu/">@nganchi_miu</a></div>	
+								<a href="https://urlebird.com/video/co-cai-gi-buon-cuoi-bối-7627430568157793554/"><span>Co cai gi buon cuoi? @Bối Bối 🎀  #nganchi #fyp #j4f #xh #ann...</span></a>
+							</div>
+							<a href="https://urlebird.com/video/co-cai-gi-buon-cuoi-bối-7627430568157793554/"><div class="overlay-s"></div></a>
+							<div class="overlay-shadow"></div>
+						</div><div class="thumb wc">
+							<div class="author text-right">
+								<a href="https://urlebird.com/user/annhien_boiboi/"><img src="https://p16-va.tiktokcdn.com/tos-alisg-avt-0068/43c95159539bf73e9dede5f392ceca42~tplv-tiktokx-cropcenter:100:100.jpeg" alt="annhien_boiboi"></a>
+							</div>
+							<div class="img"><img src="https://i.axod.net/pcYQ7b2SwIczHb6kVxBMrNbDv17GzW3IqGV36eWhKz1mDTtG-2i8yjIvdq-1rKYyxtwrqudq0mVpfVyrzcET4qJuTr22fRlWmtL1mgod3LU3GMGMG5Nz0AVUykdXjcZXZO1YZ5a9H8OLp3ASC-f1kCw7DuQzm184Nllq.jpeg" class="img-fluid" alt="@AnNhi&ecirc;n ❤️ BốiBối"></div>
+							<div class="stats">
+								<div class="flex items-center mb-1"><span><i class="fas fa-clock" aria-hidden="true"></i> 1 month ago</span></div>								
+								<div class="flex items-center mb-1"><span><i class="fas fa-play" aria-hidden="true"></i> 12.67M</span></div>									
+								<div class="flex items-center mb-1"><span><i class="fas fa-heart" aria-hidden="true"></i> 544.09K</span></div>
+								<div class="flex items-center mb-1"><span><i class="fas fa-comment" aria-hidden="true"></i> 3.7K</span></div>																						
+							</div>			
+							<div class="info3">
+								<div class="author-name"><a href="https://urlebird.com/user/annhien_boiboi/">@annhien_boiboi</a></div>	
+								<a href="https://urlebird.com/video/kakaka-7655710172907703560/"><span>Kakaka</span></a>
+							</div>
+							<a href="https://urlebird.com/video/kakaka-7655710172907703560/"><div class="overlay-s"></div></a>
+							<div class="overlay-shadow"></div>
+						</div><div class="d-block d-md-none text-center mt-1 mb-1"><div id="frame" style="width: 300px; margin: 0 auto; "><iframe data-aa="2374085" src="//ad.a-ads.com/2374085?size=300x250" style="width:300px; height:250px; border:0px; padding:0; overflow:hidden; background-color: transparent;"></iframe><a style="display: block; text-align: right; font-size: 12px" id="frame-link" href="https://aads.com/campaigns/new/?source_id=2374085&source_type=ad_unit&partner=2374085">Advertise here</a></div></div><div class="thumb wc">
+							<div class="author text-right">
+								<a href="https://urlebird.com/user/annhien_boiboi/"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAEALAAAAAABAAEAAAICTAEAOw==" data-src="https://p16-va.tiktokcdn.com/tos-alisg-avt-0068/43c95159539bf73e9dede5f392ceca42~tplv-tiktokx-cropcenter:100:100.jpeg" class="lazyload" alt="annhien_boiboi"></a>
+							</div>
+							<div class="img"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAEALAAAAAABAAEAAAICTAEAOw==" data-src="https://i.axod.net/pcYc6f2SzIczHb5aTCGLrBABCfkSRogWzWh2nINQEfm2MFesrcL0EUtAfKzQui7buhN5_3HFggTdoCuXyeQRKHIcrjeqvziyJtGx27-VYF2gHs1LHsY7KI0dmiHvKOID07utRtMmAWVlb0XzQbH-iPCkx-9srHxw50H63M4.jpeg" class="img-fluid lazyload" alt="@AnNhi&ecirc;n ❤️ BốiBối"></div>
+							<div class="stats">
+								<div class="flex items-center mb-1"><span><i class="fas fa-clock" aria-hidden="true"></i> 5 months ago</span></div>								
+								<div class="flex items-center mb-1"><span><i class="fas fa-play" aria-hidden="true"></i> 10.24M</span></div>									
+								<div class="flex items-center mb-1"><span><i class="fas fa-heart" aria-hidden="true"></i> 377.49K</span></div>
+								<div class="flex items-center mb-1"><span><i class="fas fa-comment" aria-hidden="true"></i> 2.77K</span></div>																						
+							</div>			
+							<div class="info3">
+								<div class="author-name"><a href="https://urlebird.com/user/annhien_boiboi/">@annhien_boiboi</a></div>	
+								<a href="https://urlebird.com/video/nghe-nói-10-năm-trước-2-chị-em-thân-nhau-lắm-7618596031420255495/"><span>Nghe n&amp;oacute;i 10 năm trước 2 chị em th&amp;acirc;n nha...</span></a>
+							</div>
+							<a href="https://urlebird.com/video/nghe-nói-10-năm-trước-2-chị-em-thân-nhau-lắm-7618596031420255495/"><div class="overlay-s"></div></a>
+							<div class="overlay-shadow"></div>
+						</div><div class="thumb wc">
+							<div class="author text-right">
+								<a href="https://urlebird.com/user/annhien_boiboi/"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAEALAAAAAABAAEAAAICTAEAOw==" data-src="https://p16-va.tiktokcdn.com/tos-alisg-avt-0068/43c95159539bf73e9dede5f392ceca42~tplv-tiktokx-cropcenter:100:100.jpeg" class="lazyload" alt="annhien_boiboi"></a>
+							</div>
+							<div class="img"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAEALAAAAAABAAEAAAICTAEAOw==" data-src="https://i.axod.net/pcYa6L2SxIcDUUfde3vjVJF5a80JVX6wVtZfpHmr43M3N3A_bYXPmyIu-zKhhzerWClxDgKMm_e-8KrDMg61rCLarbZlIKyY1K7Emj-7lI0w8L-hZ8Yz1QOEgG8sajTA3QbfP_fbdY0uI2kQSBvbocupAyvo7Wn5rIpDmg.jpeg" class="img-fluid lazyload" alt="@AnNhi&ecirc;n ❤️ BốiBối"></div>
+							<div class="stats">
+								<div class="flex items-center mb-1"><span><i class="fas fa-clock" aria-hidden="true"></i> 2 weeks ago</span></div>								
+								<div class="flex items-center mb-1"><span><i class="fas fa-play" aria-hidden="true"></i> 1.62M</span></div>									
+								<div class="flex items-center mb-1"><span><i class="fas fa-heart" aria-hidden="true"></i> 125.28K</span></div>
+								<div class="flex items-center mb-1"><span><i class="fas fa-comment" aria-hidden="true"></i> 870</span></div>																						
+							</div>			
+							<div class="info3">
+								<div class="author-name"><a href="https://urlebird.com/user/annhien_boiboi/">@annhien_boiboi</a></div>	
+								<a href="https://urlebird.com/video/chuyện-của-ngày-hôm-qua-7670775727532510472/"><span>Chuyện của ng&agrave;y h&ocirc;m qua </span></a>
+							</div>
+							<a href="https://urlebird.com/video/chuyện-của-ngày-hôm-qua-7670775727532510472/"><div class="overlay-s"></div></a>
+							<div class="overlay-shadow"></div>
+						</div><div class="thumb wc">
+							<div class="author text-right">
+								<a href="https://urlebird.com/user/annhien_boiboi/"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAEALAAAAAABAAEAAAICTAEAOw==" data-src="https://p16-va.tiktokcdn.com/tos-alisg-avt-0068/43c95159539bf73e9dede5f392ceca42~tplv-tiktokx-cropcenter:100:100.jpeg" class="lazyload" alt="annhien_boiboi"></a>
+							</div>
+							<div class="img"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAEALAAAAAABAAEAAAICTAEAOw==" data-src="https://i.axod.net/pcaQ7L2SzIczZbDlAo3syZ3W7xvy-EYp1bnEomIyTvgtLwZe2B8j9tnUU04XCpoMZYN-2fGENuk6i2tJI5neayYMgwaENdJYTcfFn5hdlv_WCPuZg0Ie9EZktCPNFA_CHjuESNdz8WTUK2eYVZUU6sNtYmJxKNeONGgF38k.jpeg" class="img-fluid lazyload" alt="@AnNhi&ecirc;n ❤️ BốiBối"></div>
+							<div class="stats">
+								<div class="flex items-center mb-1"><span><i class="fas fa-clock" aria-hidden="true"></i> 15 hours ago</span></div>								
+								<div class="flex items-center mb-1"><span><i class="fas fa-play" aria-hidden="true"></i> 18.26K</span></div>									
+								<div class="flex items-center mb-1"><span><i class="fas fa-heart" aria-hidden="true"></i> 1.37K</span></div>
+								<div class="flex items-center mb-1"><span><i class="fas fa-comment" aria-hidden="true"></i> 37</span></div>																						
+							</div>			
+							<div class="info3">
+								<div class="author-name"><a href="https://urlebird.com/user/annhien_boiboi/">@annhien_boiboi</a></div>	
+								<a href="https://urlebird.com/video/khi-mọi-người-hỏi-đi-xem-concert-sao-không-thấy-quay-clip-và-đây-7677219713193118984/"><span>khi mọi người hỏi đi xem concert sao kh&amp;ocirc;ng thấy qu...</span></a>
+							</div>
+							<a href="https://urlebird.com/video/khi-mọi-người-hỏi-đi-xem-concert-sao-không-thấy-quay-clip-và-đây-7677219713193118984/"><div class="overlay-s"></div></a>
+							<div class="overlay-shadow"></div>
+						</div><div class="thumb wc">
+							<div class="author text-right">
+								<a href="https://urlebird.com/user/annhien_boiboi/"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAEALAAAAAABAAEAAAICTAEAOw==" data-src="https://p16-va.tiktokcdn.com/tos-alisg-avt-0068/43c95159539bf73e9dede5f392ceca42~tplv-tiktokx-cropcenter:100:100.jpeg" class="lazyload" alt="annhien_boiboi"></a>
+							</div>
+							<div class="img"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAEALAAAAAABAAEAAAICTAEAOw==" data-src="https://i.axod.net/pcaM7L2SzIcDZbDkUrJmq26jwgswhf9vcvPhGB4ZM8YU8xi0JZ0vFo5EAf51uP_EJTFE2sfi_pJFCcDqlBBn42BCcGUY5sj85Bad0tsYLE2_7tJ9jjXyqzN295gPjZ2WbZy0Pw_RxsAn3K7KJ6PZSymhem-KQyIYBrOIODVH.jpeg" class="img-fluid lazyload" alt="@AnNhi&ecirc;n ❤️ BốiBối"></div>
+							<div class="stats">
+								<div class="flex items-center mb-1"><span><i class="fas fa-clock" aria-hidden="true"></i> 1 day ago</span></div>								
+								<div class="flex items-center mb-1"><span><i class="fas fa-play" aria-hidden="true"></i> 48.16K</span></div>									
+								<div class="flex items-center mb-1"><span><i class="fas fa-heart" aria-hidden="true"></i> 3.39K</span></div>
+								<div class="flex items-center mb-1"><span><i class="fas fa-comment" aria-hidden="true"></i> 52</span></div>																						
+							</div>			
+							<div class="info3">
+								<div class="author-name"><a href="https://urlebird.com/user/annhien_boiboi/">@annhien_boiboi</a></div>	
+								<a href="https://urlebird.com/video/khi-tôi-cần-đi-vệ-sinh-và-người-cuối-cùng-vào-đó-lại-là-ba-tôi-c-7676814172381875474/"><span>Khi t&amp;ocirc;i cần đi vệ sinh v&amp;agrave; người cuối c&...</span></a>
+							</div>
+							<a href="https://urlebird.com/video/khi-tôi-cần-đi-vệ-sinh-và-người-cuối-cùng-vào-đó-lại-là-ba-tôi-c-7676814172381875474/"><div class="overlay-s"></div></a>
+							<div class="overlay-shadow"></div>
+						</div><div class="thumb wc">
+							<div class="author text-right">
+								<a href="https://urlebird.com/user/annhien_boiboi/"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAEALAAAAAABAAEAAAICTAEAOw==" data-src="https://p16-va.tiktokcdn.com/tos-alisg-avt-0068/43c95159539bf73e9dede5f392ceca42~tplv-tiktokx-cropcenter:100:100.jpeg" class="lazyload" alt="annhien_boiboi"></a>
+							</div>
+							<div class="img"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAEALAAAAAABAAEAAAICTAEAOw==" data-src="https://i.axod.net/pcbq6PySwIcDbfDwdATTVyxapW_ciIN4NIXSr9Aegu8JVOxmQJzMyv88cpMQALPZf9OcWSrf6VovmcqyJLhVKmj_8r7-IjpCL8d303K5Ey8nndw8fuiaqt73A8AsuSn_CINXTgrx7KI9KXBmltvxVnLSwABP5efd_vYw.jpeg" class="img-fluid lazyload" alt="@AnNhi&ecirc;n ❤️ BốiBối"></div>
+							<div class="stats">
+								<div class="flex items-center mb-1"><span><i class="fas fa-clock" aria-hidden="true"></i> 3 days ago</span></div>								
+								<div class="flex items-center mb-1"><span><i class="fas fa-play" aria-hidden="true"></i> 44.18K</span></div>									
+								<div class="flex items-center mb-1"><span><i class="fas fa-heart" aria-hidden="true"></i> 4.75K</span></div>
+								<div class="flex items-center mb-1"><span><i class="fas fa-comment" aria-hidden="true"></i> 60</span></div>																						
+							</div>			
+							<div class="info3">
+								<div class="author-name"><a href="https://urlebird.com/user/annhien_boiboi/">@annhien_boiboi</a></div>	
+								<a href="https://urlebird.com/video/cortis-dayyyyy-7676012939278552338/"><span>CORTIS dayyyyy </span></a>
+							</div>
+							<a href="https://urlebird.com/video/cortis-dayyyyy-7676012939278552338/"><div class="overlay-s"></div></a>
+							<div class="overlay-shadow"></div>
+						</div>
+					</div>			
+				</div>
+				<div class="row">
+					<div class="col-md-12 mt-3 justify-content-center text-center">
+						<button class="flat mb-4" id="search_load_more" data-q="af28eeae606e72f1bJmxuc8agaAeVll-8kkp-t2_cKwCKQPcKu_jI1ZC8GA" data-c="f4e1b5227addaed1A7l9Ns-kZ_jEfII-ewTLiQ" data-lang="" data-no-more="No more video" data-x="458b6e48641f8adeI0gdS_1luz3E4JDsvBLDKzPk925a__ZEAKrqR91bR9w" T>Load More</button>
+					</div>
+				</div>				
+			</div>
+		</div>
+		<footer class="page-footer font-small blue py-2">
+	<div class="container-fluid text-center text-md-left">
+		<div class="row">
+			<div class="col-md-7 mt-md-0 mt-3 d-none d-md-block copyright">
+				Made with ❤️ <a href="https://urlebird.com/" title="The is most comfortable tiktok online viewer">UrleBird.com</a> 
+				<span class="sp">|</span> <a href="https://urlebird.com/page/privacy-policy/">Privacy Policy</a> 
+				<span class="sp">|</span> <a href="https://urlebird.com/page/terms-of-use/">Terms of Use</a> 
+				<span class="sp">|</span> <a href="https://urlebird.com/contact-us/">Contact Us</a> 
+				<span class="sp">|</span> <a href="https://urlebird.com/removal-request/">Removal</a>
+				<span class="sp">|</span> <a href="https://urlebird.com/page/about-us/">About Us</a>
+			</div>
+			<div class="col-md-7 mt-md-0 mt-3 d-md-none copyright">
+				Made with ❤️ <a href="https://urlebird.com/" title="The is most comfortable tiktok online viewer">UrleBird.com</a>
+				<div class="mb-1"></div>
+				<a href="https://urlebird.com/page/privacy-policy/">Privacy Policy</a><br>
+				<a href="https://urlebird.com/page/terms-of-use/">Terms of Use</a><br>
+				<a href="https://urlebird.com/contact-us/">Contact Us</a><br>
+				<a href="https://urlebird.com/removal-request/">Removal</a><br>
+				<a href="https://urlebird.com/page/about-us/">About Us</a>
+			</div>
+			<hr class="clearfix w-100 d-md-none pb-1">
+			<div class="col-md-5 mb-md-0 mb-3 d-none d-md-block langs">
+				<a href="https://urlebird.com/search/?q=annhien.boibo"><img src="https://urlebird.com/tml/images/flags/us.png" class="flag" alt="us"></a>
+				<a href="https://urlebird.com/ru/search/?q=annhien.boibo"><img src="https://urlebird.com/tml/images/flags/ru.png" class="flag" alt="ru"></a>
+				<a href="https://urlebird.com/ua/search/?q=annhien.boibo"><img src="https://urlebird.com/tml/images/flags/ua.png" class="flag" alt="ua"></a>
+				<a href="https://urlebird.com/es/search/?q=annhien.boibo"><img src="https://urlebird.com/tml/images/flags/es.png" class="flag" alt="es"></a>
+				<a href="https://urlebird.com/it/search/?q=annhien.boibo"><img src="https://urlebird.com/tml/images/flags/it.png" class="flag" alt="it"></a>
+				<a href="https://urlebird.com/de/search/?q=annhien.boibo"><img src="https://urlebird.com/tml/images/flags/de.png" class="flag" alt="de"></a>
+				<a href="https://urlebird.com/fr/search/?q=annhien.boibo"><img src="https://urlebird.com/tml/images/flags/fr.png" class="flag" alt="fr"></a>	
+				<a href="https://urlebird.com/pt/search/?q=annhien.boibo"><img src="https://urlebird.com/tml/images/flags/pt.png" class="flag" alt="pt"></a>		
+			</div>
+			<div class="col-md-5 mb-md-0 mb-3 d-md-none langs">
+				<a href="https://urlebird.com/search/?q=annhien.boibo"><img src="https://urlebird.com/tml/images/flags/us.png" class="flag" alt="us"></a>
+				<a href="https://urlebird.com/ru/search/?q=annhien.boibo"><img src="https://urlebird.com/tml/images/flags/ru.png" class="flag" alt="ru"></a>
+				<a href="https://urlebird.com/ua/search/?q=annhien.boibo"><img src="https://urlebird.com/tml/images/flags/ua.png" class="flag" alt="ua"></a>
+				<a href="https://urlebird.com/es/search/?q=annhien.boibo"><img src="https://urlebird.com/tml/images/flags/es.png" class="flag" alt="es"></a>
+				<div class="mb-1"></div>
+				<a href="https://urlebird.com/it/search/?q=annhien.boibo"><img src="https://urlebird.com/tml/images/flags/it.png" class="flag" alt="it"></a>
+				<a href="https://urlebird.com/de/search/?q=annhien.boibo"><img src="https://urlebird.com/tml/images/flags/de.png" class="flag" alt="de"></a>
+				<a href="https://urlebird.com/fr/search/?q=annhien.boibo"><img src="https://urlebird.com/tml/images/flags/fr.png" class="flag" alt="fr"></a>	
+				<a href="https://urlebird.com/pt/search/?q=annhien.boibo"><img src="https://urlebird.com/tml/images/flags/pt.png" class="flag" alt="pt"></a>		
+			</div>
+			<hr class="clearfix w-100 d-md-none pb-1">	
+			<div class="col-md-12 mt-2 mb-1">
+				<span class="disclaimer">Urlebird is not associated with official TikTok. We do not host any content on our servers, all videos, photos and previews hosted only on TikTok servers and all rights reserved by their respective owners</span>
+			</div>							
+		</div>
+	</div>
+</footer>
+		<script>
+  function its_mobile() {
+    const toMatch = [/Android/i, /webOS/i, /iPhone/i, /iPad/i, /iPod/i, /BlackBerry/i, /Windows Phone/i];
+    return toMatch.some((toMatchItem) => {
+        return navigator.userAgent.match(toMatchItem);
+    });
+  }
+</script>
+<!-- 300x600
+<script src="//ads.themoneytizer.com/s/gen.js?type=3"></script> 
+<script src="//ads.themoneytizer.com/s/requestform.js?siteId=83467&formatId=3"></script> 
+-->
+
+<script>const country = 'US';</script>
+
+
+<!--<div id="83467-6"><script src="//ads.themoneytizer.com/s/gen.js?type=6"></script><script src="//ads.themoneytizer.com/s/requestform.js?siteId=83467&formatId=6"></script></div>-->
+
+
+
+<script defer src="//code.jquery.com/jquery-3.4.1.min.js"></script>
+<script defer src="https://urlebird.com/tml/js/app.js?v=6.2"></script>
+
+<script async src="//cdnjs.cloudflare.com/ajax/libs/lazysizes/5.2.0/lazysizes.min.js"></script>
+
+<script defer src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+
+<script defer src="//stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<script async src="//cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+
+<script async src="//www.googletagmanager.com/gtag/js?id=UA-156932907-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-156932907-1');
+</script>
+	<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2ffe16d1c432786',t:'MTc4NzU0ODU0MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"b37deba67d544bf48d0c26d2f3d55145"}' crossorigin="anonymous"></script>
+</body>
+</html>

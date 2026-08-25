@@ -5057,9 +5057,33 @@ const PlanView = () => {
   );
 };
 
-/* ================================================================
-   MAIN APP
-================================================================ */
+class ViewErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, info) {
+    console.error("View Error:", error, info);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: 30, textAlign: "center", color: "var(--ink)", background: "var(--card)", flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ fontSize: 28, marginBottom: 8 }}>⚠️</div>
+          <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Không thể hiển thị nội dung</div>
+          <div style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 16 }}>{this.state.error?.message || "Đã có lỗi phát sinh."}</div>
+          <button className="kt-btn kt-btn-primary" onClick={() => this.setState({ hasError: false, error: null })}>
+            🔄 Thử lại
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 const LS_KEY = "kol_tracking_v5";
 
 export default function App() {
@@ -5852,42 +5876,44 @@ const [view, setView] = useState("table");
           minHeight: 0,
           boxShadow: "0 8px 30px rgba(72, 67, 92, 0.015)"
         }}>
-          {view === "table" && <TableView rows={filtered} statusMap={statusMap} statusStages={statusStages} onOpen={r => setSelected(r)} onSave={(id, changes) => { setData(prev => prev.map(item => item.id === id ? { ...item, ...changes } : item)); }} campaignLabels={campaignLabels} />}
-          {view === "kanban" && (
-            <KanbanView 
-              rows={filtered} 
-              statusStages={statusStages}
-              statusMap={statusMap} 
-              onOpen={r => setSelected(r)} 
-              onUpdateStatus={(id, newStatus) => {
-                setData(prev => prev.map(item => item.id === id ? { ...item, statusKey: newStatus } : item));
-                showToast(`Đã chuyển trạng thái sang: ${statusMap[newStatus]?.label || newStatus}`);
-              }}
-              campaignLabels={campaignLabels}
-            />
-          )}
-          {view === "calendar" && (
-            <CalendarView 
-              rows={filtered} 
-              onOpen={r => setSelected(r)}
-              onUpdateRow={(id, updatedFields) => {
-                setData(prev => prev.map(item => item.id === id ? { ...item, ...updatedFields } : item));
-                showToast(`Đã xếp lịch lên sóng cho KOL!`);
-              }}
-              campaignLabels={campaignLabels}
-            />
-          )}
-          {view === "profile" && (
-            <ProfileView 
-              rows={data} 
-              onOpenProfile={k => setSelectedProfile(k)} 
-              campaignLabels={campaignLabels}
-              dynamicCampaigns={dynamicCampaigns}
-              statusStages={statusStages}
-              statusMap={statusMap}
-            />
-          )}
-          {view === "plan" && <PlanView />}
+          <ViewErrorBoundary>
+            {view === "table" && <TableView rows={filtered} statusMap={statusMap} statusStages={statusStages} onOpen={r => setSelected(r)} onSave={(id, changes) => { setData(prev => prev.map(item => item.id === id ? { ...item, ...changes } : item)); }} campaignLabels={campaignLabels} />}
+            {view === "kanban" && (
+              <KanbanView 
+                rows={filtered} 
+                statusStages={statusStages}
+                statusMap={statusMap} 
+                onOpen={r => setSelected(r)} 
+                onUpdateStatus={(id, newStatus) => {
+                  setData(prev => prev.map(item => item.id === id ? { ...item, statusKey: newStatus } : item));
+                  showToast(`Đã chuyển trạng thái sang: ${statusMap[newStatus]?.label || newStatus}`);
+                }}
+                campaignLabels={campaignLabels}
+              />
+            )}
+            {view === "calendar" && (
+              <CalendarView 
+                rows={filtered} 
+                onOpen={r => setSelected(r)}
+                onUpdateRow={(id, updatedFields) => {
+                  setData(prev => prev.map(item => item.id === id ? { ...item, ...updatedFields } : item));
+                  showToast(`Đã xếp lịch lên sóng cho KOL!`);
+                }}
+                campaignLabels={campaignLabels}
+              />
+            )}
+            {view === "profile" && (
+              <ProfileView 
+                rows={data} 
+                onOpenProfile={k => setSelectedProfile(k)} 
+                campaignLabels={campaignLabels}
+                dynamicCampaigns={dynamicCampaigns}
+                statusStages={statusStages}
+                statusMap={statusMap}
+              />
+            )}
+            {view === "plan" && <PlanView />}
+          </ViewErrorBoundary>
         </div>
       </div>
 
