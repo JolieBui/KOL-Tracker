@@ -3098,36 +3098,36 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels = {} }) => {
         
         {/* Top Calendar Toolbar */}
         <div style={{
-          padding: "14px 20px",
+          padding: "10px 18px",
           borderBottom: "1px solid var(--line)",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           flexWrap: "wrap",
-          gap: 12,
+          gap: 10,
           background: "var(--card)",
           flexShrink: 0
         }}>
           
           {/* Month Navigation */}
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ display: "flex", alignItems: "center", background: "var(--paper)", borderRadius: 20, padding: 3, border: "1px solid var(--line)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", background: "var(--paper)", borderRadius: 18, padding: 2, border: "1px solid var(--line)" }}>
               <button 
                 className="kt-btn kt-btn-ghost" 
                 onClick={handlePrevMonth} 
                 title="Tháng trước"
-                style={{ padding: "4px 10px", fontSize: 13, borderRadius: 16, color: "var(--ink)" }}
+                style={{ padding: "4px 8px", fontSize: 12, borderRadius: 14, color: "var(--ink)" }}
               >
                 ◀
               </button>
-              <h2 style={{ fontSize: 15, fontWeight: 800, margin: "0 10px", color: "var(--ink)", minWidth: 120, textAlign: "center" }}>
+              <h2 style={{ fontSize: 14, fontWeight: 700, margin: "0 8px", color: "var(--ink)", minWidth: 110, textAlign: "center" }}>
                 Tháng {month + 1} / {year}
               </h2>
               <button 
                 className="kt-btn kt-btn-ghost" 
                 onClick={handleNextMonth} 
                 title="Tháng sau"
-                style={{ padding: "4px 10px", fontSize: 13, borderRadius: 16, color: "var(--ink)" }}
+                style={{ padding: "4px 8px", fontSize: 12, borderRadius: 14, color: "var(--ink)" }}
               >
                 ▶
               </button>
@@ -3138,47 +3138,46 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels = {} }) => {
               onClick={handleToday}
               style={{
                 fontSize: 11,
-                fontWeight: 700,
-                padding: "6px 12px",
-                borderRadius: 16,
+                fontWeight: 600,
+                padding: "4px 10px",
+                borderRadius: 14,
                 border: "1px solid var(--line)",
                 color: "var(--ink)"
               }}
             >
-              📅 Hôm nay
+              Hôm nay
             </button>
           </div>
 
-          {/* Quick Metrics & Sidebar Toggle */}
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, background: "var(--accent-bg)", padding: "5px 12px", borderRadius: 16, color: "var(--accent)", fontWeight: 700 }}>
-              <span>🚀 Lên sóng tháng này:</span>
-              <span style={{ fontSize: 13 }}>{monthScheduledCount} KOLs</span>
-            </div>
+          {/* Metrics & Sidebar Toggle */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 600 }}>
+              🚀 <strong style={{ color: "var(--ink)" }}>{monthScheduledCount}</strong> KOLs lên sóng tháng này
+            </span>
 
             <button
               className="kt-btn kt-btn-ghost"
               onClick={() => setShowSidebar(!showSidebar)}
-              title={showSidebar ? "Ẩn danh sách chưa lên lịch" : "Hiện danh sách chưa lên lịch"}
               style={{
-                padding: "6px 12px",
+                padding: "4px 10px",
                 fontSize: 11,
-                fontWeight: 700,
-                borderRadius: 16,
+                fontWeight: 600,
+                borderRadius: 14,
                 border: "1px solid var(--line)",
                 display: "flex",
                 alignItems: "center",
-                gap: 6,
+                gap: 5,
                 color: "var(--ink)"
               }}
             >
-              <span>{showSidebar ? "👁️ Ẩn hàng đợi" : "📋 Hiện hàng đợi"}</span>
+              <span>{showSidebar ? "Ẩn hàng đợi" : "Hiện hàng đợi"}</span>
               <span style={{
-                background: unscheduled.length > 0 ? "var(--accent)" : "var(--ok)",
-                color: "white",
+                background: unscheduled.length > 0 ? "var(--accent)" : "var(--paper)",
+                color: unscheduled.length > 0 ? "#FFFFFF" : "var(--ink-soft)",
                 borderRadius: 10,
-                padding: "1px 6px",
-                fontSize: 10
+                padding: "0 6px",
+                fontSize: 10,
+                fontWeight: 700
               }}>
                 {unscheduled.length}
               </span>
@@ -3201,12 +3200,12 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels = {} }) => {
               <div 
                 key={d.short} 
                 style={{ 
-                  padding: "8px 0", 
-                  fontSize: 11, 
-                  fontWeight: 800, 
+                  padding: "6px 0", 
+                  fontSize: 10.5, 
+                  fontWeight: 700, 
                   color: isWeekend ? "var(--accent)" : "var(--ink-soft)",
                   textTransform: "uppercase",
-                  letterSpacing: "0.04em",
+                  letterSpacing: "0.02em",
                   borderRight: i < 6 ? "1px solid var(--line)" : "none"
                 }}
               >
@@ -3222,7 +3221,7 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels = {} }) => {
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(7, 1fr)",
-            gridAutoRows: "minmax(110px, 1fr)",
+            gridAutoRows: "minmax(95px, 1fr)",
             flex: 1,
             overflowY: "auto",
             background: "var(--line)",
@@ -3247,49 +3246,36 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels = {} }) => {
                   background: isDragOver 
                     ? "var(--accent-bg)" 
                     : cell.isCurrentMonth 
-                      ? (isToday ? "#FFFDF5" : (isWeekend ? "#FAF9F5" : "var(--card)"))
-                      : "#F3F4F6",
-                  padding: "6px 8px",
+                      ? (isToday ? "#FFFDF5" : (isWeekend ? "#FCFCFA" : "var(--card)"))
+                      : "#F8F9FA",
+                  padding: "5px 6px",
                   display: "flex",
                   flexDirection: "column",
-                  minHeight: 110,
+                  minHeight: 95,
                   overflow: "hidden",
-                  transition: "all 0.15s ease",
+                  transition: "background 0.1s ease",
                   position: "relative",
                   outline: isDragOver ? "2px dashed var(--accent)" : isToday ? "2px solid var(--accent)" : "none",
                   outlineOffset: -2,
                   zIndex: isToday ? 2 : 1
                 }}
               >
-                {/* Day Header: Number & Count */}
+                {/* Day Header */}
                 <div style={{
                   display: "flex",
-                  justifyContent: "space-between",
+                  justifyContent: "flex-end",
                   alignItems: "center",
-                  marginBottom: 6,
+                  marginBottom: 3,
                   flexShrink: 0
                 }}>
-                  {kols.length > 0 ? (
-                    <span style={{
-                      fontSize: 9,
-                      fontWeight: 700,
-                      color: "var(--ink-soft)",
-                      background: "var(--paper)",
-                      padding: "1px 5px",
-                      borderRadius: 10
-                    }}>
-                      {kols.length} KOL
-                    </span>
-                  ) : <span />}
-
                   <div style={{
-                    width: isToday ? 22 : "auto",
-                    height: isToday ? 22 : "auto",
+                    width: isToday ? 20 : "auto",
+                    height: isToday ? 20 : "auto",
                     borderRadius: isToday ? "50%" : 0,
                     background: isToday ? "var(--accent)" : "transparent",
                     color: isToday ? "#FFFFFF" : (cell.isCurrentMonth ? (isWeekend ? "var(--accent)" : "var(--ink)") : "var(--ink-faint)"),
-                    fontSize: 11,
-                    fontWeight: isToday ? 800 : 700,
+                    fontSize: 10.5,
+                    fontWeight: isToday ? 800 : 600,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -3303,32 +3289,32 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels = {} }) => {
                 {isDragOver && (
                   <div style={{
                     position: "absolute",
-                    inset: 4,
-                    background: "rgba(234, 146, 22, 0.12)",
-                    borderRadius: 8,
+                    inset: 3,
+                    background: "rgba(234, 146, 22, 0.1)",
+                    borderRadius: 6,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: 11,
+                    fontSize: 10.5,
                     fontWeight: 700,
                     color: "var(--accent)",
                     zIndex: 10,
                     pointerEvents: "none"
                   }}>
-                    + Thả vào ngày {cell.day}/{cell.month + 1}
+                    + Thả vào {cell.day}/{cell.month + 1}
                   </div>
                 )}
 
-                {/* KOL Badges Container */}
+                {/* Minimal Single-Line Event Chips */}
                 <div 
                   className="kt-scrollbar"
                   style={{
                     flex: 1,
                     display: "flex",
                     flexDirection: "column",
-                    gap: 4,
+                    gap: 3,
                     overflowY: "auto",
-                    paddingRight: 2
+                    paddingRight: 1
                   }}
                 >
                   {kols.map(r => {
@@ -3343,65 +3329,56 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels = {} }) => {
                           e.dataTransfer.setData("text/plain", r.id);
                         }}
                         style={{
-                          background: "var(--card)",
-                          border: "1px solid var(--line)",
-                          borderLeft: `3.5px solid ${brandColor}`,
-                          borderRadius: 6,
-                          padding: "4px 6px",
-                          cursor: "pointer",
                           display: "flex",
-                          flexDirection: "column",
-                          gap: 2,
-                          boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
-                          transition: "transform 0.1s ease, box-shadow 0.1s ease",
-                          flexShrink: 0
+                          alignItems: "center",
+                          gap: 5,
+                          padding: "2px 6px",
+                          borderRadius: 4,
+                          background: brandColor + "14",
+                          border: `1px solid ${brandColor}30`,
+                          cursor: "pointer",
+                          transition: "all 0.1s ease",
+                          flexShrink: 0,
+                          height: 20
                         }}
                         onMouseEnter={e => {
-                          e.currentTarget.style.transform = "translateY(-1px)";
-                          e.currentTarget.style.boxShadow = "0 3px 8px rgba(0,0,0,0.08)";
+                          e.currentTarget.style.background = brandColor + "25";
+                          e.currentTarget.style.borderColor = brandColor;
                         }}
                         onMouseLeave={e => {
-                          e.currentTarget.style.transform = "none";
-                          e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.03)";
+                          e.currentTarget.style.background = brandColor + "14";
+                          e.currentTarget.style.borderColor = brandColor + "30";
                         }}
-                        title={`${r.kol} - ${campaignLabels[r.campaign] || r.campaign}\nMón ăn: ${r.monAn || "Chưa có"}\nTrạng thái: ${isAired ? "Đã lên sóng" : "Chờ lên sóng"}`}
+                        title={`${r.kol} (${campaignLabels[r.campaign] || r.campaign})\nMón: ${r.monAn || "Chưa có"}\nTrạng thái: ${isAired ? "Đã lên sóng" : "Chờ lên sóng"}`}
                       >
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 4 }}>
-                          <span style={{
-                            fontSize: 8.5,
-                            fontWeight: 800,
-                            color: brandColor,
-                            textTransform: "uppercase",
-                            letterSpacing: "0.02em"
-                          }}>
-                            {campaignLabels[r.campaign] || r.campaign}
-                          </span>
-                          <span style={{ fontSize: 9 }}>
-                            {isAired ? "🎬" : (r.ngayGuiDemo ? "📼" : "📝")}
-                          </span>
-                        </div>
-
-                        <div style={{
-                          fontWeight: 700,
-                          fontSize: 10.5,
+                        <span style={{
+                          width: 5,
+                          height: 5,
+                          borderRadius: "50%",
+                          backgroundColor: brandColor,
+                          flexShrink: 0
+                        }} />
+                        <span style={{
+                          fontSize: 9,
+                          fontWeight: 800,
+                          color: brandColor,
+                          flexShrink: 0
+                        }}>
+                          {campaignLabels[r.campaign] || r.campaign}
+                        </span>
+                        <span style={{
+                          fontSize: 10,
+                          fontWeight: 600,
                           color: "var(--ink)",
-                          whiteSpace: "nowrap",
                           overflow: "hidden",
-                          textOverflow: "ellipsis"
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                          flex: 1
                         }}>
                           {r.kol}
-                        </div>
-
-                        {r.monAn && (
-                          <div style={{
-                            fontSize: 9,
-                            color: "var(--ink-soft)",
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis"
-                          }}>
-                            🍲 {r.monAn}
-                          </div>
+                        </span>
+                        {isAired && (
+                          <span style={{ fontSize: 8, opacity: 0.8, flexShrink: 0 }}>🎬</span>
                         )}
                       </div>
                     );
@@ -3418,8 +3395,8 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels = {} }) => {
       {/* ── RIGHT SIDEBAR (QUEUE: CHƯA LÊN LỊCH) ── */}
       {showSidebar && (
         <div style={{
-          width: 290,
-          minWidth: 290,
+          width: 260,
+          minWidth: 260,
           background: "var(--card)",
           display: "flex",
           flexDirection: "column",
@@ -3429,25 +3406,11 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels = {} }) => {
         }}>
           
           {/* Sidebar Header */}
-          <div style={{ padding: "14px 16px", borderBottom: "1px solid var(--line)", display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)", display: "flex", flexDirection: "column", gap: 8 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div style={{ fontSize: 13, fontWeight: 800, color: "var(--ink)", display: "flex", alignItems: "center", gap: 6 }}>
-                <span>⏳ Hàng đợi chưa lên lịch</span>
-                <span style={{
-                  fontSize: 11,
-                  fontWeight: 800,
-                  backgroundColor: "var(--accent-bg)",
-                  color: "var(--accent)",
-                  padding: "1px 7px",
-                  borderRadius: 10
-                }}>
-                  {unscheduled.length}
-                </span>
-              </div>
-            </div>
-
-            <div style={{ fontSize: 11, color: "var(--ink-soft)", lineHeight: 1.4 }}>
-              Kéo thả KOL vào ô ngày tương ứng trong lịch để gán ngày lên sóng.
+              <span style={{ fontSize: 12, fontWeight: 700, color: "var(--ink)" }}>
+                Chưa lên lịch ({unscheduled.length})
+              </span>
             </div>
 
             {/* Quick Search */}
@@ -3455,12 +3418,12 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels = {} }) => {
               className="kt-input"
               value={sidebarSearch}
               onChange={e => setSidebarSearch(e.target.value)}
-              placeholder="🔍 Tìm nhanh KOL chưa lên lịch..."
-              style={{ width: "100%", fontSize: 11, padding: "6px 10px", boxSizing: "border-box" }}
+              placeholder="🔍 Tìm tên KOL..."
+              style={{ width: "100%", fontSize: 10.5, padding: "4px 8px", boxSizing: "border-box", borderRadius: 6 }}
             />
 
             {/* Brand Filter Chips */}
-            <div style={{ display: "flex", gap: 4, overflowX: "auto", paddingBottom: 2 }}>
+            <div style={{ display: "flex", gap: 3, overflowX: "auto" }}>
               {["all", "AM", "AX", "Vinegar", "MSG"].map(cKey => {
                 const isSelected = sidebarCampaign === cKey;
                 return (
@@ -3469,10 +3432,10 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels = {} }) => {
                     onClick={() => setSidebarCampaign(cKey)}
                     className="kt-btn"
                     style={{
-                      padding: "3px 8px",
-                      borderRadius: 12,
-                      fontSize: 9.5,
-                      fontWeight: 700,
+                      padding: "2px 6px",
+                      borderRadius: 10,
+                      fontSize: 9,
+                      fontWeight: 600,
                       border: isSelected ? "1px solid var(--accent)" : "1px solid var(--line)",
                       background: isSelected ? "var(--accent)" : "var(--paper)",
                       color: isSelected ? "#FFFFFF" : "var(--ink-mid)",
@@ -3487,16 +3450,16 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels = {} }) => {
             </div>
           </div>
 
-          {/* Draggable Queue Cards List */}
+          {/* Minimal Draggable Cards List */}
           <div 
             className="kt-scrollbar"
             style={{
               flex: 1,
               overflowY: "auto",
-              padding: "12px 14px",
+              padding: "8px 10px",
               display: "flex",
               flexDirection: "column",
-              gap: 8
+              gap: 5
             }}
           >
             {filteredUnscheduled.map(r => {
@@ -3511,67 +3474,61 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels = {} }) => {
                   }}
                   onClick={() => onOpen(r)}
                   style={{
-                    padding: "10px 12px",
-                    borderRadius: 10,
+                    padding: "6px 8px",
+                    borderRadius: 6,
                     background: "var(--paper)",
                     border: "1px solid var(--line)",
                     cursor: "grab",
-                    transition: "all 0.15s ease",
+                    transition: "all 0.1s ease",
                     display: "flex",
-                    flexDirection: "column",
-                    gap: 4,
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.02)"
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 6
                   }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.transform = "translateY(-1px)";
                     e.currentTarget.style.borderColor = "var(--accent)";
-                    e.currentTarget.style.boxShadow = "0 4px 10px rgba(0,0,0,0.06)";
+                    e.currentTarget.style.background = "var(--card)";
                   }}
                   onMouseLeave={e => {
-                    e.currentTarget.style.transform = "none";
                     e.currentTarget.style.borderColor = "var(--line)";
-                    e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.02)";
+                    e.currentTarget.style.background = "var(--paper)";
                   }}
+                  title={`Kéo thả vào ngày trong lịch để xếp lịch\n${r.monAn ? "Món: " + r.monAn : ""}`}
                 >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0, flex: 1 }}>
                     <span style={{
-                      fontSize: 9,
+                      fontSize: 8.5,
                       fontWeight: 800,
                       color: brandColor,
                       background: brandColor + "18",
-                      padding: "2px 6px",
-                      borderRadius: 6
+                      padding: "1px 5px",
+                      borderRadius: 4,
+                      flexShrink: 0
                     }}>
                       {campaignLabels[r.campaign] || r.campaign}
                     </span>
-                    <span style={{ fontSize: 10, color: "var(--ink-faint)", fontFamily: "var(--kt-mono)" }}>
-                      ⠿ {r.id}
+                    <span style={{
+                      fontWeight: 600,
+                      fontSize: 11,
+                      color: "var(--ink)",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap"
+                    }}>
+                      {r.kol}
                     </span>
                   </div>
 
-                  <div style={{ fontWeight: 800, fontSize: 12, color: "var(--ink)" }}>
-                    {r.kol}
-                  </div>
-
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 10, color: "var(--ink-soft)" }}>
-                    <span>{r.type || "Micro"}</span>
-                    {r.follower && <span>{r.follower} flw</span>}
-                  </div>
-
-                  {r.monAn && (
-                    <div style={{ fontSize: 10, color: "var(--ink-soft)", borderTop: "1px dashed var(--line)", paddingTop: 4, marginTop: 2 }}>
-                      🍲 {r.monAn}
-                    </div>
-                  )}
+                  <span style={{ fontSize: 9.5, color: "var(--ink-soft)", flexShrink: 0 }}>
+                    {r.follower || r.type || "Micro"}
+                  </span>
                 </div>
               );
             })}
 
             {filteredUnscheduled.length === 0 && (
-              <div style={{ textAlign: "center", padding: "40px 10px", color: "var(--ink-soft)", fontSize: 11, display: "flex", flexDirection: "column", gap: 6 }}>
-                <span style={{ fontSize: 24 }}>🎉</span>
-                <strong>{sidebarSearch ? "Không tìm thấy KOL phù hợp" : "Tất cả KOL đã được lên lịch!"}</strong>
-                <span>Kéo thả để dời ngày nếu cần sắp xếp lại.</span>
+              <div style={{ textAlign: "center", padding: "30px 10px", color: "var(--ink-soft)", fontSize: 10.5 }}>
+                🎉 Đã lên lịch xong tất cả!
               </div>
             )}
           </div>
