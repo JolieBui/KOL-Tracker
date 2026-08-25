@@ -4725,54 +4725,62 @@ const PlanView = () => {
     return Number(num).toLocaleString("vi-VN");
   };
 
-  const handleExportPlan = () => {
-    const exportRows = [];
-    MEDIA_PLAN_DATA.brands.forEach(brand => {
-      brand.kpis.forEach(k => {
-        exportRows.push({
-          "Chiến dịch (Brand)": brand.name,
-          "Giai đoạn (Phase)": k.phase,
-          "Khu vực (Geo)": k.geo,
-          "Đơn giá (CPV 6s)": k.unitCost,
-          "Ngân sách (Budget)": k.budget,
-          "Hiển thị (Impression)": k.impression,
-          "CPM (VNĐ)": k.cpm,
-          "6s Focused Views": k.view6s,
-          "Tỷ lệ xem (VR)": k.vr,
-          "Unique Reach": k.reach,
-          "Target Pool": k.pool,
-          "% Pool Reach": k.pctPool,
-          "Tần suất (Frequency)": k.freq
-        });
-      });
-      if (brand.totalKpi) {
-        exportRows.push({
-          "Chiến dịch (Brand)": brand.name + " (TỔNG)",
-          "Giai đoạn (Phase)": "Tổng cộng",
-          "Khu vực (Geo)": "Toàn chiến dịch",
-          "Đơn giá (CPV 6s)": brand.totalKpi.unitCost,
-          "Ngân sách (Budget)": brand.totalKpi.budget,
-          "Hiển thị (Impression)": brand.totalKpi.impression,
-          "CPM (VNĐ)": brand.totalKpi.cpm,
-          "6s Focused Views": brand.totalKpi.view6s,
-          "Tỷ lệ xem (VR)": brand.totalKpi.vr,
-          "Unique Reach": brand.totalKpi.reach,
-          "Target Pool": brand.totalKpi.pool,
-          "% Pool Reach": brand.totalKpi.pctPool,
-          "Tần suất (Frequency)": brand.totalKpi.freq
-        });
-      }
-    });
+  const brandsList = MEDIA_PLAN_DATA?.brands || [];
+  const planSummary = MEDIA_PLAN_DATA?.summary || {};
 
-    const ws = XLSX.utils.json_to_sheet(exportRows);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Media Plan FY26");
-    XLSX.writeFile(wb, `TCV_Media_Plan_FY26_${new Date().toISOString().slice(0, 10)}.xlsx`);
+  const handleExportPlan = () => {
+    try {
+      const exportRows = [];
+      brandsList.forEach(brand => {
+        (brand.kpis || []).forEach(k => {
+          exportRows.push({
+            "Chiến dịch (Brand)": brand.name || "",
+            "Giai đoạn (Phase)": k.phase || "",
+            "Khu vực (Geo)": k.geo || "",
+            "Đơn giá (CPV 6s)": k.unitCost || 0,
+            "Ngân sách (Budget)": k.budget || 0,
+            "Hiển thị (Impression)": k.impression || 0,
+            "CPM (VNĐ)": k.cpm || 0,
+            "6s Focused Views": k.view6s || 0,
+            "Tỷ lệ xem (VR)": k.vr || "",
+            "Unique Reach": k.reach || 0,
+            "Target Pool": k.pool || 0,
+            "% Pool Reach": k.pctPool || "",
+            "Tần suất (Frequency)": k.freq || 0
+          });
+        });
+        if (brand.totalKpi) {
+          exportRows.push({
+            "Chiến dịch (Brand)": (brand.name || "") + " (TỔNG)",
+            "Giai đoạn (Phase)": "Tổng cộng",
+            "Khu vực (Geo)": "Toàn chiến dịch",
+            "Đơn giá (CPV 6s)": brand.totalKpi.unitCost || 0,
+            "Ngân sách (Budget)": brand.totalKpi.budget || 0,
+            "Hiển thị (Impression)": brand.totalKpi.impression || 0,
+            "CPM (VNĐ)": brand.totalKpi.cpm || 0,
+            "6s Focused Views": brand.totalKpi.view6s || 0,
+            "Tỷ lệ xem (VR)": brand.totalKpi.vr || "",
+            "Unique Reach": brand.totalKpi.reach || 0,
+            "Target Pool": brand.totalKpi.pool || 0,
+            "% Pool Reach": brand.totalKpi.pctPool || "",
+            "Tần suất (Frequency)": brand.totalKpi.freq || 0
+          });
+        }
+      });
+
+      const ws = XLSX.utils.json_to_sheet(exportRows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Media Plan FY26");
+      XLSX.writeFile(wb, `TCV_Media_Plan_FY26_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    } catch (err) {
+      console.error("Export plan error:", err);
+      window.alert("Không thể xuất file Excel Media Plan.");
+    }
   };
 
   const filteredBrands = selectedBrand === "all" 
-    ? MEDIA_PLAN_DATA.brands 
-    : MEDIA_PLAN_DATA.brands.filter(b => b.id === selectedBrand);
+    ? brandsList 
+    : brandsList.filter(b => b.id === selectedBrand);
 
   return (
     <div className="kt-scrollbar" style={{ flex: 1, overflowY: "auto", padding: "16px 20px", display: "flex", flexDirection: "column", gap: 16, background: "var(--card)" }}>
@@ -4819,26 +4827,26 @@ const PlanView = () => {
       }}>
         <div style={{ background: "var(--paper)", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--line)" }}>
           <div style={{ fontSize: 10.5, color: "var(--ink-soft)", fontWeight: 600, textTransform: "uppercase" }}>💰 Tổng Ngân Sách Plan</div>
-          <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)", marginTop: 3 }}>{formatVnd(MEDIA_PLAN_DATA.summary.totalBudget)}</div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)", marginTop: 3 }}>{formatVnd(planSummary.totalBudget)}</div>
           <div style={{ fontSize: 10, color: "var(--ink-soft)", marginTop: 2 }}>4 Chiến dịch trọng điểm</div>
         </div>
 
         <div style={{ background: "var(--paper)", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--line)" }}>
           <div style={{ fontSize: 10.5, color: "var(--ink-soft)", fontWeight: 600, textTransform: "uppercase" }}>👁️ Mục Tiêu 6s Views</div>
-          <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)", marginTop: 3 }}>{formatNumber(MEDIA_PLAN_DATA.summary.total6sViews)}</div>
-          <div style={{ fontSize: 10, color: "var(--ink-soft)", marginTop: 2 }}>CPView TB: ~{MEDIA_PLAN_DATA.summary.avgUnitCost} ₫</div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)", marginTop: 3 }}>{formatNumber(planSummary.total6sViews)}</div>
+          <div style={{ fontSize: 10, color: "var(--ink-soft)", marginTop: 2 }}>CPView TB: ~{planSummary.avgUnitCost || 73} ₫</div>
         </div>
 
         <div style={{ background: "var(--paper)", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--line)" }}>
           <div style={{ fontSize: 10.5, color: "var(--ink-soft)", fontWeight: 600, textTransform: "uppercase" }}>📢 Tổng Impressions</div>
-          <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)", marginTop: 3 }}>{formatNumber(MEDIA_PLAN_DATA.summary.totalImpression)}</div>
-          <div style={{ fontSize: 10, color: "var(--ink-soft)", marginTop: 2 }}>CPM TB: {formatNumber(MEDIA_PLAN_DATA.summary.avgCpm)} ₫</div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)", marginTop: 3 }}>{formatNumber(planSummary.totalImpression)}</div>
+          <div style={{ fontSize: 10, color: "var(--ink-soft)", marginTop: 2 }}>CPM TB: {formatNumber(planSummary.avgCpm)} ₫</div>
         </div>
 
         <div style={{ background: "var(--paper)", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--line)" }}>
           <div style={{ fontSize: 10.5, color: "var(--ink-soft)", fontWeight: 600, textTransform: "uppercase" }}>👥 Quy Mô KOL / View Rate</div>
-          <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)", marginTop: 3 }}>{MEDIA_PLAN_DATA.summary.totalKolsRange}</div>
-          <div style={{ fontSize: 10, color: "var(--ink-soft)", marginTop: 2 }}>VR trung bình: {MEDIA_PLAN_DATA.summary.avgVr}</div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)", marginTop: 3 }}>{planSummary.totalKolsRange || "35 – 40 KOLs"}</div>
+          <div style={{ fontSize: 10, color: "var(--ink-soft)", marginTop: 2 }}>VR trung bình: {planSummary.avgVr || "22,54%"}</div>
         </div>
       </div>
 
@@ -4854,10 +4862,10 @@ const PlanView = () => {
             fontWeight: 600
           }}
         >
-          Tất cả Brand ({MEDIA_PLAN_DATA.brands.length})
+          Tất cả Brand ({brandsList.length})
         </button>
 
-        {MEDIA_PLAN_DATA.brands.map(b => {
+        {brandsList.map(b => {
           const isSelected = selectedBrand === b.id;
           return (
             <button
@@ -4931,17 +4939,17 @@ const PlanView = () => {
                 </div>
 
                 <div style={{ background: "var(--paper)", padding: "10px 12px", borderRadius: 8, fontSize: 11, display: "flex", flexDirection: "column", gap: 4, lineHeight: 1.4 }}>
-                  <div><strong>Độ tuổi: </strong>{brand.targetAudience.core} {brand.targetAudience.sub && `(${brand.targetAudience.sub})`}</div>
-                  <div><strong>Phân khúc: </strong>{brand.targetAudience.socialClass}</div>
-                  <div><strong>Địa bàn: </strong>{brand.targetAudience.location}</div>
-                  {brand.targetAudience.notes && (
+                  <div><strong>Độ tuổi: </strong>{brand.targetAudience?.core || "—"} {brand.targetAudience?.sub && `(${brand.targetAudience.sub})`}</div>
+                  <div><strong>Phân khúc: </strong>{brand.targetAudience?.socialClass || "—"}</div>
+                  <div><strong>Địa bàn: </strong>{brand.targetAudience?.location || "—"}</div>
+                  {brand.targetAudience?.notes && (
                     <div style={{ color: "var(--ink-soft)", borderTop: "1px dashed var(--line)", paddingTop: 4, marginTop: 2, fontStyle: "italic" }}>
                       💡 {brand.targetAudience.notes}
                     </div>
                   )}
                 </div>
 
-                {brand.groupsContext && (
+                {brand.groupsContext && Array.isArray(brand.groupsContext) && (
                   <div style={{ display: "flex", flexDirection: "column", gap: 4, marginTop: 2 }}>
                     <div style={{ fontSize: 10, fontWeight: 700, color: "var(--ink-soft)" }}>PHÂN NHÓM BỐI CẢNH (GROUP CONTEXT):</div>
                     {brand.groupsContext.map((g, idx) => (
@@ -4962,7 +4970,7 @@ const PlanView = () => {
                 <div style={{ background: "var(--paper)", padding: "10px 12px", borderRadius: 8, fontSize: 11 }}>
                   <div style={{ fontWeight: 700, color: "var(--ink-soft)", marginBottom: 4, fontSize: 10 }}>TIÊU CHÍ CHỌN KOL:</div>
                   <ul style={{ margin: 0, paddingLeft: 16, display: "flex", flexDirection: "column", gap: 3 }}>
-                    {brand.kolCriteria.map((c, idx) => (
+                    {(brand.kolCriteria || []).map((c, idx) => (
                       <li key={idx}><span>{c}</span></li>
                     ))}
                   </ul>
@@ -4970,7 +4978,7 @@ const PlanView = () => {
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                   <div style={{ fontSize: 10, fontWeight: 700, color: "var(--ink-soft)" }}>DANH MỤC SKU:</div>
-                  {brand.skus.map((sku, idx) => (
+                  {(brand.skus || []).map((sku, idx) => (
                     <div key={idx} style={{ background: "var(--paper)", padding: "6px 10px", borderRadius: 6, fontSize: 10.5, display: "flex", alignItems: "center", gap: 6 }}>
                       <span style={{
                         padding: "1px 5px",
@@ -5015,7 +5023,7 @@ const PlanView = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {brand.kpis.map((k, idx) => (
+                    {(brand.kpis || []).map((k, idx) => (
                       <tr key={idx} style={{ borderBottom: "1px solid var(--line)" }}>
                         <td style={{ padding: "6px 10px", fontWeight: 600, color: "var(--ink)" }}>{k.phase}</td>
                         <td style={{ padding: "6px 10px", color: "var(--ink-mid)" }}>{k.geo}</td>
