@@ -4624,16 +4624,39 @@ class ViewErrorBoundary extends React.Component {
     return this.props.children;
   }
 }
-const LS_KEY = "kol_tracking_v5";
+const LS_KEY = "kol_tracking_v6";
 
 export default function App() {
   const [data, rawSetData] = useState(() => {
     try {
+      // One-time cleanup: purge old hardcoded brand demo data from previous versions
+      try {
+        localStorage.removeItem("kol_tracking_v5");
+        localStorage.removeItem("kol_tracking_v4");
+        localStorage.removeItem("kol_tracking_v3");
+        localStorage.removeItem("kol_tracking_v2");
+        localStorage.removeItem("kol_tracking_v1");
+        const oldLabels = localStorage.getItem("kol_campaign_labels");
+        if (oldLabels && (oldLabels.includes('"AM"') || oldLabels.includes('"AX"'))) {
+          localStorage.removeItem("kol_campaign_labels");
+        }
+      } catch {}
+
       const s = localStorage.getItem(LS_KEY);
       const parsed = s ? JSON.parse(s) : SEED_DATA;
+
+      // Sanitize old demo campaign names if present
+      const sanitizedData = parsed.map(r => {
+        if (r.campaign === "AM") return { ...r, id: (r.id || "").replace("AM-", "CA-"), campaign: "Campaign A" };
+        if (r.campaign === "AX") return { ...r, id: (r.id || "").replace("AX-", "CB-"), campaign: "Campaign B" };
+        if (r.campaign === "Vinegar") return { ...r, id: (r.id || "").replace("AV-", "CC-"), campaign: "Campaign C" };
+        if (r.campaign === "MSG" || r.campaign === "MGS") return { ...r, id: (r.id || "").replace("MSG-", "CD-"), campaign: "Campaign D" };
+        if (r.campaign === "Blendy") return { ...r, id: (r.id || "").replace("Blendy-", "CE-"), campaign: "Campaign E" };
+        return r;
+      });
+
       // One-time cleanup: strip auto-generated fake performance data
-      // Detect: revenue === conversions * 165000 AND addToCart === conversions * 5
-      const cleaned = parsed.map(r => {
+      const cleaned = sanitizedData.map(r => {
         const conv = Number(r.conversions) || 0;
         const rev = Number(r.revenue) || 0;
         const atc = Number(r.addToCart) || 0;
@@ -4650,40 +4673,7 @@ export default function App() {
         return r;
       });
 
-      // Auto-migrate historical decimal ratios to raw percentage scale (runs once per client session)
-      const migrationVersion = "v6_unconditional";
-      const isMigrated = localStorage.getItem("kol_pct_migrated") === migrationVersion;
-      
-      let migrated = cleaned;
-      if (!isMigrated) {
-        migrated = cleaned.map(r => {
-          const updateVal = (val) => {
-            if (val === undefined || val === null || val === "") return val;
-            const num = Number(val);
-            if (isNaN(num)) return val;
-            // Since historical values in DB were unmultiplied decimal ratios (e.g. 0.7093, 8.5),
-            // we must scale them by 100 to align with the new raw percentage format.
-            return num * 100;
-          };
-
-          return {
-            ...r,
-            pctViewAchieved: updateVal(r.pctViewAchieved),
-            pctEngAchieved: updateVal(r.pctEngAchieved),
-            pctViewAchievedTotal: updateVal(r.pctViewAchievedTotal),
-            pctEngAchievedTotal: updateVal(r.pctEngAchievedTotal),
-            paidPctCompletedView: updateVal(r.paidPctCompletedView)
-          };
-        });
-        try {
-          localStorage.setItem("kol_pct_migrated", migrationVersion);
-          localStorage.setItem(LS_KEY, JSON.stringify(migrated));
-        } catch (e) {
-          console.error("Failed to write migrated data:", e);
-        }
-      }
-
-      const synced = migrated.map(row => {
+      const synced = cleaned.map(row => {
         const link = row.airedLink ? row.airedLink.toString().trim() : "";
         const isLinkAired = link && !["air", "aired", "—", "-"].includes(link.toLowerCase()) && (/^https?:\/\//i.test(link) || (link.includes(".") && !link.includes(" ")));
         if (isLinkAired && row.statusKey !== "aired") {
