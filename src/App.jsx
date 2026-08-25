@@ -458,9 +458,32 @@ const DEFAULT_STATUS_STAGES = [
   { key: "aired",          label: "Đã lên sóng",         color: "#8A7BFF", soft: "#F4F2FF" },
 ];
 
-const PREDEFINED_COLORS = ["#FFAFA3", "#A2C2E8", "#A8C3A0", "#FFD175", "#C7B1E6", "#F4A261", "#E76F51", "#2A9D8F", "#E9C46A", "#264653"];
+const PREDEFINED_COLORS = ["#10B981", "#EA9216", "#8B5CF6", "#EF4444", "#3B82F6", "#EC4899", "#06B6D4", "#F59E0B", "#6366F1", "#14B8A6"];
+const BRAND_COLORS = {
+  AM: "#10B981",
+  AX: "#EA9216",
+  Vinegar: "#8B5CF6",
+  Giấm: "#8B5CF6",
+  Giam: "#8B5CF6",
+  MSG: "#EF4444",
+  "Bột Ngọt": "#EF4444",
+  BotNgot: "#EF4444",
+  Blendy: "#3B82F6"
+};
+
 const getCampaignColor = (key) => {
   if (!key) return "#888";
+  const cleanKey = key.toString().trim();
+  if (BRAND_COLORS[cleanKey]) return BRAND_COLORS[cleanKey];
+  const upper = cleanKey.toUpperCase();
+  if (BRAND_COLORS[upper]) return BRAND_COLORS[upper];
+  
+  if (/aji.*mayo|am/i.test(cleanKey)) return "#10B981";
+  if (/aji.*xot|ax/i.test(cleanKey)) return "#EA9216";
+  if (/giam|vinegar/i.test(cleanKey)) return "#8B5CF6";
+  if (/bot.*ngot|msg/i.test(cleanKey)) return "#EF4444";
+  if (/blendy/i.test(cleanKey)) return "#3B82F6";
+
   let hash = 0;
   for (let i = 0; i < key.length; i++) {
     hash = key.charCodeAt(i) + ((hash << 5) - hash);
@@ -2920,11 +2943,14 @@ const KanbanView = ({ rows, onOpen, onUpdateStatus, campaignLabels, statusStages
 );
 
 /* ================================================================
-   CALENDAR VIEW
+   CALENDAR VIEW (REDESIGNED & HIGH-AESTHETIC)
 ================================================================ */
-const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels }) => {
-  const [currentMonth, setCurrentMonth] = useState(new Date()); // Default to current system date
-  const [draggedOverDay, setDraggedOverDay] = useState(null); // String identifier of day cell 'YYYY-MM-DD'
+const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels = {} }) => {
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [draggedOverDay, setDraggedOverDay] = useState(null);
+  const [sidebarSearch, setSidebarSearch] = useState("");
+  const [sidebarCampaign, setSidebarCampaign] = useState("all");
+  const [showSidebar, setShowSidebar] = useState(true);
 
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
@@ -2945,7 +2971,6 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels }) => {
     const s = str.toString().trim();
     if (!s || s.startsWith("http")) return null;
 
-    // Handle Excel serial date numbers (e.g. 46234 -> 2026-07-20)
     if (!isNaN(s) && Number(s) > 30000 && Number(s) < 60000) {
       const d = new Date(Math.round((Number(s) - 25569) * 86400 * 1000));
       if (!isNaN(d.getTime())) {
@@ -2953,7 +2978,6 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels }) => {
       }
     }
 
-    // Match DD/MM or DD-MM or DD/MM/YYYY pattern in text
     const match = s.match(/(\d{1,2})[/-](\d{1,2})(?:[/-](\d{2,4}))?/);
     if (match) {
       const day = parseInt(match[1], 10);
@@ -3022,52 +3046,196 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels }) => {
     }
   });
 
+  // Calculate monthly scheduled count
+  let monthScheduledCount = 0;
+  cells.forEach(cell => {
+    if (cell.isCurrentMonth) {
+      const key = `${cell.year}-${cell.month}-${cell.day}`;
+      monthScheduledCount += (scheduledMap[key] || []).length;
+    }
+  });
+
   const handleDrop = (e, cell) => {
     e.preventDefault();
     setDraggedOverDay(null);
     const id = e.dataTransfer.getData("text/plain");
     if (id) {
-      // Format as DD/MM
       const dateStr = `${cell.day}/${cell.month + 1}`;
       onUpdateRow(id, { ngayAir: dateStr });
     }
   };
 
-  const weekdays = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
+  const weekdays = [
+    { label: "Thứ Hai", short: "T2" },
+    { label: "Thứ Ba", short: "T3" },
+    { label: "Thứ Tư", short: "T4" },
+    { label: "Thứ Năm", short: "T5" },
+    { label: "Thứ Sáu", short: "T6" },
+    { label: "Thứ Bảy", short: "T7" },
+    { label: "Chủ Nhật", short: "CN" }
+  ];
+
+  // Filter unscheduled list
+  const filteredUnscheduled = unscheduled.filter(r => {
+    if (sidebarCampaign !== "all" && resolveCampaignKey(r) !== sidebarCampaign) return false;
+    if (sidebarSearch.trim()) {
+      const q = sidebarSearch.toLowerCase();
+      const matchName = (r.kol || "").toLowerCase().includes(q);
+      const matchFood = (r.monAn || "").toLowerCase().includes(q);
+      const matchTier = (r.type || "").toLowerCase().includes(q);
+      if (!matchName && !matchFood && !matchTier) return false;
+    }
+    return true;
+  });
+
+  const todayObj = new Date();
 
   return (
-    <div className="kt-calendar-container">
-      {/* Left panel: Calendar Grid */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "var(--card)", borderRadius: 12, border: "1px solid var(--line)", padding: 14, overflow: "hidden" }}>
-        {/* Navigation */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+    <div style={{ display: "flex", flex: 1, minHeight: 0, height: "100%", overflow: "hidden", background: "var(--card)" }}>
+      
+      {/* ── MAIN CALENDAR AREA ── */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, overflow: "hidden", borderRight: showSidebar ? "1px solid var(--line)" : "none" }}>
+        
+        {/* Top Calendar Toolbar */}
+        <div style={{
+          padding: "14px 20px",
+          borderBottom: "1px solid var(--line)",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: 12,
+          background: "var(--card)",
+          flexShrink: 0
+        }}>
+          
+          {/* Month Navigation */}
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <h2 style={{ fontSize: 16, fontWeight: 800, margin: 0, color: "var(--ink)", width: 140 }}>
-              Tháng {month + 1}, {year}
-            </h2>
-            <button className="kt-btn kt-btn-ghost" onClick={handleToday} style={{ fontSize: 11, padding: "4px 8px" }}>Hôm nay</button>
+            <div style={{ display: "flex", alignItems: "center", background: "var(--paper)", borderRadius: 20, padding: 3, border: "1px solid var(--line)" }}>
+              <button 
+                className="kt-btn kt-btn-ghost" 
+                onClick={handlePrevMonth} 
+                title="Tháng trước"
+                style={{ padding: "4px 10px", fontSize: 13, borderRadius: 16, color: "var(--ink)" }}
+              >
+                ◀
+              </button>
+              <h2 style={{ fontSize: 15, fontWeight: 800, margin: "0 10px", color: "var(--ink)", minWidth: 120, textAlign: "center" }}>
+                Tháng {month + 1} / {year}
+              </h2>
+              <button 
+                className="kt-btn kt-btn-ghost" 
+                onClick={handleNextMonth} 
+                title="Tháng sau"
+                style={{ padding: "4px 10px", fontSize: 13, borderRadius: 16, color: "var(--ink)" }}
+              >
+                ▶
+              </button>
+            </div>
+
+            <button 
+              className="kt-btn kt-btn-ghost" 
+              onClick={handleToday}
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                padding: "6px 12px",
+                borderRadius: 16,
+                border: "1px solid var(--line)",
+                color: "var(--ink)"
+              }}
+            >
+              📅 Hôm nay
+            </button>
           </div>
-          <div style={{ display: "flex", gap: 6 }}>
-            <button className="kt-btn kt-btn-ghost" onClick={handlePrevMonth} style={{ padding: "4px 10px", fontSize: 13 }}>◀</button>
-            <button className="kt-btn kt-btn-ghost" onClick={handleNextMonth} style={{ padding: "4px 10px", fontSize: 13 }}>▶</button>
+
+          {/* Quick Metrics & Sidebar Toggle */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, background: "var(--accent-bg)", padding: "5px 12px", borderRadius: 16, color: "var(--accent)", fontWeight: 700 }}>
+              <span>🚀 Lên sóng tháng này:</span>
+              <span style={{ fontSize: 13 }}>{monthScheduledCount} KOLs</span>
+            </div>
+
+            <button
+              className="kt-btn kt-btn-ghost"
+              onClick={() => setShowSidebar(!showSidebar)}
+              title={showSidebar ? "Ẩn danh sách chưa lên lịch" : "Hiện danh sách chưa lên lịch"}
+              style={{
+                padding: "6px 12px",
+                fontSize: 11,
+                fontWeight: 700,
+                borderRadius: 16,
+                border: "1px solid var(--line)",
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                color: "var(--ink)"
+              }}
+            >
+              <span>{showSidebar ? "👁️ Ẩn hàng đợi" : "📋 Hiện hàng đợi"}</span>
+              <span style={{
+                background: unscheduled.length > 0 ? "var(--accent)" : "var(--ok)",
+                color: "white",
+                borderRadius: 10,
+                padding: "1px 6px",
+                fontSize: 10
+              }}>
+                {unscheduled.length}
+              </span>
+            </button>
           </div>
         </div>
 
-        {/* Calendar Week Header */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 4, marginBottom: 4, textAlign: "center" }}>
-          {weekdays.map(d => (
-            <div key={d} style={{ fontSize: 10, fontWeight: 700, color: "var(--ink-soft)", padding: "4px 0", textTransform: "uppercase" }}>{d}</div>
-          ))}
+        {/* Calendar Week Header (T2 - CN) */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(7, 1fr)",
+          background: "var(--paper)",
+          borderBottom: "1px solid var(--line)",
+          textAlign: "center",
+          flexShrink: 0
+        }}>
+          {weekdays.map((d, i) => {
+            const isWeekend = i >= 5;
+            return (
+              <div 
+                key={d.short} 
+                style={{ 
+                  padding: "8px 0", 
+                  fontSize: 11, 
+                  fontWeight: 800, 
+                  color: isWeekend ? "var(--accent)" : "var(--ink-soft)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.04em",
+                  borderRight: i < 6 ? "1px solid var(--line)" : "none"
+                }}
+              >
+                {d.label}
+              </div>
+            );
+          })}
         </div>
 
-        {/* Month grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gridTemplateRows: "repeat(6, 1fr)", gap: 6, flex: 1 }}>
+        {/* Calendar Grid (6 rows x 7 cols) */}
+        <div 
+          className="kt-scrollbar"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(7, 1fr)",
+            gridAutoRows: "minmax(110px, 1fr)",
+            flex: 1,
+            overflowY: "auto",
+            background: "var(--line)",
+            gap: 1
+          }}
+        >
           {cells.map((cell, idx) => {
             const cellKey = `${cell.year}-${cell.month}-${cell.day}`;
             const kols = scheduledMap[cellKey] || [];
-            const todayObj = new Date();
             const isToday = cell.day === todayObj.getDate() && cell.month === todayObj.getMonth() && cell.year === todayObj.getFullYear();
             const isDragOver = draggedOverDay === cellKey;
+            const colIndex = idx % 7;
+            const isWeekend = colIndex >= 5;
 
             return (
               <div
@@ -3076,113 +3244,341 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels }) => {
                 onDragLeave={() => setDraggedOverDay(null)}
                 onDrop={(e) => handleDrop(e, cell)}
                 style={{
-                  background: isDragOver ? "var(--accent-bg)" : (cell.isCurrentMonth ? "var(--paper)" : "#FAF9F5"),
-                  border: isDragOver ? "1px dashed var(--accent)" : `1px solid ${isToday ? "var(--blue)" : "var(--line)"}`,
-                  borderRadius: 8,
-                  padding: 4,
+                  background: isDragOver 
+                    ? "var(--accent-bg)" 
+                    : cell.isCurrentMonth 
+                      ? (isToday ? "#FFFDF5" : (isWeekend ? "#FAF9F5" : "var(--card)"))
+                      : "#F3F4F6",
+                  padding: "6px 8px",
                   display: "flex",
                   flexDirection: "column",
-                  minHeight: 30,
+                  minHeight: 110,
                   overflow: "hidden",
                   transition: "all 0.15s ease",
-                  transform: isDragOver ? "scale(1.02)" : "none",
-                  boxShadow: isToday ? "0 0 0 2px var(--blue-soft)" : "none"
+                  position: "relative",
+                  outline: isDragOver ? "2px dashed var(--accent)" : isToday ? "2px solid var(--accent)" : "none",
+                  outlineOffset: -2,
+                  zIndex: isToday ? 2 : 1
                 }}
               >
-                {/* Day number */}
+                {/* Day Header: Number & Count */}
                 <div style={{
-                  fontSize: 10,
-                  fontWeight: 700,
-                  color: cell.isCurrentMonth ? (isToday ? "var(--blue)" : "var(--ink)") : "var(--ink-soft)",
-                  alignSelf: "flex-end",
-                  opacity: cell.isCurrentMonth ? 1 : 0.45,
-                  marginBottom: 2
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 6,
+                  flexShrink: 0
                 }}>
-                  {cell.day}
+                  {kols.length > 0 ? (
+                    <span style={{
+                      fontSize: 9,
+                      fontWeight: 700,
+                      color: "var(--ink-soft)",
+                      background: "var(--paper)",
+                      padding: "1px 5px",
+                      borderRadius: 10
+                    }}>
+                      {kols.length} KOL
+                    </span>
+                  ) : <span />}
+
+                  <div style={{
+                    width: isToday ? 22 : "auto",
+                    height: isToday ? 22 : "auto",
+                    borderRadius: isToday ? "50%" : 0,
+                    background: isToday ? "var(--accent)" : "transparent",
+                    color: isToday ? "#FFFFFF" : (cell.isCurrentMonth ? (isWeekend ? "var(--accent)" : "var(--ink)") : "var(--ink-faint)"),
+                    fontSize: 11,
+                    fontWeight: isToday ? 800 : 700,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontFamily: "var(--kt-mono)"
+                  }}>
+                    {cell.day}
+                  </div>
                 </div>
 
-                {/* KOL Badges in this day */}
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 3, overflowY: "auto" }} className="kt-scrollbar">
-                  {kols.map(r => (
-                    <div
-                      key={r.id}
-                      onClick={() => onOpen(r)}
-                      draggable
-                      onDragStart={(e) => {
-                        e.dataTransfer.setData("text/plain", r.id);
-                      }}
-                      style={{
-                        background: "var(--card)",
-                        borderLeft: `3px solid ${getCampaignColor(r.campaign) || "var(--green)"}`,
-                        borderRadius: 4,
-                        padding: "2px 4px",
-                        fontSize: 9,
-                        fontWeight: 600,
-                        color: "var(--ink)",
-                        cursor: "grab",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        boxShadow: "0 1px 2px rgba(0,0,0,0.02)"
-                      }}
-                      title={`${r.kol} (${campaignLabels[r.campaign] || r.campaign}) - ${r.monAn || "Chưa có món ăn"}`}
-                    >
-                      {r.kol}
-                    </div>
-                  ))}
+                {/* Drag over cue */}
+                {isDragOver && (
+                  <div style={{
+                    position: "absolute",
+                    inset: 4,
+                    background: "rgba(234, 146, 22, 0.12)",
+                    borderRadius: 8,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: "var(--accent)",
+                    zIndex: 10,
+                    pointerEvents: "none"
+                  }}>
+                    + Thả vào ngày {cell.day}/{cell.month + 1}
+                  </div>
+                )}
+
+                {/* KOL Badges Container */}
+                <div 
+                  className="kt-scrollbar"
+                  style={{
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 4,
+                    overflowY: "auto",
+                    paddingRight: 2
+                  }}
+                >
+                  {kols.map(r => {
+                    const brandColor = getCampaignColor(r.campaign);
+                    const isAired = r.statusKey === "aired" || r.status === "Đã lên sóng" || (Number(r.views) > 0);
+                    return (
+                      <div
+                        key={r.id}
+                        onClick={() => onOpen(r)}
+                        draggable
+                        onDragStart={(e) => {
+                          e.dataTransfer.setData("text/plain", r.id);
+                        }}
+                        style={{
+                          background: "var(--card)",
+                          border: "1px solid var(--line)",
+                          borderLeft: `3.5px solid ${brandColor}`,
+                          borderRadius: 6,
+                          padding: "4px 6px",
+                          cursor: "pointer",
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 2,
+                          boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
+                          transition: "transform 0.1s ease, box-shadow 0.1s ease",
+                          flexShrink: 0
+                        }}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.transform = "translateY(-1px)";
+                          e.currentTarget.style.boxShadow = "0 3px 8px rgba(0,0,0,0.08)";
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.transform = "none";
+                          e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.03)";
+                        }}
+                        title={`${r.kol} - ${campaignLabels[r.campaign] || r.campaign}\nMón ăn: ${r.monAn || "Chưa có"}\nTrạng thái: ${isAired ? "Đã lên sóng" : "Chờ lên sóng"}`}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 4 }}>
+                          <span style={{
+                            fontSize: 8.5,
+                            fontWeight: 800,
+                            color: brandColor,
+                            textTransform: "uppercase",
+                            letterSpacing: "0.02em"
+                          }}>
+                            {campaignLabels[r.campaign] || r.campaign}
+                          </span>
+                          <span style={{ fontSize: 9 }}>
+                            {isAired ? "🎬" : (r.ngayGuiDemo ? "📼" : "📝")}
+                          </span>
+                        </div>
+
+                        <div style={{
+                          fontWeight: 700,
+                          fontSize: 10.5,
+                          color: "var(--ink)",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis"
+                        }}>
+                          {r.kol}
+                        </div>
+
+                        {r.monAn && (
+                          <div style={{
+                            fontSize: 9,
+                            color: "var(--ink-soft)",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis"
+                          }}>
+                            🍲 {r.monAn}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
+
               </div>
             );
           })}
         </div>
+
       </div>
 
-      {/* Right panel: Unscheduled KOLs Sidebar */}
-      <div className="kt-calendar-sidebar">
-        <h3 style={{ fontSize: 12, fontWeight: 700, margin: "0 0 10px 0", color: "var(--ink)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span>📅 Chưa lên lịch</span>
-          <span className="kt-badge" style={{ background: "var(--accent-bg)", color: "var(--accent)", fontSize: 10 }}>{unscheduled.length}</span>
-        </h3>
-        <div style={{ fontSize: 10, color: "var(--ink-soft)", marginBottom: 12, lineHeight: 1.4 }}>
-          Kéo thả KOL vào lịch tháng bên cạnh để sắp xếp ngày lên sóng (Air date).
-        </div>
-
-        <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 8 }} className="kt-scrollbar">
-          {unscheduled.map(r => (
-            <div
-              key={r.id}
-              draggable
-              onDragStart={(e) => {
-                e.dataTransfer.setData("text/plain", r.id);
-                e.dataTransfer.effectAllowed = "move";
-              }}
-              onClick={() => onOpen(r)}
-              style={{
-                padding: "8px 10px",
-                borderRadius: 8,
-                background: "var(--paper)",
-                border: "1px solid var(--line)",
-                cursor: "grab",
-                transition: "all 0.15s ease",
-                boxShadow: "0 1px 2px rgba(0,0,0,0.01)"
-              }}
-              className="kt-kanban-card"
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                <CampaignDot campaign={r.campaign} labels={campaignLabels} />
-                <span className="kt-mono" style={{ fontSize: 8, color: "var(--ink-soft)" }}>{r.id}</span>
+      {/* ── RIGHT SIDEBAR (QUEUE: CHƯA LÊN LỊCH) ── */}
+      {showSidebar && (
+        <div style={{
+          width: 290,
+          minWidth: 290,
+          background: "var(--card)",
+          display: "flex",
+          flexDirection: "column",
+          minHeight: 0,
+          overflow: "hidden",
+          flexShrink: 0
+        }}>
+          
+          {/* Sidebar Header */}
+          <div style={{ padding: "14px 16px", borderBottom: "1px solid var(--line)", display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "var(--ink)", display: "flex", alignItems: "center", gap: 6 }}>
+                <span>⏳ Hàng đợi chưa lên lịch</span>
+                <span style={{
+                  fontSize: 11,
+                  fontWeight: 800,
+                  backgroundColor: "var(--accent-bg)",
+                  color: "var(--accent)",
+                  padding: "1px 7px",
+                  borderRadius: 10
+                }}>
+                  {unscheduled.length}
+                </span>
               </div>
-              <div style={{ fontWeight: 600, fontSize: 11, color: "var(--ink)" }}>{r.kol}</div>
-              <div style={{ fontSize: 9, color: "var(--ink-soft)", marginTop: 2 }}>{r.type || "Chưa phân loại"}</div>
             </div>
-          ))}
-          {unscheduled.length === 0 && (
-            <div style={{ textAlign: "center", padding: "40px 0", color: "var(--ink-soft)", fontSize: 11 }}>
-              🎉 Tất cả KOL đã được lên lịch!
+
+            <div style={{ fontSize: 11, color: "var(--ink-soft)", lineHeight: 1.4 }}>
+              Kéo thả KOL vào ô ngày tương ứng trong lịch để gán ngày lên sóng.
             </div>
-          )}
+
+            {/* Quick Search */}
+            <input
+              className="kt-input"
+              value={sidebarSearch}
+              onChange={e => setSidebarSearch(e.target.value)}
+              placeholder="🔍 Tìm nhanh KOL chưa lên lịch..."
+              style={{ width: "100%", fontSize: 11, padding: "6px 10px", boxSizing: "border-box" }}
+            />
+
+            {/* Brand Filter Chips */}
+            <div style={{ display: "flex", gap: 4, overflowX: "auto", paddingBottom: 2 }}>
+              {["all", "AM", "AX", "Vinegar", "MSG"].map(cKey => {
+                const isSelected = sidebarCampaign === cKey;
+                return (
+                  <button
+                    key={cKey}
+                    onClick={() => setSidebarCampaign(cKey)}
+                    className="kt-btn"
+                    style={{
+                      padding: "3px 8px",
+                      borderRadius: 12,
+                      fontSize: 9.5,
+                      fontWeight: 700,
+                      border: isSelected ? "1px solid var(--accent)" : "1px solid var(--line)",
+                      background: isSelected ? "var(--accent)" : "var(--paper)",
+                      color: isSelected ? "#FFFFFF" : "var(--ink-mid)",
+                      cursor: "pointer",
+                      whiteSpace: "nowrap"
+                    }}
+                  >
+                    {cKey === "all" ? "Tất cả" : (campaignLabels[cKey] || cKey)}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Draggable Queue Cards List */}
+          <div 
+            className="kt-scrollbar"
+            style={{
+              flex: 1,
+              overflowY: "auto",
+              padding: "12px 14px",
+              display: "flex",
+              flexDirection: "column",
+              gap: 8
+            }}
+          >
+            {filteredUnscheduled.map(r => {
+              const brandColor = getCampaignColor(r.campaign);
+              return (
+                <div
+                  key={r.id}
+                  draggable
+                  onDragStart={(e) => {
+                    e.dataTransfer.setData("text/plain", r.id);
+                    e.dataTransfer.effectAllowed = "move";
+                  }}
+                  onClick={() => onOpen(r)}
+                  style={{
+                    padding: "10px 12px",
+                    borderRadius: 10,
+                    background: "var(--paper)",
+                    border: "1px solid var(--line)",
+                    cursor: "grab",
+                    transition: "all 0.15s ease",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 4,
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.02)"
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.transform = "translateY(-1px)";
+                    e.currentTarget.style.borderColor = "var(--accent)";
+                    e.currentTarget.style.boxShadow = "0 4px 10px rgba(0,0,0,0.06)";
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.transform = "none";
+                    e.currentTarget.style.borderColor = "var(--line)";
+                    e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.02)";
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{
+                      fontSize: 9,
+                      fontWeight: 800,
+                      color: brandColor,
+                      background: brandColor + "18",
+                      padding: "2px 6px",
+                      borderRadius: 6
+                    }}>
+                      {campaignLabels[r.campaign] || r.campaign}
+                    </span>
+                    <span style={{ fontSize: 10, color: "var(--ink-faint)", fontFamily: "var(--kt-mono)" }}>
+                      ⠿ {r.id}
+                    </span>
+                  </div>
+
+                  <div style={{ fontWeight: 800, fontSize: 12, color: "var(--ink)" }}>
+                    {r.kol}
+                  </div>
+
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 10, color: "var(--ink-soft)" }}>
+                    <span>{r.type || "Micro"}</span>
+                    {r.follower && <span>{r.follower} flw</span>}
+                  </div>
+
+                  {r.monAn && (
+                    <div style={{ fontSize: 10, color: "var(--ink-soft)", borderTop: "1px dashed var(--line)", paddingTop: 4, marginTop: 2 }}>
+                      🍲 {r.monAn}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            {filteredUnscheduled.length === 0 && (
+              <div style={{ textAlign: "center", padding: "40px 10px", color: "var(--ink-soft)", fontSize: 11, display: "flex", flexDirection: "column", gap: 6 }}>
+                <span style={{ fontSize: 24 }}>🎉</span>
+                <strong>{sidebarSearch ? "Không tìm thấy KOL phù hợp" : "Tất cả KOL đã được lên lịch!"}</strong>
+                <span>Kéo thả để dời ngày nếu cần sắp xếp lại.</span>
+              </div>
+            )}
+          </div>
+
         </div>
-      </div>
+      )}
+
     </div>
   );
 };
@@ -5508,8 +5904,8 @@ const [view, setView] = useState("table");
           </div>
         </div>
 
-        {/* Bottom Row: Filters (hidden on Hồ sơ KOL & Kế hoạch) */}
-        {view !== "profile" && view !== "plan" && (
+        {/* Bottom Row: Filters (hidden on Hồ sơ KOL, Kế hoạch & Lịch) */}
+        {view !== "profile" && view !== "plan" && view !== "calendar" && (
           <div className="kt-filters-bar">
             {/* Search */}
             <input className="kt-input kt-filter-input" placeholder="🔍 Tìm tên KOL, món ăn…"
