@@ -422,22 +422,21 @@ const GlobalStyle = () => (
 );
 /* ---------------- Domain constants ---------------- */
 const CAMPAIGNS = [
-  { key: "AM", label: "AM", color: "#FFAFA3" },
-  { key: "AX", label: "AX", color: "#A2C2E8" },
-  { key: "Vinegar", label: "Vinegar", color: "#A8C3A0" },
-  { key: "MSG", label: "MGS", color: "#FFD175" },
-  { key: "Blendy", label: "Blendy", color: "#C7B1E6" },
+  { key: "Campaign A", label: "Campaign A", color: "#10B981" },
+  { key: "Campaign B", label: "Campaign B", color: "#EA9216" },
+  { key: "Campaign C", label: "Campaign C", color: "#8B5CF6" },
+  { key: "Campaign D", label: "Campaign D", color: "#EF4444" },
 ];
 
 const normalizeCampaignKey = (sheetName) => {
   if (!sheetName) return "";
-  const name = sheetName.toString().toLowerCase().trim();
-  if (name.startsWith("am_") || name.includes("mayo") || name === "am" || name.includes("campaign a") || name.includes("campaign_a")) return "AM";
-  if (name.startsWith("ax_") || name.includes("xốt") || name === "ax" || name.includes("campaign b") || name.includes("campaign_b")) return "AX";
-  if (name.startsWith("av_") || name.startsWith("vinegar") || name.startsWith("vinegear") || name.includes("giấm") || name.includes("vinegar") || name === "giấm_fy25" || name.includes("campaign c") || name.includes("campaign_c")) return "Vinegar";
-  if (name.startsWith("msg_") || name.startsWith("mgs_") || name.includes("msg") || name.includes("mgs") || name === "mgs" || name.includes("bột ngọt") || name.includes("mì chính") || name.includes("campaign d") || name.includes("campaign_d")) return "MSG";
-  if (name.startsWith("blendy_") || name.includes("blendy") || name.includes("campaign e") || name.includes("campaign_e")) return "Blendy";
-  return sheetName;
+  const name = sheetName.toString().trim();
+  const lower = name.toLowerCase();
+  if (lower.startsWith("campaign a") || lower.startsWith("campaign_a") || lower.startsWith("dự án a") || lower.startsWith("chiến dịch a")) return "Campaign A";
+  if (lower.startsWith("campaign b") || lower.startsWith("campaign_b") || lower.startsWith("dự án b") || lower.startsWith("chiến dịch b")) return "Campaign B";
+  if (lower.startsWith("campaign c") || lower.startsWith("campaign_c") || lower.startsWith("dự án c") || lower.startsWith("chiến dịch c")) return "Campaign C";
+  if (lower.startsWith("campaign d") || lower.startsWith("campaign_d") || lower.startsWith("dự án d") || lower.startsWith("chiến dịch d")) return "Campaign D";
+  return name;
 };
 
 const resolveCampaignKey = (row) => {
@@ -460,15 +459,10 @@ const DEFAULT_STATUS_STAGES = [
 
 const PREDEFINED_COLORS = ["#10B981", "#EA9216", "#8B5CF6", "#EF4444", "#3B82F6", "#EC4899", "#06B6D4", "#F59E0B", "#6366F1", "#14B8A6"];
 const BRAND_COLORS = {
-  AM: "#10B981",
-  AX: "#EA9216",
-  Vinegar: "#8B5CF6",
-  Giấm: "#8B5CF6",
-  Giam: "#8B5CF6",
-  MSG: "#EF4444",
-  "Bột Ngọt": "#EF4444",
-  BotNgot: "#EF4444",
-  Blendy: "#3B82F6"
+  "Campaign A": "#10B981",
+  "Campaign B": "#EA9216",
+  "Campaign C": "#8B5CF6",
+  "Campaign D": "#EF4444",
 };
 
 const getCampaignColor = (key) => {
@@ -477,18 +471,13 @@ const getCampaignColor = (key) => {
   if (BRAND_COLORS[cleanKey]) return BRAND_COLORS[cleanKey];
   const upper = cleanKey.toUpperCase();
   if (BRAND_COLORS[upper]) return BRAND_COLORS[upper];
-  
-  if (/aji.*mayo|am/i.test(cleanKey)) return "#10B981";
-  if (/aji.*xot|ax/i.test(cleanKey)) return "#EA9216";
-  if (/giam|vinegar/i.test(cleanKey)) return "#8B5CF6";
-  if (/bot.*ngot|msg/i.test(cleanKey)) return "#EF4444";
-  if (/blendy/i.test(cleanKey)) return "#3B82F6";
 
   let hash = 0;
-  for (let i = 0; i < key.length; i++) {
-    hash = key.charCodeAt(i) + ((hash << 5) - hash);
+  for (let i = 0; i < cleanKey.length; i++) {
+    hash = cleanKey.charCodeAt(i) + ((hash << 5) - hash);
   }
-  return PREDEFINED_COLORS[Math.abs(hash) % PREDEFINED_COLORS.length];
+  const idx = Math.abs(hash) % PREDEFINED_COLORS.length;
+  return PREDEFINED_COLORS[idx];
 };
 
 
@@ -673,10 +662,10 @@ const COL_ALIASES = {
   airedFb:       ["airedFb", "aired fb", "fb/ig", "reup", "social", "facebook", "instagram"],
   giftSent:      ["giftSent", "gift", "quà tặng", "qua tang", "gift sent", "gửi sản phẩm"],
   link:          ["link tiktok", "tiktok link", "tiktok url", "profile link", "url", "link", "link"],
-  campaign:      ["campaign", "chiến dịch", "chien dich"],
-  id:            ["id"],
+  campaign:      ["campaign", "chiến dịch", "chien dich", "dự án", "du an"],
+  id:            ["id", "no.", "stt"],
   estView:       ["estview", "est view", "est. view", "views kpi", "kpi view", "est. views", "est views", "kpi views"],
-  estEng:        ["esteng", "est engagement", "est. engagement", "est eng", "est. eng", "estimated engagement"],
+  estEng:        ["esteng", "est engagement", "est. engagement", "est eng", "est. eng", "estimated engagement", "kpi engagement"],
   views:         ["views", "view", "video views", "video view", "lượt xem", "luot xem", "view actual", "actual views"],
   likes:         ["likes", "like", "lượt thích", "luot thich", "paid likes"],
   comments:      ["comments", "comment", "bình luận", "binh luan", "paid comments"],
@@ -690,12 +679,12 @@ const COL_ALIASES = {
   reupEngagement:["reup eng", "reup engagement"],
   totalViewCombined: ["total view\n(tt + reup)", "total view (tt + reup)", "total view tt+reup"],
   totalEngCombined:  ["total eng.\n(tt + reup)", "total eng. (tt + reup)", "total eng tt+reup"],
-  pctViewAchieved:      ["% view achieved"],
-  pctEngAchieved:       ["% eng achieved (like, cmt, share)", "% eng achieved"],
+  pctViewAchieved:      ["% view achieved", "% view đạt", "% view dat", "% view đạt kpi"],
+  pctEngAchieved:       ["% eng achieved (like, cmt, share)", "% eng achieved", "% t.tác đạt", "% ttac dat", "% tương tác đạt", "% tuong tac dat"],
   pctViewAchievedTotal: ["% view achieved (kèm reup)"],
   pctEngAchievedTotal:  ["% eng. achieved", "% eng achieved (kèm reup)"],
-  paidAvgView:          ["paid avg. view", "paid avg view"],
-  paidPctCompletedView: ["paid % completed view"],
+  paidAvgView:          ["paid avg. view", "paid avg view", "avg. view", "avg view"],
+  paidPctCompletedView: ["paid % completed view", "% xem hết", "% xem het"],
   codeAds:              ["code ads"],
   reupLink:              ["reup link"],
   brandReup:             ["brand reup"],
@@ -774,7 +763,7 @@ const getAvatarColor = (name) => {
 
 const emptyKOL = () => ({
   id: "new-" + Date.now(),
-  campaign: "AM",
+  campaign: "Campaign A",
   kol: "",
   link: "",
   follower: "",
@@ -820,9 +809,9 @@ const emptyKOL = () => ({
 });
 
 const SEED_DATA = [
-  {"id":"AM-1","campaign":"AM","kol":"Demo KOL A","link":"https://www.tiktok.com","follower":"100K","type":"Micro","location":"Urban","group":"Female without kid","cost":5000000,"addonFee":"- Code ads","statusKey":"waiting_food","monAn":"Salad rau củ","ngayGuiScript":"","ngayGuiDemo":"","ngayAir":"","airedLink":"","airedFb":"","giftSent":""},
-  {"id":"AX-2","campaign":"AX","kol":"Demo KOL A","link":"https://www.tiktok.com","follower":"100K","type":"Micro","location":"Urban","group":"Female without kid","cost":8000000,"addonFee":"- Link showcase","statusKey":"doing_demo","monAn":"Mì xào","ngayGuiScript":"","ngayGuiDemo":"","ngayAir":"","airedLink":"","airedFb":"","giftSent":""},
-  {"id":"AX-1","campaign":"AX","kol":"Demo KOL B","link":"https://www.tiktok.com","follower":"500K","type":"Mid-tier","location":"Urban","group":"Female without kid","cost":15000000,"addonFee":"- Link showcase","statusKey":"aired","monAn":"Cơm nắm rong biển","ngayGuiScript":"","ngayGuiDemo":"","ngayAir":"15/8","airedLink":"https://www.tiktok.com","airedFb":"","giftSent":""}
+  {"id":"CA-1","campaign":"Campaign A","kol":"Demo KOL A","link":"https://www.tiktok.com","follower":"100K","type":"Micro","location":"Urban","group":"Food Reviewer","cost":5000000,"addonFee":"- Code ads","statusKey":"waiting_food","monAn":"Salad rau củ","ngayGuiScript":"","ngayGuiDemo":"","ngayAir":"","airedLink":"","airedFb":"","giftSent":""},
+  {"id":"CB-2","campaign":"Campaign B","kol":"Demo KOL A","link":"https://www.tiktok.com","follower":"100K","type":"Micro","location":"Urban","group":"Food Reviewer","cost":8000000,"addonFee":"- Link showcase","statusKey":"doing_demo","monAn":"Mì xào","ngayGuiScript":"","ngayGuiDemo":"","ngayAir":"","airedLink":"","airedFb":"","giftSent":""},
+  {"id":"CB-1","campaign":"Campaign B","kol":"Demo KOL B","link":"https://www.tiktok.com","follower":"500K","type":"Mid-tier","location":"Urban","group":"Lifestyle","cost":15000000,"addonFee":"- Link showcase","statusKey":"aired","monAn":"Cơm nắm rong biển","ngayGuiScript":"","ngayGuiDemo":"","ngayAir":"15/8","airedLink":"https://www.tiktok.com","airedFb":"","giftSent":""}
 ];
 
 /* ================================================================
@@ -1735,8 +1724,8 @@ const DualFileImportModal = ({ existingData, onConfirm, onClose, onImportSingle,
         if (file && file.wb) {
           file.wb.SheetNames.forEach(sheetName => {
             const key = normalizeCampaignKey(sheetName);
-            if (CAMPAIGNS.find(c => c.key === key)) {
-              sheetLabels[key] = key === "MSG" ? "MGS" : key;
+            if (key) {
+              sheetLabels[key] = key;
             }
           });
         }
@@ -2582,7 +2571,20 @@ const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCamp
           </button>
           <div style={{ display: "flex", gap: 8 }}>
             <button className="kt-btn kt-btn-ghost" onClick={onClose}>Huỷ</button>
-            <button className="kt-btn kt-btn-primary" onClick={() => { onSave(form); onClose(); }}>💾 Lưu</button>
+            <button className="kt-btn kt-btn-primary" onClick={() => {
+              if (!form.kol || !form.kol.trim()) {
+                window.alert("⚠️ Vui lòng nhập Tên KOL trước khi lưu!");
+                return;
+              }
+              const sanitized = {
+                ...form,
+                kol: form.kol.trim(),
+                campaign: form.campaign ? form.campaign.trim() : "Campaign A",
+                cost: Math.max(0, Number(form.cost) || 0),
+              };
+              onSave(sanitized);
+              onClose();
+            }}>💾 Lưu</button>
           </div>
         </div>
       </div>
@@ -3424,7 +3426,7 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels = {} }) => {
 
             {/* Brand Filter Chips */}
             <div style={{ display: "flex", gap: 3, overflowX: "auto" }}>
-              {["all", "AM", "AX", "Vinegar", "MSG"].map(cKey => {
+              {["all", ...Array.from(new Set([...rows.map(r => resolveCampaignKey(r)).filter(Boolean), ...Object.keys(campaignLabels)]))].map(cKey => {
                 const isSelected = sidebarCampaign === cKey;
                 return (
                   <button
@@ -3642,75 +3644,129 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
     return Object.values(map).sort((a, b) => a.kol.localeCompare(b.kol, "vi"));
   }, [rows]);
 
-  const topViewsKols = useMemo(() => {
-    return [...uniqueKols]
-      .filter(k => k.totalViews > 0)
-      .sort((a, b) => b.totalViews - a.totalViews)
-      .slice(0, 5);
-  }, [uniqueKols]);
-
-  const topEngKols = useMemo(() => {
-    return [...uniqueKols]
-      .map(k => ({
-        ...k,
-        totalEng: (k.totalLikes || 0) + (k.totalComments || 0) + (k.totalShares || 0)
-      }))
-      .filter(k => k.totalEng > 0)
-      .sort((a, b) => b.totalEng - a.totalEng)
-      .slice(0, 5);
-  }, [uniqueKols]);
-
-  const topCostKols = useMemo(() => {
-    return [...uniqueKols]
-      .filter(k => k.totalCost > 0)
-      .sort((a, b) => b.totalCost - a.totalCost)
-      .slice(0, 5);
-  }, [uniqueKols]);
-
-
-  const tierStats = useMemo(() => {
-    const counts = {};
-    uniqueKols.forEach(k => {
-      if (k.type) counts[k.type] = (counts[k.type] || 0) + 1;
-    });
-    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
-  }, [uniqueKols]);
-
   const filteredKols = useMemo(() => {
     const q = search.trim().toLowerCase();
-    const result = uniqueKols.filter(k => {
-      if (q && !k.kol.toLowerCase().includes(q)) return false;
-      if (filterCampaign !== "all" && !k.campaigns.has(filterCampaign)) return false;
-      if (filterTier !== "all" && k.type !== filterTier) return false;
-      if (filterPhase !== "all" && !k.phases.has(filterPhase)) return false;
+    const hasDealFilters = filterCampaign !== "all" || filterPhase !== "all" || filterStatus !== "all";
+
+    const results = [];
+
+    uniqueKols.forEach(k => {
+      // 1. Filter by KOL name
+      if (q && !k.kol.toLowerCase().includes(q)) return;
+
+      // 2. Filter by Tier
+      if (filterTier !== "all" && k.type !== filterTier) return;
+
+      // 3. Filter campaign details
+      const matchingDetails = k.campaignDetails.filter(r => {
+        if (filterCampaign !== "all" && resolveCampaignKey(r) !== filterCampaign) return false;
+        if (filterPhase !== "all") {
+          const phases = (r.phaseTags || "").split(",").map(s => s.trim()).filter(Boolean);
+          if (!phases.includes(filterPhase)) return false;
+        }
+        if (filterStatus !== "all") {
+          if (filterStatus === "in_progress") {
+            if (r.statusKey === "aired") return false;
+          } else {
+            if (r.statusKey !== filterStatus) return false;
+          }
+        }
+        return true;
+      });
+
+      // If user selected campaign/phase/status filter, require at least one matching deal
+      if (hasDealFilters && matchingDetails.length === 0) return;
+
+      const activeRows = hasDealFilters ? matchingDetails : k.campaignDetails;
+
+      const displayCost = activeRows.reduce((s, r) => s + (Number(r.cost) || 0), 0);
+      const displayViews = activeRows.reduce((s, r) => s + (Number(r.views) || 0), 0);
+      const displayLikes = activeRows.reduce((s, r) => s + (Number(r.likes) || 0), 0);
+      const displayComments = activeRows.reduce((s, r) => s + (Number(r.comments) || 0), 0);
+      const displayShares = activeRows.reduce((s, r) => s + (Number(r.shares) || 0), 0);
+      const displaySaves = activeRows.reduce((s, r) => s + (Number(r.saves) || 0), 0);
+      const displayConversions = activeRows.reduce((s, r) => s + (Number(r.conversions) || 0), 0);
+      const displayRevenue = activeRows.reduce((s, r) => s + (Number(r.revenue) || 0), 0);
+      const displayEng = displayLikes + displayComments + displayShares;
+
+      // 4. Cost bucket filter
       if (filterCost !== "all") {
         const bucket = COST_BUCKETS.find(b => b.key === filterCost);
-        if (bucket && !bucket.test(k.totalCost)) return false;
+        if (bucket && !bucket.test(displayCost)) return;
       }
+
+      // 5. Views bucket filter
       if (filterViews !== "all") {
         const bucket = VIEWS_BUCKETS.find(b => b.key === filterViews);
-        if (bucket && !bucket.test(k.totalViews)) return false;
+        if (bucket && !bucket.test(displayViews)) return;
       }
-      if (filterStatus !== "all" && !k.campaignDetails.some(c => c.statusKey === filterStatus)) return false;
-      return true;
+
+      results.push({
+        ...k,
+        displayCost,
+        displayViews,
+        displayLikes,
+        displayComments,
+        displayShares,
+        displaySaves,
+        displayConversions,
+        displayRevenue,
+        displayEng,
+        filteredDetails: matchingDetails,
+      });
     });
 
     // Apply sorting
     if (sortOrder === "costAsc") {
-      result.sort((a, b) => a.totalCost - b.totalCost);
+      results.sort((a, b) => a.displayCost - b.displayCost);
     } else if (sortOrder === "costDesc") {
-      result.sort((a, b) => b.totalCost - a.totalCost);
+      results.sort((a, b) => b.displayCost - a.displayCost);
     } else if (sortOrder === "viewAsc") {
-      result.sort((a, b) => a.totalViews - b.totalViews);
+      results.sort((a, b) => a.displayViews - b.displayViews);
     } else if (sortOrder === "viewDesc") {
-      result.sort((a, b) => b.totalViews - a.totalViews);
+      results.sort((a, b) => b.displayViews - a.displayViews);
     } // else "default" which is already sorted alphabetically by KOL name in uniqueKols
 
-    return result;
+    return results;
   }, [uniqueKols, search, filterCampaign, filterTier, filterPhase, filterCost, filterViews, filterStatus, sortOrder]);
 
-  const hasActiveFilters = !!search.trim() || filterCampaign !== "all" || filterTier !== "all" ||
-    filterPhase !== "all" || filterCost !== "all" || filterViews !== "all" || filterStatus !== "all";
+  const topViewsKols = useMemo(() => {
+    return [...filteredKols]
+      .filter(k => k.displayViews > 0)
+      .sort((a, b) => b.displayViews - a.displayViews)
+      .slice(0, 5);
+  }, [filteredKols]);
+
+  const topEngKols = useMemo(() => {
+    return [...filteredKols]
+      .filter(k => k.displayEng > 0)
+      .sort((a, b) => b.displayEng - a.displayEng)
+      .slice(0, 5);
+  }, [filteredKols]);
+
+  const topCostKols = useMemo(() => {
+    return [...filteredKols]
+      .filter(k => k.displayCost > 0)
+      .sort((a, b) => b.displayCost - a.displayCost)
+      .slice(0, 5);
+  }, [filteredKols]);
+
+  const tierStats = useMemo(() => {
+    const counts = {};
+    filteredKols.forEach(k => {
+      if (k.type) counts[k.type] = (counts[k.type] || 0) + 1;
+    });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  }, [filteredKols]);
+
+  const activeFilterCount = (search.trim() ? 1 : 0) +
+    (filterCampaign !== "all" ? 1 : 0) +
+    (filterTier !== "all" ? 1 : 0) +
+    (filterPhase !== "all" ? 1 : 0) +
+    (filterCost !== "all" ? 1 : 0) +
+    (filterViews !== "all" ? 1 : 0) +
+    (filterStatus !== "all" ? 1 : 0);
+  const hasActiveFilters = activeFilterCount > 0;
 
   const clearFilters = () => {
     setSearch(""); setFilterCampaign("all"); setFilterTier("all");
@@ -3720,9 +3776,9 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
 
   const summary = useMemo(() => ({
     count: filteredKols.length,
-    totalCost: filteredKols.reduce((s, k) => s + k.totalCost, 0),
-    totalViews: filteredKols.reduce((s, k) => s + k.totalViews, 0),
-    totalEng: filteredKols.reduce((s, k) => s + ((k.totalLikes || 0) + (k.totalComments || 0) + (k.totalShares || 0)), 0),
+    totalCost: filteredKols.reduce((s, k) => s + k.displayCost, 0),
+    totalViews: filteredKols.reduce((s, k) => s + k.displayViews, 0),
+    totalEng: filteredKols.reduce((s, k) => s + k.displayEng, 0),
   }), [filteredKols]);
 
   return (
@@ -3746,41 +3802,41 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
         </div>
 
         {/* Filter bar */}
-        <div className="kt-scrollbar" style={{ display: "flex", gap: 8, flexWrap: "nowrap", alignItems: "center", overflowX: "auto", paddingBottom: 4 }}>
+        <div className="kt-scrollbar" style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", paddingBottom: 4 }}>
           <input
             className="kt-input"
             placeholder="🔍 Tìm tên KOL..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ flex: "0 0 140px", width: 140 }}
+            style={{ flex: "1 1 140px", minWidth: 120, maxWidth: 200 }}
           />
-          <select className="kt-select" value={filterCampaign} onChange={e => setFilterCampaign(e.target.value)} style={{ flex: "0 0 auto", minWidth: 130, width: "auto" }}>
+          <select className="kt-select" value={filterCampaign} onChange={e => setFilterCampaign(e.target.value)} style={{ flex: "0 0 auto", minWidth: 120 }}>
             <option value="all">Tất cả Dự án</option>
             {dynamicCampaigns.map(c => <option key={c.key} value={c.key}>{campaignLabels[c.key] || c.label}</option>)}
           </select>
-          <select className="kt-select" value={filterTier} onChange={e => setFilterTier(e.target.value)} style={{ flex: "0 0 auto", minWidth: 120, width: "auto" }}>
+          <select className="kt-select" value={filterTier} onChange={e => setFilterTier(e.target.value)} style={{ flex: "0 0 auto", minWidth: 110 }}>
             <option value="all">Tất cả Tier</option>
             {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
           </select>
 
-          <select className="kt-select" value={filterPhase} onChange={e => setFilterPhase(e.target.value)} style={{ flex: "0 0 auto", minWidth: 145, width: "auto" }}>
+          <select className="kt-select" value={filterPhase} onChange={e => setFilterPhase(e.target.value)} style={{ flex: "0 0 auto", minWidth: 130 }}>
             <option value="all">Tất cả Thời điểm</option>
             <option value="Phase 1">Phase 1</option>
             <option value="Phase 2">Phase 2</option>
           </select>
-          <select className="kt-select" value={filterCost} onChange={e => setFilterCost(e.target.value)} style={{ flex: "0 0 auto", minWidth: 135, width: "auto" }}>
+          <select className="kt-select" value={filterCost} onChange={e => setFilterCost(e.target.value)} style={{ flex: "0 0 auto", minWidth: 125 }}>
             <option value="all">Tất cả Chi phí</option>
             {COST_BUCKETS.map(b => <option key={b.key} value={b.key}>{b.label}</option>)}
           </select>
-          <select className="kt-select" value={filterViews} onChange={e => setFilterViews(e.target.value)} style={{ flex: "0 0 auto", minWidth: 130, width: "auto" }}>
+          <select className="kt-select" value={filterViews} onChange={e => setFilterViews(e.target.value)} style={{ flex: "0 0 auto", minWidth: 120 }}>
             <option value="all">Tất cả Views</option>
             {VIEWS_BUCKETS.map(b => <option key={b.key} value={b.key}>{b.label}</option>)}
           </select>
-          <select className="kt-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ flex: "0 0 auto", minWidth: 140, width: "auto" }}>
+          <select className="kt-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ flex: "0 0 auto", minWidth: 130 }}>
             <option value="all">Tất cả Tiến độ</option>
             {statusStages.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
           </select>
-          <select className="kt-select" value={sortOrder} onChange={e => setSortOrder(e.target.value)} style={{ flex: "0 0 auto", minWidth: 160, width: "auto", background: "var(--surface)", border: "1px solid var(--line)" }}>
+          <select className="kt-select" value={sortOrder} onChange={e => setSortOrder(e.target.value)} style={{ flex: "0 0 auto", minWidth: 155, background: "var(--surface)", border: "1px solid var(--line)" }}>
             <option value="default">Sắp xếp: Mặc định (A-Z)</option>
             <option value="costAsc">Chi phí: Thấp ➝ Cao</option>
             <option value="costDesc">Chi phí: Cao ➝ Thấp</option>
@@ -3788,8 +3844,8 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
             <option value="viewDesc">Lượt xem: Cao ➝ Thấp</option>
           </select>
           {hasActiveFilters && (
-            <button className="kt-btn kt-btn-ghost" onClick={clearFilters} style={{ flex: "0 0 auto", padding: "8px 14px", whiteSpace: "nowrap" }}>
-              ✕ Xoá lọc
+            <button className="kt-btn kt-btn-ghost" onClick={clearFilters} style={{ flex: "0 0 auto", padding: "8px 14px", whiteSpace: "nowrap", border: "1px solid var(--accent)", color: "var(--accent)" }}>
+              ✕ Xoá lọc ({activeFilterCount})
             </button>
           )}
         </div>
@@ -3850,15 +3906,15 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, borderTop: "1px dashed var(--line)", paddingTop: 10, fontSize: 11, textAlign: "center" }}>
                     <div>
                       <div style={{ color: "var(--ink-soft)" }}>Chi phí</div>
-                      <strong style={{ color: "var(--accent)" }}>{fmtVND(k.totalCost)}</strong>
+                      <strong style={{ color: "var(--accent)" }}>{fmtVND(k.displayCost)}</strong>
                     </div>
                     <div>
                       <div style={{ color: "var(--ink-soft)" }}>Views</div>
-                      <strong style={{ color: "var(--ink)" }}>{k.totalViews ? k.totalViews.toLocaleString() : "—"}</strong>
+                      <strong style={{ color: "var(--ink)" }}>{k.displayViews ? k.displayViews.toLocaleString() : "—"}</strong>
                     </div>
                     <div>
                       <div style={{ color: "var(--ink-soft)" }}>Đơn hàng</div>
-                      <strong style={{ color: "var(--ok)" }}>{k.totalConversions ? k.totalConversions.toLocaleString() : "—"}</strong>
+                      <strong style={{ color: "var(--ok)" }}>{k.displayConversions ? k.displayConversions.toLocaleString() : "—"}</strong>
                     </div>
                   </div>
 
@@ -3892,8 +3948,8 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {topViewsKols.map((k, idx) => {
-                const maxVal = topViewsKols[0]?.totalViews || 1;
-                const ratio = Math.min(100, Math.max(5, (k.totalViews / maxVal) * 100));
+                const maxVal = topViewsKols[0]?.displayViews || 1;
+                const ratio = Math.min(100, Math.max(5, (k.displayViews / maxVal) * 100));
                 const colors = ["#F59E0B", "#94A3B8", "#B45309", "var(--ink-soft)", "var(--ink-soft)"];
                 const rankLabels = ["1st", "2nd", "3rd", "4th", "5th"];
                 return (
@@ -3906,7 +3962,7 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
                         </span>
                       </div>
                       <span style={{ fontSize: 11, color: "var(--blue)", fontWeight: 700 }}>
-                        {k.totalViews >= 1000000 ? `${(k.totalViews / 1000000).toFixed(1)}M` : k.totalViews.toLocaleString()}
+                        {k.displayViews >= 1000000 ? `${(k.displayViews / 1000000).toFixed(1)}M` : k.displayViews.toLocaleString()}
                       </span>
                     </div>
                     <div style={{ height: 4, background: "var(--line)", borderRadius: 2, overflow: "hidden" }}>
@@ -3927,8 +3983,8 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {topEngKols.map((k, idx) => {
-                const maxVal = topEngKols[0]?.totalEng || 1;
-                const ratio = Math.min(100, Math.max(5, (k.totalEng / maxVal) * 100));
+                const maxVal = topEngKols[0]?.displayEng || 1;
+                const ratio = Math.min(100, Math.max(5, (k.displayEng / maxVal) * 100));
                 const colors = ["#F59E0B", "#94A3B8", "#B45309", "var(--ink-soft)", "var(--ink-soft)"];
                 const rankLabels = ["1st", "2nd", "3rd", "4th", "5th"];
                 return (
@@ -3941,7 +3997,7 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
                         </span>
                       </div>
                       <span style={{ fontSize: 11, color: "var(--ok)", fontWeight: 700 }}>
-                        {k.totalEng >= 1000000 ? `${(k.totalEng / 1000000).toFixed(1)}M` : k.totalEng.toLocaleString()}
+                        {k.displayEng >= 1000000 ? `${(k.displayEng / 1000000).toFixed(1)}M` : k.displayEng.toLocaleString()}
                       </span>
                     </div>
                     <div style={{ height: 4, background: "var(--line)", borderRadius: 2, overflow: "hidden" }}>
@@ -3962,8 +4018,8 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {topCostKols.map((k, idx) => {
-                const maxVal = topCostKols[0]?.totalCost || 1;
-                const ratio = Math.min(100, Math.max(5, (k.totalCost / maxVal) * 100));
+                const maxVal = topCostKols[0]?.displayCost || 1;
+                const ratio = Math.min(100, Math.max(5, (k.displayCost / maxVal) * 100));
                 const colors = ["#F59E0B", "#94A3B8", "#B45309", "var(--ink-soft)", "var(--ink-soft)"];
                 const rankLabels = ["1st", "2nd", "3rd", "4th", "5th"];
                 return (
@@ -3976,7 +4032,7 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
                         </span>
                       </div>
                       <span style={{ fontSize: 11, color: "var(--accent)", fontWeight: 700 }}>
-                        {fmtVND(k.totalCost)}
+                        {fmtVND(k.displayCost)}
                       </span>
                     </div>
                     <div style={{ height: 4, background: "var(--line)", borderRadius: 2, overflow: "hidden" }}>
@@ -3997,7 +4053,7 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {tierStats.map(([tier, count]) => {
-                const total = uniqueKols.length || 1;
+                const total = filteredKols.length || 1;
                 const ratio = (count / total) * 100;
                 return (
                   <div key={tier} style={{ fontSize: 12 }}>
@@ -4640,23 +4696,30 @@ export default function App() {
       return SEED_DATA;
     }
   });
-    const [campaignLabels, setCampaignLabels] = useState(() => {
+  const [campaignLabels, setCampaignLabels] = useState(() => {
     try {
       const s = localStorage.getItem("kol_campaign_labels");
-      return s ? JSON.parse(s) : {
-        AM: "AM",
-        AX: "AX",
-        Vinegar: "Vinegar",
-        MSG: "MGS",
-        Blendy: "Blendy"
+      if (s) {
+        const parsed = JSON.parse(s);
+        delete parsed.AM;
+        delete parsed.AX;
+        delete parsed.Vinegar;
+        delete parsed.MSG;
+        delete parsed.Blendy;
+        if (Object.keys(parsed).length > 0) return parsed;
+      }
+      return {
+        "Campaign A": "Campaign A",
+        "Campaign B": "Campaign B",
+        "Campaign C": "Campaign C",
+        "Campaign D": "Campaign D"
       };
     } catch {
       return {
-        AM: "AM",
-        AX: "AX",
-        Vinegar: "Vinegar",
-        MSG: "MGS",
-        Blendy: "Blendy"
+        "Campaign A": "Campaign A",
+        "Campaign B": "Campaign B",
+        "Campaign C": "Campaign C",
+        "Campaign D": "Campaign D"
       };
     }
   });
@@ -4681,11 +4744,9 @@ export default function App() {
   const [showStatusSettings, setShowStatusSettings] = useState(false);
 
   const dynamicCampaigns = useMemo(() => {
-    const uniqueKeys = Array.from(new Set([
-      ...Object.keys(campaignLabels),
-      ...data.map(d => d.campaign).filter(Boolean)
-    ]));
-    return uniqueKeys.map(key => ({
+    const dataCampaigns = Array.from(new Set(data.map(d => resolveCampaignKey(d)).filter(Boolean)));
+    const keys = dataCampaigns.length > 0 ? dataCampaigns : Object.keys(campaignLabels);
+    return keys.map(key => ({
       key,
       label: campaignLabels[key] || key
     }));
@@ -5003,7 +5064,7 @@ const [view, setView] = useState("table");
   const statsRows = useMemo(() => {
     const q = search.toLowerCase();
     return data.filter(r => {
-      if (filterCampaign !== "all" && r.campaign !== filterCampaign) return false;
+      if (filterCampaign !== "all" && resolveCampaignKey(r) !== filterCampaign) return false;
       if (filterType !== "all" && r.type !== filterType) return false;
       if (q && !r.kol.toLowerCase().includes(q) && !r.id.toLowerCase().includes(q) && !(r.monAn || "").toLowerCase().includes(q)) return false;
       return true;
@@ -5013,7 +5074,7 @@ const [view, setView] = useState("table");
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
     return data.filter(r => {
-      if (filterCampaign !== "all" && r.campaign !== filterCampaign) return false;
+      if (filterCampaign !== "all" && resolveCampaignKey(r) !== filterCampaign) return false;
       if (filterStatus !== "all") {
         if (filterStatus === "in_progress") {
           if (r.statusKey === "aired") return false;
@@ -5038,7 +5099,8 @@ const [view, setView] = useState("table");
   };
 
   const generateKOLId = (campaign, currentData) => {
-    const cleanCamp = campaign ? campaign.trim() : "AM";
+    const cleanCamp = campaign ? campaign.trim() : "CA";
+    const prefix = cleanCamp.length <= 3 ? cleanCamp : cleanCamp.split(" ").map(w => w[0]).join("").toUpperCase();
     const campaignRows = currentData.filter(r => r.campaign === cleanCamp);
     const indices = campaignRows.map(r => {
       if (!r.id) return 0;
@@ -5047,7 +5109,7 @@ const [view, setView] = useState("table");
       return isNaN(num) ? 0 : num;
     });
     const maxIndex = indices.length > 0 ? Math.max(...indices) : 0;
-    return `${cleanCamp}-${maxIndex + 1}`;
+    return `${prefix}-${maxIndex + 1}`;
   };
 
   const handleSave = async (updated) => {
@@ -5166,16 +5228,21 @@ const [view, setView] = useState("table");
 
   const handleReset = async () => {
     const clearAll = window.confirm(
-      "Bạn muốn thực hiện thao tác nào?\n\n- Bấm 'OK' để XÓA SẠCH toàn bộ dữ liệu hiện tại (về 0 KOLs).\n- Bấm 'Cancel' để KHÔI PHỤC lại 66 dòng dữ liệu mẫu ban đầu."
+      "Bạn muốn thực hiện thao tác nào?\n\n- Bấm 'OK' để XÓA SẠCH toàn bộ dữ liệu hiện tại (về 0 KOLs).\n- Bấm 'Cancel' để KHÔI PHỤC lại dữ liệu mẫu ban đầu."
     );
-    const defLabels = { AM: "AM", AX: "AX", Vinegar: "Vinegar", MSG: "MGS", Blendy: "Blendy" };
+    const defLabels = {
+      "Campaign A": "Campaign A",
+      "Campaign B": "Campaign B",
+      "Campaign C": "Campaign C",
+      "Campaign D": "Campaign D"
+    };
     if (clearAll) {
       setData([]);
       setCampaignLabels(defLabels);
       localStorage.setItem("kol_campaign_labels", JSON.stringify(defLabels));
       showToast("🗑️ Đã xóa sạch dữ liệu");
     } else {
-      if (window.confirm("Bạn có chắc chắn muốn khôi phục lại 66 dòng dữ liệu mẫu ban đầu? Mọi chỉnh sửa hiện tại sẽ bị mất.")) {
+      if (window.confirm("Bạn có chắc chắn muốn khôi phục lại dữ liệu mẫu ban đầu? Mọi chỉnh sửa hiện tại sẽ bị mất.")) {
         setData(SEED_DATA);
         setCampaignLabels(defLabels);
         localStorage.setItem("kol_campaign_labels", JSON.stringify(defLabels));
