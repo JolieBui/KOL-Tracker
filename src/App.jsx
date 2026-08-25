@@ -465,9 +465,14 @@ const BRAND_COLORS = {
   "Campaign D": "#EF4444",
 };
 
-const getCampaignColor = (key) => {
+const getCampaignColor = (key, customColors = null) => {
   if (!key) return "#888";
   const cleanKey = key.toString().trim();
+  if (customColors && customColors[cleanKey]) return customColors[cleanKey];
+  try {
+    const stored = JSON.parse(localStorage.getItem("kol_campaign_colors") || "{}");
+    if (stored[cleanKey]) return stored[cleanKey];
+  } catch {}
   if (BRAND_COLORS[cleanKey]) return BRAND_COLORS[cleanKey];
   const upper = cleanKey.toUpperCase();
   if (BRAND_COLORS[upper]) return BRAND_COLORS[upper];
@@ -1980,46 +1985,222 @@ const CampaignDot = ({ campaign, labels }) => (
 
 
 /* ================================================================
-   STATUS SETTINGS MODAL
+   APP SETTINGS MODAL (CAMPAIGNS & STATUSES)
 ================================================================ */
-const StatusSettingsModal = ({ statuses, onSave, onClose, onReset }) => {
-  const [list, setList] = useState(() => statuses.map(s => ({ ...s, originalKey: s.originalKey || s.key })));
+const AppSettingsModal = ({ 
+  campaigns = [], 
+  campaignLabels = {}, 
+  campaignColors = {}, 
+  statuses = [], 
+  onSave, 
+  onClose, 
+  onReset 
+}) => {
+  const [tab, setTab] = useState("campaigns"); // "campaigns" | "statuses"
 
-  const handleChange = (idx, field, val) => {
-    const arr = list.map((item, i) => i === idx ? { ...item, [field]: val, ...(field === "color" ? { soft: val + "22" } : {}) } : item);
-    setList(arr);
+  // Campaign list state: [{ key, originalKey, label, color }]
+  const [campaignList, setCampaignList] = useState(() => {
+    const map = new Map();
+    // Pre-populate with existing dynamic campaigns
+    campaigns.forEach(c => {
+      map.set(c.key, {
+        key: c.key,
+        originalKey: c.key,
+        label: campaignLabels[c.key] || c.label || c.key,
+        color: campaignColors[c.key] || getCampaignColor(c.key, campaignColors)
+      });
+    });
+    // Ensure all keys in campaignLabels are present
+    Object.keys(campaignLabels).forEach(k => {
+      if (!map.has(k)) {
+        map.set(k, {
+          key: k,
+          originalKey: k,
+          label: campaignLabels[k] || k,
+          color: campaignColors[k] || getCampaignColor(k, campaignColors)
+        });
+      }
+    });
+    return Array.from(map.values());
+  });
+
+  // Status list state: [{ key, originalKey, label, color, soft }]
+  const [statusList, setStatusList] = useState(() => {
+    return statuses.map(s => ({ ...s, originalKey: s.originalKey || s.key }));
+  });
+
+  const handleCampaignChange = (idx, field, val) => {
+    setCampaignList(prev => prev.map((item, i) => i === idx ? { ...item, [field]: val } : item));
   };
 
-  const handleAdd = () => {
-    const newKey = "new_status_" + Date.now();
-    setList([...list, { key: newKey, originalKey: newKey, label: "Trạng thái mới", color: "#888888", soft: "#eeeeee" }]);
+  const handleAddCampaign = () => {
+    const nextIdx = campaignList.length + 1;
+    const newKey = "Campaign " + String.fromCharCode(65 + (campaignList.length % 26));
+    const defaultColor = PREDEFINED_COLORS[campaignList.length % PREDEFINED_COLORS.length];
+    setCampaignList([
+      ...campaignList,
+      { key: newKey, originalKey: newKey, label: newKey, color: defaultColor }
+    ]);
   };
 
-  const handleRemove = (idx) => {
-    const arr = [...list];
+  const handleRemoveCampaign = (idx) => {
+    const arr = [...campaignList];
     arr.splice(idx, 1);
-    setList(arr);
+    setCampaignList(arr);
+  };
+
+  const handleStatusChange = (idx, field, val) => {
+    const arr = statusList.map((item, i) => i === idx ? { ...item, [field]: val, ...(field === "color" ? { soft: val + "22" } : {}) } : item);
+    setStatusList(arr);
+  };
+
+  const handleAddStatus = () => {
+    const newKey = "new_status_" + Date.now();
+    setStatusList([...statusList, { key: newKey, originalKey: newKey, label: "Trạng thái mới", color: "#888888", soft: "#eeeeee" }]);
+  };
+
+  const handleRemoveStatus = (idx) => {
+    const arr = [...statusList];
+    arr.splice(idx, 1);
+    setStatusList(arr);
+  };
+
+  const handleSaveAll = () => {
+    onSave({
+      campaigns: campaignList,
+      statuses: statusList
+    });
   };
 
   return (
     <div className="kt-overlay" style={{ zIndex: 200 }} onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="kt-modal kt-anim" style={{ width: 600, padding: 20 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-          <h3 style={{ margin: 0 }}>Cài đặt Trạng thái (Statuses)</h3>
-          <button className="kt-btn kt-btn-ghost" onClick={onClose}>✕</button>
+      <div className="kt-modal kt-anim" style={{ width: 660, maxWidth: "92vw", padding: 24, borderRadius: 14 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 20 }}>⚙️</span>
+            <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Cài đặt Hệ thống</h3>
+          </div>
+          <button className="kt-btn kt-btn-ghost" onClick={onClose} style={{ padding: "4px 8px" }}>✕</button>
         </div>
-        <div style={{ maxHeight: "60vh", overflowY: "auto", paddingRight: 10 }}>
-          {list.map((s, i) => (
-            <div key={i} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "center" }}>
-              <input className="kt-input" style={{ flex: 1 }} value={s.label} onChange={e => handleChange(i, "label", e.target.value)} placeholder="Tên hiển thị" />
-              <input className="kt-input" style={{ flex: 1 }} value={s.key} onChange={e => handleChange(i, "key", e.target.value)} placeholder="Mã nội bộ (key)" />
-              <input type="color" value={s.color} onChange={e => handleChange(i, "color", e.target.value)} style={{ width: 36, height: 36, padding: 0, border: "none", borderRadius: 4, cursor: "pointer" }} />
-              <button className="kt-btn kt-btn-ghost" style={{ padding: "6px 10px", color: "var(--red)" }} onClick={() => handleRemove(i)}>✕</button>
+
+        {/* Tab switch */}
+        <div style={{ display: "flex", gap: 8, borderBottom: "1px solid var(--line)", paddingBottom: 12, marginBottom: 18 }}>
+          <button
+            onClick={() => setTab("campaigns")}
+            className="kt-btn"
+            style={{
+              padding: "7px 16px",
+              borderRadius: 8,
+              fontSize: 13,
+              fontWeight: 600,
+              background: tab === "campaigns" ? "var(--accent)" : "transparent",
+              color: tab === "campaigns" ? "#FFFFFF" : "var(--ink-mid)",
+              border: tab === "campaigns" ? "1px solid var(--accent)" : "1px solid var(--line)"
+            }}
+          >
+            📊 Chiến dịch / Dự án ({campaignList.length})
+          </button>
+          <button
+            onClick={() => setTab("statuses")}
+            className="kt-btn"
+            style={{
+              padding: "7px 16px",
+              borderRadius: 8,
+              fontSize: 13,
+              fontWeight: 600,
+              background: tab === "statuses" ? "var(--accent)" : "transparent",
+              color: tab === "statuses" ? "#FFFFFF" : "var(--ink-mid)",
+              border: tab === "statuses" ? "1px solid var(--accent)" : "1px solid var(--line)"
+            }}
+          >
+            ⚡ Trạng thái tiến độ ({statusList.length})
+          </button>
+        </div>
+
+        {/* Tab Content: CAMPAIGNS */}
+        {tab === "campaigns" && (
+          <div>
+            <div style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 14 }}>
+              💡 Quản lý tên hiển thị, mã nội bộ và màu sắc đại diện của các Chiến dịch / Dự án.
             </div>
-          ))}
-          <button className="kt-btn kt-btn-ghost" onClick={handleAdd} style={{ marginTop: 10, width: "100%", border: "1px dashed var(--line)" }}>+ Thêm trạng thái mới</button>
-        </div>
-        <div style={{ marginTop: 20, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ maxHeight: "50vh", overflowY: "auto", paddingRight: 6 }}>
+              <div style={{ display: "flex", gap: 10, marginBottom: 6, fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>
+                <div style={{ flex: 1.2 }}>Tên hiển thị (Label)</div>
+                <div style={{ flex: 1 }}>Mã dự án (Key)</div>
+                <div style={{ width: 40, textAlign: "center" }}>Màu</div>
+                <div style={{ width: 32 }}></div>
+              </div>
+              {campaignList.map((c, i) => (
+                <div key={i} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "center" }}>
+                  <input
+                    className="kt-input"
+                    style={{ flex: 1.2, fontWeight: 600 }}
+                    value={c.label}
+                    onChange={e => handleCampaignChange(i, "label", e.target.value)}
+                    placeholder="Tên chiến dịch (ví dụ: Aji-Mayo, Dự án A)"
+                  />
+                  <input
+                    className="kt-input"
+                    style={{ flex: 1 }}
+                    value={c.key}
+                    onChange={e => handleCampaignChange(i, "key", e.target.value)}
+                    placeholder="Mã key (AM, CA...)"
+                  />
+                  <input
+                    type="color"
+                    value={c.color || "#10B981"}
+                    onChange={e => handleCampaignChange(i, "color", e.target.value)}
+                    style={{ width: 38, height: 38, padding: 0, border: "1px solid var(--line)", borderRadius: 6, cursor: "pointer" }}
+                  />
+                  <button
+                    className="kt-btn kt-btn-ghost"
+                    style={{ padding: "6px 8px", color: "var(--red)", width: 32 }}
+                    onClick={() => handleRemoveCampaign(i)}
+                    title="Xóa chiến dịch"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+              <button
+                className="kt-btn kt-btn-ghost"
+                onClick={handleAddCampaign}
+                style={{ marginTop: 6, width: "100%", border: "1px dashed var(--line)", padding: "8px" }}
+              >
+                + Thêm Chiến dịch mới
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Tab Content: STATUSES */}
+        {tab === "statuses" && (
+          <div>
+            <div style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 14 }}>
+              💡 Quản lý các bước quy trình và trạng thái bài viết KOL.
+            </div>
+            <div style={{ maxHeight: "50vh", overflowY: "auto", paddingRight: 6 }}>
+              <div style={{ display: "flex", gap: 10, marginBottom: 6, fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>
+                <div style={{ flex: 1.2 }}>Tên hiển thị</div>
+                <div style={{ flex: 1 }}>Mã nội bộ (Key)</div>
+                <div style={{ width: 40, textAlign: "center" }}>Màu</div>
+                <div style={{ width: 32 }}></div>
+              </div>
+              {statusList.map((s, i) => (
+                <div key={i} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "center" }}>
+                  <input className="kt-input" style={{ flex: 1.2 }} value={s.label} onChange={e => handleStatusChange(i, "label", e.target.value)} placeholder="Tên hiển thị" />
+                  <input className="kt-input" style={{ flex: 1 }} value={s.key} onChange={e => handleStatusChange(i, "key", e.target.value)} placeholder="Mã nội bộ (key)" />
+                  <input type="color" value={s.color} onChange={e => handleStatusChange(i, "color", e.target.value)} style={{ width: 38, height: 38, padding: 0, border: "1px solid var(--line)", borderRadius: 6, cursor: "pointer" }} />
+                  <button className="kt-btn kt-btn-ghost" style={{ padding: "6px 8px", color: "var(--red)", width: 32 }} onClick={() => handleRemoveStatus(i)}>✕</button>
+                </div>
+              ))}
+              <button className="kt-btn kt-btn-ghost" onClick={handleAddStatus} style={{ marginTop: 6, width: "100%", border: "1px dashed var(--line)", padding: "8px" }}>+ Thêm trạng thái mới</button>
+            </div>
+          </div>
+        )}
+
+        {/* Modal Footer */}
+        <div style={{ marginTop: 22, paddingTop: 16, borderTop: "1px solid var(--line)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <button 
             className="kt-btn kt-btn-ghost" 
             type="button"
@@ -2030,7 +2211,7 @@ const StatusSettingsModal = ({ statuses, onSave, onClose, onReset }) => {
           </button>
           <div style={{ display: "flex", gap: 10 }}>
             <button className="kt-btn kt-btn-ghost" onClick={onClose}>Hủy</button>
-            <button className="kt-btn kt-btn-primary" onClick={() => onSave(list)}>Lưu thay đổi</button>
+            <button className="kt-btn kt-btn-primary" onClick={handleSaveAll}>Lưu thay đổi</button>
           </div>
         </div>
       </div>
@@ -4629,34 +4810,11 @@ const LS_KEY = "kol_tracking_v6";
 export default function App() {
   const [data, rawSetData] = useState(() => {
     try {
-      // One-time cleanup: purge old hardcoded brand demo data from previous versions
-      try {
-        localStorage.removeItem("kol_tracking_v5");
-        localStorage.removeItem("kol_tracking_v4");
-        localStorage.removeItem("kol_tracking_v3");
-        localStorage.removeItem("kol_tracking_v2");
-        localStorage.removeItem("kol_tracking_v1");
-        const oldLabels = localStorage.getItem("kol_campaign_labels");
-        if (oldLabels && (oldLabels.includes('"AM"') || oldLabels.includes('"AX"'))) {
-          localStorage.removeItem("kol_campaign_labels");
-        }
-      } catch {}
-
       const s = localStorage.getItem(LS_KEY);
       const parsed = s ? JSON.parse(s) : SEED_DATA;
 
-      // Sanitize old demo campaign names if present
-      const sanitizedData = parsed.map(r => {
-        if (r.campaign === "AM") return { ...r, id: (r.id || "").replace("AM-", "CA-"), campaign: "Campaign A" };
-        if (r.campaign === "AX") return { ...r, id: (r.id || "").replace("AX-", "CB-"), campaign: "Campaign B" };
-        if (r.campaign === "Vinegar") return { ...r, id: (r.id || "").replace("AV-", "CC-"), campaign: "Campaign C" };
-        if (r.campaign === "MSG" || r.campaign === "MGS") return { ...r, id: (r.id || "").replace("MSG-", "CD-"), campaign: "Campaign D" };
-        if (r.campaign === "Blendy") return { ...r, id: (r.id || "").replace("Blendy-", "CE-"), campaign: "Campaign E" };
-        return r;
-      });
-
       // One-time cleanup: strip auto-generated fake performance data
-      const cleaned = sanitizedData.map(r => {
+      const cleaned = parsed.map(r => {
         const conv = Number(r.conversions) || 0;
         const rev = Number(r.revenue) || 0;
         const atc = Number(r.addToCart) || 0;
@@ -4686,19 +4844,11 @@ export default function App() {
       return SEED_DATA;
     }
   });
+
   const [campaignLabels, setCampaignLabels] = useState(() => {
     try {
       const s = localStorage.getItem("kol_campaign_labels");
-      if (s) {
-        const parsed = JSON.parse(s);
-        delete parsed.AM;
-        delete parsed.AX;
-        delete parsed.Vinegar;
-        delete parsed.MSG;
-        delete parsed.Blendy;
-        if (Object.keys(parsed).length > 0) return parsed;
-      }
-      return {
+      return s ? JSON.parse(s) : {
         "Campaign A": "Campaign A",
         "Campaign B": "Campaign B",
         "Campaign C": "Campaign C",
@@ -4711,6 +4861,15 @@ export default function App() {
         "Campaign C": "Campaign C",
         "Campaign D": "Campaign D"
       };
+    }
+  });
+
+  const [campaignColors, setCampaignColors] = useState(() => {
+    try {
+      const s = localStorage.getItem("kol_campaign_colors");
+      return s ? JSON.parse(s) : BRAND_COLORS;
+    } catch {
+      return BRAND_COLORS;
     }
   });
 
@@ -4734,13 +4893,16 @@ export default function App() {
   const [showStatusSettings, setShowStatusSettings] = useState(false);
 
   const dynamicCampaigns = useMemo(() => {
-    const dataCampaigns = Array.from(new Set(data.map(d => resolveCampaignKey(d)).filter(Boolean)));
-    const keys = dataCampaigns.length > 0 ? dataCampaigns : Object.keys(campaignLabels);
+    const keys = Array.from(new Set([
+      ...Object.keys(campaignLabels),
+      ...data.map(d => resolveCampaignKey(d)).filter(Boolean)
+    ]));
     return keys.map(key => ({
       key,
-      label: campaignLabels[key] || key
+      label: campaignLabels[key] || key,
+      color: campaignColors[key] || getCampaignColor(key, campaignColors)
     }));
-  }, [data, campaignLabels]);
+  }, [data, campaignLabels, campaignColors]);
 
 
 const [view, setView] = useState("table");
@@ -5590,25 +5752,51 @@ const [view, setView] = useState("table");
       
       {/* ── SETTINGS MODAL ── */}
       {showStatusSettings && (
-        <StatusSettingsModal
+        <AppSettingsModal
+          campaigns={dynamicCampaigns}
+          campaignLabels={campaignLabels}
+          campaignColors={campaignColors}
           statuses={statusStages}
           onClose={() => setShowStatusSettings(false)}
           onReset={handleReset}
-          onSave={(newList) => {
-            // Update statusKey in database for renamed keys
+          onSave={({ campaigns: newCampaigns, statuses: newStatuses }) => {
+            // 1. Process Campaign updates
+            const newLabels = {};
+            const newColors = {};
+            newCampaigns.forEach(c => {
+              newLabels[c.key] = c.label || c.key;
+              newColors[c.key] = c.color;
+            });
+
+            // Update campaign in data rows if a key was renamed
+            setData(prev => prev.map(row => {
+              const match = newCampaigns.find(nc => nc.originalKey === row.campaign);
+              if (match && match.key !== row.campaign) {
+                return { ...row, campaign: match.key };
+              }
+              return row;
+            }));
+
+            setCampaignLabels(newLabels);
+            setCampaignColors(newColors);
+            localStorage.setItem("kol_campaign_labels", JSON.stringify(newLabels));
+            localStorage.setItem("kol_campaign_colors", JSON.stringify(newColors));
+
+            // 2. Process Status updates
             setData(prev => prev.map(item => {
-              const match = newList.find(ns => ns.originalKey === item.statusKey);
+              const match = newStatuses.find(ns => ns.originalKey === item.statusKey);
               if (match && match.key !== item.statusKey) {
                 return { ...item, statusKey: match.key };
               }
               return item;
             }));
 
-            // Clean up originalKey field before saving
-            const cleanedList = newList.map(({ key, label, color, soft }) => ({ key, label, color, soft }));
-            setStatusStages(cleanedList);
-            localStorage.setItem("kol_status_stages", JSON.stringify(cleanedList));
+            const cleanedStatuses = newStatuses.map(({ key, label, color, soft }) => ({ key, label, color, soft: soft || color + "22" }));
+            setStatusStages(cleanedStatuses);
+            localStorage.setItem("kol_status_stages", JSON.stringify(cleanedStatuses));
+
             setShowStatusSettings(false);
+            showToast("✅ Đã lưu cài đặt Chiến dịch & Trạng thái");
           }}
         />
       )}
