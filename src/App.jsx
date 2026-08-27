@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import * as XLSX from "xlsx";
+import InsightsReportView from "./InsightsReportView";
 
 /* ---------------- Design tokens (injected via <style>) ---------------- */
 const GlobalStyle = () => (
@@ -2721,26 +2722,46 @@ const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCamp
           {/* Reup & Extended KPI (from Social Outreach file) */}
           <div style={{ gridColumn: "1 / -1", borderTop: "1px solid var(--line)", paddingTop: 16, marginTop: 10 }}>
             <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)", display: "flex", alignItems: "center", gap: 6 }}>
-              🔁 Reup & KPI mở rộng (Social Outreach)
+              🔁 Reup & Quyền Lợi FOC (Social Outreach)
             </h3>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0 16px" }}>
-              <Field label="Reup Views" field="reupViews" type="number" />
-              <Field label="Reup Engagement" field="reupEngagement" type="number" />
-              <Field label="Tổng View (TikTok + Reup)" field="totalViewCombined" type="number" />
+              <Field label="Reup Views (FB/YT)" field="reupViews" type="number" />
+              <Field label="Paid Views (Spark Ads)" field="paidViews" type="number" />
+              <Field label="Giây xuất hiện SP (Placement)" field="placementDuration" placeholder="VD: 4 (giây)" />
 
-              <Field label="Tổng Engagement (TikTok + Reup)" field="totalEngCombined" type="number" />
-              <Field label="% View đạt KPI" field="pctViewAchieved" type="number" />
-              <Field label="% Eng đạt KPI" field="pctEngAchieved" type="number" />
+              <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 8 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-soft)" }}>Quyền lợi FOC (Đàm phán được):</span>
+                <div style={{ display: "flex", gap: 12, fontSize: 12 }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: 4, cursor: "pointer" }}>
+                    <input type="checkbox" checked={Boolean(form.focReup)} onChange={e => set("focReup", e.target.checked)} />
+                    <span>FOC Reup</span>
+                  </label>
+                  <label style={{ display: "flex", alignItems: "center", gap: 4, cursor: "pointer" }}>
+                    <input type="checkbox" checked={Boolean(form.focCodeAds)} onChange={e => set("focCodeAds", e.target.checked)} />
+                    <span>Code Ads</span>
+                  </label>
+                  <label style={{ display: "flex", alignItems: "center", gap: 4, cursor: "pointer" }}>
+                    <input type="checkbox" checked={Boolean(form.focLink)} onChange={e => set("focLink", e.target.checked)} />
+                    <span>Link Bio</span>
+                  </label>
+                </div>
+              </div>
 
-              <Field label="% View đạt KPI (kèm Reup)" field="pctViewAchievedTotal" type="number" />
-              <Field label="% Eng đạt KPI (kèm Reup)" field="pctEngAchievedTotal" type="number" />
-              <Field label="Paid Avg. View" field="paidAvgView" type="number" />
+              <Field label="Tuyến Creator" field="creatorCategory" type="select" options={["Cooking Specialist", "Mom & Family", "Food Reviewer", "Lifestyle / Entertainment"]} />
+              <Field label="Vùng miền" field="region" type="select" options={["Toàn quốc", "Miền Bắc", "Miền Trung", "Miền Nam"]} />
+            </div>
+          </div>
 
-              <Field label="Paid % Completed View" field="paidPctCompletedView" type="number" />
-              <Field label="Code Ads" field="codeAds" />
-              <Field label="Brand Reup" field="brandReup" />
-
-              <Field label="Link Reup" field="reupLink" />
+          {/* FY26 Post-Campaign Evaluation & VOC */}
+          <div style={{ gridColumn: "1 / -1", borderTop: "1px solid var(--line)", paddingTop: 16, marginTop: 10 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, margin: "0 0 12px 0", color: "var(--ink)", display: "flex", alignItems: "center", gap: 6 }}>
+              🎯 Đánh Giá Hậu Chiến Dịch & Phản Hồi VOC (FY26 Template)
+            </h3>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 16px" }}>
+              <Field label="Kết luận Đánh giá" field="recommendationAction" type="select" options={["", "CONTINUE", "CONSIDER", "STOP"]} />
+              <Field label="Lý do & Key Learning" field="recommendationReason" placeholder="VD: CPV rẻ, Save công thức cao..." />
+              <Field label="VOC: Hỏi công thức (Recipe)" field="vocRecipe" placeholder="VD: Khách hỏi cách nêm canh..." />
+              <Field label="VOC: Nhắc nhãn hàng / Rào cản" field="vocProduct" placeholder="VD: Khen ngọt thanh, hỏi thay chanh..." />
             </div>
           </div>
         </div>
@@ -5463,6 +5484,12 @@ const [view, setView] = useState("table");
               <button className={`kt-btn ${view === "profile" ? "kt-btn-primary" : "kt-btn-ghost"}`}
                 style={{ padding: "5px 12px", fontSize: 11, borderRadius: 16 }}
                 onClick={() => setView("profile")}>Hồ sơ KOL</button>
+              <button className={`kt-btn ${view === "report" ? "kt-btn-primary" : "kt-btn-ghost"}`}
+                style={{ padding: "5px 12px", fontSize: 11, borderRadius: 16, display: "flex", alignItems: "center", gap: 4 }}
+                onClick={() => setView("report")}>
+                <span>📊</span>
+                <span>Báo Cáo & Insight FY26</span>
+              </button>
             </div>
           </div>
 
@@ -5525,7 +5552,7 @@ const [view, setView] = useState("table");
         </div>
 
         {/* Bottom Row: Filters (hidden on Hồ sơ KOL & Lịch) */}
-        {view !== "profile" && view !== "calendar" && (
+        {view !== "profile" && view !== "calendar" && view !== "report" && (
           <div className="kt-filters-bar">
             {/* Search */}
             <input className="kt-input kt-filter-input" placeholder="🔍 Tìm tên KOL, món ăn…"
@@ -5553,7 +5580,7 @@ const [view, setView] = useState("table");
         )}
 
         {/* Stats Row (Only visible for table, kanban) */}
-        {(view === "table" || view === "kanban") && (
+        {(view === "table" || view === "kanban") && view !== "report" && (
           <StatsBar 
             rows={statsRows} 
             currentStatus={filterStatus}
@@ -5600,6 +5627,15 @@ const [view, setView] = useState("table");
                   showToast(`Đã xếp lịch lên sóng cho KOL!`);
                 }}
                 campaignLabels={campaignLabels}
+              />
+            )}
+            {view === "report" && (
+              <InsightsReportView 
+                data={data} 
+                onOpenProfile={k => setSelectedProfile(k)} 
+                dynamicCampaigns={dynamicCampaigns}
+                campaignLabels={campaignLabels}
+                campaignColors={campaignColors}
               />
             )}
             {view === "profile" && (
