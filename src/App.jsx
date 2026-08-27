@@ -5485,11 +5485,8 @@ const [view, setView] = useState("table");
                 style={{ padding: "5px 12px", fontSize: 11, borderRadius: 16 }}
                 onClick={() => setView("profile")}>Hồ sơ KOL</button>
               <button className={`kt-btn ${view === "report" ? "kt-btn-primary" : "kt-btn-ghost"}`}
-                style={{ padding: "5px 12px", fontSize: 11, borderRadius: 16, display: "flex", alignItems: "center", gap: 4 }}
-                onClick={() => setView("report")}>
-                <span>📊</span>
-                <span>Báo Cáo & Insight FY26</span>
-              </button>
+                style={{ padding: "5px 12px", fontSize: 11, borderRadius: 16 }}
+                onClick={() => setView("report")}>Báo cáo</button>
             </div>
           </div>
 

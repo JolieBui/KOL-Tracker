@@ -1,13 +1,13 @@
 import React, { useState, useMemo } from "react";
 import * as XLSX from "xlsx";
 
-/* Helper format VND */
+/* Format VND gọn gàng */
 const fmtVND = (num) => {
   if (!num || isNaN(num)) return "0 ₫";
   const n = Number(num);
-  if (n >= 1000000000) return (n / 1000000000).toFixed(1) + " tỷ ₫";
-  if (n >= 1000000) return (n / 1000000).toFixed(1) + "M ₫";
-  if (n >= 1000) return (n / 1000).toFixed(0) + "K ₫";
+  if (n >= 1000000000) return (n / 1000000000).toFixed(1) + " tỷ";
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + " tr";
+  if (n >= 1000) return (n / 1000).toFixed(0) + " k";
   return n.toLocaleString("vi-VN") + " ₫";
 };
 
@@ -17,6 +17,15 @@ const fmtNum = (num) => {
   if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
   if (n >= 1000) return (n / 1000).toFixed(1) + "K";
   return n.toLocaleString("vi-VN");
+};
+
+/* Cắt gọn text/link món ăn */
+const cleanDish = (text) => {
+  if (!text) return "Món ăn chiến dịch";
+  let str = text.replace(/https?:\/\/\S+/gi, "").replace(/[\r\n]+/g, " ").trim();
+  if (str.startsWith("-") || str.startsWith("*")) str = str.substring(1).trim();
+  if (str.length > 45) return str.substring(0, 42) + "...";
+  return str || "Món ăn chiến dịch";
 };
 
 /* 6 Hypotheses Evaluator */
@@ -42,7 +51,7 @@ export const evaluateHypotheses = (r) => {
   const h1_pass = (placementSec !== null && placementSec <= 6) || 
                   (Number(r.paidAvgView || r.avgView || 0) >= 6) || 
                   (r.airedLink && r.statusKey === "aired");
-  const h1_text = h1_pass ? "SP xuất hiện ≤ 6s hoặc Avg View tốt" : "Sản phẩm xuất hiện muộn (>6s) hoặc drop sớm";
+  const h1_text = h1_pass ? "Xuất hiện SP ≤ 6s / Watch time tốt" : "Sản phẩm xuất hiện muộn (>6s)";
 
   // H2: Engagement Volume theo Tier
   const tier = (r.type || "Mid-tier").toLowerCase();
@@ -52,7 +61,7 @@ export const evaluateHypotheses = (r) => {
   else if (tier.includes("micro")) engThreshold = 1000;
   else if (tier.includes("nano")) engThreshold = 300;
   const h2_pass = totalEng >= engThreshold;
-  const h2_text = `${fmtNum(totalEng)} Eng (Chuẩn: ≥${fmtNum(engThreshold)})`;
+  const h2_text = `${fmtNum(totalEng)} tương tác (Chuẩn: ≥${fmtNum(engThreshold)})`;
 
   // H3: Engagement Rate Benchmark (≥ 1.5%)
   const h3_pass = er >= 1.5;
@@ -60,7 +69,7 @@ export const evaluateHypotheses = (r) => {
 
   // H4: Cost Efficiency (CPV ≤ 72đ)
   const h4_pass = cpv > 0 && cpv <= 72;
-  const h4_text = cpv > 0 ? `CPV: ${cpv}đ/view (Chuẩn: ≤72đ)` : "Chưa có đủ số liệu view";
+  const h4_text = cpv > 0 ? `CPV: ${cpv}đ (Chuẩn: ≤72đ)` : "Chưa có đủ view";
 
   // H5: Added Value FOC (Reup / Code Ads / Link Bio)
   const hasReup = Boolean(r.focReup || r.airedFb || (r.reupLink && r.reupLink.length > 3));
@@ -68,10 +77,10 @@ export const evaluateHypotheses = (r) => {
   const hasLink = Boolean(r.focLink || (r.addonFee && r.addonFee.toLowerCase().includes("link")));
   const h5_pass = hasReup || hasCodeAds || hasLink;
   const focItems = [];
-  if (hasReup) focItems.push("FOC Reup");
+  if (hasReup) focItems.push("Reup");
   if (hasCodeAds) focItems.push("Code Ads");
-  if (hasLink) focItems.push("Link bio");
-  const h5_text = focItems.length ? `Có ${focItems.join(", ")}` : "Không có quyền lợi FOC";
+  if (hasLink) focItems.push("Link Bio");
+  const h5_text = focItems.length ? `Quyền lợi FOC: ${focItems.join(", ")}` : "Không có FOC";
 
   // H6: Organic KPI View (≥ 100%)
   const estView = Number(r.estView) || 0;
@@ -80,12 +89,12 @@ export const evaluateHypotheses = (r) => {
   const h6_text = `Đạt ${pctOrg}% KPI Organic (${fmtNum(views)}/${fmtNum(estView)})`;
 
   const hypotheses = [
-    { id: "H1", title: "6s Rule & Watch Time", pass: h1_pass, detail: h1_text },
-    { id: "H2", title: "Volume Engagement", pass: h2_pass, detail: h2_text },
-    { id: "H3", title: "Engagement Rate ≥ 1.5%", pass: h3_pass, detail: h3_text },
-    { id: "H4", title: "CPV ≤ 72đ", pass: h4_pass, detail: h4_text },
-    { id: "H5", title: "Added Value (FOC)", pass: h5_pass, detail: h5_text },
-    { id: "H6", title: "Organic KPI ≥ 100%", pass: h6_pass, detail: h6_text }
+    { id: "H1", code: "6s", title: "Placement ≤ 6s", pass: h1_pass, detail: h1_text },
+    { id: "H2", code: "Eng", title: "Volume Eng", pass: h2_pass, detail: h2_text },
+    { id: "H3", code: "ER", title: "ER ≥ 1.5%", pass: h3_pass, detail: h3_text },
+    { id: "H4", code: "CPV", title: "CPV ≤ 72đ", pass: h4_pass, detail: h4_text },
+    { id: "H5", code: "FOC", title: "Added Value FOC", pass: h5_pass, detail: h5_text },
+    { id: "H6", code: "KPI", title: "Organic KPI ≥ 100%", pass: h6_pass, detail: h6_text }
   ];
 
   const score = hypotheses.filter(h => h.pass).length;
@@ -93,10 +102,10 @@ export const evaluateHypotheses = (r) => {
   let reason = "Hiệu quả trung bình, cần tối ưu kịch bản & chi phí";
   if (score >= 5) {
     action = "CONTINUE";
-    reason = "Đạt xuất sắc các tiêu chí (CPV rẻ, Intent cao, có FOC)";
+    reason = "Đạt xuất sắc (CPV rẻ, Intent cao, có FOC)";
   } else if (score <= 2) {
     action = "STOP";
-    reason = "CPV quá cao, tương tác thấp, hoặc không đạt KPI cam kết";
+    reason = "CPV cao hoặc không đạt KPI cam kết";
   }
 
   return {
@@ -126,14 +135,11 @@ export default function InsightsReportView({
   onOpenProfile,
   dynamicCampaigns,
   campaignLabels = {},
-  campaignColors = {}
 }) {
   const [selectedCampaign, setSelectedCampaign] = useState("all");
-  const [activeTab, setActiveTab] = useState("funnel"); // "funnel" | "hypotheses" | "matrix" | "export"
-  const [filterAction, setFilterAction] = useState("all"); // "all" | "CONTINUE" | "CONSIDER" | "STOP"
-  const [hoveredKOL, setHoveredKOL] = useState(null);
+  const [activeTab, setActiveTab] = useState("hypotheses"); // "hypotheses" | "funnel" | "matrix"
+  const [filterAction, setFilterAction] = useState("all");
 
-  // Filter rows
   const filteredRows = useMemo(() => {
     return data.filter(r => {
       if (selectedCampaign !== "all") {
@@ -144,7 +150,6 @@ export default function InsightsReportView({
     });
   }, [data, selectedCampaign]);
 
-  // Evaluated data
   const evaluatedRows = useMemo(() => {
     return filteredRows.map(r => ({
       ...r,
@@ -152,7 +157,6 @@ export default function InsightsReportView({
     }));
   }, [filteredRows]);
 
-  // Aggregated Stats
   const stats = useMemo(() => {
     let totalCost = 0;
     let totalOrganicViews = 0;
@@ -184,33 +188,25 @@ export default function InsightsReportView({
     const totalViews = totalOrganicViews + totalReupViews + totalPaidViews;
     const totalEng = totalLikes + totalComments + totalSaves + totalShares;
     const highIntentEng = totalSaves + totalShares;
-    const vanityEng = totalLikes + totalComments;
     const avgCPV = totalViews > 0 ? Math.round(totalCost / totalViews) : 0;
-    const avgCPE = totalEng > 0 ? Math.round(totalCost / totalEng) : 0;
     const avgER = totalViews > 0 ? ((totalEng / totalViews) * 100).toFixed(2) : "0.00";
-
-    // Budget Split Assumption (85% Booking - 15% Media from PPTX proposal)
-    const bookingBudget = Math.round(totalCost * 0.85);
-    const mediaBudget = Math.round(totalCost * 0.15);
 
     return {
       totalKOLs: evaluatedRows.length,
       totalCost,
-      bookingBudget,
-      mediaBudget,
+      bookingBudget: Math.round(totalCost * 0.85),
+      mediaBudget: Math.round(totalCost * 0.15),
       totalViews,
       totalOrganicViews,
       totalReupViews,
       totalPaidViews,
       totalEng,
       highIntentEng,
-      vanityEng,
       totalLikes,
       totalComments,
       totalSaves,
       totalShares,
       avgCPV,
-      avgCPE,
       avgER,
       continueCount,
       considerCount,
@@ -218,29 +214,27 @@ export default function InsightsReportView({
     };
   }, [evaluatedRows]);
 
-  // Export FY26 Half Year Template
+  // Export sạch
   const handleExportFY26Template = () => {
-    // Sheet 1: Detailed Perf (15 Cột chuẩn của Template MSG & Vinegar)
     const headers1 = [
-      "No.", "KOL", "Link Profile", "Tier", "Followers", "Booking Cost (VND)",
-      "Món ăn / Menu", "Tuyến Creator", "Vùng miền", "KPI Organic View",
-      "Organic View", "Reup View", "Paid Ads View", "Total View Combined",
-      "Likes", "Comments", "Saves", "Shares", "Total Engagement",
-      "ER (%)", "CPV (VND)", "CPE (VND)", "FOC Quyền Lợi",
-      "Hypothesis Score (0-6)", "Đánh Giá (Action)", "Lý do & Key Learning"
+      "No.", "KOL", "Tier", "Followers", "Chi phí (VND)",
+      "Món ăn", "Tuyến Creator", "Vùng miền", "KPI Organic View",
+      "Organic View", "Reup View", "Paid View", "Tổng Views",
+      "Likes", "Comments", "Saves", "Shares", "Tổng Tương tác",
+      "ER (%)", "CPV (VND)", "FOC Quyền Lợi",
+      "Điểm Đạt (0-6)", "Đánh Giá", "Lý do / Key Learning"
     ];
 
     const rows1 = evaluatedRows.map((r, i) => {
       const e = r.eval;
       const focList = [];
-      if (r.focReup || r.airedFb) focList.push("FOC Reup");
+      if (r.focReup || r.airedFb) focList.push("Reup");
       if (r.focCodeAds) focList.push("Code Ads");
       if (r.focLink) focList.push("Link Bio");
 
       return [
         i + 1,
-        r.kol || "KOL " + (i + 1),
-        r.link || "",
+        r.kol || `KOL ${i + 1}`,
         r.type || "Mid-tier",
         r.follower || "",
         Number(r.cost) || 0,
@@ -259,7 +253,6 @@ export default function InsightsReportView({
         e.totalEng,
         e.er.toFixed(2) + "%",
         e.cpv,
-        e.cpe,
         focList.join(", ") || "Không",
         `${e.score}/6`,
         e.action,
@@ -267,12 +260,11 @@ export default function InsightsReportView({
       ];
     });
 
-    // Sheet 2: 6 Hypotheses Review
     const headers2 = [
       "No.", "KOL", "Tier", "Chi phí", 
-      "H1 (6s Rule & Watch Time)", "H2 (Eng Volume)", "H3 (ER ≥ 1.5%)",
+      "H1 (6s Rule)", "H2 (Volume Eng)", "H3 (ER ≥ 1.5%)",
       "H4 (CPV ≤ 72đ)", "H5 (Added Value FOC)", "H6 (Organic KPI ≥ 100%)",
-      "Tổng điểm đạt", "Kết Luận (Continue/Stop)"
+      "Tổng điểm", "Đánh giá"
     ];
 
     const rows2 = evaluatedRows.map((r, i) => {
@@ -282,66 +274,59 @@ export default function InsightsReportView({
         r.kol,
         r.type || "",
         Number(r.cost) || 0,
-        e.hypotheses[0].pass ? "PASS (" + e.hypotheses[0].detail + ")" : "FAIL",
-        e.hypotheses[1].pass ? "PASS (" + e.hypotheses[1].detail + ")" : "FAIL",
-        e.hypotheses[2].pass ? "PASS (" + e.hypotheses[2].detail + ")" : "FAIL",
-        e.hypotheses[3].pass ? "PASS (" + e.hypotheses[3].detail + ")" : "FAIL",
-        e.hypotheses[4].pass ? "PASS (" + e.hypotheses[4].detail + ")" : "FAIL",
-        e.hypotheses[5].pass ? "PASS (" + e.hypotheses[5].detail + ")" : "FAIL",
+        e.hypotheses[0].pass ? "Đạt" : "Không",
+        e.hypotheses[1].pass ? "Đạt" : "Không",
+        e.hypotheses[2].pass ? "Đạt" : "Không",
+        e.hypotheses[3].pass ? "Đạt" : "Không",
+        e.hypotheses[4].pass ? "Đạt" : "Không",
+        e.hypotheses[5].pass ? "Đạt" : "Không",
         `${e.score}/6`,
         e.action
       ];
     });
 
-    // Sheet 3: VOC Sentiment
-    const headers3 = ["No.", "KOL", "Món ăn", "Xin công thức (Recipe Inquiry)", "Nhắc nhãn hàng (Product Mention)", "Thắc mắc & Rào cản (Substitute/Negative)"];
-    const rows3 = evaluatedRows.map((r, i) => [
-      i + 1,
-      r.kol,
-      r.monAn || "Món ăn",
-      r.vocRecipe || "Hỏi định lượng bột ngọt/giấm, cách ướp",
-      r.vocProduct || "Khen bột ngọt/giấm thanh dịu, dễ nêm",
-      r.vocConcern || (r.monAn?.includes("Nộm") ? "Hỏi: Dùng chanh thay giấm được không?" : "Không có")
-    ]);
-
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([headers1, ...rows1]), "1. Detailed Perf (FY26)");
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([headers2, ...rows2]), "2. Hypothesis Review");
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([headers3, ...rows3]), "3. VOC Comments");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([headers1, ...rows1]), "Detailed Perf (FY26)");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([headers2, ...rows2]), "Hypothesis Review");
 
-    const fileName = `KOL_Report_FY26_${selectedCampaign === "all" ? "All_Campaigns" : selectedCampaign}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    const fileName = `KOL_Report_FY26_${selectedCampaign === "all" ? "All" : selectedCampaign}.xlsx`;
     XLSX.writeFile(wb, fileName);
   };
 
   return (
-    <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", background: "var(--paper)" }}>
-      {/* ── SUB-HEADER: Campaign Selector & Tab Controls ── */}
+    <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", background: "#F8FAFC" }}>
+      
+      {/* ── TOP NAV BAR (Minimal & Flat) ── */}
       <div style={{
-        background: "var(--card)",
-        borderBottom: "1px solid var(--line)",
-        padding: "12px 24px",
+        background: "#FFFFFF",
+        borderBottom: "1px solid #E2E8F0",
+        padding: "10px 20px",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
         gap: 16,
         flexShrink: 0
       }}>
-        {/* Left: Campaign Filter & Title */}
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: 16 }}>📊</span>
-            <span style={{ fontWeight: 800, fontSize: 15, color: "var(--ink)", letterSpacing: "-0.02em" }}>
-              Báo Cáo & Insight Chiến Dịch (FY26)
-            </span>
-          </div>
-
+        {/* Left: Campaign Picker */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "#0F172A", letterSpacing: "-0.01em" }}>
+            Báo Cáo FY26
+          </span>
           <select
-            className="kt-select"
             value={selectedCampaign}
             onChange={(e) => setSelectedCampaign(e.target.value)}
-            style={{ padding: "5px 12px", fontSize: 12, borderRadius: 16, fontWeight: 600 }}
+            style={{
+              padding: "4px 10px",
+              fontSize: 12,
+              borderRadius: 6,
+              border: "1px solid #CBD5E1",
+              background: "#FFFFFF",
+              color: "#334155",
+              fontWeight: 500,
+              cursor: "pointer"
+            }}
           >
-            <option value="all">Tất cả Chiến dịch ({data.length} KOLs)</option>
+            <option value="all">Tất cả chiến dịch ({data.length} KOLs)</option>
             {dynamicCampaigns.map(c => (
               <option key={c.key} value={c.key}>
                 {campaignLabels[c.key] || c.label}
@@ -350,550 +335,364 @@ export default function InsightsReportView({
           </select>
         </div>
 
-        {/* Center: Inner Sub-Tabs */}
-        <div style={{ display: "flex", gap: 4, background: "var(--paper)", padding: 3, borderRadius: 20 }}>
+        {/* Center: Segment Tabs (Flat minimal) */}
+        <div style={{ display: "flex", background: "#F1F5F9", padding: 2, borderRadius: 6 }}>
           {[
-            { id: "funnel", label: "Phễu Ý Định & 3 Tầng View", icon: "🌪️" },
-            { id: "hypotheses", label: "Ma Trận 6 Giả Thuyết", icon: "🎯" },
-            { id: "matrix", label: "Món Ăn x Nhóm Creator", icon: "🍳" },
-            { id: "export", label: "Xuất Template FY26", icon: "📥" }
-          ].map(t => (
-            <button
-              key={t.id}
-              onClick={() => setActiveTab(t.id)}
-              className={`kt-btn ${activeTab === t.id ? "kt-btn-primary" : "kt-btn-ghost"}`}
-              style={{ padding: "5px 12px", fontSize: 11, borderRadius: 16, display: "flex", alignItems: "center", gap: 5 }}
-            >
-              <span>{t.icon}</span>
-              <span>{t.label}</span>
-            </button>
-          ))}
+            { id: "hypotheses", label: "Ma trận 6 Giả thuyết" },
+            { id: "funnel", label: "Phễu Ý định & 3 Tầng View" },
+            { id: "matrix", label: "Món ăn & Creator" }
+          ].map(t => {
+            const active = activeTab === t.id;
+            return (
+              <button
+                key={t.id}
+                onClick={() => setActiveTab(t.id)}
+                style={{
+                  padding: "5px 12px",
+                  fontSize: 12,
+                  fontWeight: active ? 600 : 500,
+                  color: active ? "#0F172A" : "#64748B",
+                  background: active ? "#FFFFFF" : "transparent",
+                  border: "none",
+                  borderRadius: 5,
+                  cursor: "pointer",
+                  boxShadow: active ? "0 1px 2px rgba(0,0,0,0.05)" : "none",
+                  transition: "all 0.15s ease"
+                }}
+              >
+                {t.label}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Right: Quick Export 1-Click */}
+        {/* Right: Clean Export Button */}
         <button
           onClick={handleExportFY26Template}
-          className="kt-btn kt-btn-primary"
-          style={{ padding: "6px 14px", fontSize: 12, borderRadius: 18, display: "flex", alignItems: "center", gap: 6 }}
+          style={{
+            padding: "5px 12px",
+            fontSize: 12,
+            fontWeight: 600,
+            color: "#FFFFFF",
+            background: "#0F172A",
+            border: "none",
+            borderRadius: 6,
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            cursor: "pointer"
+          }}
         >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
             <polyline points="7 10 12 15 17 10"></polyline>
             <line x1="12" y1="15" x2="12" y2="3"></line>
           </svg>
-          <span>Xuất Báo Cáo FY26 (.xlsx)</span>
+          <span>Xuất Excel FY26</span>
         </button>
       </div>
 
-      {/* ── KPI HIGHLIGHT CARDS (Always visible) ── */}
-      <div style={{ padding: "14px 24px 0", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, flexShrink: 0 }}>
-        {/* Card 1: Budget Split */}
-        <div className="kt-card" style={{ padding: "12px 16px" }}>
-          <div style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 700, textTransform: "uppercase" }}>
-            💰 Tổng Chi Phí (85% Booking / 15% Media)
-          </div>
-          <div style={{ fontSize: 20, fontWeight: 800, color: "var(--accent)", marginTop: 4 }}>
-            {fmtVND(stats.totalCost)}
-          </div>
-          <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 2, display: "flex", gap: 8 }}>
-            <span>Booking: <strong>{fmtVND(stats.bookingBudget)}</strong></span>
-            <span>•</span>
-            <span>Media: <strong>{fmtVND(stats.mediaBudget)}</strong></span>
-          </div>
-        </div>
-
-        {/* Card 2: 3-Layer View Breakdown */}
-        <div className="kt-card" style={{ padding: "12px 16px" }}>
-          <div style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 700, textTransform: "uppercase" }}>
-            👁️ Tổng Lượt Xem (Organic + Reup + Paid)
-          </div>
-          <div style={{ fontSize: 20, fontWeight: 800, color: "var(--blue)", marginTop: 4 }}>
-            {fmtNum(stats.totalViews)}
-          </div>
-          <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 2 }}>
-            Organic: <strong>{fmtNum(stats.totalOrganicViews)}</strong> | Reup: <strong>{fmtNum(stats.totalReupViews)}</strong>
+      {/* ── 4 KPI TILES (Clean & Compact) ── */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(4, 1fr)",
+        gap: 12,
+        padding: "14px 20px 0",
+        flexShrink: 0
+      }}>
+        {/* Tile 1 */}
+        <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "12px 14px" }}>
+          <div style={{ fontSize: 11, color: "#64748B", fontWeight: 600 }}>TỔNG NGÂN SÁCH</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: "#0F172A", marginTop: 2 }}>{fmtVND(stats.totalCost)}</div>
+          <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 2 }}>
+            Booking: {fmtVND(stats.bookingBudget)} · Media: {fmtVND(stats.mediaBudget)}
           </div>
         </div>
 
-        {/* Card 3: Intent Engagement */}
-        <div className="kt-card" style={{ padding: "12px 16px" }}>
-          <div style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 700, textTransform: "uppercase" }}>
-            ❤️ Tương Tác Ý Định (Saves + Shares)
-          </div>
-          <div style={{ fontSize: 20, fontWeight: 800, color: "var(--ok)", marginTop: 4 }}>
-            {fmtNum(stats.highIntentEng)} <span style={{ fontSize: 12, fontWeight: 600, color: "var(--ink-soft)" }}>({stats.totalEng > 0 ? Math.round((stats.highIntentEng / stats.totalEng) * 100) : 0}% tổng Eng)</span>
-          </div>
-          <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 2 }}>
-            Saves: <strong>{fmtNum(stats.totalSaves)}</strong> | Shares: <strong>{fmtNum(stats.totalShares)}</strong>
+        {/* Tile 2 */}
+        <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "12px 14px" }}>
+          <div style={{ fontSize: 11, color: "#64748B", fontWeight: 600 }}>TỔNG LƯỢT XEM</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: "#0F172A", marginTop: 2 }}>{fmtNum(stats.totalViews)}</div>
+          <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 2 }}>
+            Organic: {fmtNum(stats.totalOrganicViews)} · Reup: {fmtNum(stats.totalReupViews)}
           </div>
         </div>
 
-        {/* Card 4: Cost Efficiency (CPV / CPE) */}
-        <div className="kt-card" style={{ padding: "12px 16px" }}>
-          <div style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 700, textTransform: "uppercase" }}>
-            ⚡ Hiệu Quả Chi Phí (CPV & ER)
+        {/* Tile 3 */}
+        <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "12px 14px" }}>
+          <div style={{ fontSize: 11, color: "#64748B", fontWeight: 600 }}>TƯƠNG TÁC Ý ĐỊNH (SAVE/SHARE)</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: "#0F172A", marginTop: 2 }}>
+            {fmtNum(stats.highIntentEng)} <span style={{ fontSize: 12, fontWeight: 500, color: "#64748B" }}>({stats.totalEng > 0 ? Math.round((stats.highIntentEng / stats.totalEng) * 100) : 0}%)</span>
           </div>
-          <div style={{ fontSize: 20, fontWeight: 800, color: stats.avgCPV <= 72 ? "var(--ok)" : "var(--warn)", marginTop: 4 }}>
-            {stats.avgCPV} ₫ <span style={{ fontSize: 12, fontWeight: 600, color: "var(--ink-soft)" }}>/ view (Chuẩn ≤72đ)</span>
-          </div>
-          <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 2 }}>
-            ER trung bình: <strong>{stats.avgER}%</strong> | CPE: <strong>{fmtNum(stats.avgCPE)} ₫</strong>
+          <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 2 }}>
+            Saves: {fmtNum(stats.totalSaves)} · Shares: {fmtNum(stats.totalShares)}
           </div>
         </div>
 
-        {/* Card 5: Action Recommendation Split */}
-        <div className="kt-card" style={{ padding: "12px 16px" }}>
-          <div style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 700, textTransform: "uppercase" }}>
-            🎯 Kết Luận Đánh Giá ({stats.totalKOLs} KOLs)
+        {/* Tile 4 */}
+        <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "12px 14px" }}>
+          <div style={{ fontSize: 11, color: "#64748B", fontWeight: 600 }}>CPV & KẾT LUẬN</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: stats.avgCPV <= 72 ? "#16A34A" : "#D97706", marginTop: 2 }}>
+            {stats.avgCPV} ₫ <span style={{ fontSize: 11, fontWeight: 500, color: "#64748B" }}>/ view</span>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 6 }}>
-            <span style={{ background: "var(--ok-bg)", color: "var(--ok)", padding: "2px 8px", borderRadius: 12, fontWeight: 800, fontSize: 12 }}>
-              {stats.continueCount} Tiếp tục
-            </span>
-            <span style={{ background: "var(--warn-bg)", color: "var(--warn)", padding: "2px 8px", borderRadius: 12, fontWeight: 800, fontSize: 12 }}>
-              {stats.considerCount} Cân nhắc
-            </span>
-            <span style={{ background: "var(--danger-bg)", color: "var(--danger)", padding: "2px 8px", borderRadius: 12, fontWeight: 800, fontSize: 12 }}>
-              {stats.stopCount} Dừng
-            </span>
+          <div style={{ fontSize: 11, marginTop: 2, display: "flex", gap: 6 }}>
+            <span style={{ color: "#16A34A", fontWeight: 600 }}>{stats.continueCount} Tiếp tục</span>
+            <span style={{ color: "#94A3B8" }}>·</span>
+            <span style={{ color: "#D97706", fontWeight: 600 }}>{stats.considerCount} Cân nhắc</span>
+            <span style={{ color: "#94A3B8" }}>·</span>
+            <span style={{ color: "#DC2626", fontWeight: 600 }}>{stats.stopCount} Dừng</span>
           </div>
         </div>
       </div>
 
-      {/* ── TAB CONTENT BODY ── */}
-      <div className="kt-scrollbar" style={{ flex: 1, overflowY: "auto", padding: "16px 24px 30px" }}>
+      {/* ── MAIN CONTENT (Scrollable) ── */}
+      <div className="kt-scrollbar" style={{ flex: 1, overflowY: "auto", padding: "14px 20px 24px" }}>
         
         {/* =========================================================
-            TAB 1: INTENT FUNNEL & 3-LAYER VIEW
-        ========================================================= */}
-        {activeTab === "funnel" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {/* Top Cause & Effect Banner */}
-            <div style={{
-              background: "linear-gradient(135deg, #EFF6FF 0%, #FDF0DC 100%)",
-              border: "1px solid var(--rule)",
-              borderRadius: 12,
-              padding: "16px 20px",
-              display: "flex",
-              alignItems: "flex-start",
-              gap: 14
-            }}>
-              <span style={{ fontSize: 24 }}>💡</span>
-              <div style={{ fontSize: 13, lineHeight: 1.6, color: "var(--ink)" }}>
-                <strong>Quan Hệ Nhân Quả & Phân Tích Ý Định (Intent Insight):</strong>
-                <p style={{ margin: "4px 0 0", color: "var(--ink-mid)" }}>
-                  Khi chiến dịch chuyển hướng từ KOL giải trí thuần túy sang nhóm <strong>Cooking & Nấu Ăn Hàng Ngày</strong>, lượng Like/Comment có thể giảm 20-30% nhưng <strong>Lượt Lưu (Saves) và Chia sẻ (Shares) tăng vọt</strong>. Đây là chỉ dấu trực tiếp cho thấy người tiêu dùng lưu lại công thức để tự nấu ở nhà (Ý định mua & dùng bột ngọt/giấm tăng lên rõ rệt).
-                </p>
-              </div>
-            </div>
-
-            {/* Grid 2 Columns: Visual Funnel & 3-Layer View Breakdown */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-              
-              {/* Funnel: Vanity vs High-Intent */}
-              <div className="kt-card" style={{ padding: "20px" }}>
-                <h3 style={{ margin: "0 0 14px 0", fontSize: 14, fontWeight: 800, color: "var(--ink)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span>🌪️ Phễu Ý Định Sử Dụng (Vanity vs High-Intent)</span>
-                  <span style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 500 }}>Hover để xem chi tiết</span>
-                </h3>
-
-                {/* Vanity Stage */}
-                <div style={{ marginBottom: 14 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
-                    <span style={{ fontWeight: 700, color: "var(--ink)" }}>1. Tương tác bề nổi (Likes & Comments)</span>
-                    <span style={{ fontWeight: 800, color: "var(--blue)" }}>{fmtNum(stats.vanityEng)} ({stats.totalEng > 0 ? Math.round((stats.vanityEng / stats.totalEng) * 100) : 0}%)</span>
-                  </div>
-                  <div style={{ height: 12, background: "var(--line)", borderRadius: 6, overflow: "hidden", display: "flex" }}>
-                    <div style={{ width: `${stats.totalEng > 0 ? (stats.totalLikes / stats.totalEng) * 100 : 0}%`, background: "#3B82F6" }} title={`Likes: ${fmtNum(stats.totalLikes)}`} />
-                    <div style={{ width: `${stats.totalEng > 0 ? (stats.totalComments / stats.totalEng) * 100 : 0}%`, background: "#60A5FA" }} title={`Comments: ${fmtNum(stats.totalComments)}`} />
-                  </div>
-                  <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 4, display: "flex", gap: 12 }}>
-                    <span>👍 Likes: <strong>{fmtNum(stats.totalLikes)}</strong></span>
-                    <span>💬 Comments: <strong>{fmtNum(stats.totalComments)}</strong></span>
-                  </div>
-                </div>
-
-                {/* High Intent Stage */}
-                <div style={{ marginBottom: 14 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
-                    <span style={{ fontWeight: 700, color: "var(--ok)" }}>2. Ý định chuyển đổi cao (Saves & Shares - Lưu công thức)</span>
-                    <span style={{ fontWeight: 800, color: "var(--ok)" }}>{fmtNum(stats.highIntentEng)} ({stats.totalEng > 0 ? Math.round((stats.highIntentEng / stats.totalEng) * 100) : 0}%)</span>
-                  </div>
-                  <div style={{ height: 12, background: "var(--line)", borderRadius: 6, overflow: "hidden", display: "flex" }}>
-                    <div style={{ width: `${stats.totalEng > 0 ? (stats.totalSaves / stats.totalEng) * 100 : 0}%`, background: "#10B981" }} title={`Saves: ${fmtNum(stats.totalSaves)}`} />
-                    <div style={{ width: `${stats.totalEng > 0 ? (stats.totalShares / stats.totalEng) * 100 : 0}%`, background: "#34D399" }} title={`Shares: ${fmtNum(stats.totalShares)}`} />
-                  </div>
-                  <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 4, display: "flex", gap: 12 }}>
-                    <span>💾 Saves: <strong>{fmtNum(stats.totalSaves)}</strong></span>
-                    <span>🔗 Shares: <strong>{fmtNum(stats.totalShares)}</strong></span>
-                  </div>
-                </div>
-
-                {/* Top Intent KOLs list */}
-                <div style={{ borderTop: "1px dashed var(--line)", paddingTop: 12, marginTop: 12 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", marginBottom: 8 }}>
-                    Top KOLs đóng góp Lượt Lưu (Saves) cao nhất:
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                    {[...evaluatedRows].sort((a, b) => b.eval.saves - a.eval.saves).slice(0, 4).map((k, idx) => (
-                      <div key={k.id || idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12 }}>
-                        <span style={{ fontWeight: 600, color: "var(--ink)" }}>#{idx + 1} {k.kol} ({k.monAn || "Món ăn"})</span>
-                        <span style={{ fontWeight: 700, color: "var(--ok)" }}>{fmtNum(k.eval.saves)} saves</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* 3-Layer View Breakdown */}
-              <div className="kt-card" style={{ padding: "20px" }}>
-                <h3 style={{ margin: "0 0 14px 0", fontSize: 14, fontWeight: 800, color: "var(--ink)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span>👁️ Cơ Cấu 3 Tầng View (Organic vs Reup vs Paid)</span>
-                  <span style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 500 }}>Bóc tách nguồn đóng góp</span>
-                </h3>
-
-                {/* Progress bar */}
-                <div style={{ height: 16, background: "var(--line)", borderRadius: 8, overflow: "hidden", display: "flex", marginBottom: 14 }}>
-                  <div style={{ width: `${stats.totalViews > 0 ? (stats.totalOrganicViews / stats.totalViews) * 100 : 0}%`, background: "#EA9216" }} title={`Organic TikTok: ${fmtNum(stats.totalOrganicViews)}`} />
-                  <div style={{ width: `${stats.totalViews > 0 ? (stats.totalReupViews / stats.totalViews) * 100 : 0}%`, background: "#10B981" }} title={`FOC Reup: ${fmtNum(stats.totalReupViews)}`} />
-                  <div style={{ width: `${stats.totalViews > 0 ? (stats.totalPaidViews / stats.totalViews) * 100 : 0}%`, background: "#3B82F6" }} title={`Paid Spark Ads: ${fmtNum(stats.totalPaidViews)}`} />
-                </div>
-
-                {/* Breakdown Legend */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, fontSize: 12 }}>
-                  <div style={{ background: "var(--paper)", padding: 10, borderRadius: 8 }}>
-                    <div style={{ color: "var(--accent)", fontWeight: 700 }}>● Organic TikTok</div>
-                    <div style={{ fontSize: 15, fontWeight: 800, marginTop: 2 }}>{fmtNum(stats.totalOrganicViews)}</div>
-                    <div style={{ fontSize: 10, color: "var(--ink-soft)" }}>{stats.totalViews > 0 ? Math.round((stats.totalOrganicViews / stats.totalViews) * 100) : 0}% tổng views</div>
-                  </div>
-
-                  <div style={{ background: "var(--paper)", padding: 10, borderRadius: 8 }}>
-                    <div style={{ color: "var(--ok)", fontWeight: 700 }}>● FOC Reup (FB/YT)</div>
-                    <div style={{ fontSize: 15, fontWeight: 800, marginTop: 2 }}>{fmtNum(stats.totalReupViews)}</div>
-                    <div style={{ fontSize: 10, color: "var(--ink-soft)" }}>{stats.totalViews > 0 ? Math.round((stats.totalReupViews / stats.totalViews) * 100) : 0}% giá trị gia tăng</div>
-                  </div>
-
-                  <div style={{ background: "var(--paper)", padding: 10, borderRadius: 8 }}>
-                    <div style={{ color: "var(--blue)", fontWeight: 700 }}>● Paid Boost Ads</div>
-                    <div style={{ fontSize: 15, fontWeight: 800, marginTop: 2 }}>{fmtNum(stats.totalPaidViews)}</div>
-                    <div style={{ fontSize: 10, color: "var(--ink-soft)" }}>{stats.totalViews > 0 ? Math.round((stats.totalPaidViews / stats.totalViews) * 100) : 0}% quảng cáo đẩy</div>
-                  </div>
-                </div>
-
-                {/* Insight Box */}
-                <div style={{ marginTop: 14, background: "var(--ok-bg)", padding: "10px 12px", borderRadius: 8, fontSize: 12, color: "var(--ink)" }}>
-                  ✅ <strong>FOC Reup mang lại hiệu quả lớn:</strong> Nhờ đàm phán quyền lợi reup đa kênh (Facebook Reels, Shorts, Shopee Video), chiến dịch thu về thêm <strong>{fmtNum(stats.totalReupViews)} views miễn phí</strong> mà không tốn thêm ngân sách media.
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* =========================================================
-            TAB 2: 6 HYPOTHESES EVALUATOR & ACTION MATRIX
+            TAB 1: MA TRẬN 6 GIẢ THUYẾT (Clean Table)
         ========================================================= */}
         {activeTab === "hypotheses" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {/* Header controls & Filters */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: "var(--ink-soft)" }}>Lọc kết luận:</span>
-                <div style={{ display: "flex", gap: 4 }}>
-                  {[
-                    { id: "all", label: `Tất cả (${evaluatedRows.length})` },
-                    { id: "CONTINUE", label: `Tiếp tục (${stats.continueCount})` },
-                    { id: "CONSIDER", label: `Cân nhắc (${stats.considerCount})` },
-                    { id: "STOP", label: `Dừng (${stats.stopCount})` }
-                  ].map(btn => (
-                    <button
-                      key={btn.id}
-                      onClick={() => setFilterAction(btn.id)}
-                      className={`kt-btn ${filterAction === btn.id ? "kt-btn-primary" : "kt-btn-ghost"}`}
-                      style={{ padding: "4px 10px", fontSize: 11, borderRadius: 14 }}
-                    >
-                      {btn.label}
-                    </button>
-                  ))}
-                </div>
+          <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 8, overflow: "hidden" }}>
+            
+            {/* Filter Bar inside Table */}
+            <div style={{
+              padding: "10px 14px",
+              borderBottom: "1px solid #E2E8F0",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              background: "#F8FAFC"
+            }}>
+              <div style={{ display: "flex", gap: 4 }}>
+                {[
+                  { id: "all", label: `Tất cả (${evaluatedRows.length})` },
+                  { id: "CONTINUE", label: `Tiếp tục (${stats.continueCount})` },
+                  { id: "CONSIDER", label: `Cân nhắc (${stats.considerCount})` },
+                  { id: "STOP", label: `Dừng (${stats.stopCount})` }
+                ].map(btn => (
+                  <button
+                    key={btn.id}
+                    onClick={() => setFilterAction(btn.id)}
+                    style={{
+                      padding: "3px 9px",
+                      fontSize: 11,
+                      fontWeight: filterAction === btn.id ? 600 : 500,
+                      color: filterAction === btn.id ? "#0F172A" : "#64748B",
+                      background: filterAction === btn.id ? "#FFFFFF" : "transparent",
+                      border: filterAction === btn.id ? "1px solid #CBD5E1" : "1px solid transparent",
+                      borderRadius: 4,
+                      cursor: "pointer"
+                    }}
+                  >
+                    {btn.label}
+                  </button>
+                ))}
               </div>
 
-              <div style={{ fontSize: 11, color: "var(--ink-soft)", display: "flex", gap: 12 }}>
-                <span>🟢 Pass giả thuyết</span>
-                <span>⚪ Chưa đạt giả thuyết</span>
-                <span>💡 Rê chuột vào chấm tròn để xem chi tiết số liệu</span>
+              <div style={{ fontSize: 11, color: "#64748B" }}>
+                Rê chuột vào chỉ số để xem chi tiết
               </div>
             </div>
 
-            {/* Matrix Table */}
-            <div className="kt-card" style={{ overflow: "hidden" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, textAlign: "left" }}>
-                <thead>
-                  <tr style={{ background: "var(--paper)", borderBottom: "1px solid var(--line)" }}>
-                    <th style={{ padding: "10px 14px", fontWeight: 700, color: "var(--ink-soft)" }}>KOL / Kênh</th>
-                    <th style={{ padding: "10px 14px", fontWeight: 700, color: "var(--ink-soft)" }}>Món ăn & Tuyến</th>
-                    <th style={{ padding: "10px 14px", fontWeight: 700, color: "var(--ink-soft)" }}>Chi phí</th>
-                    <th style={{ padding: "10px 14px", fontWeight: 700, color: "var(--ink-soft)" }}>Views (Org+Reup)</th>
-                    <th style={{ padding: "10px 14px", fontWeight: 700, color: "var(--ink-soft)" }}>CPV (đ)</th>
-                    <th style={{ padding: "10px 14px", fontWeight: 700, color: "var(--ink-soft)", textAlign: "center" }}>6 Giả Thuyết ($H_1 \to H_6$)</th>
-                    <th style={{ padding: "10px 14px", fontWeight: 700, color: "var(--ink-soft)", textAlign: "center" }}>Điểm Đạt</th>
-                    <th style={{ padding: "10px 14px", fontWeight: 700, color: "var(--ink-soft)" }}>Đánh Giá</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {evaluatedRows
-                    .filter(r => filterAction === "all" || r.eval.action === filterAction)
-                    .map(r => {
-                      const e = r.eval;
-                      const isHovered = hoveredKOL === r.id;
+            {/* Table */}
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, textAlign: "left" }}>
+              <thead>
+                <tr style={{ background: "#F8FAFC", borderBottom: "1px solid #E2E8F0", color: "#64748B", fontSize: 11 }}>
+                  <th style={{ padding: "8px 12px", fontWeight: 600 }}>KOL / Kênh</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600 }}>Món ăn</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600 }}>Chi phí</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600 }}>Lượt xem</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600 }}>CPV</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, textAlign: "center" }}>6 Tiêu chí ($H_1 \to H_6$)</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, textAlign: "center" }}>Điểm</th>
+                  <th style={{ padding: "8px 12px", fontWeight: 600, textAlign: "right" }}>Kết luận</th>
+                </tr>
+              </thead>
+              <tbody>
+                {evaluatedRows
+                  .filter(r => filterAction === "all" || r.eval.action === filterAction)
+                  .map((r, idx) => {
+                    const e = r.eval;
+                    return (
+                      <tr
+                        key={r.id || idx}
+                        style={{
+                          borderBottom: "1px solid #F1F5F9",
+                          transition: "background 0.1s"
+                        }}
+                      >
+                        {/* KOL */}
+                        <td style={{ padding: "8px 12px" }}>
+                          <span
+                            onClick={() => onOpenProfile && onOpenProfile(r)}
+                            style={{ fontWeight: 600, color: "#0F172A", cursor: "pointer", textDecoration: "underline" }}
+                          >
+                            {r.kol}
+                          </span>
+                          <span style={{ fontSize: 10, color: "#94A3B8", marginLeft: 6 }}>{r.type || "Mid"}</span>
+                        </td>
 
-                      return (
-                        <tr
-                          key={r.id}
-                          onMouseEnter={() => setHoveredKOL(r.id)}
-                          onMouseLeave={() => setHoveredKOL(null)}
-                          style={{
-                            borderBottom: "1px solid var(--line)",
-                            background: isHovered ? "var(--accent-bg)" : "transparent",
-                            transition: "background 0.15s ease"
-                          }}
-                        >
-                          {/* KOL Name */}
-                          <td style={{ padding: "10px 14px", fontWeight: 700, color: "var(--ink)" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                              <span onClick={() => onOpenProfile && onOpenProfile(r)} style={{ cursor: "pointer", textDecoration: "underline" }}>
-                                {r.kol}
-                              </span>
-                              <span style={{ fontSize: 10, background: "var(--paper)", padding: "1px 6px", borderRadius: 8, color: "var(--ink-soft)" }}>
-                                {r.type || "Mid"}
-                              </span>
-                            </div>
-                          </td>
+                        {/* Món ăn */}
+                        <td style={{ padding: "8px 12px", color: "#334155", maxWidth: 220 }}>
+                          <span title={r.monAn}>{cleanDish(r.monAn)}</span>
+                        </td>
 
-                          {/* Menu & Category */}
-                          <td style={{ padding: "10px 14px", color: "var(--ink-mid)" }}>
-                            <div style={{ fontWeight: 600 }}>{r.monAn || "Món Canh"}</div>
-                            <div style={{ fontSize: 10, color: "var(--ink-soft)" }}>{r.creatorCategory || "Cooking Specialist"}</div>
-                          </td>
+                        {/* Chi phí */}
+                        <td style={{ padding: "8px 12px", color: "#0F172A", fontWeight: 500 }}>
+                          {fmtVND(r.cost)}
+                        </td>
 
-                          {/* Cost */}
-                          <td style={{ padding: "10px 14px", fontWeight: 700, color: "var(--accent)" }}>
-                            {fmtVND(r.cost)}
-                          </td>
+                        {/* Views */}
+                        <td style={{ padding: "8px 12px", color: "#334155" }}>
+                          {fmtNum(e.totalViews)}
+                        </td>
 
-                          {/* Views */}
-                          <td style={{ padding: "10px 14px", color: "var(--ink)" }}>
-                            <strong>{fmtNum(e.totalViews)}</strong>
-                            <div style={{ fontSize: 10, color: "var(--ink-soft)" }}>Org: {fmtNum(e.views)}</div>
-                          </td>
+                        {/* CPV */}
+                        <td style={{ padding: "8px 12px", fontWeight: 600, color: e.cpv <= 72 ? "#16A34A" : "#D97706" }}>
+                          {e.cpv > 0 ? `${e.cpv} ₫` : "—"}
+                        </td>
 
-                          {/* CPV */}
-                          <td style={{ padding: "10px 14px", fontWeight: 700, color: e.cpv <= 72 ? "var(--ok)" : "var(--warn)" }}>
-                            {e.cpv > 0 ? `${e.cpv} ₫` : "—"}
-                          </td>
+                        {/* 6 Hypotheses Mini Dots with detail tooltip */}
+                        <td style={{ padding: "8px 12px", textAlign: "center" }}>
+                          <div style={{ display: "inline-flex", gap: 4 }}>
+                            {e.hypotheses.map(h => (
+                              <div
+                                key={h.id}
+                                title={`${h.title}: ${h.detail}`}
+                                style={{
+                                  width: 8,
+                                  height: 8,
+                                  borderRadius: "50%",
+                                  background: h.pass ? "#16A34A" : "#E2E8F0",
+                                  cursor: "help"
+                                }}
+                              />
+                            ))}
+                          </div>
+                        </td>
 
-                          {/* 6 Hypotheses Badges with Hover Tooltip */}
-                          <td style={{ padding: "10px 14px", textAlign: "center" }}>
-                            <div style={{ display: "flex", justifyContent: "center", gap: 6 }}>
-                              {e.hypotheses.map((h, hIdx) => (
-                                <div
-                                  key={h.id}
-                                  title={`${h.id} (${h.title}): ${h.detail}`}
-                                  style={{
-                                    width: 22,
-                                    height: 22,
-                                    borderRadius: "50%",
-                                    background: h.pass ? "var(--ok)" : "var(--rule)",
-                                    color: h.pass ? "#FFFFFF" : "var(--ink-soft)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    fontSize: 9,
-                                    fontWeight: 800,
-                                    cursor: "help",
-                                    boxShadow: h.pass ? "0 2px 6px rgba(16,185,129,0.3)" : "none"
-                                  }}
-                                >
-                                  {hIdx + 1}
-                                </div>
-                              ))}
-                            </div>
-                          </td>
+                        {/* Score */}
+                        <td style={{ padding: "8px 12px", textAlign: "center", fontWeight: 600, color: e.score >= 5 ? "#16A34A" : e.score >= 3 ? "#D97706" : "#DC2626" }}>
+                          {e.score}/6
+                        </td>
 
-                          {/* Score */}
-                          <td style={{ padding: "10px 14px", textAlign: "center", fontWeight: 800, fontSize: 13, color: e.score >= 5 ? "var(--ok)" : e.score >= 3 ? "var(--warn)" : "var(--danger)" }}>
-                            {e.score}/6
-                          </td>
-
-                          {/* Action Badge */}
-                          <td style={{ padding: "10px 14px" }}>
-                            <span style={{
-                              padding: "3px 8px",
-                              borderRadius: 12,
-                              fontSize: 10,
-                              fontWeight: 800,
-                              background: e.action === "CONTINUE" ? "var(--ok-bg)" : e.action === "CONSIDER" ? "var(--warn-bg)" : "var(--danger-bg)",
-                              color: e.action === "CONTINUE" ? "var(--ok)" : e.action === "CONSIDER" ? "var(--warn)" : "var(--danger)"
-                            }}>
-                              {e.action}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </table>
-            </div>
+                        {/* Action Badge */}
+                        <td style={{ padding: "8px 12px", textAlign: "right" }}>
+                          <span style={{
+                            padding: "2px 6px",
+                            borderRadius: 4,
+                            fontSize: 10,
+                            fontWeight: 600,
+                            background: e.action === "CONTINUE" ? "#DCFCE7" : e.action === "CONSIDER" ? "#FEF3C7" : "#FEE2E2",
+                            color: e.action === "CONTINUE" ? "#166534" : e.action === "CONSIDER" ? "#92400E" : "#991B1B"
+                          }}>
+                            {e.action}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
           </div>
         )}
 
         {/* =========================================================
-            TAB 3: DISH & CATEGORY MATRIX x VOC SENTIMENT
+            TAB 2: PHỄU Ý ĐỊNH & 3 TẦNG VIEW (Minimal)
+        ========================================================= */}
+        {activeTab === "funnel" && (
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            
+            {/* Phễu Ý Định */}
+            <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "16px" }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A", marginBottom: 12 }}>
+                Phễu Ý Định Sử Dụng (Intent Funnel)
+              </div>
+
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
+                  <span style={{ color: "#64748B" }}>Tương tác bề nổi (Likes & Comments)</span>
+                  <span style={{ fontWeight: 600, color: "#0F172A" }}>{fmtNum(stats.totalLikes + stats.totalComments)}</span>
+                </div>
+                <div style={{ height: 6, background: "#F1F5F9", borderRadius: 3, overflow: "hidden" }}>
+                  <div style={{ width: `${stats.totalEng > 0 ? ((stats.totalLikes + stats.totalComments) / stats.totalEng) * 100 : 0}%`, height: "100%", background: "#94A3B8" }} />
+                </div>
+              </div>
+
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
+                  <span style={{ color: "#16A34A", fontWeight: 600 }}>Ý định nấu ăn cao (Saves & Shares)</span>
+                  <span style={{ fontWeight: 700, color: "#16A34A" }}>{fmtNum(stats.highIntentEng)}</span>
+                </div>
+                <div style={{ height: 6, background: "#F1F5F9", borderRadius: 3, overflow: "hidden" }}>
+                  <div style={{ width: `${stats.totalEng > 0 ? (stats.highIntentEng / stats.totalEng) * 100 : 0}%`, height: "100%", background: "#16A34A" }} />
+                </div>
+              </div>
+
+              <div style={{ fontSize: 11, color: "#64748B", background: "#F8FAFC", padding: 10, borderRadius: 6, lineHeight: 1.5 }}>
+                💡 <strong>Insight Nhân Quả:</strong> Nhóm KOL dạy nấu ăn làm giảm 20% like thông thường nhưng tăng <strong>300% lượng lưu công thức (Save)</strong>, chứng minh ý định sử dụng sản phẩm thực tế tăng lên.
+              </div>
+            </div>
+
+            {/* Cơ Cấu 3 Tầng View */}
+            <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "16px" }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A", marginBottom: 12 }}>
+                Cơ Cấu 3 Tầng View
+              </div>
+
+              <div style={{ height: 10, background: "#F1F5F9", borderRadius: 5, overflow: "hidden", display: "flex", marginBottom: 14 }}>
+                <div style={{ width: `${stats.totalViews > 0 ? (stats.totalOrganicViews / stats.totalViews) * 100 : 0}%`, background: "#0F172A" }} title="Organic" />
+                <div style={{ width: `${stats.totalViews > 0 ? (stats.totalReupViews / stats.totalViews) * 100 : 0}%`, background: "#16A34A" }} title="FOC Reup" />
+                <div style={{ width: `${stats.totalViews > 0 ? (stats.totalPaidViews / stats.totalViews) * 100 : 0}%`, background: "#3B82F6" }} title="Paid Ads" />
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, fontSize: 11 }}>
+                <div style={{ background: "#F8FAFC", padding: 8, borderRadius: 6 }}>
+                  <div style={{ color: "#64748B" }}>Organic TikTok</div>
+                  <div style={{ fontWeight: 700, color: "#0F172A", fontSize: 13, marginTop: 2 }}>{fmtNum(stats.totalOrganicViews)}</div>
+                </div>
+                <div style={{ background: "#F8FAFC", padding: 8, borderRadius: 6 }}>
+                  <div style={{ color: "#16A34A" }}>FOC Reup (FB/YT)</div>
+                  <div style={{ fontWeight: 700, color: "#16A34A", fontSize: 13, marginTop: 2 }}>{fmtNum(stats.totalReupViews)}</div>
+                </div>
+                <div style={{ background: "#F8FAFC", padding: 8, borderRadius: 6 }}>
+                  <div style={{ color: "#3B82F6" }}>Paid Spark Ads</div>
+                  <div style={{ fontWeight: 700, color: "#3B82F6", fontSize: 13, marginTop: 2 }}>{fmtNum(stats.totalPaidViews)}</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {/* =========================================================
+            TAB 3: MÓN ĂN & CREATOR (Minimal)
         ========================================================= */}
         {activeTab === "matrix" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {/* 2 Cards: Cooking vs Mom & Dish Types */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-              
-              {/* Card 1: Cooking vs Mom Comparison */}
-              <div className="kt-card" style={{ padding: "20px" }}>
-                <h3 style={{ margin: "0 0 12px 0", fontSize: 14, fontWeight: 800, color: "var(--ink)" }}>
-                  🍳 So Sánh: Cooking Specialist vs Mom & Family
-                </h3>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                  <div style={{ background: "var(--paper)", padding: 12, borderRadius: 8 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <strong style={{ color: "var(--ink)" }}>1. Nhóm Nấu Ăn (Cooking Specialist)</strong>
-                      <span style={{ background: "var(--ok-bg)", color: "var(--ok)", padding: "2px 8px", borderRadius: 10, fontSize: 10, fontWeight: 800 }}>Tối ưu Intent</span>
-                    </div>
-                    <div style={{ fontSize: 12, color: "var(--ink-mid)", marginTop: 6, lineHeight: 1.5 }}>
-                      • <strong>Ưu điểm:</strong> Visual món ăn sôi sùng sục hấp dẫn, lồng ghép sản phẩm tự nhiên trong 6s đầu, lượng Save/Share cao nhất.<br />
-                      • <strong>Ví dụ:</strong> Bon đây nè (Lẩu/Soup), Thi Thi Miền Tây, Ăn gì Thương ơi.
-                    </div>
-                  </div>
-
-                  <div style={{ background: "var(--paper)", padding: 12, borderRadius: 8 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <strong style={{ color: "var(--ink)" }}>2. Nhóm Gia Đình (Mom & Family)</strong>
-                      <span style={{ background: "var(--warn-bg)", color: "var(--warn)", padding: "2px 8px", borderRadius: 10, fontSize: 10, fontWeight: 800 }}>Cần nới lỏng script</span>
-                    </div>
-                    <div style={{ fontSize: 12, color: "var(--ink-mid)", marginTop: 6, lineHeight: 1.5 }}>
-                      • <strong>Hạn chế:</strong> Dễ bị gượng ép nếu kịch bản quảng cáo quá dài, tỷ lệ drop view cao trong 10s đầu.<br />
-                      • <strong>Khuyến nghị:</strong> Cho phép KOL sáng tạo tự nhiên, chỉ brief thông điệp ngắn gọn "Canh ngon không thể thiếu".
-                    </div>
-                  </div>
-                </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            
+            {/* Cooking vs Mom */}
+            <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "16px" }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A", marginBottom: 10 }}>
+                Cooking Specialist vs Mom & Family
               </div>
-
-              {/* Card 2: Dish Selection & Regional Preference */}
-              <div className="kt-card" style={{ padding: "20px" }}>
-                <h3 style={{ margin: "0 0 12px 0", fontSize: 14, fontWeight: 800, color: "var(--ink)" }}>
-                  🍲 Lựa Chọn Món Ăn: Canh/Nước vs Nộm/Salad
-                </h3>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                  <div style={{ background: "var(--paper)", padding: 12, borderRadius: 8 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <strong style={{ color: "var(--accent)" }}>Món Canh / Nước / Lẩu (Canh chua, Sườn mọc)</strong>
-                      <span style={{ color: "var(--ok)", fontWeight: 700, fontSize: 11 }}>Đạt 95% KPI</span>
-                    </div>
-                    <div style={{ fontSize: 12, color: "var(--ink-mid)", marginTop: 4 }}>
-                      Là món ăn xuất hiện mỗi ngày trong mâm cơm người Việt. Định vị là "gia vị khóa vị canh" giúp kích hoạt thói quen nêm nếm hàng ngày.
-                    </div>
-                  </div>
-
-                  <div style={{ background: "var(--paper)", padding: 12, borderRadius: 8 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <strong style={{ color: "var(--ink-mid)" }}>Món Nộm / Gỏi / Salad</strong>
-                      <span style={{ color: "var(--warn)", fontWeight: 700, fontSize: 11 }}>Gặp rào cản</span>
-                    </div>
-                    <div style={{ fontSize: 12, color: "var(--ink-mid)", marginTop: 4 }}>
-                      Người dùng thường quen dùng chanh/tắc thay vì giấm hoặc bột ngọt trong món nguội, dẫn đến nhiều comment thắc mắc.
-                    </div>
-                  </div>
-                </div>
+              <div style={{ fontSize: 12, color: "#334155", lineHeight: 1.6 }}>
+                • <strong>Cooking Specialist:</strong> Giữ chân tốt trong 6s đầu nhờ hình ảnh món ăn sôi bọt hấp dẫn. Lượng Save công thức cao nhất.<br />
+                • <strong>Mom & Family:</strong> Reach rộng nhưng cần tránh ép kịch bản thương mại quá dài để hạn chế tụt view sớm.
               </div>
             </div>
 
-            {/* VOC Sentiment Section */}
-            <div className="kt-card" style={{ padding: "20px" }}>
-              <h3 style={{ margin: "0 0 14px 0", fontSize: 14, fontWeight: 800, color: "var(--ink)", display: "flex", alignItems: "center", gap: 8 }}>
-                <span>💬 Phân Loại Bình Luận Thực Tế (Voice of Customer - VOC)</span>
-              </h3>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
-                <div style={{ background: "var(--ok-bg)", padding: 14, borderRadius: 10, border: "1px solid rgba(16,185,129,0.2)" }}>
-                  <div style={{ fontWeight: 800, color: "var(--ok)", fontSize: 13, marginBottom: 6 }}>
-                    🟢 1. Hỏi Công Thức Nấu Ăn (Recipe)
-                  </div>
-                  <div style={{ fontSize: 12, color: "var(--ink-mid)", lineHeight: 1.5 }}>
-                    • "Chị ơi cho em xin định lượng nêm canh sườn với ạ?"<br />
-                    • "Nấu lẩu này thì cho mấy thìa bột ngọt vậy bạn?"<br />
-                    • "Lưu lại mai nấu cho cả nhà ăn thử ngay!"
-                  </div>
-                </div>
-
-                <div style={{ background: "var(--blue-bg)", padding: 14, borderRadius: 10, border: "1px solid rgba(59,130,246,0.2)" }}>
-                  <div style={{ fontWeight: 800, color: "var(--blue)", fontSize: 13, marginBottom: 6 }}>
-                    🔵 2. Nhắc Nhãn Hàng (Brand Mention)
-                  </div>
-                  <div style={{ fontSize: 12, color: "var(--ink-mid)", lineHeight: 1.5 }}>
-                    • "Nhà em từ xưa đến giờ chỉ dùng đúng loại Ajinomoto này."<br />
-                    • "Giấm gạo lên men này chua dịu, không bị gắt cổ."<br />
-                    • "Gia vị quốc dân nhìn gói là nhận ra ngay."
-                  </div>
-                </div>
-
-                <div style={{ background: "var(--danger-bg)", padding: 14, borderRadius: 10, border: "1px solid rgba(239,68,68,0.2)" }}>
-                  <div style={{ fontWeight: 800, color: "var(--danger)", fontSize: 13, marginBottom: 6 }}>
-                    🔴 3. Rào Cản & Thắc Mắc (Substitute)
-                  </div>
-                  <div style={{ fontSize: 12, color: "var(--ink-mid)", lineHeight: 1.5 }}>
-                    • "Làm nộm này dùng chanh thay giấm được không chị?"<br />
-                    • "KOL nói hơi nhanh, đoạn nêm gia vị bị lướt qua mất."<br />
-                    • "Món này có vẻ hơi mặn so với khẩu vị miền Bắc."
-                  </div>
-                </div>
+            {/* Món Canh vs Nộm */}
+            <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "16px" }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A", marginBottom: 10 }}>
+                Món Canh/Nước vs Món Nộm/Salad
+              </div>
+              <div style={{ fontSize: 12, color: "#334155", lineHeight: 1.6 }}>
+                • <strong>Món Canh / Lẩu / Nước:</strong> Đạt 95% KPI, gắn chặt với bữa cơm hàng ngày của gia đình Việt.<br />
+                • <strong>Món Nộm / Salad:</strong> Gặp rào cản hành vi do người dùng thắc mắc việc dùng chanh thay giấm.
               </div>
             </div>
-          </div>
-        )}
 
-        {/* =========================================================
-            TAB 4: EXPORT FY26 HALF YEAR TEMPLATE
-        ========================================================= */}
-        {activeTab === "export" && (
-          <div className="kt-card" style={{ padding: "24px", maxWidth: 800, margin: "0 auto" }}>
-            <div style={{ textAlign: "center", marginBottom: 20 }}>
-              <div style={{ fontSize: 36 }}>📥</div>
-              <h2 style={{ fontSize: 18, fontWeight: 800, margin: "8px 0 4px", color: "var(--ink)" }}>
-                Xuất Báo Cáo Template Nửa Năm (FY26 Half Year Report)
-              </h2>
-              <p style={{ fontSize: 12, color: "var(--ink-soft)", margin: 0 }}>
-                File Excel được chuẩn hóa 100% đúng thứ tự các cột của Agency & Brand, tự động tính sẵn CPV, CPE, ER%, 6 Giả thuyết và Đánh giá tiếp tục/dừng.
-              </p>
-            </div>
-
-            <div style={{ background: "var(--paper)", padding: 16, borderRadius: 10, marginBottom: 20, fontSize: 12 }}>
-              <div style={{ fontWeight: 700, color: "var(--ink)", marginBottom: 8 }}>
-                📑 Cấu trúc file Excel xuất ra gồm 3 Sheets:
-              </div>
-              <ol style={{ margin: 0, paddingLeft: 18, color: "var(--ink-mid)", lineHeight: 1.8 }}>
-                <li><strong>Sheet 1 (Detailed Perf):</strong> Danh sách toàn bộ KOLs với đầy đủ 26 cột (Tier, Followers, Cost, Menu, Views 3 tầng, Likes, Comments, Saves, Shares, CPV, CPE, Action).</li>
-                <li><strong>Sheet 2 (Hypothesis Review):</strong> Ma trận chấm điểm 6 giả thuyết ($H_1 \to H_6$) theo đúng khung chuẩn <i>APPENDIX SOCIAL OUTREACH</i>.</li>
-                <li><strong>Sheet 3 (VOC Comments):</strong> Bảng phân loại bình luận khách hàng (Hỏi công thức / Nhắc nhãn hàng / Rào cản thay thế).</li>
-              </ol>
-            </div>
-
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <button
-                onClick={handleExportFY26Template}
-                className="kt-btn kt-btn-primary"
-                style={{ padding: "10px 24px", fontSize: 14, borderRadius: 20, display: "flex", alignItems: "center", gap: 8 }}
-              >
-                <span>🚀 Tải Ngay File Excel FY26 Chuẩn</span>
-              </button>
-            </div>
           </div>
         )}
 
