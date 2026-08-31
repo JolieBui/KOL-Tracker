@@ -869,8 +869,8 @@ export default function DashboardView({
               )}
             </div>
 
-            {/* Quick Filter Buttons */}
-            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11 }}>
+            {/* Quick Filter Buttons (Dynamic for both MSG & Vinegar) */}
+            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, flexWrap: "wrap" }}>
               <span style={{ color: "#64748B", fontWeight: 700 }}>Lọc phân cấp:</span>
               <button 
                 onClick={() => setKolSearch("")}
@@ -878,34 +878,29 @@ export default function DashboardView({
               >
                 Tất cả
               </button>
-              {data.key === "MSG" && (
-                <>
+              {["Macro", "Mid-tier", "Micro", "Nano"].map(tier => {
+                const hasTier = data.kols.some(k => k.tier.toLowerCase() === tier.toLowerCase());
+                if (!hasTier) return null;
+                const isActive = kolSearch.toLowerCase() === tier.toLowerCase();
+
+                return (
                   <button 
-                    onClick={() => setKolSearch("Macro")}
-                    style={{ padding: "4px 10px", borderRadius: 6, border: "1px solid #E2E8F0", background: kolSearch === "Macro" ? "#0F172A" : "#F8FAFC", color: kolSearch === "Macro" ? "#FFFFFF" : "#475569", fontWeight: 700, cursor: "pointer" }}
+                    key={tier}
+                    onClick={() => setKolSearch(tier)}
+                    style={{ 
+                      padding: "4px 10px", 
+                      borderRadius: 6, 
+                      border: "1px solid #E2E8F0", 
+                      background: isActive ? "#0F172A" : "#F8FAFC", 
+                      color: isActive ? "#FFFFFF" : "#475569", 
+                      fontWeight: 700, 
+                      cursor: "pointer" 
+                    }}
                   >
-                    Macro
+                    {tier}
                   </button>
-                  <button 
-                    onClick={() => setKolSearch("Mid-tier")}
-                    style={{ padding: "4px 10px", borderRadius: 6, border: "1px solid #E2E8F0", background: kolSearch === "Mid-tier" ? "#0F172A" : "#F8FAFC", color: kolSearch === "Mid-tier" ? "#FFFFFF" : "#475569", fontWeight: 700, cursor: "pointer" }}
-                  >
-                    Mid-tier
-                  </button>
-                  <button 
-                    onClick={() => setKolSearch("Micro")}
-                    style={{ padding: "4px 10px", borderRadius: 6, border: "1px solid #E2E8F0", background: kolSearch === "Micro" ? "#0F172A" : "#F8FAFC", color: kolSearch === "Micro" ? "#FFFFFF" : "#475569", fontWeight: 700, cursor: "pointer" }}
-                  >
-                    Micro
-                  </button>
-                  <button 
-                    onClick={() => setKolSearch("Nano")}
-                    style={{ padding: "4px 10px", borderRadius: 6, border: "1px solid #E2E8F0", background: kolSearch === "Nano" ? "#0F172A" : "#F8FAFC", color: kolSearch === "Nano" ? "#FFFFFF" : "#475569", fontWeight: 700, cursor: "pointer" }}
-                  >
-                    Nano
-                  </button>
-                </>
-              )}
+                );
+              })}
             </div>
           </div>
 
