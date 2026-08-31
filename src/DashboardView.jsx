@@ -390,6 +390,8 @@ export default function DashboardView({
   const [sortCol, setSortCol] = useState("totalViews");
   const [sortDir, setSortDir] = useState("desc");
   const [hoveredKol, setHoveredKol] = useState(null);
+  const [hoveredMetricIdx, setHoveredMetricIdx] = useState(null);
+  const [hoveredKolTableIdx, setHoveredKolTableIdx] = useState(null);
   const [activeDetailKol, setActiveDetailKol] = useState(null);
 
   const data = projectKey === "MSG" ? DATA_MSG : DATA_VINEGAR;
@@ -573,69 +575,88 @@ export default function DashboardView({
                   </tr>
                 </thead>
                 <tbody>
-                  {data.metrics.map((m, idx) => (
-                    <tr key={idx} style={{ borderBottom: "1px solid #F1F5F9", background: idx % 2 === 0 ? "#FFFFFF" : "#F8FAFC" }}>
-                      
-                      <td style={{ 
-                        padding: "12px 16px", 
-                        paddingLeft: m.level === 1 ? 32 : m.level === 2 ? 48 : 16,
-                        fontWeight: m.level === 0 ? 800 : m.level === 1 ? 700 : m.level === 2 ? 600 : 700, 
-                        color: m.level === 2 ? "#475569" : m.level === 1 ? "#334155" : "#0F172A", 
-                        whiteSpace: "nowrap" 
-                      }}>
-                        {m.level === 1 && (
-                          <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: "#94A3B8", marginRight: 8, verticalAlign: "middle" }} />
-                        )}
-                        {m.level === 2 && (
-                          <span style={{ color: "#94A3B8", marginRight: 8, fontSize: 13, fontWeight: 700 }}>↳</span>
-                        )}
-                        {m.metric}
-                      </td>
-
-                      <td style={{ padding: "12px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#64748B", whiteSpace: "nowrap" }}>
-                        {m.ly}
-                      </td>
-
-                      <td style={{ padding: "12px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 700, color: "#D97706", whiteSpace: "nowrap" }}>
-                        {m.target}
-                      </td>
-
-                      <td style={{ padding: "12px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#0D9488", fontSize: 13, whiteSpace: "nowrap" }}>
-                        {m.actual}
-                      </td>
-
-                      <td style={{ padding: "12px 14px", textAlign: "center", whiteSpace: "nowrap" }}>
-                        <span style={{ 
-                          display: "inline-block",
-                          padding: "3px 8px", 
-                          borderRadius: 6, 
-                          background: m.isTargetGood === true ? "#CCFBF1" : m.isTargetGood === false ? "#FFE4E6" : "#F1F5F9",
-                          color: m.isTargetGood === true ? "#0D9488" : m.isTargetGood === false ? "#E11D48" : "#0F172A",
-                          fontWeight: 800,
-                          fontSize: 11,
-                          whiteSpace: "nowrap"
+                  {data.metrics.map((m, idx) => {
+                    const isHovered = hoveredMetricIdx === idx;
+                    return (
+                      <tr 
+                        key={idx} 
+                        onMouseEnter={() => setHoveredMetricIdx(idx)}
+                        onMouseLeave={() => setHoveredMetricIdx(null)}
+                        style={{ 
+                          borderBottom: "1px solid #F1F5F9", 
+                          background: isHovered 
+                            ? "#F0FDFA" 
+                            : idx % 2 === 0 ? "#FFFFFF" : "#F8FAFC",
+                          boxShadow: isHovered ? "inset 3px 0 0 #0D9488" : "none",
+                          transition: "all 0.15s ease",
+                          cursor: "default"
+                        }}
+                      >
+                        
+                        <td style={{ 
+                          padding: "12px 16px", 
+                          paddingLeft: m.level === 1 ? 32 : m.level === 2 ? 48 : 16,
+                          fontWeight: m.level === 0 ? 800 : m.level === 1 ? 700 : m.level === 2 ? 600 : 700, 
+                          color: isHovered 
+                            ? "#0D9488" 
+                            : (m.level === 2 ? "#475569" : m.level === 1 ? "#334155" : "#0F172A"), 
+                          whiteSpace: "nowrap",
+                          transition: "color 0.15s ease"
                         }}>
-                          {m.diffTarget}
-                        </span>
-                      </td>
+                          {m.level === 1 && (
+                            <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: isHovered ? "#0D9488" : "#94A3B8", marginRight: 8, verticalAlign: "middle", transition: "background 0.15s ease" }} />
+                          )}
+                          {m.level === 2 && (
+                            <span style={{ color: isHovered ? "#0D9488" : "#94A3B8", marginRight: 8, fontSize: 13, fontWeight: 700, transition: "color 0.15s ease" }}>↳</span>
+                          )}
+                          {m.metric}
+                        </td>
 
-                      <td style={{ padding: "12px 14px", textAlign: "center", whiteSpace: "nowrap" }}>
-                        <span style={{ 
-                          display: "inline-block",
-                          padding: "3px 8px", 
-                          borderRadius: 6, 
-                          background: m.isLYGood === true ? "#CCFBF1" : m.isLYGood === false ? "#FFE4E6" : "#F1F5F9",
-                          color: m.isLYGood === true ? "#0D9488" : m.isLYGood === false ? "#E11D48" : "#0F172A",
-                          fontWeight: 800,
-                          fontSize: 11,
-                          whiteSpace: "nowrap"
-                        }}>
-                          {m.diffLY}
-                        </span>
-                      </td>
+                        <td style={{ padding: "12px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#64748B", whiteSpace: "nowrap" }}>
+                          {m.ly}
+                        </td>
 
-                    </tr>
-                  ))}
+                        <td style={{ padding: "12px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 700, color: "#D97706", whiteSpace: "nowrap" }}>
+                          {m.target}
+                        </td>
+
+                        <td style={{ padding: "12px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#0D9488", fontSize: 13, whiteSpace: "nowrap" }}>
+                          {m.actual}
+                        </td>
+
+                        <td style={{ padding: "12px 14px", textAlign: "center", whiteSpace: "nowrap" }}>
+                          <span style={{ 
+                            display: "inline-block",
+                            padding: "3px 8px", 
+                            borderRadius: 6, 
+                            background: m.isTargetGood === true ? "#CCFBF1" : m.isTargetGood === false ? "#FFE4E6" : "#F1F5F9",
+                            color: m.isTargetGood === true ? "#0D9488" : m.isTargetGood === false ? "#E11D48" : "#0F172A",
+                            fontWeight: 800,
+                            fontSize: 11,
+                            whiteSpace: "nowrap"
+                          }}>
+                            {m.diffTarget}
+                          </span>
+                        </td>
+
+                        <td style={{ padding: "12px 14px", textAlign: "center", whiteSpace: "nowrap" }}>
+                          <span style={{ 
+                            display: "inline-block",
+                            padding: "3px 8px", 
+                            borderRadius: 6, 
+                            background: m.isLYGood === true ? "#CCFBF1" : m.isLYGood === false ? "#FFE4E6" : "#F1F5F9",
+                            color: m.isLYGood === true ? "#0D9488" : m.isLYGood === false ? "#E11D48" : "#0F172A",
+                            fontWeight: 800,
+                            fontSize: 11,
+                            whiteSpace: "nowrap"
+                          }}>
+                            {m.diffLY}
+                          </span>
+                        </td>
+
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -935,14 +956,21 @@ export default function DashboardView({
                 {sortedKols.map((k, idx) => {
                   const pct = ((k.totalViews / k.targetViews) * 100).toFixed(1);
                   const isGood = k.totalViews >= k.targetViews;
+                  const isHovered = hoveredKolTableIdx === idx;
 
                   return (
                     <tr 
                       key={idx} 
                       onClick={() => setActiveDetailKol(k)}
+                      onMouseEnter={() => setHoveredKolTableIdx(idx)}
+                      onMouseLeave={() => setHoveredKolTableIdx(null)}
                       style={{ 
                         borderBottom: "1px solid #F1F5F9", 
-                        background: idx % 2 === 0 ? "#FFFFFF" : "#F8FAFC",
+                        background: isHovered 
+                          ? "#F0FDFA" 
+                          : idx % 2 === 0 ? "#FFFFFF" : "#F8FAFC",
+                        boxShadow: isHovered ? "inset 3px 0 0 #0D9488" : "none",
+                        transition: "all 0.15s ease",
                         cursor: "pointer"
                       }}
                     >
