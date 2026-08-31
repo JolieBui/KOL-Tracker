@@ -378,7 +378,12 @@ const DATA_VINEGAR = {
   ]
 };
 
-export default function DashboardView({ onOpen = () => {} }) {
+export default function DashboardView({ 
+  onOpen = () => {}, 
+  onOpenProfile = () => {}, 
+  onOpenTable = () => {}, 
+  onOpenKanban = () => {} 
+}) {
   const [projectKey, setProjectKey] = useState("MSG");
   const [viewTab, setViewTab] = useState("compare"); // "compare" | "kols"
   const [kolSearch, setKolSearch] = useState("");
@@ -1197,11 +1202,55 @@ export default function DashboardView({ onOpen = () => {} }) {
 
             </div>
 
-            {/* Footer */}
-            <div style={{ padding: "12px 20px", background: "#F8FAFC", borderTop: "1px solid #E2E8F0", display: "flex", justifyContent: "flex-end" }}>
+            {/* Footer with Cross-Tab Interconnected Quick Actions */}
+            <div style={{ padding: "12px 20px", background: "#F8FAFC", borderTop: "1px solid #E2E8F0", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                <button 
+                  onClick={() => {
+                    setViewTab("kols");
+                    setKolSearch(activeDetailKol.kol);
+                    setActiveDetailKol(null);
+                  }}
+                  title="Xem và lọc bạn KOL này trong danh sách Dashboard"
+                  style={{ padding: "6px 10px", borderRadius: 6, background: "#FFFFFF", color: "#0F172A", fontWeight: 700, border: "1px solid #CBD5E1", cursor: "pointer", fontSize: 11, display: "flex", alignItems: "center", gap: 4 }}
+                >
+                  📋 Xem trên Danh Sách
+                </button>
+                <button 
+                  onClick={() => {
+                    onOpenProfile(activeDetailKol.kol);
+                    setActiveDetailKol(null);
+                  }}
+                  title="Chuyển sang tab Hồ Sơ KOL"
+                  style={{ padding: "6px 10px", borderRadius: 6, background: "#FFFFFF", color: "#0D9488", fontWeight: 700, border: "1px solid #99F6E4", cursor: "pointer", fontSize: 11, display: "flex", alignItems: "center", gap: 4 }}
+                >
+                  👤 Hồ Sơ KOL
+                </button>
+                <button 
+                  onClick={() => {
+                    onOpenTable(activeDetailKol.kol);
+                    setActiveDetailKol(null);
+                  }}
+                  title="Chuyển sang tab Bảng Master"
+                  style={{ padding: "6px 10px", borderRadius: 6, background: "#FFFFFF", color: "#0284C7", fontWeight: 700, border: "1px solid #BAE6FD", cursor: "pointer", fontSize: 11, display: "flex", alignItems: "center", gap: 4 }}
+                >
+                  📊 Tab Bảng
+                </button>
+                <button 
+                  onClick={() => {
+                    onOpenKanban(activeDetailKol.kol);
+                    setActiveDetailKol(null);
+                  }}
+                  title="Chuyển sang tab Kanban"
+                  style={{ padding: "6px 10px", borderRadius: 6, background: "#FFFFFF", color: "#7C3AED", fontWeight: 700, border: "1px solid #DDD6FE", cursor: "pointer", fontSize: 11, display: "flex", alignItems: "center", gap: 4 }}
+                >
+                  📌 Kanban
+                </button>
+              </div>
+
               <button 
                 onClick={() => setActiveDetailKol(null)}
-                style={{ padding: "8px 18px", borderRadius: 8, background: "#0F172A", color: "#FFFFFF", fontWeight: 700, border: "none", cursor: "pointer", fontSize: 12 }}
+                style={{ padding: "7px 16px", borderRadius: 8, background: "#0F172A", color: "#FFFFFF", fontWeight: 700, border: "none", cursor: "pointer", fontSize: 12 }}
               >
                 Đóng
               </button>

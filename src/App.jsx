@@ -5927,7 +5927,22 @@ const [view, setView] = useState("table");
             {view === "dashboard" && (
               <DashboardView 
                 rows={data} 
-                onOpen={r => setSelected(r)} 
+                onOpen={r => {
+                  const fullRow = data.find(item => item.kol?.toLowerCase().trim() === (r.kol || r.name)?.toLowerCase().trim()) || r;
+                  setSelected(fullRow);
+                }} 
+                onOpenProfile={kName => {
+                  setSearch(kName);
+                  setView("profile");
+                }}
+                onOpenTable={kName => {
+                  setSearch(kName);
+                  setView("table");
+                }}
+                onOpenKanban={kName => {
+                  setSearch(kName);
+                  setView("kanban");
+                }}
                 campaignLabels={campaignLabels} 
               />
             )}
