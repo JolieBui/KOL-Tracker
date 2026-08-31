@@ -3521,6 +3521,30 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels = {} }) => {
               </>
             )}
 
+            {/* Metric 5.5: Eng (nếu > 0) */}
+            {monthStats.totalEng > 0 && (
+              <>
+                <div style={{ width: 1, height: 12, background: "var(--line)", flexShrink: 0 }} />
+                <div 
+                  title="Tổng lượt tương tác thực tế trong tháng"
+                  style={{
+                    display: "flex",
+                    alignItems: "baseline",
+                    gap: 4,
+                    padding: "3px 8px",
+                    borderRadius: 6,
+                    fontSize: 11,
+                    whiteSpace: "nowrap"
+                  }}
+                >
+                  <span style={{ color: "var(--ink-soft)", fontWeight: 600 }}>Eng:</span>
+                  <strong className="kt-mono" style={{ color: "var(--ok)", fontWeight: 800 }}>
+                    {monthStats.totalEng >= 1000 ? `${(monthStats.totalEng / 1000).toFixed(1)}K` : monthStats.totalEng.toLocaleString()}
+                  </strong>
+                </div>
+              </>
+            )}
+
             {/* Metric 6: Mini Campaign Pills */}
             {Object.keys(monthStats.campaignCounts).length > 0 && (
               <div style={{ display: "flex", alignItems: "center", gap: 3, marginLeft: 2, paddingLeft: 6, borderLeft: "1px solid var(--line)" }}>
@@ -4018,6 +4042,12 @@ const VIEWS_BUCKETS = [
   { key: "50to200k",  label: "50K – 200K",   test: v => v >= 50000 && v < 200000 },
   { key: "over200k",  label: "Trên 200K",    test: v => v >= 200000 },
 ];
+const ENG_BUCKETS = [
+  { key: "under5k",  label: "Dưới 5K",      test: e => e < 5000 },
+  { key: "5to20k",   label: "5K – 20K",     test: e => e >= 5000 && e < 20000 },
+  { key: "20to50k",  label: "20K – 50K",    test: e => e >= 20000 && e < 50000 },
+  { key: "over50k",  label: "Trên 50K",     test: e => e >= 50000 },
+];
 
 const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, statusStages, statusMap }) => {
   const [search, setSearch] = useState("");
@@ -4026,6 +4056,7 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
   const [filterPhase, setFilterPhase] = useState("all");
   const [filterCost, setFilterCost] = useState("all");
   const [filterViews, setFilterViews] = useState("all");
+  const [filterEng, setFilterEng] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
   const [sortOrder, setSortOrder] = useState("default");
 
@@ -4144,6 +4175,12 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
         if (bucket && !bucket.test(displayViews)) return;
       }
 
+      // 6. Eng bucket filter
+      if (filterEng !== "all") {
+        const bucket = ENG_BUCKETS.find(b => b.key === filterEng);
+        if (bucket && !bucket.test(displayEng)) return;
+      }
+
       results.push({
         ...k,
         displayCost,
@@ -4168,10 +4205,14 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
       results.sort((a, b) => a.displayViews - b.displayViews);
     } else if (sortOrder === "viewDesc") {
       results.sort((a, b) => b.displayViews - a.displayViews);
-    } // else "default" which is already sorted alphabetically by KOL name in uniqueKols
+    } else if (sortOrder === "engAsc") {
+      results.sort((a, b) => a.displayEng - b.displayEng);
+    } else if (sortOrder === "engDesc") {
+      results.sort((a, b) => b.displayEng - a.displayEng);
+    }
 
     return results;
-  }, [uniqueKols, search, filterCampaign, filterTier, filterPhase, filterCost, filterViews, filterStatus, sortOrder]);
+  }, [uniqueKols, search, filterCampaign, filterTier, filterPhase, filterCost, filterViews, filterEng, filterStatus, sortOrder]);
 
   const topViewsKols = useMemo(() => {
     return [...filteredKols]
@@ -4208,13 +4249,14 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
     (filterPhase !== "all" ? 1 : 0) +
     (filterCost !== "all" ? 1 : 0) +
     (filterViews !== "all" ? 1 : 0) +
+    (filterEng !== "all" ? 1 : 0) +
     (filterStatus !== "all" ? 1 : 0);
   const hasActiveFilters = activeFilterCount > 0;
 
   const clearFilters = () => {
     setSearch(""); setFilterCampaign("all"); setFilterTier("all");
     setFilterPhase("all"); setFilterCost("all"); setFilterViews("all");
-    setFilterStatus("all"); setSortOrder("default");
+    setFilterEng("all"); setFilterStatus("all"); setSortOrder("default");
   };
 
   const summary = useMemo(() => ({
@@ -4233,7 +4275,7 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
             { label: "Hồ sơ KOL", value: summary.count, color: "var(--ink)" },
             { label: "Tổng chi phí", value: fmtVND(summary.totalCost), color: "var(--accent)" },
             { label: "Tổng Views", value: summary.totalViews.toLocaleString(), color: "var(--blue)" },
-            { label: "Tổng Tương tác", value: summary.totalEng.toLocaleString(), color: "var(--ok)" },
+            { label: "Tổng Tương tác (Eng)", value: summary.totalEng.toLocaleString(), color: "var(--ok)" },
           ].map(s => (
             <div key={s.label} className="kt-card" style={{ padding: "10px 16px", flex: "1 1 160px", minWidth: 160, boxSizing: "border-box" }}>
               <div style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap" }}>
@@ -4275,6 +4317,10 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
             <option value="all">Tất cả Views</option>
             {VIEWS_BUCKETS.map(b => <option key={b.key} value={b.key}>{b.label}</option>)}
           </select>
+          <select className="kt-select" value={filterEng} onChange={e => setFilterEng(e.target.value)} style={{ flex: "0 0 auto", minWidth: 145, width: "auto" }}>
+            <option value="all">Tất cả Tương tác (Eng)</option>
+            {ENG_BUCKETS.map(b => <option key={b.key} value={b.key}>{b.label}</option>)}
+          </select>
           <select className="kt-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ flex: "0 0 auto", minWidth: 140, width: "auto" }}>
             <option value="all">Tất cả Tiến độ</option>
             {statusStages.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
@@ -4285,6 +4331,8 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
             <option value="costDesc">Chi phí: Cao ➝ Thấp</option>
             <option value="viewAsc">Lượt xem: Thấp ➝ Cao</option>
             <option value="viewDesc">Lượt xem: Cao ➝ Thấp</option>
+            <option value="engAsc">Tương tác: Thấp ➝ Cao</option>
+            <option value="engDesc">Tương tác: Cao ➝ Thấp</option>
           </select>
           {hasActiveFilters && (
             <button className="kt-btn kt-btn-ghost" onClick={clearFilters} style={{ flex: "0 0 auto", padding: "8px 14px", whiteSpace: "nowrap" }}>
