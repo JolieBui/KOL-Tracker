@@ -924,7 +924,7 @@ export default function DashboardView({
                     Mục tiêu {sortCol === "targetViews" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
                   <th onClick={() => handleSort("organicViews")} style={{ padding: "8px 6px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
-                    Tự nhiên {sortCol === "organicViews" && (sortDir === "asc" ? "▲" : "▼")}
+                    Không reup {sortCol === "organicViews" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
                   <th onClick={() => handleSort("reupViews")} style={{ padding: "8px 6px", textAlign: "right", cursor: "pointer", fontWeight: 800, color: "#0284C7", whiteSpace: "nowrap" }}>
                     Reup {sortCol === "reupViews" && (sortDir === "asc" ? "▲" : "▼")}
@@ -932,8 +932,11 @@ export default function DashboardView({
                   <th onClick={() => handleSort("totalViews")} style={{ padding: "8px 6px", textAlign: "right", cursor: "pointer", fontWeight: 800, color: "#0D9488", whiteSpace: "nowrap" }}>
                     Tổng view {sortCol === "totalViews" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
+                  <th style={{ padding: "8px 4px", textAlign: "center", fontWeight: 800, whiteSpace: "nowrap" }}>
+                    % KPI (Ko reup)
+                  </th>
                   <th onClick={() => handleSort("pct")} style={{ padding: "8px 4px", textAlign: "center", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
-                    % KPI {sortCol === "pct" && (sortDir === "asc" ? "▲" : "▼")}
+                    % KPI (Có reup) {sortCol === "pct" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
                   <th style={{ padding: "8px 4px", textAlign: "center", fontWeight: 800, whiteSpace: "nowrap" }}>
                     YoY
@@ -949,8 +952,10 @@ export default function DashboardView({
               </thead>
               <tbody>
                 {sortedKols.map((k, idx) => {
-                  const pct = ((k.totalViews / k.targetViews) * 100).toFixed(1);
-                  const isGood = k.totalViews >= k.targetViews;
+                  const orgPct = ((k.organicViews / k.targetViews) * 100).toFixed(1);
+                  const totPct = ((k.totalViews / k.targetViews) * 100).toFixed(1);
+                  const isOrgGood = k.organicViews >= k.targetViews;
+                  const isTotGood = k.totalViews >= k.targetViews;
                   const isHovered = hoveredKolTableIdx === idx;
 
                   return (
@@ -1003,13 +1008,27 @@ export default function DashboardView({
                           display: "inline-block",
                           padding: "2px 5px", 
                           borderRadius: 4, 
-                          background: isGood ? "#CCFBF1" : "#FFE4E6", 
-                          color: isGood ? "#0D9488" : "#E11D48",
+                          background: isOrgGood ? "#CCFBF1" : "#FFE4E6", 
+                          color: isOrgGood ? "#0D9488" : "#E11D48",
                           fontWeight: 800,
                           fontSize: 10,
                           whiteSpace: "nowrap"
                         }}>
-                          {pct}%
+                          {orgPct}%
+                        </span>
+                      </td>
+                      <td style={{ padding: "7px 4px", textAlign: "center", whiteSpace: "nowrap" }}>
+                        <span style={{ 
+                          display: "inline-block",
+                          padding: "2px 5px", 
+                          borderRadius: 4, 
+                          background: isTotGood ? "#CCFBF1" : "#FFE4E6", 
+                          color: isTotGood ? "#0D9488" : "#E11D48",
+                          fontWeight: 800,
+                          fontSize: 10,
+                          whiteSpace: "nowrap"
+                        }}>
+                          {totPct}%
                         </span>
                       </td>
                       <td style={{ padding: "7px 4px", textAlign: "center", whiteSpace: "nowrap" }}>
@@ -1065,10 +1084,22 @@ export default function DashboardView({
                   <td style={{ padding: "8px 4px", textAlign: "center", whiteSpace: "nowrap" }}>
                     {(() => {
                       const t = sortedKols.reduce((a, b) => a + b.targetViews, 0);
-                      const a = sortedKols.reduce((a, b) => a + b.totalViews, 0);
-                      const p = t > 0 ? ((a / t) * 100).toFixed(1) : 0;
+                      const org = sortedKols.reduce((a, b) => a + b.organicViews, 0);
+                      const p = t > 0 ? ((org / t) * 100).toFixed(1) : 0;
                       return (
-                        <span style={{ padding: "2px 5px", borderRadius: 4, background: a >= t ? "#0D9488" : "#E11D48", color: "#FFFFFF", fontWeight: 800, fontSize: 10 }}>
+                        <span style={{ padding: "2px 5px", borderRadius: 4, background: org >= t ? "#0D9488" : "#E11D48", color: "#FFFFFF", fontWeight: 800, fontSize: 10 }}>
+                          {p}%
+                        </span>
+                      );
+                    })()}
+                  </td>
+                  <td style={{ padding: "8px 4px", textAlign: "center", whiteSpace: "nowrap" }}>
+                    {(() => {
+                      const t = sortedKols.reduce((a, b) => a + b.targetViews, 0);
+                      const tot = sortedKols.reduce((a, b) => a + b.totalViews, 0);
+                      const p = t > 0 ? ((tot / t) * 100).toFixed(1) : 0;
+                      return (
+                        <span style={{ padding: "2px 5px", borderRadius: 4, background: tot >= t ? "#0D9488" : "#E11D48", color: "#FFFFFF", fontWeight: 800, fontSize: 10 }}>
                           {p}%
                         </span>
                       );
