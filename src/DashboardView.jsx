@@ -385,6 +385,7 @@ export default function DashboardView({ onOpen = () => {} }) {
   const [sortCol, setSortCol] = useState("totalViews");
   const [sortDir, setSortDir] = useState("desc");
   const [hoveredKol, setHoveredKol] = useState(null);
+  const [activeDetailKol, setActiveDetailKol] = useState(null);
 
   const data = projectKey === "MSG" ? DATA_MSG : DATA_VINEGAR;
 
@@ -652,8 +653,13 @@ export default function DashboardView({ onOpen = () => {} }) {
                   return (
                     <div 
                       key={i} 
+                      onClick={() => {
+                        const found = data.kols.find(item => item.kol === k.name);
+                        if (found) { setActiveDetailKol(found); onOpen(found); }
+                      }}
                       onMouseEnter={() => setHoveredKol(k.name)}
                       onMouseLeave={() => setHoveredKol(null)}
+                      title={`Nhấp để xem chi tiết thông số của ${k.name}`}
                       style={{ 
                         display: "flex", 
                         justifyContent: "space-between", 
@@ -702,8 +708,13 @@ export default function DashboardView({ onOpen = () => {} }) {
                   return (
                     <div 
                       key={i} 
+                      onClick={() => {
+                        const found = data.kols.find(item => item.kol === k.name);
+                        if (found) { setActiveDetailKol(found); onOpen(found); }
+                      }}
                       onMouseEnter={() => setHoveredKol(k.name)}
                       onMouseLeave={() => setHoveredKol(null)}
+                      title={`Nhấp để xem chi tiết thông số của ${k.name}`}
                       style={{ 
                         display: "flex", 
                         justifyContent: "space-between", 
@@ -750,8 +761,13 @@ export default function DashboardView({ onOpen = () => {} }) {
                   return (
                     <div 
                       key={i} 
+                      onClick={() => {
+                        const found = data.kols.find(item => item.kol === k.name);
+                        if (found) { setActiveDetailKol(found); onOpen(found); }
+                      }}
                       onMouseEnter={() => setHoveredKol(k.name)}
                       onMouseLeave={() => setHoveredKol(null)}
+                      title={`Nhấp để xem chi tiết thông số của ${k.name}`}
                       style={{ 
                         display: "flex", 
                         justifyContent: "space-between", 
@@ -918,7 +934,7 @@ export default function DashboardView({ onOpen = () => {} }) {
                   return (
                     <tr 
                       key={idx} 
-                      onClick={() => onOpen(k)}
+                      onClick={() => { setActiveDetailKol(k); onOpen(k); }}
                       style={{ 
                         borderBottom: "1px solid #F1F5F9", 
                         background: idx % 2 === 0 ? "#FFFFFF" : "#F8FAFC",
@@ -1045,6 +1061,152 @@ export default function DashboardView({ onOpen = () => {} }) {
                 </tr>
               </tfoot>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          KOL DETAIL MODAL (CHI TIẾT THÔNG SỐ TỪNG BẠN KOL)
+         ========================================================================= */}
+      {activeDetailKol && (
+        <div 
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(15, 23, 42, 0.6)",
+            backdropFilter: "blur(4px)",
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 16
+          }}
+          onClick={() => setActiveDetailKol(null)}
+        >
+          <div 
+            style={{
+              background: "#FFFFFF",
+              borderRadius: 16,
+              maxWidth: 520,
+              width: "100%",
+              boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+              overflow: "hidden",
+              border: "1px solid #E2E8F0"
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{ padding: "16px 20px", background: "#F8FAFC", borderBottom: "1px solid #E2E8F0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ width: 38, height: 38, borderRadius: "50%", background: getColor(activeDetailKol.kol).dot, color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 16 }}>
+                  {activeDetailKol.kol.charAt(0)}
+                </div>
+                <div>
+                  <div style={{ fontWeight: 800, fontSize: 16, color: "#0F172A" }}>{activeDetailKol.kol}</div>
+                  <div style={{ display: "flex", gap: 6, marginTop: 3 }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 6px", borderRadius: 4, background: "#E2E8F0", color: "#475569" }}>
+                      {activeDetailKol.tier}
+                    </span>
+                    <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 6px", borderRadius: 4, background: projectKey === "MSG" ? "#CCFBF1" : "#E0F2FE", color: projectKey === "MSG" ? "#0D9488" : "#0284C7" }}>
+                      {projectKey}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <button 
+                onClick={() => setActiveDetailKol(null)}
+                style={{ background: "#F1F5F9", border: "none", width: 30, height: 30, borderRadius: "50%", fontSize: 14, color: "#64748B", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800 }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Body: Grid of Key Metrics */}
+            <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: 12 }}>
+              
+              {/* Row 1: Cost & KPI View Achievement */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                <div style={{ background: "#F8FAFC", padding: "12px 14px", borderRadius: 10, border: "1px solid #F1F5F9" }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "#64748B" }}>💰 Chi phí booking</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: "#0F172A", marginTop: 4, fontFamily: "'IBM Plex Mono', monospace" }}>
+                    {(activeDetailKol.cost / 1000000).toFixed(1)}M VNĐ
+                  </div>
+                </div>
+
+                <div style={{ background: activeDetailKol.totalViews >= activeDetailKol.targetViews ? "#F0FDF4" : "#FFF1F2", padding: "12px 14px", borderRadius: 10, border: activeDetailKol.totalViews >= activeDetailKol.targetViews ? "1px solid #BBF7D0" : "1px solid #FECDD3" }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: activeDetailKol.totalViews >= activeDetailKol.targetViews ? "#16A34A" : "#E11D48" }}>🎯 % Đạt KPI Lượt xem</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: activeDetailKol.totalViews >= activeDetailKol.targetViews ? "#15803D" : "#BE123C", marginTop: 4 }}>
+                    {((activeDetailKol.totalViews / activeDetailKol.targetViews) * 100).toFixed(1)}%
+                  </div>
+                </div>
+              </div>
+
+              {/* Row 2: View Breakdown */}
+              <div style={{ background: "#F8FAFC", padding: "12px 14px", borderRadius: 10, border: "1px solid #F1F5F9" }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: "#475569", marginBottom: 8 }}>📊 CHI TIẾT LƯỢT XEM (VIEWS)</div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, textAlign: "center" }}>
+                  <div>
+                    <div style={{ fontSize: 10, color: "#64748B" }}>Mục tiêu</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A", marginTop: 2 }}>{activeDetailKol.targetViews.toLocaleString()}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 10, color: "#64748B" }}>Tự nhiên (TikTok)</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A", marginTop: 2 }}>{activeDetailKol.organicViews.toLocaleString()}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 10, color: "#0284C7" }}>Reup (Facebook)</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#0284C7", marginTop: 2 }}>+{activeDetailKol.reupViews.toLocaleString()}</div>
+                  </div>
+                </div>
+                <div style={{ marginTop: 10, paddingTop: 8, borderTop: "1px solid #E2E8F0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: 11, fontWeight: 800, color: "#0F172A" }}>Tổng lượt xem gộp:</span>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: "#0D9488", fontFamily: "'IBM Plex Mono', monospace" }}>{activeDetailKol.totalViews.toLocaleString()} views</span>
+                </div>
+              </div>
+
+              {/* Row 3: Engagement, Watch time, CPV 6s */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+                <div style={{ background: "#F8FAFC", padding: "10px", borderRadius: 10, border: "1px solid #F1F5F9", textAlign: "center" }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: "#64748B" }}>❤️ Tương tác</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: "#0284C7", marginTop: 2 }}>{activeDetailKol.eng.toLocaleString()}</div>
+                </div>
+                <div style={{ background: "#F8FAFC", padding: "10px", borderRadius: 10, border: "1px solid #F1F5F9", textAlign: "center" }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: "#64748B" }}>⏱️ Thời lượng xem</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: "#7C3AED", marginTop: 2 }}>{activeDetailKol.time}</div>
+                </div>
+                <div style={{ background: "#F8FAFC", padding: "10px", borderRadius: 10, border: "1px solid #F1F5F9", textAlign: "center" }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: "#64748B" }}>⚡ CPV 6s</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: activeDetailKol.cpv <= 45 ? "#0D9488" : "#0F172A", marginTop: 2 }}>{activeDetailKol.cpv}đ</div>
+                </div>
+              </div>
+
+              {/* Row 4: Historical Comparison FY25 */}
+              <div style={{ background: "#F8FAFC", padding: "12px 14px", borderRadius: 10, border: "1px solid #F1F5F9", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: "#64748B" }}>📈 LỊCH SỬ CÙNG KỲ (FY25)</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#0F172A", marginTop: 2 }}>
+                    {activeDetailKol.lyViews === "Mới" ? "✨ KOL Mới tham gia chiến dịch lần đầu" : `Cùng kỳ FY25 đạt: ${activeDetailKol.lyViews} views`}
+                  </div>
+                </div>
+                {activeDetailKol.yoy !== "—" && (
+                  <span style={{ padding: "4px 8px", borderRadius: 6, background: activeDetailKol.yoy.startsWith("+") ? "#CCFBF1" : "#FFE4E6", color: activeDetailKol.yoy.startsWith("+") ? "#0D9488" : "#E11D48", fontWeight: 800, fontSize: 12 }}>
+                    {activeDetailKol.yoy} YoY
+                  </span>
+                )}
+              </div>
+
+            </div>
+
+            {/* Footer */}
+            <div style={{ padding: "12px 20px", background: "#F8FAFC", borderTop: "1px solid #E2E8F0", display: "flex", justifyContent: "flex-end" }}>
+              <button 
+                onClick={() => setActiveDetailKol(null)}
+                style={{ padding: "8px 18px", borderRadius: 8, background: "#0F172A", color: "#FFFFFF", fontWeight: 700, border: "none", cursor: "pointer", fontSize: 12 }}
+              >
+                Đóng
+              </button>
+            </div>
+
           </div>
         </div>
       )}
