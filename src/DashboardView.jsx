@@ -58,7 +58,7 @@ const DATA_MSG = {
       barPct: 64.6
     },
     {
-      metric: "Tổng ngân sách thực chi",
+      metric: "Tổng ngân sách (bao gồm AF 15%)",
       unit: "VNĐ",
       ly: "501.72M",
       target: "720.18M",
@@ -82,13 +82,25 @@ const DATA_MSG = {
       barPct: 100
     },
     {
-      metric: "└── Chi phí quảng cáo (Media Ads)",
+      metric: "├── Chi phí quảng cáo (Media Paid)",
       unit: "VNĐ",
       ly: "0đ",
       target: "154.71M",
-      actual: "219.78M",
-      diffTarget: "+42.1%",
-      diffLY: "+219.78M",
+      actual: "125.85M",
+      diffTarget: "-18.7%",
+      diffLY: "+125.85M",
+      isTargetGood: true,
+      isLYGood: true,
+      barPct: 100
+    },
+    {
+      metric: "└── Phí Agency (AF 15%)",
+      unit: "VNĐ",
+      ly: "65.44M",
+      target: "93.94M",
+      actual: "93.94M",
+      diffTarget: "100.0%",
+      diffLY: "+43.5%",
       isTargetGood: true,
       isLYGood: true,
       barPct: 100
@@ -238,7 +250,7 @@ const DATA_VINEGAR = {
       barPct: 52.9
     },
     {
-      metric: "Tổng ngân sách thực chi",
+      metric: "Tổng ngân sách (bao gồm AF 15%)",
       unit: "VNĐ",
       ly: "442.24M",
       target: "200.00M",
@@ -262,13 +274,25 @@ const DATA_VINEGAR = {
       barPct: 100
     },
     {
-      metric: "└── Chi phí quảng cáo (Media Ads)",
+      metric: "├── Chi phí quảng cáo (Media Paid)",
       unit: "VNĐ",
-      ly: "0đ",
+      ly: "60.56M",
       target: "38.51M",
       actual: "22.00M",
       diffTarget: "-42.9%",
-      diffLY: "+22.00M",
+      diffLY: "-63.7%",
+      isTargetGood: true,
+      isLYGood: true,
+      barPct: 100
+    },
+    {
+      metric: "└── Phí Agency (AF 15%)",
+      unit: "VNĐ",
+      ly: "57.68M",
+      target: "26.09M",
+      actual: "26.09M",
+      diffTarget: "100.0%",
+      diffLY: "-54.8%",
       isTargetGood: true,
       isLYGood: true,
       barPct: 100
