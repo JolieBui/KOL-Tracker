@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import * as XLSX from "xlsx";
+import DashboardView from "./DashboardView";
 
 /* ---------------- Design tokens (injected via <style>) ---------------- */
 const GlobalStyle = () => (
@@ -5757,7 +5758,7 @@ const [view, setView] = useState("table");
               </h1>
             </div>
             
-            {/* View Toggle (Bảng, Kanban, Lịch, Hồ sơ KOL) */}
+            {/* View Toggle (Bảng, Kanban, Lịch, Hồ sơ KOL, Dashboard) */}
             <div style={{ display: "flex", gap: 2, background: "var(--paper)", padding: 3, borderRadius: 20 }}>
               <button className={`kt-btn ${view === "table" ? "kt-btn-primary" : "kt-btn-ghost"}`}
                 style={{ padding: "5px 12px", fontSize: 11, borderRadius: 16 }}
@@ -5771,6 +5772,9 @@ const [view, setView] = useState("table");
               <button className={`kt-btn ${view === "profile" ? "kt-btn-primary" : "kt-btn-ghost"}`}
                 style={{ padding: "5px 12px", fontSize: 11, borderRadius: 16 }}
                 onClick={() => setView("profile")}>Hồ sơ KOL</button>
+              <button className={`kt-btn ${view === "dashboard" ? "kt-btn-primary" : "kt-btn-ghost"}`}
+                style={{ padding: "5px 12px", fontSize: 11, borderRadius: 16 }}
+                onClick={() => setView("dashboard")}>Dashboard</button>
             </div>
           </div>
 
@@ -5832,8 +5836,8 @@ const [view, setView] = useState("table");
           </div>
         </div>
 
-        {/* Bottom Row: Filters (hidden on Hồ sơ KOL & Lịch) */}
-        {view !== "profile" && view !== "calendar" && (
+        {/* Bottom Row: Filters (hidden on Hồ sơ KOL, Lịch & Dashboard) */}
+        {view !== "profile" && view !== "calendar" && view !== "dashboard" && (
           <div className="kt-filters-bar">
             {/* Search */}
             <input className="kt-input kt-filter-input" placeholder="🔍 Tìm tên KOL, món ăn…"
@@ -5918,6 +5922,13 @@ const [view, setView] = useState("table");
                 dynamicCampaigns={dynamicCampaigns}
                 statusStages={statusStages}
                 statusMap={statusMap}
+              />
+            )}
+            {view === "dashboard" && (
+              <DashboardView 
+                rows={data} 
+                onOpen={r => setSelected(r)} 
+                campaignLabels={campaignLabels} 
               />
             )}
           </ViewErrorBoundary>
