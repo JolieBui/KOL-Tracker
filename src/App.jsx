@@ -2807,16 +2807,20 @@ const StatsBar = ({ rows, currentStatus = "all", onCardClick }) => {
   const total = rows.reduce((s, r) => s + (Number(r.cost) || 0), 0);
   const aired = rows.filter(r => r.statusKey === "aired").length;
   const inProgress = rows.filter(r => r.statusKey !== "aired").length;
+  const totalViews = rows.reduce((s, r) => s + (Number(r.views) || 0), 0);
+  const totalEng = rows.reduce((s, r) => s + (Number(r.engagement) || (Number(r.likes) || 0) + (Number(r.comments) || 0) + (Number(r.shares) || 0)), 0);
 
   return (
     <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
       {[
         { label: "Tổng KOL", value: rows.length, color: "var(--ink)", key: "all" },
-        { label: "Đã lên sóng", value: aired, color: "var(--green)", key: "aired" },
-        { label: "Đang xử lý", value: inProgress, color: "var(--amber)", key: "in_progress" },
+        { label: "Đã lên sóng", value: aired, color: "var(--ok)", key: "aired" },
+        { label: "Đang xử lý", value: inProgress, color: "var(--warn)", key: "in_progress" },
         { label: "Tổng chi phí", value: fmtVND(total), color: "var(--accent)", key: "cost" },
+        { label: "Total Views", value: totalViews >= 1000000 ? `${(totalViews / 1000000).toFixed(1)}M` : totalViews.toLocaleString(), color: "var(--blue)", key: "views" },
+        { label: "TOTAL ENG", value: totalEng >= 1000000 ? `${(totalEng / 1000000).toFixed(1)}M` : totalEng >= 1000 ? `${(totalEng / 1000).toFixed(1)}K` : totalEng.toLocaleString(), color: "var(--purple)", key: "eng" },
       ].map(({ label, value, color, key }) => {
-        const isClickable = key !== "cost";
+        const isClickable = key === "all" || key === "aired" || key === "in_progress";
         const isActive = isClickable && currentStatus === key;
         return (
           <div 
@@ -2825,13 +2829,13 @@ const StatsBar = ({ rows, currentStatus = "all", onCardClick }) => {
             className={isClickable ? "kt-stats-card-hover" : ""}
             style={{
               background: "var(--card)", 
-              border: `1px solid ${isActive ? "var(--blue)" : "var(--line)"}`,
+              border: `1px solid ${isActive ? "var(--accent)" : "var(--line)"}`,
               borderRadius: 10, 
               padding: "10px 16px", 
-              flex: "1 1 160px", 
-              minWidth: 160,
+              flex: "1 1 150px", 
+              minWidth: 140,
               boxSizing: "border-box",
-              boxShadow: isActive ? "0 4px 12px rgba(42,104,140,0.08)" : "none",
+              boxShadow: isActive ? "0 4px 12px rgba(217, 122, 108, 0.15)" : "none",
               position: "relative",
               transform: isActive ? "translateY(-1px)" : "none"
             }}
@@ -2849,12 +2853,12 @@ const StatsBar = ({ rows, currentStatus = "all", onCardClick }) => {
             }}>
               <span>{label}</span>
               {isClickable && (
-                <span style={{ fontSize: 9, color: isActive ? "var(--blue)" : "var(--ink-soft)", fontWeight: 700 }}>
+                <span style={{ fontSize: 9, color: isActive ? "var(--accent)" : "var(--ink-soft)", fontWeight: 700 }}>
                   {isActive ? "Đang lọc ●" : "Lọc ↗"}
                 </span>
               )}
             </div>
-            <div className="kt-display" style={{ fontSize: 20, color, marginTop: 2 }}>{value}</div>
+            <div className="kt-display" style={{ fontSize: 20, color, marginTop: 2, fontWeight: 700 }}>{value}</div>
           </div>
         );
       })}
