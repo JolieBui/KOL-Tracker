@@ -7,7 +7,7 @@ const DATA_MSG = {
   key: "MSG",
   name: "MSG",
   kolCount: 25,
-  period: "Tuần 4 Tháng 6 – Tuần 1 Tháng 8 (6 tuần)",
+  period: "24/06 – 01/08 (Tuần 4 Tháng 6 – Tuần 1 Tháng 8)",
   metrics: [
     {
       metric: "Tổng lượt xem",
@@ -210,7 +210,7 @@ const DATA_VINEGAR = {
   key: "VINEGAR",
   name: "Vinegar",
   kolCount: 10,
-  period: "Tuần 4 Tháng 6 – Tuần 1 Tháng 8 (6 tuần)",
+  period: "10/07 – 25/07 (Tuần 2 – Tuần 4 Tháng 7)",
   metrics: [
     {
       metric: "Tổng lượt xem",
