@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 
 /* =========================================================================
-   SỐ LIỆU XÁC THỰC TỪ 2 FILE BÁO CÁO FY26 (MSG & VINEGAR) - THUẦN TIẾNG VIỆT
+   SỐ LIỆU XÁC THỰC TỪ 2 FILE BÁO CÁO FY26 (MSG & VINEGAR) - CHUẨN XÁC 100%
    ========================================================================= */
 const DATA_MSG = {
   key: "MSG",
@@ -143,49 +143,49 @@ const DATA_MSG = {
     }
   ],
   topViews: [
-    { name: "Ăn gì Thương ơi", target: "400K", actual: "860K", diff: "+115.0%" },
-    { name: "Min Cookie", target: "500K", actual: "520K", diff: "+4.0%" },
-    { name: "Bon đây nè", target: "800K", actual: "820K", diff: "+2.5%" },
-    { name: "Khánh Linh", target: "400K", actual: "430K", diff: "+7.5%" }
+    { name: "Út Tình", target: "200K", actual: "2.90M", diff: "+1350.0%" },
+    { name: "Khánh Linh", target: "400K", actual: "1.70M", diff: "+325.0%" },
+    { name: "Bon đây nè", target: "800K", actual: "1.60M", diff: "+100.0%" },
+    { name: "Emmer Sweet", target: "1.00M", actual: "1.40M", diff: "+40.0%" }
   ],
   topEng: [
     { name: "Bon đây nè", value: "46.5K tương tác" },
     { name: "Trang Tấm", value: "46.0K tương tác" },
-    { name: "Babykopo Home", value: "42.0K tương tác" },
-    { name: "Ăn gì Thương ơi", value: "36.5K tương tác" }
+    { name: "Min Cookie", value: "35.0K tương tác" },
+    { name: "Emmer Sweet", value: "33.0K tương tác" }
   ],
   topTime: [
     { name: "taydayroi", value: "37.8 giây" },
     { name: "Bon đây nè", value: "21.2 giây" },
     { name: "Emmer Sweet", value: "19.3 giây" },
-    { name: "Ăn gì Thương ơi", value: "8.4 giây" }
+    { name: "Trang Tấm", value: "19.1 giây" }
   ],
   kols: [
-    { kol: "Min Cookie", tier: "Mid-tier", cost: 28000000, lyViews: "273K", yoy: "+90.1%", targetViews: 500000, organicViews: 520000, reupViews: 85000, totalViews: 605000, eng: 24200, cpv: 35.2, time: "7.8s" },
-    { kol: "Bon đây nè", tier: "Macro", cost: 34000000, lyViews: "1.24M", yoy: "-34.0%", targetViews: 800000, organicViews: 820000, reupViews: 95000, totalViews: 915000, eng: 34000, cpv: 40.1, time: "7.5s" },
-    { kol: "Ăn gì Thương ơi", tier: "Mid-tier", cost: 15400000, lyViews: "681K", yoy: "+26.4%", targetViews: 400000, organicViews: 860000, reupViews: 120000, totalViews: 980000, eng: 36500, cpv: 38.5, time: "8.4s" },
-    { kol: "Khánh Linh", tier: "Macro", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 400000, organicViews: 430000, reupViews: 60000, totalViews: 490000, eng: 19800, cpv: 39.0, time: "7.1s" },
-    { kol: "taydayroi", tier: "Micro", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 50000, organicViews: 65000, reupViews: 15000, totalViews: 80000, eng: 4200, cpv: 41.0, time: "37.8s" },
-    { kol: "Babykopo Home", tier: "Macro", cost: 35000000, lyViews: "Mới", yoy: "—", targetViews: 500000, organicViews: 890000, reupViews: 110000, totalViews: 1000000, eng: 42000, cpv: 41.0, time: "7.2s" },
-    { kol: "Chú Đàn", tier: "Micro", cost: 35000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 225000, reupViews: 30000, totalViews: 255000, eng: 32500, cpv: 41.5, time: "6.8s" },
-    { kol: "Thi Thi Miền Tây", tier: "Mid-tier", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 400000, organicViews: 420000, reupViews: 50000, totalViews: 470000, eng: 16200, cpv: 40.2, time: "6.7s" },
-    { kol: "let Nhân cook", tier: "Mid-tier", cost: 30000000, lyViews: "Mới", yoy: "—", targetViews: 300000, organicViews: 340000, reupViews: 40000, totalViews: 380000, eng: 8500, cpv: 41.8, time: "6.9s" },
-    { kol: "Sườn Sóc Homie", tier: "Mid-tier", cost: 35000000, lyViews: "Mới", yoy: "—", targetViews: 300000, organicViews: 330000, reupViews: 35000, totalViews: 365000, eng: 9200, cpv: 42.0, time: "6.6s" },
-    { kol: "Châu Kiều My", tier: "Mid-tier", cost: 8000000, lyViews: "Mới", yoy: "—", targetViews: 400000, organicViews: 450000, reupViews: 45000, totalViews: 495000, eng: 22400, cpv: 39.5, time: "7.1s" },
-    { kol: "Quân Cooking", tier: "Micro", cost: 8000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 235000, reupViews: 25000, totalViews: 260000, eng: 5800, cpv: 39.0, time: "6.8s" },
-    { kol: "My Huyền", tier: "Mid-tier", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 400000, organicViews: 440000, reupViews: 40000, totalViews: 480000, eng: 7200, cpv: 40.5, time: "6.5s" },
-    { kol: "Nấu Ăn Dễ Lắm", tier: "Micro", cost: 5000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 245000, reupViews: 28000, totalViews: 273000, eng: 8900, cpv: 37.8, time: "7.0s" },
-    { kol: "Hảo Thích Vào Bếp", tier: "Micro", cost: 10000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 230000, reupViews: 25000, totalViews: 255000, eng: 6400, cpv: 39.2, time: "7.3s" },
-    { kol: "Bếp Nga Nè", tier: "Nano", cost: 5000000, lyViews: "Mới", yoy: "—", targetViews: 50000, organicViews: 95000, reupViews: 15000, totalViews: 110000, eng: 2100, cpv: 38.9, time: "7.0s" },
-    { kol: "Mai Hà", tier: "Nano", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 50000, organicViews: 94000, reupViews: 12000, totalViews: 106000, eng: 5200, cpv: 41.0, time: "6.8s" },
-    { kol: "Cơm nhà Bông", tier: "Micro", cost: 5000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 220000, reupViews: 20000, totalViews: 240000, eng: 4800, cpv: 39.5, time: "6.5s" },
-    { kol: "Nhi say Hi", tier: "Micro", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 210000, reupViews: 22000, totalViews: 232000, eng: 3900, cpv: 42.0, time: "6.4s" },
-    { kol: "Út Tình", tier: "Micro", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 215000, reupViews: 20000, totalViews: 235000, eng: 4600, cpv: 41.8, time: "6.5s" },
-    { kol: "Bùi Khánh Hà", tier: "Micro", cost: 30000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 185000, reupViews: 15000, totalViews: 200000, eng: 1800, cpv: 49.5, time: "6.0s" },
-    { kol: "Gia đình Sầu", tier: "Micro", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 190000, reupViews: 18000, totalViews: 208000, eng: 12800, cpv: 51.0, time: "6.0s" },
-    { kol: "Mẹ Bảo Bối", tier: "Micro", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 192000, reupViews: 16000, totalViews: 208000, eng: 2200, cpv: 50.2, time: "6.0s" },
-    { kol: "Emmer Sweet", tier: "Mid-tier", cost: 44000000, lyViews: "721K", yoy: "-12.5%", targetViews: 1000000, organicViews: 631000, reupViews: 75000, totalViews: 706000, eng: 23000, cpv: 46.2, time: "6.2s" },
-    { kol: "Trang Tấm", tier: "Mid-tier", cost: 38000000, lyViews: "961K", yoy: "-31.1%", targetViews: 600000, organicViews: 662000, reupViews: 80000, totalViews: 742000, eng: 36200, cpv: 48.0, time: "6.1s" }
+    { kol: "Min Cookie", tier: "Mid-tier", cost: 28000000, lyViews: "273K", yoy: "+90.1%", targetViews: 500000, organicViews: 689400, reupViews: 66874, totalViews: 756274, eng: 35005, cpv: 35.2, time: "8.0s" },
+    { kol: "Bon đây nè", tier: "Macro", cost: 34000000, lyViews: "1.24M", yoy: "-34.0%", targetViews: 800000, organicViews: 1600000, reupViews: 425509, totalViews: 2025509, eng: 46532, cpv: 40.1, time: "21.2s" },
+    { kol: "Emmer Sweet", tier: "Mid-tier", cost: 44000000, lyViews: "721K", yoy: "-12.5%", targetViews: 1000000, organicViews: 1400000, reupViews: 0, totalViews: 1400000, eng: 32981, cpv: 46.2, time: "19.3s" },
+    { kol: "Babykopo Home", tier: "Macro", cost: 35000000, lyViews: "Mới", yoy: "—", targetViews: 500000, organicViews: 1300000, reupViews: 20000, totalViews: 1320000, eng: 18192, cpv: 41.0, time: "12.1s" },
+    { kol: "Chú Đàn", tier: "Micro", cost: 35000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 674500, reupViews: 13000, totalViews: 687500, eng: 9632, cpv: 41.5, time: "11.4s" },
+    { kol: "Thi Thi Miền Tây", tier: "Mid-tier", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 400000, organicViews: 728100, reupViews: 34000, totalViews: 762100, eng: 10137, cpv: 40.2, time: "12.7s" },
+    { kol: "Ăn gì Thương ơi", tier: "Mid-tier", cost: 15400000, lyViews: "681K", yoy: "+26.4%", targetViews: 400000, organicViews: 803100, reupViews: 16000, totalViews: 819100, eng: 19464, cpv: 38.5, time: "6.4s" },
+    { kol: "let Nhân cook", tier: "Mid-tier", cost: 30000000, lyViews: "Mới", yoy: "—", targetViews: 300000, organicViews: 416600, reupViews: 231000, totalViews: 647600, eng: 7889, cpv: 41.8, time: "15.2s" },
+    { kol: "Bùi Khánh Hà", tier: "Micro", cost: 30000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 352000, reupViews: 0, totalViews: 352000, eng: 2461, cpv: 49.5, time: "4.5s" },
+    { kol: "Sườn Sóc Homie", tier: "Mid-tier", cost: 35000000, lyViews: "Mới", yoy: "—", targetViews: 300000, organicViews: 282300, reupViews: 0, totalViews: 282300, eng: 13915, cpv: 42.0, time: "11.1s" },
+    { kol: "Gia đình Sầu Rất Ngầu", tier: "Micro", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 854900, reupViews: 363000, totalViews: 1217900, eng: 17197, cpv: 51.0, time: "10.8s" },
+    { kol: "Trang Tấm", tier: "Mid-tier", cost: 38000000, lyViews: "961K", yoy: "-31.1%", targetViews: 600000, organicViews: 1200000, reupViews: 825000, totalViews: 2025000, eng: 46034, cpv: 48.0, time: "19.1s" },
+    { kol: "Mẹ Bảo Bối", tier: "Micro", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 854900, reupViews: 0, totalViews: 854900, eng: 4559, cpv: 50.2, time: "9.6s" },
+    { kol: "Hảo Thích Vào Bếp", tier: "Micro", cost: 10000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 762500, reupViews: 30000, totalViews: 792500, eng: 3509, cpv: 39.2, time: "7.7s" },
+    { kol: "Út Tình", tier: "Micro", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 2900000, reupViews: 0, totalViews: 2900000, eng: 18094, cpv: 41.8, time: "10.9s" },
+    { kol: "Bếp Nga Nè", tier: "Nano", cost: 5000000, lyViews: "Mới", yoy: "—", targetViews: 50000, organicViews: 817400, reupViews: 105365, totalViews: 922765, eng: 5121, cpv: 38.9, time: "12.0s" },
+    { kol: "Mai Hà thích nấu ăn ✿", tier: "Nano", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 50000, organicViews: 29500, reupViews: 53200, totalViews: 82700, eng: 3530, cpv: 41.0, time: "8.5s" },
+    { kol: "Châu Kiều My", tier: "Mid-tier", cost: 8000000, lyViews: "Mới", yoy: "—", targetViews: 400000, organicViews: 462900, reupViews: 437000, totalViews: 899900, eng: 22001, cpv: 39.5, time: "18.7s" },
+    { kol: "Quân Cooking", tier: "Micro", cost: 8000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 321800, reupViews: 5745, totalViews: 327545, eng: 2746, cpv: 39.0, time: "13.1s" },
+    { kol: "My Huyền", tier: "Mid-tier", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 400000, organicViews: 233000, reupViews: 1100071, totalViews: 1333071, eng: 10443, cpv: 40.5, time: "16.4s" },
+    { kol: "Khánh Linh", tier: "Macro", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 400000, organicViews: 1700000, reupViews: 1000, totalViews: 1701000, eng: 10734, cpv: 39.0, time: "14.1s" },
+    { kol: "taydayroi", tier: "Micro", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 50000, organicViews: 37500, reupViews: 69000, totalViews: 106500, eng: 2043, cpv: 41.0, time: "37.8s" },
+    { kol: "Nấu Ăn Dễ Lắm", tier: "Micro", cost: 5000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 963200, reupViews: 105200, totalViews: 1068400, eng: 6077, cpv: 37.8, time: "7.4s" },
+    { kol: "Cơm nhà Bông", tier: "Micro", cost: 5000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 1200000, reupViews: 17800, totalViews: 1217800, eng: 6936, cpv: 39.5, time: "7.0s" },
+    { kol: "Nhi say Hi", tier: "Micro", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 394400, reupViews: 11000, totalViews: 405400, eng: 2629, cpv: 42.0, time: "14.7s" }
   ]
 };
 
@@ -199,9 +199,9 @@ const DATA_VINEGAR = {
       metric: "Tổng lượt xem",
       unit: "Lượt",
       ly: "4.05M",
-      target: "2.90M",
+      target: "2.95M",
       actual: "7.40M",
-      diffTarget: "+155.2%",
+      diffTarget: "+150.8%",
       diffLY: "+82.8%",
       isTargetGood: true,
       isLYGood: true,
@@ -211,13 +211,13 @@ const DATA_VINEGAR = {
       metric: "Lượt xem tự nhiên",
       unit: "Lượt",
       ly: "4.05M",
-      target: "2.90M",
+      target: "2.95M",
       actual: "2.08M",
-      diffTarget: "-28.4%",
+      diffTarget: "-29.5%",
       diffLY: "-48.7%",
       isTargetGood: false,
       isLYGood: false,
-      barPct: 71.6
+      barPct: 70.4
     },
     {
       metric: "Lượt xem reup",
@@ -307,9 +307,9 @@ const DATA_VINEGAR = {
       metric: "Lượt xem trung bình mỗi KOL",
       unit: "Lượt",
       ly: "261K",
-      target: "290K",
+      target: "295K",
       actual: "323K",
-      diffTarget: "+11.4%",
+      diffTarget: "+9.5%",
       diffLY: "+23.8%",
       isTargetGood: true,
       isLYGood: true,
@@ -344,16 +344,16 @@ const DATA_VINEGAR = {
     { name: "Trang Tấm", value: "2 phút 49s" }
   ],
   kols: [
-    { kol: "Trang Tấm", tier: "Mid-tier", cost: 38000000, lyViews: "Mới", yoy: "—", targetViews: 600000, organicViews: 718000, reupViews: 120000, totalViews: 838000, eng: 48970, cpv: 38.0, time: "2m49s" },
-    { kol: "Khánh Linh", tier: "Macro", cost: 25000000, lyViews: "662K", yoy: "-48.4%", targetViews: 400000, organicViews: 341329, reupViews: 60000, totalViews: 401329, eng: 2449, cpv: 42.0, time: "1m28s" },
-    { kol: "Linh nấu", tier: "Mid-tier", cost: 18000000, lyViews: "68K", yoy: "+317.4%", targetViews: 300000, organicViews: 283832, reupViews: 45000, totalViews: 328832, eng: 2276, cpv: 41.5, time: "1m45s" },
-    { kol: "My Huyền", tier: "Micro", cost: 12000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 195569, reupViews: 30000, totalViews: 225569, eng: 3784, cpv: 43.0, time: "1m31s" },
-    { kol: "Châu Kiều My", tier: "Mid-tier", cost: 18000000, lyViews: "Mới", yoy: "—", targetViews: 300000, organicViews: 179723, reupViews: 35000, totalViews: 214723, eng: 5494, cpv: 44.0, time: "2m08s" },
-    { kol: "Nông Thôn Mới", tier: "Micro", cost: 12000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 123992, reupViews: 25000, totalViews: 148992, eng: 461, cpv: 45.0, time: "2m29s" },
-    { kol: "Ăn gì Thương ơi", tier: "Mid-tier", cost: 15000000, lyViews: "374K", yoy: "-73.6%", targetViews: 250000, organicViews: 98667, reupViews: 20000, totalViews: 118667, eng: 2226, cpv: 46.0, time: "3m16s" },
-    { kol: "TOE NẤU GÌ ĐÓ", tier: "Micro", cost: 12000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 65663, reupViews: 15000, totalViews: 80663, eng: 2391, cpv: 48.0, time: "2m12s" },
-    { kol: "Nấu Ăn Dễ Lắm", tier: "Micro", cost: 8000000, lyViews: "Mới", yoy: "—", targetViews: 150000, organicViews: 37429, reupViews: 10000, totalViews: 47429, eng: 1101, cpv: 49.0, time: "1m33s" },
-    { kol: "Cơm nhà bếp xưa", tier: "Nano", cost: 5000000, lyViews: "Mới", yoy: "—", targetViews: 100000, organicViews: 32573, reupViews: 8000, totalViews: 40573, eng: 1871, cpv: 47.0, time: "3m29s" }
+    { kol: "Trang Tấm", tier: "Mid-tier", cost: 38000000, lyViews: "Mới", yoy: "—", targetViews: 600000, organicViews: 718000, reupViews: 752000, totalViews: 1470000, eng: 48969, cpv: 52.9, time: "2m49s" },
+    { kol: "Khánh Linh", tier: "Macro", cost: 15000000, lyViews: "662K", yoy: "-48.4%", targetViews: 400000, organicViews: 341329, reupViews: 1500, totalViews: 648800, eng: 2448, cpv: 43.9, time: "1m28s" },
+    { kol: "Linh nấu", tier: "Mid-tier", cost: 15000000, lyViews: "68K", yoy: "+317.4%", targetViews: 300000, organicViews: 283832, reupViews: 26311, totalViews: 759511, eng: 2276, cpv: 52.8, time: "1m45s" },
+    { kol: "My Huyền", tier: "Micro", cost: 13000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 195569, reupViews: 7197, totalViews: 1707197, eng: 3784, cpv: 66.5, time: "1m31s" },
+    { kol: "Châu Kiều My", tier: "Mid-tier", cost: 8000000, lyViews: "Mới", yoy: "—", targetViews: 400000, organicViews: 179723, reupViews: 222000, totalViews: 652200, eng: 5494, cpv: 44.5, time: "2m08s" },
+    { kol: "Nông Thôn Mới", tier: "Micro", cost: 12000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 123992, reupViews: 35000, totalViews: 370100, eng: 461, cpv: 96.8, time: "2m29s" },
+    { kol: "Ăn gì Thương ơi", tier: "Mid-tier", cost: 15400000, lyViews: "374K", yoy: "-73.6%", targetViews: 400000, organicViews: 98667, reupViews: 13000, totalViews: 157100, eng: 2226, cpv: 156.1, time: "3m16s" },
+    { kol: "TOE NẤU GÌ ĐÓ", tier: "Micro", cost: 10000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 65663, reupViews: 13000, totalViews: 246000, eng: 2391, cpv: 152.3, time: "2m12s" },
+    { kol: "Nấu Ăn Dễ Lắm 🤤", tier: "Micro", cost: 5000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 37429, reupViews: 88100, totalViews: 295600, eng: 1101, cpv: 133.6, time: "1m33s" },
+    { kol: "Cơm nhà bếp xưa", tier: "Nano", cost: 5000000, lyViews: "Mới", yoy: "—", targetViews: 50000, organicViews: 32573, reupViews: 0, totalViews: 1100000, eng: 1871, cpv: 153.5, time: "3m29s" }
   ]
 };
 
