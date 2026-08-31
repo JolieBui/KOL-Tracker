@@ -776,16 +776,14 @@ const getAvatarColor = (name) => {
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
   }
   const colors = [
-    "#4F46E5", // Indigo
-    "#0EA5E9", // Sky
-    "#10B981", // Emerald
-    "#F59E0B", // Amber
-    "#EC4899", // Pink
-    "#8B5CF6", // Violet
-    "#F43F5E", // Rose
-    "#06B6D4", // Cyan
-    "#84CC16", // Lime
-    "#A855F7", // Purple
+    "#D97A6C", // Soft Coral
+    "#3B9686", // Soft Mint
+    "#4A88BA", // Powder Sky
+    "#C98A26", // Soft Honey
+    "#7C6BB5", // Soft Lilac
+    "#8A7364", // Warm Sand
+    "#D45B6A", // Soft Rose
+    "#2E8B9A", // Soft Teal
   ];
   const idx = Math.abs(hash) % colors.length;
   return colors[idx];
