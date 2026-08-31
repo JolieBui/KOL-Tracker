@@ -6,28 +6,35 @@ const GlobalStyle = () => (
   <style>{`
     @import url('https://fonts.googleapis.com/css2?family=Questrial&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
-    /* ── DESIGN TOKENS: Pebble & Yam Theme ── */
+    /* ── DESIGN TOKENS: "Soft" Aesthetic Palette ── */
     .kt-root {
-      --ink:        #313841; /* High Tide - darkest text */
-      --ink-mid:    #3A4750; /* Cadet Blue - secondary text */
-      --ink-soft:   #5E6E7A; /* Muted cadet */
-      --ink-faint:  #B0BEC5; /* Light cadet */
-      --paper:      #EEEEEE; /* Pebble background */
-      --card:       #FFFFFF; /* Card white */
-      --rule:       #D8D8D8; /* Pebble border */
-      --line:       #D8D8D8;
-      --accent:     #EA9216; /* Yam orange */
-      --accent-dim: #3A4750; /* Cadet Blue dim */
-      --accent-bg:  #FDF0DC; /* Light Yam wash */
+      --ink:        #2E3840; /* Soft Deep Charcoal */
+      --ink-mid:    #4E5D6C; /* Balanced Slate */
+      --ink-soft:   #7A8A99; /* Muted Slate */
+      --ink-faint:  #CBD5E1; /* Light Slate */
+      --paper:      #F7F4EE; /* Warm Soft Canvas (#E5D5CA / #FDF0D0 wash) */
+      --card:       #FFFFFF; /* Pure White Card */
+      --surface:    #FAF7F2; /* Soft Surface */
+      --rule:       #E6DDD6; /* Soft Sand Border */
+      --line:       #E6DDD6;
+      --accent:     #D97A6C; /* Soft Coral / Terracotta (from #FACDD0 & #E5D5CA) */
+      --accent-hover: #C8695B;
+      --accent-dim: #5C6B73;
+      --accent-bg:  #FDF0D0; /* Pastel Butter Cream */
+      --accent-soft: #FACDD0; /* Soft Rose Blush */
       
-      --ok:         #10B981; /* Emerald Green */
-      --ok-bg:      #ECFDF5;
-      --warn:       #F59E0B; /* Amber Yellow */
-      --warn-bg:    #FFFBEB;
-      --danger:     #EF4444; /* Bright Red */
-      --danger-bg:  #FEF2F2;
-      --blue:       #3B82F6; /* Bright Blue */
-      --blue-bg:    #EFF6FF;
+      --ok:         #3B9686; /* Sage Mint */
+      --ok-bg:      #D0E9E6; /* Soft Mint Wash */
+      --warn:       #C98A26; /* Warm Honey */
+      --warn-bg:    #FDF0D0; /* Soft Cream Butter Wash */
+      --danger:     #D45B6A; /* Soft Coral Red */
+      --danger-bg:  #FACDD0; /* Soft Blush Wash */
+      --blue:       #4A88BA; /* Soft Sky Blue */
+      --blue-bg:    #D0E3F2; /* Powder Sky Wash */
+      --purple:     #7C6BB5; /* Soft Lilac */
+      --purple-bg:  #E0D7F5; /* Lavender Wash */
+      --sand:       #8A7364; /* Warm Sand */
+      --sand-bg:    #E5D5CA; /* Muted Sand Wash */
 
       font-family: 'Questrial', sans-serif;
       font-size: 14px;
@@ -82,7 +89,7 @@ const GlobalStyle = () => (
     }
     .kt-ticket:hover {
       border-color: var(--accent);
-      box-shadow: 0 6px 20px rgba(234, 146, 22, 0.15);
+      box-shadow: 0 6px 20px rgba(217, 122, 108, 0.18);
       transform: translateY(-1px);
     }
     .kt-ticket .kt-perf {
@@ -134,22 +141,23 @@ const GlobalStyle = () => (
     /* ── BUTTONS ── */
     .kt-btn {
       font-family: 'Questrial', sans-serif;
-      font-weight: 700; border-radius: 12px;
-      padding: 8px 16px; font-size: 12px;
+      font-weight: 700; border-radius: 10px;
+      padding: 7px 14px; font-size: 12px;
       cursor: pointer; border: 1px solid transparent;
       transition: all 0.2s ease;
       display: inline-flex; align-items: center; gap: 6px;
       white-space: nowrap; letter-spacing: -0.01em;
     }
     .kt-btn-primary {
-      background: #EA9216;
+      background: var(--accent);
       color: #fff;
       border: none;
+      box-shadow: 0 2px 8px rgba(217, 122, 108, 0.25);
     }
     .kt-btn-primary:hover {
-      background: #D4820E;
+      background: var(--accent-hover);
       transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(234, 146, 22, 0.35);
+      box-shadow: 0 4px 14px rgba(217, 122, 108, 0.35);
     }
     .kt-btn-ghost {
       background: transparent; color: var(--ink);
@@ -167,8 +175,8 @@ const GlobalStyle = () => (
       font-family: 'Questrial', sans-serif;
       background: var(--card);
       border: 1px solid var(--rule);
-      border-radius: 10px;
-      padding: 8px 12px;
+      border-radius: 9px;
+      padding: 7px 12px;
       font-size: 13px;
       color: var(--ink);
       width: 100%;
@@ -177,7 +185,7 @@ const GlobalStyle = () => (
     }
     .kt-input:focus, .kt-select:focus, .kt-textarea:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(234, 146, 22, 0.18);
+      box-shadow: 0 0 0 3px rgba(217, 122, 108, 0.18);
       background: var(--card);
     }
     .kt-label {
@@ -248,7 +256,8 @@ const GlobalStyle = () => (
       gap: 10px;
       flex-wrap: wrap;
       border-top: 1px dashed var(--line);
-      padding-top: 12px;
+      padding-top: 10px;
+      margin-top: 10px;
     }
     .kt-filter-input {
       width: 240px;
@@ -422,10 +431,14 @@ const GlobalStyle = () => (
 );
 /* ---------------- Domain constants ---------------- */
 const CAMPAIGNS = [
-  { key: "Campaign A", label: "Campaign A", color: "#10B981" },
-  { key: "Campaign B", label: "Campaign B", color: "#EA9216" },
-  { key: "Campaign C", label: "Campaign C", color: "#8B5CF6" },
-  { key: "Campaign D", label: "Campaign D", color: "#EF4444" },
+  { key: "AM", label: "Aji-Mayo", color: "#D97A6C" },
+  { key: "AX", label: "Aji-Xốt", color: "#C98A26" },
+  { key: "MSG", label: "Bột ngọt", color: "#3B9686" },
+  { key: "Vinegar", label: "Giấm gạo", color: "#4A88BA" },
+  { key: "Campaign A", label: "Campaign A", color: "#3B9686" },
+  { key: "Campaign B", label: "Campaign B", color: "#D97A6C" },
+  { key: "Campaign C", label: "Campaign C", color: "#7C6BB5" },
+  { key: "Campaign D", label: "Campaign D", color: "#D45B6A" },
 ];
 
 const normalizeCampaignKey = (sheetName) => {
@@ -448,21 +461,35 @@ const resolveCampaignKey = (row) => {
 
 
 const DEFAULT_STATUS_STAGES = [
-  { key: "waiting_food",   label: "Chờ duyệt món ăn",   color: "#E28B65", soft: "#FAF0EB" },
-  { key: "waiting_script", label: "Chờ duyệt script",   color: "#B284A3", soft: "#FAF0F6" },
-  { key: "doing_demo",     label: "Đang làm demo",       color: "#5E9BE2", soft: "#EBF3FC" },
-  { key: "waiting_demo",   label: "Chờ duyệt demo",      color: "#E28B65", soft: "#FAF0EB" },
-  { key: "revised_demo",   label: "Demo đã chỉnh sửa",   color: "#B284A3", soft: "#FAF0F6" },
-  { key: "confirmed_demo", label: "Demo đã duyệt",       color: "#47B39C", soft: "#EBF8F5" },
-  { key: "aired",          label: "Đã lên sóng",         color: "#8A7BFF", soft: "#F4F2FF" },
+  { key: "waiting_food",   label: "Chờ duyệt món ăn",   color: "#D97A6C", soft: "#FACDD0" },
+  { key: "waiting_script", label: "Chờ duyệt script",   color: "#7C6BB5", soft: "#E0D7F5" },
+  { key: "doing_demo",     label: "Đang làm demo",       color: "#4A88BA", soft: "#D0E3F2" },
+  { key: "waiting_demo",   label: "Chờ duyệt demo",      color: "#C98A26", soft: "#FDF0D0" },
+  { key: "revised_demo",   label: "Demo đã chỉnh sửa",   color: "#8A7364", soft: "#E5D5CA" },
+  { key: "confirmed_demo", label: "Demo đã duyệt",       color: "#3B9686", soft: "#D0E9E6" },
+  { key: "aired",          label: "Đã lên sóng",         color: "#3B9686", soft: "#D0E9E6" },
 ];
 
-const PREDEFINED_COLORS = ["#10B981", "#EA9216", "#8B5CF6", "#EF4444", "#3B82F6", "#EC4899", "#06B6D4", "#F59E0B", "#6366F1", "#14B8A6"];
+const PREDEFINED_COLORS = [
+  "#D97A6C", // Soft Coral / Terracotta (from #FACDD0)
+  "#3B9686", // Mint Sage (from #D0E9E6)
+  "#4A88BA", // Powder Sky (from #D0E3F2)
+  "#C98A26", // Honey Gold (from #FDF0D0)
+  "#7C6BB5", // Soft Lavender (from #E0D7F5)
+  "#8A7364", // Warm Sand (from #E5D5CA)
+  "#D45B6A", // Soft Rose Blush (from #FACDD0)
+  "#2E8B9A", // Soft Seafoam
+];
+
 const BRAND_COLORS = {
-  "Campaign A": "#10B981",
-  "Campaign B": "#EA9216",
-  "Campaign C": "#8B5CF6",
-  "Campaign D": "#EF4444",
+  "AM": "#D97A6C",
+  "AX": "#C98A26",
+  "MSG": "#3B9686",
+  "VINEGAR": "#4A88BA",
+  "Campaign A": "#3B9686",
+  "Campaign B": "#D97A6C",
+  "Campaign C": "#7C6BB5",
+  "Campaign D": "#D45B6A",
 };
 
 const getCampaignColor = (key, customColors = null) => {
@@ -5655,12 +5682,12 @@ const [view, setView] = useState("table");
             {/* Logo & Brand Name */}
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <div style={{
-                width: 34, height: 34, borderRadius: 9,
-                background: "#EA9216",
+                width: 32, height: 32, borderRadius: 8,
+                background: "linear-gradient(135deg, var(--accent-soft) 0%, var(--accent) 100%)",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                boxShadow: "0 4px 12px rgba(234, 146, 22, 0.3)",
+                boxShadow: "0 3px 10px rgba(217, 122, 108, 0.25)",
               }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 2L2 7l10 5 10-5-10-5z" />
                   <path d="M2 17l10 5 10-5" />
                   <path d="M2 12l10 5 10-5" />
@@ -5674,7 +5701,7 @@ const [view, setView] = useState("table");
                 letterSpacing: "-0.03em",
                 fontFamily: "'Questrial', sans-serif"
               }}>
-                KOL <span style={{ color: "#EA9216" }}>Tracking</span>
+                KOL <span style={{ color: "var(--accent)" }}>Tracking</span>
               </h1>
             </div>
             
