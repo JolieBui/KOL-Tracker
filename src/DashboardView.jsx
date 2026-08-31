@@ -51,6 +51,12 @@ const MSG_DATA = {
       vsLY: { pct: "+100%", diff: "+1.20M", isGood: true, label: "kênh mở rộng mới so với LY" }
     }
   ],
+  charts: {
+    views: { actual: 8830000, target: 8150000, ly: 7492067, unit: "views" },
+    cpv: { actual: 42.01, target: 65.0, ly: 52.0, unit: "đ/view" },
+    budget: { actual: 720182071, target: 144722071, ly: 501715977, unit: "VNĐ" },
+    engagement: { actual: 244000, target: 263622, ly: 340531, unit: "eng" }
+  },
   summaryTable: [
     { metric: "Total Views (kèm Reup)", target: 8150000, ly: 7492067, actual: 20000000, unit: "views" },
     { metric: "Organic Views (TikTok)", target: 8150000, ly: 7492067, actual: 8830000, unit: "views" },
@@ -142,6 +148,12 @@ const VINEGAR_DATA = {
       vsLY: { pct: "+100%", diff: "+1.15M", isGood: true, label: "kênh mở rộng mới so với LY" }
     }
   ],
+  charts: {
+    views: { actual: 2076777, target: 2900000, ly: 4048198, unit: "views" },
+    cpv: { actual: 45.0, target: 85.0, ly: 75.0, unit: "đ/view" },
+    budget: { actual: 178000000, target: 178000000, ly: 324000000, unit: "VNĐ" },
+    engagement: { actual: 71021, target: 114000, ly: 170655, unit: "eng" }
+  },
   summaryTable: [
     { metric: "Total Views (kèm Reup)", target: 2900000, ly: 4048198, actual: 7400000, unit: "views" },
     { metric: "Organic Views (TikTok)", target: 2900000, ly: 4048198, actual: 2076777, unit: "views" },
@@ -179,14 +191,19 @@ const fmtNum = (val) => {
 
 export default function DashboardView({ onOpen = () => {} }) {
   const [activeProject, setActiveProject] = useState("MSG");
+  const [activeSubTab, setActiveSubTab] = useState("overview"); // "overview" | "charts" | "table"
   const [sortField, setSortField] = useState("totalViews");
   const [sortAsc, setSortAsc] = useState(false);
+  const [searchKol, setSearchKol] = useState("");
 
   const data = activeProject === "MSG" ? MSG_DATA : VINEGAR_DATA;
 
-  // Sorting
-  const sortedKols = useMemo(() => {
-    let list = [...data.kols];
+  // Sorting for KOLs
+  const displayKols = useMemo(() => {
+    let list = data.kols.filter(item => {
+      return !searchKol.trim() || item.kol.toLowerCase().includes(searchKol.toLowerCase());
+    });
+
     list.sort((a, b) => {
       let vA = a[sortField];
       let vB = b[sortField];
@@ -198,17 +215,19 @@ export default function DashboardView({ onOpen = () => {} }) {
       return sortAsc ? (vA - vB) : (vB - vA);
     });
     return list;
-  }, [data, sortField, sortAsc]);
+  }, [data, searchKol, sortField, sortAsc]);
 
   const handleSort = (field) => {
     if (sortField === field) setSortAsc(!sortAsc);
     else { setSortField(field); setSortAsc(false); }
   };
 
+  const ch = data.charts;
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", overflowY: "auto", background: "var(--surface)", padding: "16px 20px", gap: 16 }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", overflowY: "auto", background: "var(--surface)", padding: "16px 20px", gap: 14 }}>
       
-      {/* ── PROJECT SWITCHER HEADER ── */}
+      {/* ── TOP SWITCHER HEADER (DỰ ÁN & SUB-VIEWS) ── */}
       <div style={{ 
         background: "var(--card)", 
         borderRadius: 14, 
@@ -218,13 +237,15 @@ export default function DashboardView({ onOpen = () => {} }) {
         justifyContent: "space-between", 
         alignItems: "center", 
         flexWrap: "wrap", 
-        gap: 10
+        gap: 10,
+        boxShadow: "0 2px 8px rgba(0,0,0,0.02)"
       }}>
+        {/* Project Selector */}
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase" }}>DỰ ÁN:</span>
           <div style={{ display: "flex", gap: 4, background: "var(--paper)", padding: 3, borderRadius: 16, border: "1px solid var(--rule)" }}>
             <button 
-              onClick={() => setActiveProject("MSG")}
+              onClick={() => { setActiveProject("MSG"); setSearchKol(""); }}
               style={{
                 padding: "6px 16px",
                 borderRadius: 14,
@@ -239,7 +260,7 @@ export default function DashboardView({ onOpen = () => {} }) {
               🧂 [MSG] Bột Ngọt (25 KOLs)
             </button>
             <button 
-              onClick={() => setActiveProject("VINEGAR")}
+              onClick={() => { setActiveProject("VINEGAR"); setSearchKol(""); }}
               style={{
                 padding: "6px 16px",
                 borderRadius: 14,
@@ -256,299 +277,509 @@ export default function DashboardView({ onOpen = () => {} }) {
           </div>
         </div>
 
-        <span style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-soft)", background: "var(--paper)", padding: "4px 10px", borderRadius: 8, border: "1px solid var(--rule)" }}>
-          ĐỐI CHIẾU THỰC TẾ (FY26) vs KẾ HOẠCH (TARGET) vs CÙNG KỲ (LY FY25)
-        </span>
+        {/* Sub-view Navigation */}
+        <div style={{ display: "flex", gap: 4, background: "var(--paper)", padding: 3, borderRadius: 10, border: "1px solid var(--rule)" }}>
+          <button 
+            className={`kt-btn ${activeSubTab === "overview" ? "kt-btn-primary" : "kt-btn-ghost"}`}
+            style={{ padding: "5px 12px", fontSize: 11, borderRadius: 8 }}
+            onClick={() => setActiveSubTab("overview")}
+          >
+            📊 Thẻ Chỉ Số & Bảng So Sánh
+          </button>
+          <button 
+            className={`kt-btn ${activeSubTab === "charts" ? "kt-btn-primary" : "kt-btn-ghost"}`}
+            style={{ padding: "5px 12px", fontSize: 11, borderRadius: 8 }}
+            onClick={() => setActiveSubTab("charts")}
+          >
+            📈 Biểu Đồ Cột So Sánh
+          </button>
+          <button 
+            className={`kt-btn ${activeSubTab === "table" ? "kt-btn-primary" : "kt-btn-ghost"}`}
+            style={{ padding: "5px 12px", fontSize: 11, borderRadius: 8 }}
+            onClick={() => setActiveSubTab("table")}
+          >
+            📋 Bảng Số Liệu KOLs ({data.kols.length})
+          </button>
+        </div>
       </div>
 
-      {/* ── SHOPEE-STYLE KPI CARDS WITH INLINE DELTA TAGS (+ / -) ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12 }}>
-        {data.cards.map((card, idx) => (
-          <div 
-            key={idx}
-            style={{
-              background: "var(--card)",
-              borderRadius: 14,
-              border: "1px solid var(--rule)",
-              padding: "16px 18px",
-              display: "flex",
-              flexDirection: "column",
-              gap: 8,
-              boxShadow: "0 2px 8px rgba(46, 56, 64, 0.02)"
-            }}
-          >
-            {/* Title */}
-            <div style={{ fontSize: 11, fontWeight: 800, color: "var(--ink-soft)", letterSpacing: "0.04em" }}>
-              {card.title}
-            </div>
+      {/* =========================================================================
+          VIEW 1: SHOPEE-STYLE METRIC CARDS & SUMMARY COMPARE TABLE
+         ========================================================================= */}
+      {activeSubTab === "overview" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          
+          {/* 6 Shopee-Style KPI Cards */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12 }}>
+            {data.cards.map((card, idx) => (
+              <div 
+                key={idx}
+                style={{
+                  background: "var(--card)",
+                  borderRadius: 14,
+                  border: "1px solid var(--rule)",
+                  padding: "16px 18px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 8,
+                  boxShadow: "0 2px 8px rgba(46, 56, 64, 0.02)"
+                }}
+              >
+                <div style={{ fontSize: 11, fontWeight: 800, color: "var(--ink-soft)", letterSpacing: "0.04em" }}>
+                  {card.title}
+                </div>
 
-            {/* Big Main Number */}
-            <div style={{ fontSize: 26, fontWeight: 800, color: "var(--ink)", fontFamily: "'IBM Plex Mono', monospace" }}>
-              {card.value}
-            </div>
+                <div style={{ fontSize: 26, fontWeight: 800, color: "var(--ink)", fontFamily: "'IBM Plex Mono', monospace" }}>
+                  {card.value}
+                </div>
 
-            {/* Shopee-style Comparison Delta Rows */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 4, marginTop: 2 }}>
-              
-              {/* vs Target */}
-              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11 }}>
-                <span 
-                  className="kt-badge" 
-                  style={{ 
-                    background: card.vsTarget.isGood ? "var(--ok-bg)" : card.vsTarget.isGood === false ? "var(--danger-bg)" : "var(--paper)", 
-                    color: card.vsTarget.isGood ? "var(--ok)" : card.vsTarget.isGood === false ? "var(--danger)" : "var(--ink)", 
-                    fontWeight: 800,
-                    fontSize: 10,
-                    padding: "2px 6px"
-                  }}
-                >
-                  {card.vsTarget.pct.startsWith("+") || card.vsTarget.pct.startsWith("-") ? (card.vsTarget.pct.startsWith("+") ? "▲ " : "▼ ") : ""}{card.vsTarget.pct} ({card.vsTarget.diff})
-                </span>
-                <span style={{ color: "var(--ink-mid)" }}>{card.vsTarget.label}</span>
+                <div style={{ display: "flex", flexDirection: "column", gap: 4, marginTop: 2 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11 }}>
+                    <span 
+                      className="kt-badge" 
+                      style={{ 
+                        background: card.vsTarget.isGood ? "var(--ok-bg)" : card.vsTarget.isGood === false ? "var(--danger-bg)" : "var(--paper)", 
+                        color: card.vsTarget.isGood ? "var(--ok)" : card.vsTarget.isGood === false ? "var(--danger)" : "var(--ink)", 
+                        fontWeight: 800,
+                        fontSize: 10,
+                        padding: "2px 6px"
+                      }}
+                    >
+                      {card.vsTarget.pct.startsWith("+") || card.vsTarget.pct.startsWith("-") ? (card.vsTarget.pct.startsWith("+") ? "▲ " : "▼ ") : ""}{card.vsTarget.pct} ({card.vsTarget.diff})
+                    </span>
+                    <span style={{ color: "var(--ink-mid)" }}>{card.vsTarget.label}</span>
+                  </div>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11 }}>
+                    <span 
+                      className="kt-badge" 
+                      style={{ 
+                        background: card.vsLY.isGood ? "var(--ok-bg)" : card.vsLY.isGood === false ? "var(--danger-bg)" : "var(--paper)", 
+                        color: card.vsLY.isGood ? "var(--ok)" : card.vsLY.isGood === false ? "var(--danger)" : "var(--ink)", 
+                        fontWeight: 800,
+                        fontSize: 10,
+                        padding: "2px 6px"
+                      }}
+                    >
+                      {card.vsLY.pct.startsWith("+") || card.vsLY.pct.startsWith("-") ? (card.vsLY.pct.startsWith("+") ? "▲ " : "▼ ") : ""}{card.vsLY.pct} ({card.vsLY.diff})
+                    </span>
+                    <span style={{ color: "var(--ink-mid)" }}>{card.vsLY.label}</span>
+                  </div>
+                </div>
+
+                <div style={{ fontSize: 10, color: "var(--ink-soft)", borderTop: "1px dashed var(--rule)", paddingTop: 6, marginTop: 4 }}>
+                  {card.subLabel}
+                </div>
               </div>
+            ))}
+          </div>
 
-              {/* vs LY */}
-              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11 }}>
-                <span 
-                  className="kt-badge" 
-                  style={{ 
-                    background: card.vsLY.isGood ? "var(--ok-bg)" : card.vsLY.isGood === false ? "var(--danger-bg)" : "var(--paper)", 
-                    color: card.vsLY.isGood ? "var(--ok)" : card.vsLY.isGood === false ? "var(--danger)" : "var(--ink)", 
-                    fontWeight: 800,
-                    fontSize: 10,
-                    padding: "2px 6px"
-                  }}
-                >
-                  {card.vsLY.pct.startsWith("+") || card.vsLY.pct.startsWith("-") ? (card.vsLY.pct.startsWith("+") ? "▲ " : "▼ ") : ""}{card.vsLY.pct} ({card.vsLY.diff})
-                </span>
-                <span style={{ color: "var(--ink-mid)" }}>{card.vsLY.label}</span>
-              </div>
-
+          {/* Summary Comparison Table */}
+          <div style={{ background: "var(--card)", borderRadius: 14, border: "1px solid var(--rule)", overflow: "hidden" }}>
+            <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--rule)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span className="kt-caps" style={{ color: "var(--ink-soft)" }}>BẢNG ĐỐI CHIẾU SỐ LIỆU TỔNG THỂ ({data.name})</span>
             </div>
 
-            {/* Sub note / secondary data */}
-            <div style={{ fontSize: 10, color: "var(--ink-soft)", borderTop: "1px dashed var(--rule)", paddingTop: 6, marginTop: 4 }}>
-              {card.subLabel}
+            <div style={{ overflowX: "auto" }}>
+              <table className="kt-table" style={{ width: "100%", fontSize: 12 }}>
+                <thead>
+                  <tr>
+                    <th>Chỉ Số (Metric)</th>
+                    <th style={{ textAlign: "right" }}>Target (Kế hoạch)</th>
+                    <th style={{ textAlign: "right" }}>LY (Cùng kỳ)</th>
+                    <th style={{ textAlign: "right" }}>Actual (Thực tế)</th>
+                    <th style={{ textAlign: "center" }}>Biến động vs Target (+/-)</th>
+                    <th style={{ textAlign: "center" }}>Biến động vs Cùng kỳ LY (+/-)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.summaryTable.map((row, idx) => {
+                    const pctTarget = row.target ? ((row.actual / row.target) * 100).toFixed(1) : null;
+                    const diffTarget = row.target ? (row.actual - row.target) : null;
+                    const pctLY = row.ly ? (((row.actual - row.ly) / row.ly) * 100).toFixed(1) : null;
+                    const diffLY = row.ly ? (row.actual - row.ly) : null;
+
+                    const isTargetGood = row.isInverse ? (diffTarget !== null && diffTarget <= 0) : (diffTarget !== null && diffTarget >= 0);
+                    const isLYGood = row.isInverse ? (diffLY !== null && diffLY <= 0) : (diffLY !== null && diffLY >= 0);
+
+                    return (
+                      <tr key={idx}>
+                        <td style={{ fontWeight: 700 }}>{row.metric}</td>
+                        <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>{fmtNum(row.target)}</td>
+                        <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>{fmtNum(row.ly)}</td>
+                        <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "var(--ink)" }}>{fmtNum(row.actual)}</td>
+                        
+                        <td style={{ textAlign: "center" }}>
+                          {diffTarget !== null ? (
+                            <span 
+                              className="kt-badge" 
+                              style={{ 
+                                background: isTargetGood ? "var(--ok-bg)" : "var(--danger-bg)", 
+                                color: isTargetGood ? "var(--ok)" : "var(--danger)",
+                                fontWeight: 800,
+                                fontSize: 11
+                              }}
+                            >
+                              {diffTarget >= 0 ? `▲ +${pctTarget}% (+${fmtNum(diffTarget)})` : `▼ ${pctTarget}% (${fmtNum(diffTarget)})`}
+                            </span>
+                          ) : "—"}
+                        </td>
+
+                        <td style={{ textAlign: "center" }}>
+                          {diffLY !== null ? (
+                            <span 
+                              className="kt-badge" 
+                              style={{ 
+                                background: isLYGood ? "var(--ok-bg)" : "var(--danger-bg)", 
+                                color: isLYGood ? "var(--ok)" : "var(--danger)",
+                                fontWeight: 800,
+                                fontSize: 11
+                              }}
+                            >
+                              {diffLY >= 0 ? `▲ +${pctLY}% (+${fmtNum(diffLY)})` : `▼ ${pctLY}% (${fmtNum(diffLY)})`}
+                            </span>
+                          ) : "—"}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* ── SUMMARY COMPARISON TABLE WITH INLINE DELTA COLUMNS ── */}
-      <div style={{ background: "var(--card)", borderRadius: 14, border: "1px solid var(--rule)", overflow: "hidden" }}>
-        <div style={{ padding: "10px 16px", borderBottom: "1px solid var(--rule)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span className="kt-caps" style={{ color: "var(--ink-soft)" }}>BẢNG ĐỐI CHIẾU SỐ LIỆU TỔNG THỂ VÀ BIẾN ĐỘNG TĂNG/GIẢM (+ / -)</span>
         </div>
+      )}
 
-        <div style={{ overflowX: "auto" }}>
-          <table className="kt-table" style={{ width: "100%", fontSize: 12 }}>
-            <thead>
-              <tr>
-                <th>Chỉ Số (Metric)</th>
-                <th style={{ textAlign: "right" }}>Target (Kế hoạch)</th>
-                <th style={{ textAlign: "right" }}>LY (Cùng kỳ)</th>
-                <th style={{ textAlign: "right" }}>Actual (Thực tế)</th>
-                <th style={{ textAlign: "center" }}>Biến động vs Target (+/-)</th>
-                <th style={{ textAlign: "center" }}>Biến động vs Cùng kỳ LY (+/-)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.summaryTable.map((row, idx) => {
-                const pctTarget = row.target ? ((row.actual / row.target) * 100).toFixed(1) : null;
-                const diffTarget = row.target ? (row.actual - row.target) : null;
-                const pctLY = row.ly ? (((row.actual - row.ly) / row.ly) * 100).toFixed(1) : null;
-                const diffLY = row.ly ? (row.actual - row.ly) : null;
+      {/* =========================================================================
+          VIEW 2: VISUAL HORIZONTAL COMPARISON BAR CHARTS
+         ========================================================================= */}
+      {activeSubTab === "charts" && (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 14 }}>
+          
+          {/* CHART 1: VIEWS */}
+          <div style={{ background: "var(--card)", borderRadius: 14, border: "1px solid var(--rule)", padding: "16px 18px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 800, color: "var(--ink-soft)", marginBottom: 12 }}>
+              <span>LƯỢT XEM ORGANIC (VIEWS)</span>
+              <span style={{ color: "var(--ok)" }}>
+                {ch.views.target ? `${((ch.views.actual / ch.views.target) * 100).toFixed(1)}% KPI` : "—"}
+              </span>
+            </div>
 
-                const isTargetGood = row.isInverse ? (diffTarget !== null && diffTarget <= 0) : (diffTarget !== null && diffTarget >= 0);
-                const isLYGood = row.isInverse ? (diffLY !== null && diffLY <= 0) : (diffLY !== null && diffLY >= 0);
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 700, marginBottom: 2 }}>
+                  <span style={{ color: "var(--ok)" }}>Actual (FY26)</span>
+                  <span style={{ fontFamily: "'IBM Plex Mono', monospace", color: "var(--ok)" }}>{fmtNum(ch.views.actual)}</span>
+                </div>
+                <div style={{ height: 16, background: "var(--surface)", borderRadius: 8, overflow: "hidden" }}>
+                  <div style={{ width: `${Math.min(100, (ch.views.actual / Math.max(ch.views.actual, ch.views.target, ch.views.ly)) * 100)}%`, height: "100%", background: "var(--ok)", borderRadius: 8 }} />
+                </div>
+              </div>
 
-                return (
-                  <tr key={idx}>
-                    <td style={{ fontWeight: 700 }}>{row.metric}</td>
-                    <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>{fmtNum(row.target)}</td>
-                    <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>{fmtNum(row.ly)}</td>
-                    <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "var(--ink)" }}>{fmtNum(row.actual)}</td>
-                    
-                    {/* Inline Delta vs Target */}
-                    <td style={{ textAlign: "center" }}>
-                      {diffTarget !== null ? (
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 700, marginBottom: 2 }}>
+                  <span style={{ color: "var(--accent)" }}>Target (KPI)</span>
+                  <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{fmtNum(ch.views.target)}</span>
+                </div>
+                <div style={{ height: 16, background: "var(--surface)", borderRadius: 8, overflow: "hidden" }}>
+                  <div style={{ width: `${Math.min(100, (ch.views.target / Math.max(ch.views.actual, ch.views.target, ch.views.ly)) * 100)}%`, height: "100%", background: "var(--accent)", borderRadius: 8 }} />
+                </div>
+              </div>
+
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 700, marginBottom: 2 }}>
+                  <span style={{ color: "var(--ink-soft)" }}>LY (FY25)</span>
+                  <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{fmtNum(ch.views.ly)}</span>
+                </div>
+                <div style={{ height: 16, background: "var(--surface)", borderRadius: 8, overflow: "hidden" }}>
+                  <div style={{ width: `${Math.min(100, (ch.views.ly / Math.max(ch.views.actual, ch.views.target, ch.views.ly)) * 100)}%`, height: "100%", background: "#CBD5E1", borderRadius: 8 }} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* CHART 2: CPV 6S */}
+          <div style={{ background: "var(--card)", borderRadius: 14, border: "1px solid var(--rule)", padding: "16px 18px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 800, color: "var(--ink-soft)", marginBottom: 12 }}>
+              <span>CHI PHÍ / VIEW 6S (CPV Đ/VIEW)</span>
+              <span style={{ color: "var(--ok)" }}>
+                {(((ch.cpv.actual - ch.cpv.target) / ch.cpv.target) * 100).toFixed(1)}% (Tiết kiệm)
+              </span>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 700, marginBottom: 2 }}>
+                  <span style={{ color: "var(--ok)" }}>Actual (FY26)</span>
+                  <span style={{ fontFamily: "'IBM Plex Mono', monospace", color: "var(--ok)" }}>{ch.cpv.actual}đ</span>
+                </div>
+                <div style={{ height: 16, background: "var(--surface)", borderRadius: 8, overflow: "hidden" }}>
+                  <div style={{ width: `${(ch.cpv.actual / Math.max(ch.cpv.actual, ch.cpv.target, ch.cpv.ly)) * 100}%`, height: "100%", background: "var(--ok)", borderRadius: 8 }} />
+                </div>
+              </div>
+
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 700, marginBottom: 2 }}>
+                  <span style={{ color: "var(--ink-soft)" }}>LY (FY25)</span>
+                  <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{ch.cpv.ly}đ</span>
+                </div>
+                <div style={{ height: 16, background: "var(--surface)", borderRadius: 8, overflow: "hidden" }}>
+                  <div style={{ width: `${(ch.cpv.ly / Math.max(ch.cpv.actual, ch.cpv.target, ch.cpv.ly)) * 100}%`, height: "100%", background: "#CBD5E1", borderRadius: 8 }} />
+                </div>
+              </div>
+
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 700, marginBottom: 2 }}>
+                  <span style={{ color: "var(--accent)" }}>Target (Max)</span>
+                  <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{ch.cpv.target}đ</span>
+                </div>
+                <div style={{ height: 16, background: "var(--surface)", borderRadius: 8, overflow: "hidden" }}>
+                  <div style={{ width: `${(ch.cpv.target / Math.max(ch.cpv.actual, ch.cpv.target, ch.cpv.ly)) * 100}%`, height: "100%", background: "var(--accent)", borderRadius: 8 }} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* CHART 3: BUDGET */}
+          <div style={{ background: "var(--card)", borderRadius: 14, border: "1px solid var(--rule)", padding: "16px 18px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 800, color: "var(--ink-soft)", marginBottom: 12 }}>
+              <span>NGÂN SÁCH (BUDGET VNĐ)</span>
+              <span style={{ color: "var(--blue)" }}>
+                {ch.budget.ly ? `${(((ch.budget.actual - ch.budget.ly) / ch.budget.ly) * 100).toFixed(1)}% YoY` : "—"}
+              </span>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 700, marginBottom: 2 }}>
+                  <span style={{ color: "var(--blue)" }}>Actual (FY26)</span>
+                  <span style={{ fontFamily: "'IBM Plex Mono', monospace", color: "var(--blue)" }}>{(ch.budget.actual / 1000000).toFixed(1)}M</span>
+                </div>
+                <div style={{ height: 16, background: "var(--surface)", borderRadius: 8, overflow: "hidden" }}>
+                  <div style={{ width: `${Math.min(100, (ch.budget.actual / Math.max(ch.budget.actual, ch.budget.target, ch.budget.ly)) * 100)}%`, height: "100%", background: "var(--blue)", borderRadius: 8 }} />
+                </div>
+              </div>
+
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 700, marginBottom: 2 }}>
+                  <span style={{ color: "var(--ink-soft)" }}>LY (FY25)</span>
+                  <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{(ch.budget.ly / 1000000).toFixed(1)}M</span>
+                </div>
+                <div style={{ height: 16, background: "var(--surface)", borderRadius: 8, overflow: "hidden" }}>
+                  <div style={{ width: `${Math.min(100, (ch.budget.ly / Math.max(ch.budget.actual, ch.budget.target, ch.budget.ly)) * 100)}%`, height: "100%", background: "#CBD5E1", borderRadius: 8 }} />
+                </div>
+              </div>
+
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 700, marginBottom: 2 }}>
+                  <span style={{ color: "var(--accent)" }}>Target Ban Đầu</span>
+                  <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{(ch.budget.target / 1000000).toFixed(1)}M</span>
+                </div>
+                <div style={{ height: 16, background: "var(--surface)", borderRadius: 8, overflow: "hidden" }}>
+                  <div style={{ width: `${Math.min(100, (ch.budget.target / Math.max(ch.budget.actual, ch.budget.target, ch.budget.ly)) * 100)}%`, height: "100%", background: "var(--accent)", borderRadius: 8 }} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* CHART 4: ENGAGEMENT */}
+          <div style={{ background: "var(--card)", borderRadius: 14, border: "1px solid var(--rule)", padding: "16px 18px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 800, color: "var(--ink-soft)", marginBottom: 12 }}>
+              <span>TƯƠNG TÁC (ORGANIC ENG)</span>
+              <span style={{ color: "var(--ink)" }}>
+                {ch.engagement.ly ? `${(((ch.engagement.actual - ch.engagement.ly) / ch.engagement.ly) * 100).toFixed(1)}% YoY` : "—"}
+              </span>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 700, marginBottom: 2 }}>
+                  <span style={{ color: "var(--ink)" }}>Actual (FY26)</span>
+                  <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800 }}>{(ch.engagement.actual / 1000).toFixed(1)}K</span>
+                </div>
+                <div style={{ height: 16, background: "var(--surface)", borderRadius: 8, overflow: "hidden" }}>
+                  <div style={{ width: `${Math.min(100, (ch.engagement.actual / Math.max(ch.engagement.actual, ch.engagement.target, ch.engagement.ly)) * 100)}%`, height: "100%", background: "var(--ink)", borderRadius: 8 }} />
+                </div>
+              </div>
+
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 700, marginBottom: 2 }}>
+                  <span style={{ color: "var(--ink-soft)" }}>LY (FY25)</span>
+                  <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{(ch.engagement.ly / 1000).toFixed(1)}K</span>
+                </div>
+                <div style={{ height: 16, background: "var(--surface)", borderRadius: 8, overflow: "hidden" }}>
+                  <div style={{ width: `${Math.min(100, (ch.engagement.ly / Math.max(ch.engagement.actual, ch.engagement.target, ch.engagement.ly)) * 100)}%`, height: "100%", background: "#CBD5E1", borderRadius: 8 }} />
+                </div>
+              </div>
+
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 700, marginBottom: 2 }}>
+                  <span style={{ color: "var(--accent)" }}>Target</span>
+                  <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{(ch.engagement.target / 1000).toFixed(1)}K</span>
+                </div>
+                <div style={{ height: 16, background: "var(--surface)", borderRadius: 8, overflow: "hidden" }}>
+                  <div style={{ width: `${Math.min(100, (ch.engagement.target / Math.max(ch.engagement.actual, ch.engagement.target, ch.engagement.ly)) * 100)}%`, height: "100%", background: "var(--accent)", borderRadius: 8 }} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {/* =========================================================================
+          VIEW 3: FULL KOLS NUMERICAL MATRIX WITH INLINE KPI TAGS
+         ========================================================================= */}
+      {activeSubTab === "table" && (
+        <div style={{ background: "var(--card)", borderRadius: 14, border: "1px solid var(--rule)", overflow: "hidden" }}>
+          
+          <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--rule)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
+            <input 
+              className="kt-input" 
+              placeholder={`🔍 Tìm kiếm KOL trong ${data.name.split(" ")[0]}...`}
+              value={searchKol}
+              onChange={e => setSearchKol(e.target.value)}
+              style={{ width: 240, padding: "5px 10px", fontSize: 12 }}
+            />
+            <span style={{ fontSize: 11, color: "var(--ink-soft)" }}>
+              Hiển thị <strong>{displayKols.length}</strong> / {data.kols.length} KOLs (Bấm tiêu đề để Sort)
+            </span>
+          </div>
+
+          <div style={{ overflowX: "auto" }}>
+            <table className="kt-table" style={{ width: "100%", fontSize: 12 }}>
+              <thead>
+                <tr>
+                  <th onClick={() => handleSort("kol")} style={{ cursor: "pointer" }}>
+                    Tên KOL {sortField === "kol" && (sortAsc ? "▲" : "▼")}
+                  </th>
+                  <th>Tier</th>
+                  <th>Followers</th>
+                  <th onClick={() => handleSort("cost")} style={{ textAlign: "right", cursor: "pointer" }}>
+                    Cost (VNĐ) {sortField === "cost" && (sortAsc ? "▲" : "▼")}
+                  </th>
+                  <th onClick={() => handleSort("targetViews")} style={{ textAlign: "right", cursor: "pointer" }}>
+                    Target Views {sortField === "targetViews" && (sortAsc ? "▲" : "▼")}
+                  </th>
+                  <th onClick={() => handleSort("organicViews")} style={{ textAlign: "right", cursor: "pointer" }}>
+                    Organic Views {sortField === "organicViews" && (sortAsc ? "▲" : "▼")}
+                  </th>
+                  <th onClick={() => handleSort("reupViews")} style={{ textAlign: "right", cursor: "pointer" }}>
+                    FB Reup {sortField === "reupViews" && (sortAsc ? "▲" : "▼")}
+                  </th>
+                  <th onClick={() => handleSort("totalViews")} style={{ textAlign: "right", cursor: "pointer" }}>
+                    Total Views {sortField === "totalViews" && (sortAsc ? "▲" : "▼")}
+                  </th>
+                  <th onClick={() => handleSort("pctKPI")} style={{ textAlign: "center", cursor: "pointer" }}>
+                    % Đạt vs Target {sortField === "pctKPI" && (sortAsc ? "▲" : "▼")}
+                  </th>
+                  <th onClick={() => handleSort("actualEng")} style={{ textAlign: "right", cursor: "pointer" }}>
+                    Engagement {sortField === "actualEng" && (sortAsc ? "▲" : "▼")}
+                  </th>
+                  <th onClick={() => handleSort("avgTime")} style={{ textAlign: "center", cursor: "pointer" }}>
+                    Avg Time (s) {sortField === "avgTime" && (sortAsc ? "▲" : "▼")}
+                  </th>
+                  <th onClick={() => handleSort("cpv")} style={{ textAlign: "right", cursor: "pointer" }}>
+                    CPV 6s (đ) {sortField === "cpv" && (sortAsc ? "▲" : "▼")}
+                  </th>
+                  <th onClick={() => handleSort("mediaSpend")} style={{ textAlign: "right", cursor: "pointer" }}>
+                    Media Spend {sortField === "mediaSpend" && (sortAsc ? "▲" : "▼")}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {displayKols.map((k, idx) => {
+                  const diffView = k.totalViews - k.targetViews;
+                  const pct = ((k.totalViews / k.targetViews) * 100).toFixed(1);
+                  return (
+                    <tr key={idx} style={{ cursor: "pointer" }} onClick={() => onOpen(k)}>
+                      <td style={{ fontWeight: 700, color: "var(--ink)", whiteSpace: "nowrap" }}>{k.kol}</td>
+                      <td><span className="kt-badge" style={{ background: "var(--paper)", color: "var(--ink-mid)" }}>{k.type}</span></td>
+                      <td style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{k.followers}</td>
+                      <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>{k.cost.toLocaleString()}đ</td>
+                      <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>{k.targetViews.toLocaleString()}</td>
+                      <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>{k.organicViews.toLocaleString()}</td>
+                      <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "var(--blue)" }}>+{k.reupViews.toLocaleString()}</td>
+                      <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 700, color: "var(--ink)" }}>
+                        {k.totalViews.toLocaleString()}
+                      </td>
+                      <td style={{ textAlign: "center" }}>
                         <span 
                           className="kt-badge" 
                           style={{ 
-                            background: isTargetGood ? "var(--ok-bg)" : "var(--danger-bg)", 
-                            color: isTargetGood ? "var(--ok)" : "var(--danger)",
+                            background: diffView >= 0 ? "var(--ok-bg)" : "var(--danger-bg)", 
+                            color: diffView >= 0 ? "var(--ok)" : "var(--danger)", 
                             fontWeight: 800,
                             fontSize: 11
                           }}
                         >
-                          {diffTarget >= 0 ? `▲ +${pctTarget}% (+${fmtNum(diffTarget)})` : `▼ ${pctTarget}% (${fmtNum(diffTarget)})`}
+                          {diffView >= 0 ? `▲ +${pct}% (+${fmtNum(diffView)})` : `▼ ${pct}% (${fmtNum(diffView)})`}
                         </span>
-                      ) : "—"}
-                    </td>
-
-                    {/* Inline Delta vs LY */}
-                    <td style={{ textAlign: "center" }}>
-                      {diffLY !== null ? (
-                        <span 
-                          className="kt-badge" 
-                          style={{ 
-                            background: isLYGood ? "var(--ok-bg)" : "var(--danger-bg)", 
-                            color: isLYGood ? "var(--ok)" : "var(--danger)",
-                            fontWeight: 800,
-                            fontSize: 11
-                          }}
-                        >
-                          {diffLY >= 0 ? `▲ +${pctLY}% (+${fmtNum(diffLY)})` : `▼ ${pctLY}% (${fmtNum(diffLY)})`}
+                      </td>
+                      <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>{k.actualEng.toLocaleString()}</td>
+                      <td style={{ textAlign: "center", fontWeight: 700 }}>
+                        {typeof k.avgTime === "number" && k.avgTime > 60 ? `${Math.floor(k.avgTime / 60)}m${k.avgTime % 60}s` : `${k.avgTime}s`}
+                      </td>
+                      <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: k.cpv <= 45 ? "var(--ok)" : "var(--ink)" }}>{k.cpv}đ</td>
+                      <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
+                        {k.mediaSpend > 0 ? `${k.mediaSpend.toLocaleString()}đ` : "0đ"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot>
+                <tr style={{ background: "var(--paper)", borderTop: "2px solid var(--rule)", fontWeight: 800 }}>
+                  <td>TỔNG CỘNG ({displayKols.length} KOLs)</td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
+                    {displayKols.reduce((a, b) => a + b.cost, 0).toLocaleString()}đ
+                  </td>
+                  <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
+                    {displayKols.reduce((a, b) => a + b.targetViews, 0).toLocaleString()}
+                  </td>
+                  <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
+                    {displayKols.reduce((a, b) => a + b.organicViews, 0).toLocaleString()}
+                  </td>
+                  <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "var(--blue)" }}>
+                    +{displayKols.reduce((a, b) => a + b.reupViews, 0).toLocaleString()}
+                  </td>
+                  <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "var(--ink)", fontSize: 13 }}>
+                    {displayKols.reduce((a, b) => a + b.totalViews, 0).toLocaleString()}
+                  </td>
+                  <td style={{ textAlign: "center" }}>
+                    {(() => {
+                      const totalT = displayKols.reduce((a, b) => a + b.targetViews, 0);
+                      const totalA = displayKols.reduce((a, b) => a + b.totalViews, 0);
+                      const diff = totalA - totalT;
+                      const pct = totalT > 0 ? ((totalA / totalT) * 100).toFixed(1) : 0;
+                      return (
+                        <span className="kt-badge" style={{ background: diff >= 0 ? "var(--ok)" : "var(--danger)", color: "#fff", fontWeight: 800 }}>
+                          {diff >= 0 ? `▲ +${pct}% (+${fmtNum(diff)})` : `▼ ${pct}% (${fmtNum(diff)})`}
                         </span>
-                      ) : "—"}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                      );
+                    })()}
+                  </td>
+                  <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
+                    {displayKols.reduce((a, b) => a + b.actualEng, 0).toLocaleString()}
+                  </td>
+                  <td style={{ textAlign: "center" }}>
+                    TB {(displayKols.reduce((a, b) => a + (typeof b.avgTime === 'number' ? b.avgTime : 7), 0) / (displayKols.length || 1)).toFixed(1)}s
+                  </td>
+                  <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "var(--ok)" }}>
+                    TB {(displayKols.reduce((a, b) => a + b.cpv, 0) / (displayKols.length || 1)).toFixed(1)}đ
+                  </td>
+                  <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
+                    {displayKols.reduce((a, b) => a + b.mediaSpend, 0).toLocaleString()}đ
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
-      </div>
-
-      {/* ── FULL KOLS NUMERICAL MATRIX WITH INLINE KPI TAGS ── */}
-      <div style={{ background: "var(--card)", borderRadius: 14, border: "1px solid var(--rule)", overflow: "hidden" }}>
-        <div style={{ padding: "10px 16px", borderBottom: "1px solid var(--rule)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span className="kt-caps" style={{ color: "var(--ink-soft)" }}>BẢNG SỐ LIỆU TỪNG KOL ({sortedKols.length} KOLs)</span>
-          <span style={{ fontSize: 11, color: "var(--ink-soft)" }}>Bấm tiêu đề cột để sắp xếp</span>
-        </div>
-
-        <div style={{ overflowX: "auto" }}>
-          <table className="kt-table" style={{ width: "100%", fontSize: 12 }}>
-            <thead>
-              <tr>
-                <th onClick={() => handleSort("kol")} style={{ cursor: "pointer" }}>
-                  Tên KOL {sortField === "kol" && (sortAsc ? "▲" : "▼")}
-                </th>
-                <th>Tier</th>
-                <th>Followers</th>
-                <th onClick={() => handleSort("cost")} style={{ textAlign: "right", cursor: "pointer" }}>
-                  Cost (VNĐ) {sortField === "cost" && (sortAsc ? "▲" : "▼")}
-                </th>
-                <th onClick={() => handleSort("targetViews")} style={{ textAlign: "right", cursor: "pointer" }}>
-                  Target Views {sortField === "targetViews" && (sortAsc ? "▲" : "▼")}
-                </th>
-                <th onClick={() => handleSort("organicViews")} style={{ textAlign: "right", cursor: "pointer" }}>
-                  Organic Views {sortField === "organicViews" && (sortAsc ? "▲" : "▼")}
-                </th>
-                <th onClick={() => handleSort("reupViews")} style={{ textAlign: "right", cursor: "pointer" }}>
-                  FB Reup {sortField === "reupViews" && (sortAsc ? "▲" : "▼")}
-                </th>
-                <th onClick={() => handleSort("totalViews")} style={{ textAlign: "right", cursor: "pointer" }}>
-                  Total Views {sortField === "totalViews" && (sortAsc ? "▲" : "▼")}
-                </th>
-                <th onClick={() => handleSort("pctKPI")} style={{ textAlign: "center", cursor: "pointer" }}>
-                  % Đạt vs Target {sortField === "pctKPI" && (sortAsc ? "▲" : "▼")}
-                </th>
-                <th onClick={() => handleSort("actualEng")} style={{ textAlign: "right", cursor: "pointer" }}>
-                  Engagement {sortField === "actualEng" && (sortAsc ? "▲" : "▼")}
-                </th>
-                <th onClick={() => handleSort("avgTime")} style={{ textAlign: "center", cursor: "pointer" }}>
-                  Avg Time (s) {sortField === "avgTime" && (sortAsc ? "▲" : "▼")}
-                </th>
-                <th onClick={() => handleSort("cpv")} style={{ textAlign: "right", cursor: "pointer" }}>
-                  CPV 6s (đ) {sortField === "cpv" && (sortAsc ? "▲" : "▼")}
-                </th>
-                <th onClick={() => handleSort("mediaSpend")} style={{ textAlign: "right", cursor: "pointer" }}>
-                  Media Spend {sortField === "mediaSpend" && (sortAsc ? "▲" : "▼")}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedKols.map((k, idx) => {
-                const diffView = k.totalViews - k.targetViews;
-                const pct = ((k.totalViews / k.targetViews) * 100).toFixed(1);
-                return (
-                  <tr key={idx} style={{ cursor: "pointer" }} onClick={() => onOpen(k)}>
-                    <td style={{ fontWeight: 700, color: "var(--ink)", whiteSpace: "nowrap" }}>{k.kol}</td>
-                    <td><span className="kt-badge" style={{ background: "var(--paper)", color: "var(--ink-mid)" }}>{k.type}</span></td>
-                    <td style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{k.followers}</td>
-                    <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>{k.cost.toLocaleString()}đ</td>
-                    <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>{k.targetViews.toLocaleString()}</td>
-                    <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>{k.organicViews.toLocaleString()}</td>
-                    <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "var(--blue)" }}>+{k.reupViews.toLocaleString()}</td>
-                    <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 700, color: "var(--ink)" }}>
-                      {k.totalViews.toLocaleString()}
-                    </td>
-                    <td style={{ textAlign: "center" }}>
-                      <span 
-                        className="kt-badge" 
-                        style={{ 
-                          background: diffView >= 0 ? "var(--ok-bg)" : "var(--danger-bg)", 
-                          color: diffView >= 0 ? "var(--ok)" : "var(--danger)", 
-                          fontWeight: 800,
-                          fontSize: 11
-                        }}
-                      >
-                        {diffView >= 0 ? `▲ +${pct}% (+${fmtNum(diffView)})` : `▼ ${pct}% (${fmtNum(diffView)})`}
-                      </span>
-                    </td>
-                    <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>{k.actualEng.toLocaleString()}</td>
-                    <td style={{ textAlign: "center", fontWeight: 700 }}>
-                      {typeof k.avgTime === "number" && k.avgTime > 60 ? `${Math.floor(k.avgTime / 60)}m${k.avgTime % 60}s` : `${k.avgTime}s`}
-                    </td>
-                    <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: k.cpv <= 45 ? "var(--ok)" : "var(--ink)" }}>{k.cpv}đ</td>
-                    <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
-                      {k.mediaSpend > 0 ? `${k.mediaSpend.toLocaleString()}đ` : "0đ"}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-            <tfoot>
-              <tr style={{ background: "var(--paper)", borderTop: "2px solid var(--rule)", fontWeight: 800 }}>
-                <td>TỔNG CỘNG ({sortedKols.length} KOLs)</td>
-                <td>—</td>
-                <td>—</td>
-                <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
-                  {sortedKols.reduce((a, b) => a + b.cost, 0).toLocaleString()}đ
-                </td>
-                <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
-                  {sortedKols.reduce((a, b) => a + b.targetViews, 0).toLocaleString()}
-                </td>
-                <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
-                  {sortedKols.reduce((a, b) => a + b.organicViews, 0).toLocaleString()}
-                </td>
-                <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "var(--blue)" }}>
-                  +{sortedKols.reduce((a, b) => a + b.reupViews, 0).toLocaleString()}
-                </td>
-                <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "var(--ink)", fontSize: 13 }}>
-                  {sortedKols.reduce((a, b) => a + b.totalViews, 0).toLocaleString()}
-                </td>
-                <td style={{ textAlign: "center" }}>
-                  {(() => {
-                    const totalT = sortedKols.reduce((a, b) => a + b.targetViews, 0);
-                    const totalA = sortedKols.reduce((a, b) => a + b.totalViews, 0);
-                    const diff = totalA - totalT;
-                    const pct = ((totalA / totalT) * 100).toFixed(1);
-                    return (
-                      <span className="kt-badge" style={{ background: diff >= 0 ? "var(--ok)" : "var(--danger)", color: "#fff", fontWeight: 800 }}>
-                        {diff >= 0 ? `▲ +${pct}% (+${fmtNum(diff)})` : `▼ ${pct}% (${fmtNum(diff)})`}
-                      </span>
-                    );
-                  })()}
-                </td>
-                <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
-                  {sortedKols.reduce((a, b) => a + b.actualEng, 0).toLocaleString()}
-                </td>
-                <td style={{ textAlign: "center" }}>
-                  TB {(sortedKols.reduce((a, b) => a + (typeof b.avgTime === 'number' ? b.avgTime : 7), 0) / sortedKols.length).toFixed(1)}s
-                </td>
-                <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "var(--ok)" }}>
-                  TB {(sortedKols.reduce((a, b) => a + b.cpv, 0) / sortedKols.length).toFixed(1)}đ
-                </td>
-                <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
-                  {sortedKols.reduce((a, b) => a + b.mediaSpend, 0).toLocaleString()}đ
-                </td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-      </div>
+      )}
 
     </div>
   );
