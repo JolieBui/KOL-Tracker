@@ -11,35 +11,31 @@ export const DATA_MSG = {
   highlights: [
     {
       icon: "🚀",
-      tag: "TĂNG TRƯỞNG LƯỢT XEM",
-      tagBg: "#CCFBF1",
-      tagColor: "#0D9488",
-      title: "Lượt xem bùng nổ +166.9% so với cùng kỳ năm trước",
-      desc: "Tổng view đạt 20.00M (gấp 2.67 lần mức 7.49M của FY25) nhờ mở rộng quy mô 25 KOLs và cơ cấu nhóm Micro/Mid-tier đạt hiệu suất viral vượt bậc."
+      value: "+166.9%",
+      valueColor: "#0D9488",
+      label: "Lượt xem YoY",
+      sub: "20.00M vs 7.49M FY25"
     },
     {
       icon: "⚡",
-      tag: "TỐI ƯU CHI PHÍ CPV",
-      tagBg: "#EFF6FF",
-      tagColor: "#2563EB",
-      title: "Chi phí CPV 6s giảm 19.2% (chỉ còn 42.01đ / view 6s)",
-      desc: "Chi phí mỗi lượt xem 6 giây tối ưu từ 52.00đ xuống 42.01đ (vượt xa mức trần mục tiêu 65.00đ), giúp thương hiệu tiết kiệm đáng kể ngân sách truyền thông."
+      value: "42.01đ",
+      valueColor: "#0D9488",
+      label: "Tối ưu CPV 6s (-19.2%)",
+      sub: "Tiết kiệm hơn trần 65đ"
     },
     {
       icon: "💡",
-      tag: "KÊNH PHÂN PHỐI REUP",
-      tagBg: "#F3E8FF",
-      tagColor: "#7E22CE",
-      title: "Kênh Reup mới đóng góp thêm +1.20M lượt xem",
-      desc: "Chiến lược phân phối chéo video lên Facebook Reup mang lại thêm 14.5% tỷ trọng view tự nhiên mà không phát sinh thêm chi phí sản xuất."
+      value: "+1.20M",
+      valueColor: "#7C3AED",
+      label: "Kênh Reup mới",
+      sub: "14.5% tỷ trọng view"
     },
     {
       icon: "💰",
-      tag: "QUẢN TRỊ NGÂN SÁCH",
-      tagBg: "#FEF3C7",
-      tagColor: "#D97706",
-      title: "Thực thi trọn vẹn 100% ngân sách Summer (Net dư đúng 0đ)",
-      desc: "Tổng chi phí Summer (Net) đạt đúng 608.70M; linh hoạt điều chuyển 13M từ Media Paid sang bù chi phí Booking để tối đa hóa chất lượng nội dung."
+      value: "100%",
+      valueColor: "#D97706",
+      label: "Giải ngân Summer Net",
+      sub: "Dư đúng 0đ (608.70M)"
     }
   ],
   metrics: [
@@ -248,27 +244,24 @@ export const DATA_VINEGAR = {
   highlights: [
     {
       icon: "🚀",
-      tag: "TĂNG TRƯỞNG LƯỢT XEM",
-      tagBg: "#CCFBF1",
-      tagColor: "#0D9488",
-      title: "Lượt xem tăng trưởng +82.8% so với cùng kỳ năm trước",
-      desc: "Tổng view đạt 7.40M (vượt xa 4.05M cùng kỳ và vượt +150.8% so với mục tiêu 2.95M) dù thời gian lên sóng chỉ gói gọn trong 3 tuần tháng 7."
+      value: "+82.8%",
+      valueColor: "#0D9488",
+      label: "Lượt xem YoY",
+      sub: "7.40M vs 4.05M FY25"
     },
     {
       icon: "💰",
-      tag: "TỐI ƯU NGÂN SÁCH",
-      tagBg: "#EFF6FF",
-      tagColor: "#2563EB",
-      title: "Tiết kiệm 54.8% ngân sách với ROI lượt xem vượt trội",
-      desc: "Ngân sách tổng chỉ 200.00M (so với 442.24M cùng kỳ) nhưng mang lại hiệu suất lượt xem cao gấp 1.8 lần cùng kỳ năm trước."
+      value: "-54.8%",
+      valueColor: "#2563EB",
+      label: "Tối ưu ngân sách",
+      sub: "Chi 200M vs 442M FY25"
     },
     {
       icon: "🎯",
-      tag: "HIỆU QUẢ KOLs",
-      tagBg: "#FEF3C7",
-      tagColor: "#D97706",
-      title: "Top KOLs vượt mục tiêu kỷ lục",
-      desc: "Trang Tấm (1.47M views) và My Huyền (1.70M views) bứt phá vượt KPI, tạo độ lan tỏa tự nhiên mạnh mẽ cho dòng sản phẩm Giấm."
+      value: "+150.8%",
+      valueColor: "#0D9488",
+      label: "Vượt Target Views",
+      sub: "7.40M vs 2.95M mục tiêu"
     }
   ],
   metrics: [
@@ -722,51 +715,37 @@ export default function DashboardView({
             </div>
           </div>
 
-          {/* NOTE / HIGHLIGHTS SO VỚI CÙNG KỲ NĂM TRƯỚC */}
+          {/* NOTE / HIGHLIGHTS SO VỚI CÙNG KỲ NĂM TRƯỚC - TINH GỌN KEY METRICS */}
           {data.highlights && data.highlights.length > 0 && (
-            <div style={{ 
-              background: "#FFFFFF", 
-              borderRadius: 14, 
-              border: "1px solid #E2E8F0", 
-              padding: "16px 20px",
-              boxShadow: "0 1px 4px rgba(0,0,0,0.02)"
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-                <span style={{ fontSize: 16 }}>📌</span>
-                <span style={{ fontSize: 13, fontWeight: 800, color: "#0F172A", textTransform: "uppercase", letterSpacing: "0.03em" }}>
-                  ĐIỂM NHẤN NỔI BẬT SO VỚI CÙNG KỲ (EXECUTIVE KEY TAKEAWAYS - {data.name})
-                </span>
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12 }}>
-                {data.highlights.map((h, i) => (
-                  <div 
-                    key={i} 
-                    style={{ 
-                      background: "#F8FAFC", 
-                      borderRadius: 10, 
-                      padding: "14px 16px", 
-                      border: "1px solid #F1F5F9",
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 6
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                      <span style={{ fontSize: 16 }}>{h.icon}</span>
-                      <span style={{ fontSize: 9.5, fontWeight: 800, padding: "2px 6px", borderRadius: 4, background: h.tagBg, color: h.tagColor }}>
-                        {h.tag}
-                      </span>
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(${data.highlights.length}, 1fr)`, gap: 10 }}>
+              {data.highlights.map((h, i) => (
+                <div 
+                  key={i} 
+                  style={{ 
+                    background: "#FFFFFF", 
+                    borderRadius: 10, 
+                    padding: "10px 14px", 
+                    border: "1px solid #E2E8F0",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    boxShadow: "0 1px 2px rgba(0,0,0,0.02)"
+                  }}
+                >
+                  <span style={{ fontSize: 20 }}>{h.icon}</span>
+                  <div>
+                    <div style={{ fontSize: 16, fontWeight: 900, color: h.valueColor, fontFamily: "'IBM Plex Mono', monospace", lineHeight: 1.1 }}>
+                      {h.value}
                     </div>
-                    <div style={{ fontWeight: 800, fontSize: 12.5, color: "#0F172A", lineHeight: 1.35, marginTop: 2 }}>
-                      {h.title}
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "#0F172A", marginTop: 2 }}>
+                      {h.label}
                     </div>
-                    <div style={{ fontSize: 11.5, color: "#64748B", lineHeight: 1.45 }}>
-                      {h.desc}
+                    <div style={{ fontSize: 10, color: "#64748B" }}>
+                      {h.sub}
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           )}
 
