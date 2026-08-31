@@ -604,6 +604,7 @@ export default function DashboardView({ onOpen = () => {} }) {
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
               <thead>
                 <tr style={{ background: "#FAF7F2", borderBottom: "2px solid #E6DDD6", color: "#68584E" }}>
+                  <th style={{ padding: "10px 8px", textAlign: "center", fontWeight: 800, width: 40, whiteSpace: "nowrap" }}>#</th>
                   <th onClick={() => handleSort("kol")} style={{ padding: "10px 14px", textAlign: "left", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
                     KOL {sortCol === "kol" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
@@ -650,6 +651,9 @@ export default function DashboardView({ onOpen = () => {} }) {
                         cursor: "pointer"
                       }}
                     >
+                      <td style={{ padding: "10px 8px", textAlign: "center", fontWeight: 700, color: "#8C7A6B", fontSize: 11 }}>
+                        {idx + 1}
+                      </td>
                       <td style={{ padding: "10px 14px", fontWeight: 700, color: "#2E3840", whiteSpace: "nowrap" }}>
                         {k.kol}
                       </td>
@@ -702,6 +706,7 @@ export default function DashboardView({ onOpen = () => {} }) {
               </tbody>
               <tfoot>
                 <tr style={{ background: "#F7F4EE", borderTop: "2px solid #E6DDD6", fontWeight: 800, color: "#2E3840" }}>
+                  <td style={{ padding: "10px 8px", textAlign: "center" }}>—</td>
                   <td style={{ padding: "10px 14px", whiteSpace: "nowrap" }}>TỔNG ({sortedKols.length})</td>
                   <td>—</td>
                   <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
