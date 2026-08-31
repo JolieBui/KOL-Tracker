@@ -525,21 +525,21 @@ export default function DashboardView({ onOpen = () => {} }) {
           </div>
 
           {/* 2 SIDE-BY-SIDE PANELS (TOP vs LOW) */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 12 }}>
             
             {/* TOP PERFORMERS */}
             <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E6DDD6", padding: "14px 16px" }}>
               <div style={{ fontSize: 12, fontWeight: 800, color: "#3B9686", marginBottom: 10, whiteSpace: "nowrap" }}>
-                🟢 TOP VƯỢT KPI
+                🟢 TOP VƯỢT KPI VIEW (LƯỢT XEM)
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {data.topKols.map((k, i) => (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", background: "#FAF7F2", borderRadius: 8, whiteSpace: "nowrap" }}>
-                    <span style={{ fontWeight: 700, color: "#2E3840", fontSize: 12 }}>{k.name} ({k.tier})</span>
-                    <div style={{ textAlign: "right" }}>
+                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", background: "#FAF7F2", borderRadius: 8, whiteSpace: "nowrap" }}>
+                    <span style={{ fontWeight: 700, color: "#2E3840", fontSize: 12 }}>{k.name} <span style={{ color: "#8C7A6B", fontSize: 11 }}>({k.tier})</span></span>
+                    <div style={{ textAlign: "right", whiteSpace: "nowrap" }}>
                       <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 700, color: "#3B9686" }}>{k.actual}</span>
-                      <span style={{ fontSize: 10, color: "#8C7A6B" }}> / {k.target}</span>
-                      <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 800, color: "#3B9686" }}>{k.diff}</span>
+                      <span style={{ fontSize: 11, color: "#8C7A6B" }}> / {k.target} view</span>
+                      <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 800, color: "#3B9686" }}>{k.diff}</span>
                     </div>
                   </div>
                 ))}
@@ -549,16 +549,16 @@ export default function DashboardView({ onOpen = () => {} }) {
             {/* ACTION NEEDED */}
             <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E6DDD6", padding: "14px 16px" }}>
               <div style={{ fontSize: 12, fontWeight: 800, color: "#D45B6A", marginBottom: 10, whiteSpace: "nowrap" }}>
-                🔴 CẦN TỐI ƯU
+                🔴 CHƯA ĐẠT KPI VIEW (LƯỢT XEM)
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {data.lowKols.map((k, i) => (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", background: "#FAF7F2", borderRadius: 8, whiteSpace: "nowrap" }}>
-                    <span style={{ fontWeight: 700, color: "#2E3840", fontSize: 12 }}>{k.name} ({k.tier})</span>
-                    <div style={{ textAlign: "right" }}>
+                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", background: "#FAF7F2", borderRadius: 8, whiteSpace: "nowrap" }}>
+                    <span style={{ fontWeight: 700, color: "#2E3840", fontSize: 12 }}>{k.name} <span style={{ color: "#8C7A6B", fontSize: 11 }}>({k.tier})</span></span>
+                    <div style={{ textAlign: "right", whiteSpace: "nowrap" }}>
                       <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 700, color: "#D45B6A" }}>{k.actual}</span>
-                      <span style={{ fontSize: 10, color: "#8C7A6B" }}> / {k.target}</span>
-                      <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 800, color: "#D45B6A" }}>{k.diff}</span>
+                      <span style={{ fontSize: 11, color: "#8C7A6B" }}> / {k.target} view</span>
+                      <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 800, color: "#D45B6A" }}>{k.diff}</span>
                     </div>
                   </div>
                 ))}
