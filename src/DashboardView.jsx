@@ -375,8 +375,37 @@ export default function DashboardView({ onOpen = () => {} }) {
   const [kolSearch, setKolSearch] = useState("");
   const [sortCol, setSortCol] = useState("totalViews");
   const [sortDir, setSortDir] = useState("desc");
+  const [hoveredKol, setHoveredKol] = useState(null);
 
   const data = projectKey === "MSG" ? DATA_MSG : DATA_VINEGAR;
+
+  // Appearance count across 3 top panels
+  const appearanceMap = useMemo(() => {
+    const map = {};
+    [...data.topViews, ...data.topEng, ...data.topTime].forEach(item => {
+      map[item.name] = (map[item.name] || 0) + 1;
+    });
+    return map;
+  }, [data]);
+
+  const KOL_PALETTES = {
+    "Bon đây nè": { bg: "#EFF6FF", border: "#3B82F6", text: "#1D4ED8", dot: "#2563EB", badgeBg: "#DBEAFE" },
+    "Emmer Sweet": { bg: "#FAF5FF", border: "#A855F7", text: "#6B21A8", dot: "#9333EA", badgeBg: "#F3E8FF" },
+    "Trang Tấm": { bg: "#F0FDF4", border: "#22C55E", text: "#15803D", dot: "#16A34A", badgeBg: "#DCFCE7" },
+    "Út Tình": { bg: "#FFF7ED", border: "#F97316", text: "#C2410C", dot: "#EA580C", badgeBg: "#FFEDD5" },
+    "Khánh Linh": { bg: "#ECFDF5", border: "#10B981", text: "#047857", dot: "#059669", badgeBg: "#D1FAE5" },
+    "Min Cookie": { bg: "#FFF1F2", border: "#F43F5E", text: "#BE123C", dot: "#E11D48", badgeBg: "#FFE4E6" },
+    "taydayroi": { bg: "#EEF2FF", border: "#6366F1", text: "#3730A3", dot: "#4F46E5", badgeBg: "#E0E7FF" },
+    "Linh nấu": { bg: "#FEFCE8", border: "#EAB308", text: "#854D0E", dot: "#CA8A04", badgeBg: "#FEF08A" },
+    "Châu Kiều My": { bg: "#FDF2F8", border: "#EC4899", text: "#9D174D", dot: "#DB2777", badgeBg: "#FCE7F3" },
+    "My Huyền": { bg: "#F0FDFA", border: "#14B8A6", text: "#115E59", dot: "#0D9488", badgeBg: "#CCFBF1" },
+    "Cơm nhà bếp xưa": { bg: "#F5F3FF", border: "#8B5CF6", text: "#5B21B6", dot: "#7C3AED", badgeBg: "#EDE9FE" },
+    "Ăn gì Thương ơi": { bg: "#FFFBEB", border: "#F59E0B", text: "#B45309", dot: "#D97706", badgeBg: "#FEF3C7" },
+  };
+
+  const getColor = (name) => {
+    return KOL_PALETTES[name] || { bg: "#F8FAFC", border: "#CBD5E1", text: "#0F172A", dot: "#64748B", badgeBg: "#F1F5F9" };
+  };
 
   // Sorted KOLs
   const sortedKols = useMemo(() => {
@@ -594,16 +623,47 @@ export default function DashboardView({ onOpen = () => {} }) {
                 🟢 TOP VƯỢT MỤC TIÊU LƯỢT XEM
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {data.topViews.map((k, i) => (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", background: "#F8FAFC", borderRadius: 8, border: "1px solid #F1F5F9", whiteSpace: "nowrap" }}>
-                    <span style={{ fontWeight: 700, color: "#0F172A", fontSize: 12 }}>{k.name}</span>
-                    <div style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                      <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 700, color: "#0D9488" }}>{k.actual}</span>
-                      <span style={{ fontSize: 11, color: "#64748B" }}> / {k.target}</span>
-                      <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 800, color: "#0D9488" }}>{k.diff}</span>
+                {data.topViews.map((k, i) => {
+                  const c = getColor(k.name);
+                  const count = appearanceMap[k.name] || 1;
+                  const isHovered = hoveredKol === k.name;
+
+                  return (
+                    <div 
+                      key={i} 
+                      onMouseEnter={() => setHoveredKol(k.name)}
+                      onMouseLeave={() => setHoveredKol(null)}
+                      style={{ 
+                        display: "flex", 
+                        justifyContent: "space-between", 
+                        alignItems: "center", 
+                        padding: "8px 12px", 
+                        background: isHovered ? c.bg : "#F8FAFC", 
+                        borderRadius: 8, 
+                        border: isHovered ? `1.5px solid ${c.border}` : "1px solid #F1F5F9", 
+                        boxShadow: isHovered ? `0 2px 8px ${c.border}33` : "none",
+                        transition: "all 0.15s ease",
+                        cursor: "pointer",
+                        whiteSpace: "nowrap" 
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <span style={{ width: 8, height: 8, borderRadius: "50%", background: c.dot, display: "inline-block" }} />
+                        <span style={{ fontWeight: 800, color: isHovered ? c.text : "#0F172A", fontSize: 12 }}>{k.name}</span>
+                        {count > 1 && (
+                          <span style={{ fontSize: 10, fontWeight: 800, padding: "1px 5px", borderRadius: 4, background: c.badgeBg, color: c.text }}>
+                            {count} bảng
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                        <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 700, color: "#0D9488" }}>{k.actual}</span>
+                        <span style={{ fontSize: 11, color: "#64748B" }}> / {k.target}</span>
+                        <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 800, color: "#0D9488" }}>{k.diff}</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -613,14 +673,45 @@ export default function DashboardView({ onOpen = () => {} }) {
                 ❤️ TOP LƯỢT TƯƠNG TÁC CAO NHẤT
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {data.topEng.map((k, i) => (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", background: "#F8FAFC", borderRadius: 8, border: "1px solid #F1F5F9", whiteSpace: "nowrap" }}>
-                    <span style={{ fontWeight: 700, color: "#0F172A", fontSize: 12 }}>{k.name}</span>
-                    <div style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                      <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#0284C7", fontSize: 12 }}>{k.value}</span>
+                {data.topEng.map((k, i) => {
+                  const c = getColor(k.name);
+                  const count = appearanceMap[k.name] || 1;
+                  const isHovered = hoveredKol === k.name;
+
+                  return (
+                    <div 
+                      key={i} 
+                      onMouseEnter={() => setHoveredKol(k.name)}
+                      onMouseLeave={() => setHoveredKol(null)}
+                      style={{ 
+                        display: "flex", 
+                        justifyContent: "space-between", 
+                        alignItems: "center", 
+                        padding: "8px 12px", 
+                        background: isHovered ? c.bg : "#F8FAFC", 
+                        borderRadius: 8, 
+                        border: isHovered ? `1.5px solid ${c.border}` : "1px solid #F1F5F9", 
+                        boxShadow: isHovered ? `0 2px 8px ${c.border}33` : "none",
+                        transition: "all 0.15s ease",
+                        cursor: "pointer",
+                        whiteSpace: "nowrap" 
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <span style={{ width: 8, height: 8, borderRadius: "50%", background: c.dot, display: "inline-block" }} />
+                        <span style={{ fontWeight: 800, color: isHovered ? c.text : "#0F172A", fontSize: 12 }}>{k.name}</span>
+                        {count > 1 && (
+                          <span style={{ fontSize: 10, fontWeight: 800, padding: "1px 5px", borderRadius: 4, background: c.badgeBg, color: c.text }}>
+                            {count} bảng
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                        <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#0284C7", fontSize: 12 }}>{k.value}</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -630,14 +721,45 @@ export default function DashboardView({ onOpen = () => {} }) {
                 ⏱️ TOP THỜI LƯỢNG XEM LÂU NHẤT
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {data.topTime.map((k, i) => (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", background: "#F8FAFC", borderRadius: 8, border: "1px solid #F1F5F9", whiteSpace: "nowrap" }}>
-                    <span style={{ fontWeight: 700, color: "#0F172A", fontSize: 12 }}>{k.name}</span>
-                    <div style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                      <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#7C3AED", fontSize: 12 }}>{k.value}</span>
+                {data.topTime.map((k, i) => {
+                  const c = getColor(k.name);
+                  const count = appearanceMap[k.name] || 1;
+                  const isHovered = hoveredKol === k.name;
+
+                  return (
+                    <div 
+                      key={i} 
+                      onMouseEnter={() => setHoveredKol(k.name)}
+                      onMouseLeave={() => setHoveredKol(null)}
+                      style={{ 
+                        display: "flex", 
+                        justifyContent: "space-between", 
+                        alignItems: "center", 
+                        padding: "8px 12px", 
+                        background: isHovered ? c.bg : "#F8FAFC", 
+                        borderRadius: 8, 
+                        border: isHovered ? `1.5px solid ${c.border}` : "1px solid #F1F5F9", 
+                        boxShadow: isHovered ? `0 2px 8px ${c.border}33` : "none",
+                        transition: "all 0.15s ease",
+                        cursor: "pointer",
+                        whiteSpace: "nowrap" 
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <span style={{ width: 8, height: 8, borderRadius: "50%", background: c.dot, display: "inline-block" }} />
+                        <span style={{ fontWeight: 800, color: isHovered ? c.text : "#0F172A", fontSize: 12 }}>{k.name}</span>
+                        {count > 1 && (
+                          <span style={{ fontSize: 10, fontWeight: 800, padding: "1px 5px", borderRadius: 4, background: c.badgeBg, color: c.text }}>
+                            {count} bảng
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                        <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#7C3AED", fontSize: 12 }}>{k.value}</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
