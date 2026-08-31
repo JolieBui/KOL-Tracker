@@ -488,7 +488,7 @@ export default function DashboardView({ onOpen = () => {} }) {
               whiteSpace: "nowrap"
             }}
           >
-            📋 Chi tiết {data.kolCount} KOLs
+            📋 Danh sách KOLs
           </button>
         </div>
       </div>
@@ -509,7 +509,7 @@ export default function DashboardView({ onOpen = () => {} }) {
           }}>
             <div style={{ padding: "12px 18px", borderBottom: "1px solid #E2E8F0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div style={{ fontWeight: 800, fontSize: 14, color: "#0F172A" }}>
-                ĐỐI CHIẾU CHỈ SỐ: {data.name} ({data.kolCount} KOLs)
+                ĐỐI CHIẾU CHỈ SỐ: {data.name}
               </div>
               <span style={{ fontSize: 11, fontWeight: 700, color: "#64748B" }}>
                 {data.period}
@@ -677,45 +677,47 @@ export default function DashboardView({ onOpen = () => {} }) {
                   color: "#0F172A"
                 }}
               />
-              <span style={{ fontSize: 12, color: "#0D9488", fontWeight: 800, whiteSpace: "nowrap", background: "#CCFBF1", padding: "4px 8px", borderRadius: 6 }}>
-                Tổng số: {sortedKols.length} / {data.kolCount} KOLs
-              </span>
+              {kolSearch && (
+                <span style={{ fontSize: 11, color: "#0D9488", fontWeight: 700, whiteSpace: "nowrap", background: "#CCFBF1", padding: "4px 8px", borderRadius: 6 }}>
+                  Tìm thấy: {sortedKols.length}
+                </span>
+              )}
             </div>
 
             {/* Quick Filter Buttons */}
             <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11 }}>
-              <span style={{ color: "#64748B", fontWeight: 700 }}>Xem nhanh:</span>
+              <span style={{ color: "#64748B", fontWeight: 700 }}>Lọc phân cấp:</span>
               <button 
                 onClick={() => setKolSearch("")}
-                style={{ padding: "4px 8px", borderRadius: 6, border: "1px solid #E2E8F0", background: !kolSearch ? "#0F172A" : "#F8FAFC", color: !kolSearch ? "#FFFFFF" : "#475569", fontWeight: 700, cursor: "pointer" }}
+                style={{ padding: "4px 10px", borderRadius: 6, border: "1px solid #E2E8F0", background: !kolSearch ? "#0F172A" : "#F8FAFC", color: !kolSearch ? "#FFFFFF" : "#475569", fontWeight: 700, cursor: "pointer" }}
               >
-                Tất cả ({data.kolCount})
+                Tất cả
               </button>
               {data.key === "MSG" && (
                 <>
                   <button 
                     onClick={() => setKolSearch("Macro")}
-                    style={{ padding: "4px 8px", borderRadius: 6, border: "1px solid #E2E8F0", background: kolSearch === "Macro" ? "#0F172A" : "#F8FAFC", color: kolSearch === "Macro" ? "#FFFFFF" : "#475569", fontWeight: 700, cursor: "pointer" }}
+                    style={{ padding: "4px 10px", borderRadius: 6, border: "1px solid #E2E8F0", background: kolSearch === "Macro" ? "#0F172A" : "#F8FAFC", color: kolSearch === "Macro" ? "#FFFFFF" : "#475569", fontWeight: 700, cursor: "pointer" }}
                   >
-                    Macro (4)
+                    Macro
                   </button>
                   <button 
                     onClick={() => setKolSearch("Mid-tier")}
-                    style={{ padding: "4px 8px", borderRadius: 6, border: "1px solid #E2E8F0", background: kolSearch === "Mid-tier" ? "#0F172A" : "#F8FAFC", color: kolSearch === "Mid-tier" ? "#FFFFFF" : "#475569", fontWeight: 700, cursor: "pointer" }}
+                    style={{ padding: "4px 10px", borderRadius: 6, border: "1px solid #E2E8F0", background: kolSearch === "Mid-tier" ? "#0F172A" : "#F8FAFC", color: kolSearch === "Mid-tier" ? "#FFFFFF" : "#475569", fontWeight: 700, cursor: "pointer" }}
                   >
-                    Mid-tier (9)
+                    Mid-tier
                   </button>
                   <button 
                     onClick={() => setKolSearch("Micro")}
-                    style={{ padding: "4px 8px", borderRadius: 6, border: "1px solid #E2E8F0", background: kolSearch === "Micro" ? "#0F172A" : "#F8FAFC", color: kolSearch === "Micro" ? "#FFFFFF" : "#475569", fontWeight: 700, cursor: "pointer" }}
+                    style={{ padding: "4px 10px", borderRadius: 6, border: "1px solid #E2E8F0", background: kolSearch === "Micro" ? "#0F172A" : "#F8FAFC", color: kolSearch === "Micro" ? "#FFFFFF" : "#475569", fontWeight: 700, cursor: "pointer" }}
                   >
-                    Micro (10)
+                    Micro
                   </button>
                   <button 
                     onClick={() => setKolSearch("Nano")}
-                    style={{ padding: "4px 8px", borderRadius: 6, border: "1px solid #E2E8F0", background: kolSearch === "Nano" ? "#0F172A" : "#F8FAFC", color: kolSearch === "Nano" ? "#FFFFFF" : "#475569", fontWeight: 700, cursor: "pointer" }}
+                    style={{ padding: "4px 10px", borderRadius: 6, border: "1px solid #E2E8F0", background: kolSearch === "Nano" ? "#0F172A" : "#F8FAFC", color: kolSearch === "Nano" ? "#FFFFFF" : "#475569", fontWeight: 700, cursor: "pointer" }}
                   >
-                    Nano (2)
+                    Nano
                   </button>
                 </>
               )}
@@ -853,7 +855,7 @@ export default function DashboardView({ onOpen = () => {} }) {
               <tfoot style={{ position: "sticky", bottom: 0, zIndex: 10, background: "#F1F5F9", boxShadow: "0 -1px 2px rgba(0,0,0,0.05)" }}>
                 <tr style={{ background: "#F1F5F9", borderTop: "2px solid #E2E8F0", fontWeight: 800, color: "#0F172A" }}>
                   <td style={{ padding: "10px 8px", textAlign: "center" }}>—</td>
-                  <td style={{ padding: "10px 14px", whiteSpace: "nowrap" }}>TỔNG ({sortedKols.length} KOLS)</td>
+                  <td style={{ padding: "10px 14px", whiteSpace: "nowrap" }}>TỔNG CỘNG</td>
                   <td>—</td>
                   <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
                     {(sortedKols.reduce((a, b) => a + b.cost, 0) / 1000000).toFixed(1)}M
