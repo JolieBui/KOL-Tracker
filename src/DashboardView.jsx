@@ -353,24 +353,25 @@ export default function DashboardView({ onOpen = () => {} }) {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", overflowY: "auto", background: "#FAF7F2", padding: "16px 20px", gap: 14 }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", overflowY: "auto", background: "#F8FAFC", padding: "16px 20px", gap: 14 }}>
       
       {/* ── TOP CONTROL BAR ── */}
       <div style={{ 
         background: "#FFFFFF", 
         borderRadius: 12, 
-        border: "1px solid #E6DDD6", 
+        border: "1px solid #E2E8F0", 
         padding: "10px 16px", 
         display: "flex", 
         justifyContent: "space-between", 
         alignItems: "center", 
         flexWrap: "nowrap",
-        gap: 12
+        gap: 12,
+        boxShadow: "0 1px 3px rgba(0,0,0,0.02)"
       }}>
         {/* Project Selector */}
         <div style={{ display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap" }}>
-          <span style={{ fontSize: 11, fontWeight: 800, color: "#8C7A6B", textTransform: "uppercase" }}>DỰ ÁN:</span>
-          <div style={{ display: "flex", gap: 4, background: "#F7F4EE", padding: 3, borderRadius: 10 }}>
+          <span style={{ fontSize: 11, fontWeight: 800, color: "#64748B", textTransform: "uppercase" }}>DỰ ÁN:</span>
+          <div style={{ display: "flex", gap: 4, background: "#F1F5F9", padding: 3, borderRadius: 10 }}>
             <button 
               onClick={() => { setProjectKey("MSG"); setKolSearch(""); }}
               style={{
@@ -380,8 +381,8 @@ export default function DashboardView({ onOpen = () => {} }) {
                 fontWeight: 800,
                 cursor: "pointer",
                 border: "none",
-                background: projectKey === "MSG" ? "#3B9686" : "transparent",
-                color: projectKey === "MSG" ? "#FFFFFF" : "#2E3840",
+                background: projectKey === "MSG" ? "#0D9488" : "transparent",
+                color: projectKey === "MSG" ? "#FFFFFF" : "#0F172A",
                 whiteSpace: "nowrap"
               }}
             >
@@ -396,8 +397,8 @@ export default function DashboardView({ onOpen = () => {} }) {
                 fontWeight: 800,
                 cursor: "pointer",
                 border: "none",
-                background: projectKey === "VINEGAR" ? "#4A88BA" : "transparent",
-                color: projectKey === "VINEGAR" ? "#FFFFFF" : "#2E3840",
+                background: projectKey === "VINEGAR" ? "#0284C7" : "transparent",
+                color: projectKey === "VINEGAR" ? "#FFFFFF" : "#0F172A",
                 whiteSpace: "nowrap"
               }}
             >
@@ -407,7 +408,7 @@ export default function DashboardView({ onOpen = () => {} }) {
         </div>
 
         {/* View Switcher */}
-        <div style={{ display: "flex", gap: 4, background: "#F7F4EE", padding: 3, borderRadius: 10, whiteSpace: "nowrap" }}>
+        <div style={{ display: "flex", gap: 4, background: "#F1F5F9", padding: 3, borderRadius: 10, whiteSpace: "nowrap" }}>
           <button 
             onClick={() => setViewTab("compare")}
             style={{
@@ -418,7 +419,7 @@ export default function DashboardView({ onOpen = () => {} }) {
               cursor: "pointer",
               border: "none",
               background: viewTab === "compare" ? "#FFFFFF" : "transparent",
-              color: viewTab === "compare" ? "#2E3840" : "#8C7A6B",
+              color: viewTab === "compare" ? "#0F172A" : "#64748B",
               boxShadow: viewTab === "compare" ? "0 1px 3px rgba(0,0,0,0.06)" : "none",
               whiteSpace: "nowrap"
             }}
@@ -435,7 +436,7 @@ export default function DashboardView({ onOpen = () => {} }) {
               cursor: "pointer",
               border: "none",
               background: viewTab === "kols" ? "#FFFFFF" : "transparent",
-              color: viewTab === "kols" ? "#2E3840" : "#8C7A6B",
+              color: viewTab === "kols" ? "#0F172A" : "#64748B",
               boxShadow: viewTab === "kols" ? "0 1px 3px rgba(0,0,0,0.06)" : "none",
               whiteSpace: "nowrap"
             }}
@@ -446,7 +447,7 @@ export default function DashboardView({ onOpen = () => {} }) {
       </div>
 
       {/* =========================================================================
-          TAB 1: BẢNG SO SÁNH CHỈ SỐ (EXACT NUMBERS, ZERO WRAP, CLEAN ALIGNMENT)
+          TAB 1: BẢNG SO SÁNH CHỈ SỐ (CRISP GRAY-WHITE THEME)
          ========================================================================= */}
       {viewTab === "compare" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -455,14 +456,15 @@ export default function DashboardView({ onOpen = () => {} }) {
           <div style={{ 
             background: "#FFFFFF", 
             borderRadius: 14, 
-            border: "1px solid #E6DDD6", 
-            overflow: "hidden" 
+            border: "1px solid #E2E8F0", 
+            overflow: "hidden",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.02)"
           }}>
-            <div style={{ padding: "12px 18px", borderBottom: "1px solid #E6DDD6", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div style={{ fontWeight: 800, fontSize: 14, color: "#2E3840" }}>
+            <div style={{ padding: "12px 18px", borderBottom: "1px solid #E2E8F0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ fontWeight: 800, fontSize: 14, color: "#0F172A" }}>
                 ĐỐI CHIẾU CHỈ SỐ: {data.name.toUpperCase()} ({data.kolCount} KOLS)
               </div>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#8C7A6B" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#64748B" }}>
                 {data.period}
               </span>
             </div>
@@ -470,32 +472,32 @@ export default function DashboardView({ onOpen = () => {} }) {
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
                 <thead>
-                  <tr style={{ background: "#FAF7F2", borderBottom: "2px solid #E6DDD6", color: "#68584E" }}>
+                  <tr style={{ background: "#F8FAFC", borderBottom: "2px solid #E2E8F0", color: "#475569" }}>
                     <th style={{ padding: "10px 16px", textAlign: "left", fontWeight: 800, whiteSpace: "nowrap" }}>CHỈ SỐ</th>
-                    <th style={{ padding: "10px 14px", textAlign: "right", fontWeight: 800, color: "#8C7A6B", whiteSpace: "nowrap" }}>LY (FY25)</th>
-                    <th style={{ padding: "10px 14px", textAlign: "right", fontWeight: 800, color: "#C98A26", whiteSpace: "nowrap" }}>TARGET (KPI)</th>
-                    <th style={{ padding: "10px 14px", textAlign: "right", fontWeight: 800, color: "#3B9686", whiteSpace: "nowrap" }}>ACTUAL (FY26)</th>
+                    <th style={{ padding: "10px 14px", textAlign: "right", fontWeight: 800, color: "#64748B", whiteSpace: "nowrap" }}>LY (FY25)</th>
+                    <th style={{ padding: "10px 14px", textAlign: "right", fontWeight: 800, color: "#D97706", whiteSpace: "nowrap" }}>TARGET (KPI)</th>
+                    <th style={{ padding: "10px 14px", textAlign: "right", fontWeight: 800, color: "#0D9488", whiteSpace: "nowrap" }}>ACTUAL (FY26)</th>
                     <th style={{ padding: "10px 14px", textAlign: "center", fontWeight: 800, whiteSpace: "nowrap" }}>VS TARGET</th>
                     <th style={{ padding: "10px 14px", textAlign: "center", fontWeight: 800, whiteSpace: "nowrap" }}>VS LY (YoY)</th>
                   </tr>
                 </thead>
                 <tbody>
                   {data.metrics.map((m, idx) => (
-                    <tr key={idx} style={{ borderBottom: "1px solid #F2ECE4", background: idx % 2 === 0 ? "#FFFFFF" : "#FAF8F5" }}>
+                    <tr key={idx} style={{ borderBottom: "1px solid #F1F5F9", background: idx % 2 === 0 ? "#FFFFFF" : "#F8FAFC" }}>
                       
-                      <td style={{ padding: "12px 16px", fontWeight: 700, color: "#2E3840", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "12px 16px", fontWeight: 700, color: "#0F172A", whiteSpace: "nowrap" }}>
                         {m.metric}
                       </td>
 
-                      <td style={{ padding: "12px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#8C7A6B", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "12px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#64748B", whiteSpace: "nowrap" }}>
                         {m.ly}
                       </td>
 
-                      <td style={{ padding: "12px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 700, color: "#C98A26", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "12px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 700, color: "#D97706", whiteSpace: "nowrap" }}>
                         {m.target}
                       </td>
 
-                      <td style={{ padding: "12px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#3B9686", fontSize: 13, whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "12px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#0D9488", fontSize: 13, whiteSpace: "nowrap" }}>
                         {m.actual}
                       </td>
 
@@ -504,8 +506,8 @@ export default function DashboardView({ onOpen = () => {} }) {
                           display: "inline-block",
                           padding: "3px 8px", 
                           borderRadius: 6, 
-                          background: m.isTargetGood === true ? "#D0E9E6" : m.isTargetGood === false ? "#FACDD0" : "#F7F4EE",
-                          color: m.isTargetGood === true ? "#3B9686" : m.isTargetGood === false ? "#D45B6A" : "#2E3840",
+                          background: m.isTargetGood === true ? "#CCFBF1" : m.isTargetGood === false ? "#FFE4E6" : "#F1F5F9",
+                          color: m.isTargetGood === true ? "#0D9488" : m.isTargetGood === false ? "#E11D48" : "#0F172A",
                           fontWeight: 800,
                           fontSize: 11,
                           whiteSpace: "nowrap"
@@ -519,8 +521,8 @@ export default function DashboardView({ onOpen = () => {} }) {
                           display: "inline-block",
                           padding: "3px 8px", 
                           borderRadius: 6, 
-                          background: m.isLYGood === true ? "#D0E9E6" : m.isLYGood === false ? "#FACDD0" : "#F7F4EE",
-                          color: m.isLYGood === true ? "#3B9686" : m.isLYGood === false ? "#D45B6A" : "#2E3840",
+                          background: m.isLYGood === true ? "#CCFBF1" : m.isLYGood === false ? "#FFE4E6" : "#F1F5F9",
+                          color: m.isLYGood === true ? "#0D9488" : m.isLYGood === false ? "#E11D48" : "#0F172A",
                           fontWeight: 800,
                           fontSize: 11,
                           whiteSpace: "nowrap"
@@ -540,18 +542,18 @@ export default function DashboardView({ onOpen = () => {} }) {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 12 }}>
             
             {/* TOP PERFORMERS */}
-            <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E6DDD6", padding: "14px 16px" }}>
-              <div style={{ fontSize: 12, fontWeight: 800, color: "#3B9686", marginBottom: 10, whiteSpace: "nowrap" }}>
+            <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E2E8F0", padding: "14px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+              <div style={{ fontSize: 12, fontWeight: 800, color: "#0D9488", marginBottom: 10, whiteSpace: "nowrap" }}>
                 🟢 TOP VƯỢT KPI VIEW (LƯỢT XEM)
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {data.topKols.map((k, i) => (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", background: "#FAF7F2", borderRadius: 8, whiteSpace: "nowrap" }}>
-                    <span style={{ fontWeight: 700, color: "#2E3840", fontSize: 12 }}>{k.name} <span style={{ color: "#8C7A6B", fontSize: 11 }}>({k.tier})</span></span>
+                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", background: "#F8FAFC", borderRadius: 8, border: "1px solid #F1F5F9", whiteSpace: "nowrap" }}>
+                    <span style={{ fontWeight: 700, color: "#0F172A", fontSize: 12 }}>{k.name} <span style={{ color: "#64748B", fontSize: 11 }}>({k.tier})</span></span>
                     <div style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                      <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 700, color: "#3B9686" }}>{k.actual}</span>
-                      <span style={{ fontSize: 11, color: "#8C7A6B" }}> / {k.target} view</span>
-                      <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 800, color: "#3B9686" }}>{k.diff}</span>
+                      <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 700, color: "#0D9488" }}>{k.actual}</span>
+                      <span style={{ fontSize: 11, color: "#64748B" }}> / {k.target} view</span>
+                      <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 800, color: "#0D9488" }}>{k.diff}</span>
                     </div>
                   </div>
                 ))}
@@ -559,18 +561,18 @@ export default function DashboardView({ onOpen = () => {} }) {
             </div>
 
             {/* ACTION NEEDED */}
-            <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E6DDD6", padding: "14px 16px" }}>
-              <div style={{ fontSize: 12, fontWeight: 800, color: "#D45B6A", marginBottom: 10, whiteSpace: "nowrap" }}>
+            <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E2E8F0", padding: "14px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+              <div style={{ fontSize: 12, fontWeight: 800, color: "#E11D48", marginBottom: 10, whiteSpace: "nowrap" }}>
                 🔴 CHƯA ĐẠT KPI VIEW (LƯỢT XEM)
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {data.lowKols.map((k, i) => (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", background: "#FAF7F2", borderRadius: 8, whiteSpace: "nowrap" }}>
-                    <span style={{ fontWeight: 700, color: "#2E3840", fontSize: 12 }}>{k.name} <span style={{ color: "#8C7A6B", fontSize: 11 }}>({k.tier})</span></span>
+                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", background: "#F8FAFC", borderRadius: 8, border: "1px solid #F1F5F9", whiteSpace: "nowrap" }}>
+                    <span style={{ fontWeight: 700, color: "#0F172A", fontSize: 12 }}>{k.name} <span style={{ color: "#64748B", fontSize: 11 }}>({k.tier})</span></span>
                     <div style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                      <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 700, color: "#D45B6A" }}>{k.actual}</span>
-                      <span style={{ fontSize: 11, color: "#8C7A6B" }}> / {k.target} view</span>
-                      <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 800, color: "#D45B6A" }}>{k.diff}</span>
+                      <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 700, color: "#E11D48" }}>{k.actual}</span>
+                      <span style={{ fontSize: 11, color: "#64748B" }}> / {k.target} view</span>
+                      <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 800, color: "#E11D48" }}>{k.diff}</span>
                     </div>
                   </div>
                 ))}
@@ -583,16 +585,17 @@ export default function DashboardView({ onOpen = () => {} }) {
       )}
 
       {/* =========================================================================
-          TAB 2: BẢNG CHI TIẾT TỪNG KOL
+          TAB 2: BẢNG CHI TIẾT TỪNG KOL (CRISP GRAY-WHITE)
          ========================================================================= */}
       {viewTab === "kols" && (
         <div style={{ 
           background: "#FFFFFF", 
           borderRadius: 14, 
-          border: "1px solid #E6DDD6", 
-          overflow: "hidden" 
+          border: "1px solid #E2E8F0", 
+          overflow: "hidden",
+          boxShadow: "0 1px 4px rgba(0,0,0,0.02)"
         }}>
-          <div style={{ padding: "10px 16px", borderBottom: "1px solid #E6DDD6", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "nowrap", gap: 10 }}>
+          <div style={{ padding: "10px 16px", borderBottom: "1px solid #E2E8F0", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "nowrap", gap: 10 }}>
             <input 
               placeholder={`🔍 Tìm KOL trong ${data.name}...`}
               value={kolSearch}
@@ -602,12 +605,13 @@ export default function DashboardView({ onOpen = () => {} }) {
                 padding: "6px 12px",
                 fontSize: 12,
                 borderRadius: 8,
-                border: "1px solid #E6DDD6",
+                border: "1px solid #CBD5E1",
                 outline: "none",
-                background: "#FAF7F2"
+                background: "#F8FAFC",
+                color: "#0F172A"
               }}
             />
-            <span style={{ fontSize: 11, color: "#8C7A6B", fontWeight: 600, whiteSpace: "nowrap" }}>
+            <span style={{ fontSize: 11, color: "#64748B", fontWeight: 600, whiteSpace: "nowrap" }}>
               {sortedKols.length} / {data.kolCount} KOLs
             </span>
           </div>
@@ -615,7 +619,7 @@ export default function DashboardView({ onOpen = () => {} }) {
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
               <thead>
-                <tr style={{ background: "#FAF7F2", borderBottom: "2px solid #E6DDD6", color: "#68584E" }}>
+                <tr style={{ background: "#F8FAFC", borderBottom: "2px solid #E2E8F0", color: "#475569" }}>
                   <th style={{ padding: "10px 8px", textAlign: "center", fontWeight: 800, width: 40, whiteSpace: "nowrap" }}>#</th>
                   <th onClick={() => handleSort("kol")} style={{ padding: "10px 14px", textAlign: "left", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
                     KOL {sortCol === "kol" && (sortDir === "asc" ? "▲" : "▼")}
@@ -630,10 +634,10 @@ export default function DashboardView({ onOpen = () => {} }) {
                   <th onClick={() => handleSort("organicViews")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
                     Organic {sortCol === "organicViews" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
-                  <th onClick={() => handleSort("reupViews")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, color: "#4A88BA", whiteSpace: "nowrap" }}>
+                  <th onClick={() => handleSort("reupViews")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, color: "#0284C7", whiteSpace: "nowrap" }}>
                     Reup {sortCol === "reupViews" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
-                  <th onClick={() => handleSort("totalViews")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, color: "#3B9686", whiteSpace: "nowrap" }}>
+                  <th onClick={() => handleSort("totalViews")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, color: "#0D9488", whiteSpace: "nowrap" }}>
                     Total {sortCol === "totalViews" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
                   <th onClick={() => handleSort("pct")} style={{ padding: "10px 12px", textAlign: "center", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
@@ -658,35 +662,35 @@ export default function DashboardView({ onOpen = () => {} }) {
                       key={idx} 
                       onClick={() => onOpen(k)}
                       style={{ 
-                        borderBottom: "1px solid #F2ECE4", 
-                        background: idx % 2 === 0 ? "#FFFFFF" : "#FAF8F5",
+                        borderBottom: "1px solid #F1F5F9", 
+                        background: idx % 2 === 0 ? "#FFFFFF" : "#F8FAFC",
                         cursor: "pointer"
                       }}
                     >
-                      <td style={{ padding: "10px 8px", textAlign: "center", fontWeight: 700, color: "#8C7A6B", fontSize: 11 }}>
+                      <td style={{ padding: "10px 8px", textAlign: "center", fontWeight: 700, color: "#64748B", fontSize: 11 }}>
                         {idx + 1}
                       </td>
-                      <td style={{ padding: "10px 14px", fontWeight: 700, color: "#2E3840", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "10px 14px", fontWeight: 700, color: "#0F172A", whiteSpace: "nowrap" }}>
                         {k.kol}
                       </td>
                       <td style={{ padding: "10px 10px", textAlign: "center", whiteSpace: "nowrap" }}>
-                        <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 6px", borderRadius: 4, background: "#F7F4EE", color: "#68584E" }}>
+                        <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 6px", borderRadius: 4, background: "#F1F5F9", color: "#475569" }}>
                           {k.tier}
                         </span>
                       </td>
                       <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
                         {(k.cost / 1000000).toFixed(1)}M
                       </td>
-                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#8C7A6B", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#64748B", whiteSpace: "nowrap" }}>
                         {k.targetViews.toLocaleString()}
                       </td>
                       <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
                         {k.organicViews.toLocaleString()}
                       </td>
-                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#4A88BA", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#0284C7", whiteSpace: "nowrap" }}>
                         +{k.reupViews.toLocaleString()}
                       </td>
-                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#2E3840", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#0F172A", whiteSpace: "nowrap" }}>
                         {k.totalViews.toLocaleString()}
                       </td>
                       <td style={{ padding: "10px 12px", textAlign: "center", whiteSpace: "nowrap" }}>
@@ -694,8 +698,8 @@ export default function DashboardView({ onOpen = () => {} }) {
                           display: "inline-block",
                           padding: "2px 6px", 
                           borderRadius: 4, 
-                          background: isGood ? "#D0E9E6" : "#FACDD0", 
-                          color: isGood ? "#3B9686" : "#D45B6A",
+                          background: isGood ? "#CCFBF1" : "#FFE4E6", 
+                          color: isGood ? "#0D9488" : "#E11D48",
                           fontWeight: 800,
                           fontSize: 11,
                           whiteSpace: "nowrap"
@@ -709,7 +713,7 @@ export default function DashboardView({ onOpen = () => {} }) {
                       <td style={{ padding: "10px 10px", textAlign: "center", fontWeight: 700, whiteSpace: "nowrap" }}>
                         {k.time}
                       </td>
-                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: k.cpv <= 45 ? "#3B9686" : "#2E3840", fontWeight: 700, whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: k.cpv <= 45 ? "#0D9488" : "#0F172A", fontWeight: 700, whiteSpace: "nowrap" }}>
                         {k.cpv}đ
                       </td>
                     </tr>
@@ -717,7 +721,7 @@ export default function DashboardView({ onOpen = () => {} }) {
                 })}
               </tbody>
               <tfoot>
-                <tr style={{ background: "#F7F4EE", borderTop: "2px solid #E6DDD6", fontWeight: 800, color: "#2E3840" }}>
+                <tr style={{ background: "#F1F5F9", borderTop: "2px solid #E2E8F0", fontWeight: 800, color: "#0F172A" }}>
                   <td style={{ padding: "10px 8px", textAlign: "center" }}>—</td>
                   <td style={{ padding: "10px 14px", whiteSpace: "nowrap" }}>TỔNG ({sortedKols.length})</td>
                   <td>—</td>
@@ -730,10 +734,10 @@ export default function DashboardView({ onOpen = () => {} }) {
                   <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
                     {sortedKols.reduce((a, b) => a + b.organicViews, 0).toLocaleString()}
                   </td>
-                  <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#4A88BA", whiteSpace: "nowrap" }}>
+                  <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#0284C7", whiteSpace: "nowrap" }}>
                     +{sortedKols.reduce((a, b) => a + b.reupViews, 0).toLocaleString()}
                   </td>
-                  <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#3B9686", whiteSpace: "nowrap" }}>
+                  <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#0D9488", whiteSpace: "nowrap" }}>
                     {sortedKols.reduce((a, b) => a + b.totalViews, 0).toLocaleString()}
                   </td>
                   <td style={{ padding: "10px 12px", textAlign: "center", whiteSpace: "nowrap" }}>
@@ -742,7 +746,7 @@ export default function DashboardView({ onOpen = () => {} }) {
                       const a = sortedKols.reduce((a, b) => a + b.totalViews, 0);
                       const p = t > 0 ? ((a / t) * 100).toFixed(1) : 0;
                       return (
-                        <span style={{ padding: "2px 6px", borderRadius: 4, background: a >= t ? "#3B9686" : "#D45B6A", color: "#FFFFFF", fontWeight: 800 }}>
+                        <span style={{ padding: "2px 6px", borderRadius: 4, background: a >= t ? "#0D9488" : "#E11D48", color: "#FFFFFF", fontWeight: 800 }}>
                           {p}%
                         </span>
                       );
@@ -752,7 +756,7 @@ export default function DashboardView({ onOpen = () => {} }) {
                     {sortedKols.reduce((a, b) => a + b.eng, 0).toLocaleString()}
                   </td>
                   <td style={{ padding: "10px 10px", textAlign: "center", whiteSpace: "nowrap" }}>TB</td>
-                  <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#3B9686", whiteSpace: "nowrap" }}>
+                  <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#0D9488", whiteSpace: "nowrap" }}>
                     TB {(sortedKols.reduce((a, b) => a + b.cpv, 0) / (sortedKols.length || 1)).toFixed(1)}đ
                   </td>
                 </tr>

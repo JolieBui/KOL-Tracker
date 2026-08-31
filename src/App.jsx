@@ -7,35 +7,35 @@ const GlobalStyle = () => (
   <style>{`
     @import url('https://fonts.googleapis.com/css2?family=Questrial&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
-    /* ── DESIGN TOKENS: "Soft" Aesthetic Palette ── */
+    /* ── DESIGN TOKENS: Modern Crisp Gray-White Slate Palette ── */
     .kt-root {
-      --ink:        #2E3840; /* Soft Deep Charcoal */
-      --ink-mid:    #4E5D6C; /* Balanced Slate */
-      --ink-soft:   #7A8A99; /* Muted Slate */
+      --ink:        #0F172A; /* Deep Slate Navy */
+      --ink-mid:    #334155; /* Balanced Slate */
+      --ink-soft:   #64748B; /* Muted Slate */
       --ink-faint:  #CBD5E1; /* Light Slate */
-      --paper:      #F7F4EE; /* Warm Soft Canvas (#E5D5CA / #FDF0D0 wash) */
+      --paper:      #F1F5F9; /* Clean Crisp Slate-White Canvas */
       --card:       #FFFFFF; /* Pure White Card */
-      --surface:    #FAF7F2; /* Soft Surface */
-      --rule:       #E6DDD6; /* Soft Sand Border */
-      --line:       #E6DDD6;
-      --accent:     #D97A6C; /* Soft Coral / Terracotta (from #FACDD0 & #E5D5CA) */
-      --accent-hover: #C8695B;
-      --accent-dim: #5C6B73;
-      --accent-bg:  #FDF0D0; /* Pastel Butter Cream */
-      --accent-soft: #FACDD0; /* Soft Rose Blush */
+      --surface:    #F8FAFC; /* Soft Light Slate Surface */
+      --rule:       #E2E8F0; /* Clean Slate Border */
+      --line:       #E2E8F0;
+      --accent:     #E11D48; /* Crimson Rose Accent */
+      --accent-hover: #BE123C;
+      --accent-dim: #64748B;
+      --accent-bg:  #FFE4E6; /* Rose Tint */
+      --accent-soft: #FECDD3;
       
-      --ok:         #3B9686; /* Sage Mint */
-      --ok-bg:      #D0E9E6; /* Soft Mint Wash */
-      --warn:       #C98A26; /* Warm Honey */
-      --warn-bg:    #FDF0D0; /* Soft Cream Butter Wash */
-      --danger:     #D45B6A; /* Soft Coral Red */
-      --danger-bg:  #FACDD0; /* Soft Blush Wash */
-      --blue:       #4A88BA; /* Soft Sky Blue */
-      --blue-bg:    #D0E3F2; /* Powder Sky Wash */
-      --purple:     #7C6BB5; /* Soft Lilac */
-      --purple-bg:  #E0D7F5; /* Lavender Wash */
-      --sand:       #8A7364; /* Warm Sand */
-      --sand-bg:    #E5D5CA; /* Muted Sand Wash */
+      --ok:         #0D9488; /* Teal Mint */
+      --ok-bg:      #CCFBF1; /* Light Teal Wash */
+      --warn:       #D97706; /* Amber */
+      --warn-bg:    #FEF3C7; /* Light Amber Wash */
+      --danger:     #E11D48; /* Rose Red */
+      --danger-bg:  #FFE4E6; /* Light Rose Wash */
+      --blue:       #0284C7; /* Clean Sky Blue */
+      --blue-bg:    #E0F2FE; /* Light Sky Wash */
+      --purple:     #7C3AED; /* Clean Violet */
+      --purple-bg:  #EDE9FE; /* Light Violet Wash */
+      --sand:       #475569; /* Cool Slate */
+      --sand-bg:    #F1F5F9; /* Slate Wash */
 
       font-family: 'Questrial', sans-serif;
       font-size: 14px;
