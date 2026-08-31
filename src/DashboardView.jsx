@@ -59,6 +59,7 @@ const DATA_MSG = {
     },
     {
       metric: "Tổng ngân sách SUM TOTAL (bao gồm AF 15%)",
+      level: 0,
       unit: "VNĐ",
       ly: "501.72M",
       target: "700.00M",
@@ -70,7 +71,8 @@ const DATA_MSG = {
       barPct: 100
     },
     {
-      metric: "├── Tổng chi phí thực hiện Summer (Net)",
+      metric: "Tổng chi phí thực hiện Summer (Net)",
+      level: 1,
       unit: "VNĐ",
       ly: "436.27M",
       target: "608.70M",
@@ -82,7 +84,8 @@ const DATA_MSG = {
       barPct: 100
     },
     {
-      metric: "│     ├── Chi phí booking KOLs",
+      metric: "Chi phí booking KOLs",
+      level: 2,
       unit: "VNĐ",
       ly: "436.27M",
       target: "520.00M",
@@ -94,7 +97,8 @@ const DATA_MSG = {
       barPct: 100
     },
     {
-      metric: "│     └── Chi phí quảng cáo (Media Paid)",
+      metric: "Chi phí quảng cáo (Media Paid)",
+      level: 2,
       unit: "VNĐ",
       ly: "0đ",
       target: "88.70M",
@@ -106,7 +110,8 @@ const DATA_MSG = {
       barPct: 100
     },
     {
-      metric: "└── Phí Agency (AF 15%)",
+      metric: "Phí Agency (AF 15%)",
+      level: 1,
       unit: "VNĐ",
       ly: "65.44M",
       target: "91.30M",
@@ -257,6 +262,7 @@ const DATA_VINEGAR = {
     },
     {
       metric: "Tổng ngân sách (bao gồm AF 15%)",
+      level: 0,
       unit: "VNĐ",
       ly: "442.24M",
       target: "200.00M",
@@ -268,7 +274,8 @@ const DATA_VINEGAR = {
       barPct: 100
     },
     {
-      metric: "├── Chi phí booking 10 KOLs",
+      metric: "Chi phí booking KOLs",
+      level: 1,
       unit: "VNĐ",
       ly: "324.00M",
       target: "178.00M",
@@ -280,7 +287,8 @@ const DATA_VINEGAR = {
       barPct: 100
     },
     {
-      metric: "├── Chi phí quảng cáo (Media Paid)",
+      metric: "Chi phí quảng cáo (Media Paid)",
+      level: 1,
       unit: "VNĐ",
       ly: "60.56M",
       target: "38.51M",
@@ -292,7 +300,8 @@ const DATA_VINEGAR = {
       barPct: 100
     },
     {
-      metric: "└── Phí Agency (AF 15%)",
+      metric: "Phí Agency (AF 15%)",
+      level: 1,
       unit: "VNĐ",
       ly: "57.68M",
       target: "26.09M",
@@ -561,7 +570,19 @@ export default function DashboardView({ onOpen = () => {} }) {
                   {data.metrics.map((m, idx) => (
                     <tr key={idx} style={{ borderBottom: "1px solid #F1F5F9", background: idx % 2 === 0 ? "#FFFFFF" : "#F8FAFC" }}>
                       
-                      <td style={{ padding: "12px 16px", fontWeight: 700, color: "#0F172A", whiteSpace: "nowrap" }}>
+                      <td style={{ 
+                        padding: "12px 16px", 
+                        paddingLeft: m.level === 1 ? 32 : m.level === 2 ? 48 : 16,
+                        fontWeight: m.level === 0 ? 800 : m.level === 1 ? 700 : m.level === 2 ? 600 : 700, 
+                        color: m.level === 2 ? "#475569" : m.level === 1 ? "#334155" : "#0F172A", 
+                        whiteSpace: "nowrap" 
+                      }}>
+                        {m.level === 1 && (
+                          <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: "#94A3B8", marginRight: 8, verticalAlign: "middle" }} />
+                        )}
+                        {m.level === 2 && (
+                          <span style={{ color: "#94A3B8", marginRight: 8, fontSize: 13, fontWeight: 700 }}>↳</span>
+                        )}
                         {m.metric}
                       </td>
 
