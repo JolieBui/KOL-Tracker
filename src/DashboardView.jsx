@@ -909,46 +909,46 @@ export default function DashboardView({
             </div>
           </div>
 
-          {/* Table Container with Sticky Header & Scrollbar */}
-          <div style={{ overflowX: "auto", overflowY: "auto", maxHeight: "calc(100vh - 250px)", minHeight: 380 }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+          {/* Table Container with Sticky Header & No Horizontal Scroll */}
+          <div style={{ overflowY: "auto", maxHeight: "calc(100vh - 250px)", minHeight: 380, width: "100%" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11, tableLayout: "auto" }}>
               <thead style={{ position: "sticky", top: 0, zIndex: 10, background: "#F8FAFC", boxShadow: "0 1px 2px rgba(0,0,0,0.05)" }}>
                 <tr style={{ background: "#F8FAFC", borderBottom: "2px solid #E2E8F0", color: "#475569" }}>
-                  <th style={{ padding: "10px 8px", textAlign: "center", fontWeight: 800, width: 40, whiteSpace: "nowrap" }}>#</th>
-                  <th onClick={() => handleSort("kol")} style={{ padding: "10px 14px", textAlign: "left", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
+                  <th style={{ padding: "8px 4px", textAlign: "center", fontWeight: 800, width: 28, whiteSpace: "nowrap" }}>#</th>
+                  <th onClick={() => handleSort("kol")} style={{ padding: "8px 8px", textAlign: "left", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
                     Tên KOL {sortCol === "kol" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
-                  <th style={{ padding: "10px 10px", textAlign: "center", fontWeight: 700, whiteSpace: "nowrap" }}>Phân cấp</th>
-                  <th onClick={() => handleSort("cost")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
-                    Chi phí booking {sortCol === "cost" && (sortDir === "asc" ? "▲" : "▼")}
+                  <th style={{ padding: "8px 4px", textAlign: "center", fontWeight: 700, whiteSpace: "nowrap" }}>Phân cấp</th>
+                  <th onClick={() => handleSort("cost")} style={{ padding: "8px 6px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
+                    Chi phí {sortCol === "cost" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
-                  <th style={{ padding: "10px 12px", textAlign: "right", fontWeight: 800, color: "#64748B", whiteSpace: "nowrap" }}>
-                    Cùng kỳ FY25
+                  <th style={{ padding: "8px 6px", textAlign: "right", fontWeight: 800, color: "#64748B", whiteSpace: "nowrap" }}>
+                    FY25
                   </th>
-                  <th onClick={() => handleSort("targetViews")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
-                    Mục tiêu lượt xem {sortCol === "targetViews" && (sortDir === "asc" ? "▲" : "▼")}
+                  <th onClick={() => handleSort("targetViews")} style={{ padding: "8px 6px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
+                    Mục tiêu {sortCol === "targetViews" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
-                  <th onClick={() => handleSort("organicViews")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
-                    Lượt xem tự nhiên {sortCol === "organicViews" && (sortDir === "asc" ? "▲" : "▼")}
+                  <th onClick={() => handleSort("organicViews")} style={{ padding: "8px 6px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
+                    Tự nhiên {sortCol === "organicViews" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
-                  <th onClick={() => handleSort("reupViews")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, color: "#0284C7", whiteSpace: "nowrap" }}>
-                    Lượt xem reup {sortCol === "reupViews" && (sortDir === "asc" ? "▲" : "▼")}
+                  <th onClick={() => handleSort("reupViews")} style={{ padding: "8px 6px", textAlign: "right", cursor: "pointer", fontWeight: 800, color: "#0284C7", whiteSpace: "nowrap" }}>
+                    Reup {sortCol === "reupViews" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
-                  <th onClick={() => handleSort("totalViews")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, color: "#0D9488", whiteSpace: "nowrap" }}>
-                    Tổng lượt xem {sortCol === "totalViews" && (sortDir === "asc" ? "▲" : "▼")}
+                  <th onClick={() => handleSort("totalViews")} style={{ padding: "8px 6px", textAlign: "right", cursor: "pointer", fontWeight: 800, color: "#0D9488", whiteSpace: "nowrap" }}>
+                    Tổng view {sortCol === "totalViews" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
-                  <th onClick={() => handleSort("pct")} style={{ padding: "10px 12px", textAlign: "center", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
-                    % Đạt KPI lượt xem {sortCol === "pct" && (sortDir === "asc" ? "▲" : "▼")}
+                  <th onClick={() => handleSort("pct")} style={{ padding: "8px 4px", textAlign: "center", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
+                    % KPI {sortCol === "pct" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
-                  <th style={{ padding: "10px 12px", textAlign: "center", fontWeight: 800, whiteSpace: "nowrap" }}>
-                    Tăng trưởng YoY
+                  <th style={{ padding: "8px 4px", textAlign: "center", fontWeight: 800, whiteSpace: "nowrap" }}>
+                    YoY
                   </th>
-                  <th onClick={() => handleSort("eng")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
-                    Lượt tương tác {sortCol === "eng" && (sortDir === "asc" ? "▲" : "▼")}
+                  <th onClick={() => handleSort("eng")} style={{ padding: "8px 6px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
+                    Tương tác {sortCol === "eng" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
-                  <th style={{ padding: "10px 10px", textAlign: "center", fontWeight: 700, whiteSpace: "nowrap" }}>Thời lượng xem</th>
-                  <th onClick={() => handleSort("cpv")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
-                    Chi phí CPV 6s {sortCol === "cpv" && (sortDir === "asc" ? "▲" : "▼")}
+                  <th style={{ padding: "8px 4px", textAlign: "center", fontWeight: 700, whiteSpace: "nowrap" }}>Thời lượng</th>
+                  <th onClick={() => handleSort("cpv")} style={{ padding: "8px 6px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
+                    CPV 6s {sortCol === "cpv" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
                 </tr>
               </thead>
@@ -974,70 +974,70 @@ export default function DashboardView({
                         cursor: "pointer"
                       }}
                     >
-                      <td style={{ padding: "10px 8px", textAlign: "center", fontWeight: 700, color: "#64748B", fontSize: 11 }}>
+                      <td style={{ padding: "7px 4px", textAlign: "center", fontWeight: 700, color: "#64748B", fontSize: 10 }}>
                         {idx + 1}
                       </td>
-                      <td style={{ padding: "10px 14px", fontWeight: 700, color: "#0F172A", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "7px 8px", fontWeight: 700, color: "#0F172A", whiteSpace: "nowrap" }}>
                         {k.kol}
                       </td>
-                      <td style={{ padding: "10px 10px", textAlign: "center", whiteSpace: "nowrap" }}>
-                        <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 6px", borderRadius: 4, background: "#F1F5F9", color: "#475569" }}>
+                      <td style={{ padding: "7px 4px", textAlign: "center", whiteSpace: "nowrap" }}>
+                        <span style={{ fontSize: 9.5, fontWeight: 700, padding: "1px 5px", borderRadius: 4, background: "#F1F5F9", color: "#475569" }}>
                           {k.tier}
                         </span>
                       </td>
-                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "7px 6px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
                         {(k.cost / 1000000).toFixed(1)}M
                       </td>
-                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#64748B", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "7px 6px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#64748B", whiteSpace: "nowrap" }}>
                         {k.lyViews}
                       </td>
-                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#64748B", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "7px 6px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#64748B", whiteSpace: "nowrap" }}>
                         {k.targetViews.toLocaleString()}
                       </td>
-                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "7px 6px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
                         {k.organicViews.toLocaleString()}
                       </td>
-                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#0284C7", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "7px 6px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#0284C7", whiteSpace: "nowrap" }}>
                         +{k.reupViews.toLocaleString()}
                       </td>
-                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#0F172A", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "7px 6px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#0F172A", whiteSpace: "nowrap" }}>
                         {k.totalViews.toLocaleString()}
                       </td>
-                      <td style={{ padding: "10px 12px", textAlign: "center", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "7px 4px", textAlign: "center", whiteSpace: "nowrap" }}>
                         <span style={{ 
                           display: "inline-block",
-                          padding: "2px 6px", 
+                          padding: "2px 5px", 
                           borderRadius: 4, 
                           background: isGood ? "#CCFBF1" : "#FFE4E6", 
                           color: isGood ? "#0D9488" : "#E11D48",
                           fontWeight: 800,
-                          fontSize: 11,
+                          fontSize: 10,
                           whiteSpace: "nowrap"
                         }}>
                           {pct}%
                         </span>
                       </td>
-                      <td style={{ padding: "10px 12px", textAlign: "center", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "7px 4px", textAlign: "center", whiteSpace: "nowrap" }}>
                         <span style={{ 
                           display: "inline-block",
-                          padding: "2px 6px", 
+                          padding: "2px 5px", 
                           borderRadius: 4, 
                           background: k.yoy.startsWith("+") ? "#CCFBF1" : k.yoy.startsWith("-") ? "#FFE4E6" : "#F1F5F9",
                           color: k.yoy.startsWith("+") ? "#0D9488" : k.yoy.startsWith("-") ? "#E11D48" : "#64748B",
                           fontWeight: 800,
-                          fontSize: 11,
+                          fontSize: 10,
                           whiteSpace: "nowrap"
                         }}>
                           {k.yoy}
                         </span>
                       </td>
-                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "7px 6px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
                         {k.eng.toLocaleString()}
                       </td>
-                      <td style={{ padding: "10px 10px", textAlign: "center", fontWeight: 700, whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "7px 4px", textAlign: "center", fontWeight: 700, whiteSpace: "nowrap" }}>
                         {k.time}
                       </td>
-                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: k.cpv <= 45 ? "#0D9488" : "#0F172A", fontWeight: 700, whiteSpace: "nowrap" }}>
+                      <td style={{ padding: "7px 6px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: k.cpv <= 45 ? "#0D9488" : "#0F172A", fontWeight: 700, whiteSpace: "nowrap" }}>
                         {k.cpv}đ
                       </td>
                     </tr>
@@ -1046,50 +1046,50 @@ export default function DashboardView({
               </tbody>
               <tfoot style={{ position: "sticky", bottom: 0, zIndex: 10, background: "#F1F5F9", boxShadow: "0 -1px 2px rgba(0,0,0,0.05)" }}>
                 <tr style={{ background: "#F1F5F9", borderTop: "2px solid #E2E8F0", fontWeight: 800, color: "#0F172A" }}>
-                  <td style={{ padding: "10px 8px", textAlign: "center" }}>—</td>
-                  <td style={{ padding: "10px 14px", whiteSpace: "nowrap" }}>TỔNG CỘNG</td>
+                  <td style={{ padding: "8px 4px", textAlign: "center" }}>—</td>
+                  <td style={{ padding: "8px 8px", whiteSpace: "nowrap" }}>TỔNG CỘNG</td>
                   <td>—</td>
-                  <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
+                  <td style={{ padding: "8px 6px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
                     {(sortedKols.reduce((a, b) => a + b.cost, 0) / 1000000).toFixed(1)}M
                   </td>
-                  <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#64748B", whiteSpace: "nowrap" }}>
+                  <td style={{ padding: "8px 6px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#64748B", whiteSpace: "nowrap" }}>
                     {data.key === "MSG" ? "7.49M" : "4.05M"}
                   </td>
-                  <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
+                  <td style={{ padding: "8px 6px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
                     {sortedKols.reduce((a, b) => a + b.targetViews, 0).toLocaleString()}
                   </td>
-                  <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
+                  <td style={{ padding: "8px 6px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
                     {sortedKols.reduce((a, b) => a + b.organicViews, 0).toLocaleString()}
                   </td>
-                  <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#0284C7", whiteSpace: "nowrap" }}>
+                  <td style={{ padding: "8px 6px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#0284C7", whiteSpace: "nowrap" }}>
                     +{sortedKols.reduce((a, b) => a + b.reupViews, 0).toLocaleString()}
                   </td>
-                  <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#0D9488", whiteSpace: "nowrap" }}>
+                  <td style={{ padding: "8px 6px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#0D9488", whiteSpace: "nowrap" }}>
                     {sortedKols.reduce((a, b) => a + b.totalViews, 0).toLocaleString()}
                   </td>
-                  <td style={{ padding: "10px 12px", textAlign: "center", whiteSpace: "nowrap" }}>
+                  <td style={{ padding: "8px 4px", textAlign: "center", whiteSpace: "nowrap" }}>
                     {(() => {
                       const t = sortedKols.reduce((a, b) => a + b.targetViews, 0);
                       const a = sortedKols.reduce((a, b) => a + b.totalViews, 0);
                       const p = t > 0 ? ((a / t) * 100).toFixed(1) : 0;
                       return (
-                        <span style={{ padding: "2px 6px", borderRadius: 4, background: a >= t ? "#0D9488" : "#E11D48", color: "#FFFFFF", fontWeight: 800 }}>
+                        <span style={{ padding: "2px 5px", borderRadius: 4, background: a >= t ? "#0D9488" : "#E11D48", color: "#FFFFFF", fontWeight: 800, fontSize: 10 }}>
                           {p}%
                         </span>
                       );
                     })()}
                   </td>
-                  <td style={{ padding: "10px 12px", textAlign: "center", whiteSpace: "nowrap" }}>
-                    <span style={{ padding: "2px 6px", borderRadius: 4, background: data.key === "MSG" ? "#CCFBF1" : "#FFE4E6", color: data.key === "MSG" ? "#0D9488" : "#E11D48", fontWeight: 800 }}>
+                  <td style={{ padding: "8px 4px", textAlign: "center", whiteSpace: "nowrap" }}>
+                    <span style={{ padding: "2px 5px", borderRadius: 4, background: data.key === "MSG" ? "#CCFBF1" : "#FFE4E6", color: data.key === "MSG" ? "#0D9488" : "#E11D48", fontWeight: 800, fontSize: 10 }}>
                       {data.key === "MSG" ? "+17.9%" : "-48.7%"}
                     </span>
                   </td>
-                  <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
+                  <td style={{ padding: "8px 6px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
                     {sortedKols.reduce((a, b) => a + b.eng, 0).toLocaleString()}
                   </td>
-                  <td style={{ padding: "10px 10px", textAlign: "center", whiteSpace: "nowrap" }}>TB</td>
-                  <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#0D9488", whiteSpace: "nowrap" }}>
-                    TB {(sortedKols.reduce((a, b) => a + b.cpv, 0) / (sortedKols.length || 1)).toFixed(1)}đ
+                  <td style={{ padding: "8px 4px", textAlign: "center", whiteSpace: "nowrap" }}>TB</td>
+                  <td style={{ padding: "8px 6px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#0D9488", whiteSpace: "nowrap" }}>
+                    {(sortedKols.reduce((a, b) => a + b.cpv, 0) / (sortedKols.length || 1)).toFixed(1)}đ
                   </td>
                 </tr>
               </tfoot>
