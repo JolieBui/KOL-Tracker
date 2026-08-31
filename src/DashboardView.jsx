@@ -776,7 +776,7 @@ export default function DashboardView({
             {/* 1. LƯỢT XEM */}
             <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E2E8F0", padding: "14px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
               <div style={{ fontSize: 12, fontWeight: 800, color: "#0D9488", marginBottom: 10, whiteSpace: "nowrap" }}>
-                🟢 TOP VƯỢT MỤC TIÊU LƯỢT XEM
+                🟢 TOP TARGET VIEWS ACHIEVEMENT
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {data.topViews.map((k, i) => {
@@ -831,7 +831,7 @@ export default function DashboardView({
             {/* 2. LƯỢT TƯƠNG TÁC */}
             <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E2E8F0", padding: "14px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
               <div style={{ fontSize: 12, fontWeight: 800, color: "#0284C7", marginBottom: 10, whiteSpace: "nowrap" }}>
-                ❤️ TOP LƯỢT TƯƠNG TÁC CAO NHẤT
+                ❤️ TOP ENGAGEMENT (TƯƠNG TÁC)
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {data.topEng.map((k, i) => {
@@ -884,7 +884,7 @@ export default function DashboardView({
             {/* 3. THỜI LƯỢNG XEM */}
             <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E2E8F0", padding: "14px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
               <div style={{ fontSize: 12, fontWeight: 800, color: "#7C3AED", marginBottom: 10, whiteSpace: "nowrap" }}>
-                ⏱️ TOP THỜI LƯỢNG XEM LÂU NHẤT
+                ⏱️ TOP AVG WATCH TIME (THỜI LƯỢNG)
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {data.topTime.map((k, i) => {
@@ -1019,40 +1019,40 @@ export default function DashboardView({
                 <tr style={{ background: "#F8FAFC", borderBottom: "2px solid #E2E8F0", color: "#475569" }}>
                   <th style={{ padding: "8px 4px", textAlign: "center", fontWeight: 800, width: 28, whiteSpace: "nowrap" }}>#</th>
                   <th onClick={() => handleSort("kol")} style={{ padding: "8px 8px", textAlign: "left", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
-                    Tên KOL {sortCol === "kol" && (sortDir === "asc" ? "▲" : "▼")}
+                    KOL Name {sortCol === "kol" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
-                  <th style={{ padding: "8px 4px", textAlign: "center", fontWeight: 700, whiteSpace: "nowrap" }}>Phân cấp</th>
+                  <th style={{ padding: "8px 4px", textAlign: "center", fontWeight: 700, whiteSpace: "nowrap" }}>Tier</th>
                   <th onClick={() => handleSort("cost")} style={{ padding: "8px 6px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
-                    Chi phí {sortCol === "cost" && (sortDir === "asc" ? "▲" : "▼")}
+                    Booking Cost {sortCol === "cost" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
                   <th style={{ padding: "8px 6px", textAlign: "right", fontWeight: 800, color: "#64748B", whiteSpace: "nowrap" }}>
-                    FY25
+                    FY25 (LY)
                   </th>
                   <th onClick={() => handleSort("targetViews")} style={{ padding: "8px 6px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
-                    Mục tiêu {sortCol === "targetViews" && (sortDir === "asc" ? "▲" : "▼")}
+                    Target Views {sortCol === "targetViews" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
                   <th onClick={() => handleSort("organicViews")} style={{ padding: "8px 6px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
-                    Không reup {sortCol === "organicViews" && (sortDir === "asc" ? "▲" : "▼")}
+                    Organic Views {sortCol === "organicViews" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
                   <th onClick={() => handleSort("reupViews")} style={{ padding: "8px 6px", textAlign: "right", cursor: "pointer", fontWeight: 800, color: "#0284C7", whiteSpace: "nowrap" }}>
-                    Reup {sortCol === "reupViews" && (sortDir === "asc" ? "▲" : "▼")}
+                    Reup Views {sortCol === "reupViews" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
                   <th onClick={() => handleSort("totalViews")} style={{ padding: "8px 6px", textAlign: "right", cursor: "pointer", fontWeight: 800, color: "#0D9488", whiteSpace: "nowrap" }}>
-                    Tổng view {sortCol === "totalViews" && (sortDir === "asc" ? "▲" : "▼")}
+                    Total Views {sortCol === "totalViews" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
                   <th style={{ padding: "8px 4px", textAlign: "center", fontWeight: 800, whiteSpace: "nowrap" }}>
-                    % KPI (Ko reup)
+                    % Target (Organic)
                   </th>
                   <th onClick={() => handleSort("pct")} style={{ padding: "8px 4px", textAlign: "center", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
-                    % KPI (Có reup) {sortCol === "pct" && (sortDir === "asc" ? "▲" : "▼")}
+                    % Target (Total) {sortCol === "pct" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
                   <th style={{ padding: "8px 4px", textAlign: "center", fontWeight: 800, whiteSpace: "nowrap" }}>
-                    YoY
+                    YoY Growth
                   </th>
                   <th onClick={() => handleSort("eng")} style={{ padding: "8px 6px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
-                    Tương tác {sortCol === "eng" && (sortDir === "asc" ? "▲" : "▼")}
+                    Engagement {sortCol === "eng" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
-                  <th style={{ padding: "8px 4px", textAlign: "center", fontWeight: 700, whiteSpace: "nowrap" }}>Thời lượng</th>
+                  <th style={{ padding: "8px 4px", textAlign: "center", fontWeight: 700, whiteSpace: "nowrap" }}>Avg Watch Time</th>
                   <th onClick={() => handleSort("cpv")} style={{ padding: "8px 6px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
                     CPV 6s {sortCol === "cpv" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
@@ -1291,7 +1291,7 @@ export default function DashboardView({
             {/* Body: Grid of Key Metrics */}
             <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: 12 }}>
               
-              {/* Row 1: Cost & % KPI (Không reup vs Có reup) */}
+              {/* Row 1: Cost & % Target (Organic vs Total) */}
               {(() => {
                 const orgPct = activeDetailKol.targetViews > 0 ? ((activeDetailKol.organicViews / activeDetailKol.targetViews) * 100).toFixed(1) : 0;
                 const totPct = activeDetailKol.targetViews > 0 ? ((activeDetailKol.totalViews / activeDetailKol.targetViews) * 100).toFixed(1) : 0;
@@ -1301,21 +1301,21 @@ export default function DashboardView({
                 return (
                   <div style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr 1fr", gap: 8 }}>
                     <div style={{ background: "#F8FAFC", padding: "10px 12px", borderRadius: 10, border: "1px solid #F1F5F9" }}>
-                      <div style={{ fontSize: 10.5, fontWeight: 700, color: "#64748B" }}>💰 Chi phí booking</div>
+                      <div style={{ fontSize: 10.5, fontWeight: 700, color: "#64748B" }}>💰 Booking Cost</div>
                       <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0F172A", marginTop: 3, fontFamily: "'IBM Plex Mono', monospace" }}>
                         {(activeDetailKol.cost / 1000000).toFixed(1)}M VNĐ
                       </div>
                     </div>
 
                     <div style={{ background: isOrgGood ? "#F0FDF4" : "#FFF1F2", padding: "10px 12px", borderRadius: 10, border: isOrgGood ? "1px solid #BBF7D0" : "1px solid #FECDD3" }}>
-                      <div style={{ fontSize: 10, fontWeight: 700, color: isOrgGood ? "#16A34A" : "#E11D48" }}>🎯 % KPI (Không reup)</div>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: isOrgGood ? "#16A34A" : "#E11D48" }}>🎯 % Target (Organic)</div>
                       <div style={{ fontSize: 14.5, fontWeight: 800, color: isOrgGood ? "#15803D" : "#BE123C", marginTop: 3 }}>
                         {orgPct}%
                       </div>
                     </div>
 
                     <div style={{ background: isTotGood ? "#F0FDF4" : "#FFF1F2", padding: "10px 12px", borderRadius: 10, border: isTotGood ? "1px solid #BBF7D0" : "1px solid #FECDD3" }}>
-                      <div style={{ fontSize: 10, fontWeight: 700, color: isTotGood ? "#16A34A" : "#E11D48" }}>🚀 % KPI (Có reup)</div>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: isTotGood ? "#16A34A" : "#E11D48" }}>🚀 % Target (Total)</div>
                       <div style={{ fontSize: 14.5, fontWeight: 800, color: isTotGood ? "#15803D" : "#BE123C", marginTop: 3 }}>
                         {totPct}%
                       </div>
@@ -1326,23 +1326,23 @@ export default function DashboardView({
 
               {/* Row 2: View Breakdown */}
               <div style={{ background: "#F8FAFC", padding: "12px 14px", borderRadius: 10, border: "1px solid #F1F5F9" }}>
-                <div style={{ fontSize: 11, fontWeight: 800, color: "#475569", marginBottom: 8 }}>📊 CHI TIẾT LƯỢT XEM (VIEWS)</div>
+                <div style={{ fontSize: 11, fontWeight: 800, color: "#475569", marginBottom: 8 }}>📊 VIEWS BREAKDOWN</div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, textAlign: "center" }}>
                   <div>
-                    <div style={{ fontSize: 10, color: "#64748B" }}>Mục tiêu cam kết</div>
+                    <div style={{ fontSize: 10, color: "#64748B" }}>Target Views (KPI)</div>
                     <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A", marginTop: 2 }}>{activeDetailKol.targetViews.toLocaleString()}</div>
                   </div>
                   <div>
-                    <div style={{ fontSize: 10, color: "#0F172A" }}>Không reup (Tự nhiên)</div>
+                    <div style={{ fontSize: 10, color: "#0F172A" }}>Organic Views (TikTok)</div>
                     <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A", marginTop: 2 }}>{activeDetailKol.organicViews.toLocaleString()}</div>
                   </div>
                   <div>
-                    <div style={{ fontSize: 10, color: "#0284C7" }}>Reup (Quảng cáo)</div>
+                    <div style={{ fontSize: 10, color: "#0284C7" }}>Reup Views (Facebook)</div>
                     <div style={{ fontSize: 13, fontWeight: 700, color: "#0284C7", marginTop: 2 }}>+{activeDetailKol.reupViews.toLocaleString()}</div>
                   </div>
                 </div>
                 <div style={{ marginTop: 10, paddingTop: 8, borderTop: "1px solid #E2E8F0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: 11, fontWeight: 800, color: "#0F172A" }}>Tổng lượt xem (Có reup):</span>
+                  <span style={{ fontSize: 11, fontWeight: 800, color: "#0F172A" }}>Total Views (All Channels):</span>
                   <span style={{ fontSize: 14, fontWeight: 800, color: "#0D9488", fontFamily: "'IBM Plex Mono', monospace" }}>{activeDetailKol.totalViews.toLocaleString()} views</span>
                 </div>
               </div>
@@ -1350,11 +1350,11 @@ export default function DashboardView({
               {/* Row 3: Engagement, Watch time, CPV 6s */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
                 <div style={{ background: "#F8FAFC", padding: "10px", borderRadius: 10, border: "1px solid #F1F5F9", textAlign: "center" }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: "#64748B" }}>❤️ Tương tác</div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: "#64748B" }}>❤️ Engagement</div>
                   <div style={{ fontSize: 14, fontWeight: 800, color: "#0284C7", marginTop: 2 }}>{activeDetailKol.eng.toLocaleString()}</div>
                 </div>
                 <div style={{ background: "#F8FAFC", padding: "10px", borderRadius: 10, border: "1px solid #F1F5F9", textAlign: "center" }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: "#64748B" }}>⏱️ Thời lượng xem</div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: "#64748B" }}>⏱️ Avg Watch Time</div>
                   <div style={{ fontSize: 14, fontWeight: 800, color: "#7C3AED", marginTop: 2 }}>{activeDetailKol.time}</div>
                 </div>
                 <div style={{ background: "#F8FAFC", padding: "10px", borderRadius: 10, border: "1px solid #F1F5F9", textAlign: "center" }}>
@@ -1366,9 +1366,9 @@ export default function DashboardView({
               {/* Row 4: Historical Comparison FY25 */}
               <div style={{ background: "#F8FAFC", padding: "12px 14px", borderRadius: 10, border: "1px solid #F1F5F9", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: "#64748B" }}>📈 LỊCH SỬ CÙNG KỲ (FY25)</div>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: "#64748B" }}>📈 FY25 BENCHMARK</div>
                   <div style={{ fontSize: 12, fontWeight: 700, color: "#0F172A", marginTop: 2 }}>
-                    {activeDetailKol.lyViews === "Mới" ? "✨ KOL Mới tham gia chiến dịch lần đầu" : `Cùng kỳ FY25 đạt: ${activeDetailKol.lyViews} views`}
+                    {activeDetailKol.lyViews === "Mới" ? "✨ New KOL (First Campaign)" : `FY25 Actual: ${activeDetailKol.lyViews} views`}
                   </div>
                 </div>
                 {activeDetailKol.yoy !== "—" && (
