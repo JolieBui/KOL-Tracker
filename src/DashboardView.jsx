@@ -5,7 +5,7 @@ import React, { useState, useMemo } from "react";
    ========================================================================= */
 const MSG_DATA = {
   key: "MSG",
-  name: "[MSG] Bột Ngọt",
+  name: "MSG",
   kolCount: 25,
   period: "W4 June 26 – W1 Aug 26 (6 tuần)",
   metrics: [
@@ -117,7 +117,7 @@ const MSG_DATA = {
 
 const VINEGAR_DATA = {
   key: "VINEGAR",
-  name: "VINEGAR Giấm Gạo",
+  name: "Vinegar",
   kolCount: 10,
   period: "W4 June 26 – W1 Aug 26 (6 tuần)",
   metrics: [
@@ -264,7 +264,7 @@ export default function DashboardView({ onOpen = () => {} }) {
             <button 
               onClick={() => { setProjectKey("MSG"); setKolSearch(""); }}
               style={{
-                padding: "8px 18px",
+                padding: "8px 20px",
                 borderRadius: 9,
                 fontSize: 13,
                 fontWeight: 800,
@@ -276,12 +276,12 @@ export default function DashboardView({ onOpen = () => {} }) {
                 transition: "all 0.15s"
               }}
             >
-              🧂 [MSG] Bột Ngọt ({MSG_DATA.kolCount} KOLs)
+              MSG
             </button>
             <button 
               onClick={() => { setProjectKey("VINEGAR"); setKolSearch(""); }}
               style={{
-                padding: "8px 18px",
+                padding: "8px 20px",
                 borderRadius: 9,
                 fontSize: 13,
                 fontWeight: 800,
@@ -293,7 +293,7 @@ export default function DashboardView({ onOpen = () => {} }) {
                 transition: "all 0.15s"
               }}
             >
-              🍶 VINEGAR Giấm Gạo ({VINEGAR_DATA.kolCount} KOLs)
+              Vinegar
             </button>
           </div>
         </div>
