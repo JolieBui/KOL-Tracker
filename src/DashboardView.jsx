@@ -660,7 +660,7 @@ export default function DashboardView({
                       key={i} 
                       onClick={() => {
                         const found = data.kols.find(item => item.kol === k.name);
-                        if (found) { setActiveDetailKol(found); onOpen(found); }
+                        if (found) setActiveDetailKol(found);
                       }}
                       onMouseEnter={() => setHoveredKol(k.name)}
                       onMouseLeave={() => setHoveredKol(null)}
@@ -715,7 +715,7 @@ export default function DashboardView({
                       key={i} 
                       onClick={() => {
                         const found = data.kols.find(item => item.kol === k.name);
-                        if (found) { setActiveDetailKol(found); onOpen(found); }
+                        if (found) setActiveDetailKol(found);
                       }}
                       onMouseEnter={() => setHoveredKol(k.name)}
                       onMouseLeave={() => setHoveredKol(null)}
@@ -768,7 +768,7 @@ export default function DashboardView({
                       key={i} 
                       onClick={() => {
                         const found = data.kols.find(item => item.kol === k.name);
-                        if (found) { setActiveDetailKol(found); onOpen(found); }
+                        if (found) setActiveDetailKol(found);
                       }}
                       onMouseEnter={() => setHoveredKol(k.name)}
                       onMouseLeave={() => setHoveredKol(null)}
@@ -939,7 +939,7 @@ export default function DashboardView({
                   return (
                     <tr 
                       key={idx} 
-                      onClick={() => { setActiveDetailKol(k); onOpen(k); }}
+                      onClick={() => setActiveDetailKol(k)}
                       style={{ 
                         borderBottom: "1px solid #F1F5F9", 
                         background: idx % 2 === 0 ? "#FFFFFF" : "#F8FAFC",
