@@ -143,55 +143,49 @@ const DATA_MSG = {
     }
   ],
   topViews: [
-    { name: "Ăn gì Thương ơi", tier: "Mid-tier", target: "400K", actual: "860K", diff: "+115.0%" },
-    { name: "Min Cookie", tier: "Mid-tier", target: "500K", actual: "520K", diff: "+4.0%" },
-    { name: "Bon đây nè", tier: "Macro", target: "800K", actual: "820K", diff: "+2.5%" },
-    { name: "Khánh Linh", tier: "Macro", target: "400K", actual: "430K", diff: "+7.5%" }
-  ],
-  lowViews: [
-    { name: "Emmer Sweet", tier: "Mid-tier", target: "1.00M", actual: "631K", diff: "-36.9%" },
-    { name: "Bùi Khánh Hà", tier: "Micro", target: "200K", actual: "185K", diff: "-7.5%" },
-    { name: "Gia đình Sầu", tier: "Micro", target: "200K", actual: "190K", diff: "-5.0%" },
-    { name: "Mẹ Bảo Bối", tier: "Micro", target: "200K", actual: "192K", diff: "-4.0%" }
+    { name: "Ăn gì Thương ơi", target: "400K", actual: "860K", diff: "+115.0%" },
+    { name: "Min Cookie", target: "500K", actual: "520K", diff: "+4.0%" },
+    { name: "Bon đây nè", target: "800K", actual: "820K", diff: "+2.5%" },
+    { name: "Khánh Linh", target: "400K", actual: "430K", diff: "+7.5%" }
   ],
   topEng: [
-    { name: "Bon đây nè", tier: "Macro", value: "46.5K tương tác", sub: "Top 1 tương tác" },
-    { name: "Trang Tấm", tier: "Mid-tier", value: "46.0K tương tác", sub: "Top 2 tương tác" },
-    { name: "Babykopo Home", tier: "Macro", value: "42.0K tương tác", sub: "Top 3 tương tác" },
-    { name: "Ăn gì Thương ơi", tier: "Mid-tier", value: "36.5K tương tác", sub: "Top 4 tương tác" }
+    { name: "Bon đây nè", value: "46.5K tương tác" },
+    { name: "Trang Tấm", value: "46.0K tương tác" },
+    { name: "Babykopo Home", value: "42.0K tương tác" },
+    { name: "Ăn gì Thương ơi", value: "36.5K tương tác" }
   ],
   topTime: [
-    { name: "taydayroi", tier: "Micro", value: "37.8 giây", sub: "Giữ chân lâu nhất" },
-    { name: "Bon đây nè", tier: "Macro", value: "21.2 giây", sub: "Top 2 thời lượng" },
-    { name: "Emmer Sweet", tier: "Mid-tier", value: "19.3 giây", sub: "Top 3 thời lượng" },
-    { name: "Ăn gì Thương ơi", tier: "Mid-tier", value: "8.4 giây", sub: "Top 4 thời lượng" }
+    { name: "taydayroi", value: "37.8 giây" },
+    { name: "Bon đây nè", value: "21.2 giây" },
+    { name: "Emmer Sweet", value: "19.3 giây" },
+    { name: "Ăn gì Thương ơi", value: "8.4 giây" }
   ],
   kols: [
-    { kol: "Min Cookie", tier: "Mid-tier", cost: 28000000, targetViews: 500000, organicViews: 520000, reupViews: 85000, totalViews: 605000, eng: 24200, cpv: 35.2, time: "7.8s" },
-    { kol: "Bon đây nè", tier: "Macro", cost: 34000000, targetViews: 800000, organicViews: 820000, reupViews: 95000, totalViews: 915000, eng: 34000, cpv: 40.1, time: "7.5s" },
-    { kol: "Ăn gì Thương ơi", tier: "Mid-tier", cost: 15400000, targetViews: 400000, organicViews: 860000, reupViews: 120000, totalViews: 980000, eng: 36500, cpv: 38.5, time: "8.4s" },
-    { kol: "Khánh Linh", tier: "Macro", cost: 15000000, targetViews: 400000, organicViews: 430000, reupViews: 60000, totalViews: 490000, eng: 19800, cpv: 39.0, time: "7.1s" },
-    { kol: "taydayroi", tier: "Micro", cost: 15000000, targetViews: 50000, organicViews: 65000, reupViews: 15000, totalViews: 80000, eng: 4200, cpv: 41.0, time: "37.8s" },
-    { kol: "Babykopo Home", tier: "Macro", cost: 35000000, targetViews: 500000, organicViews: 890000, reupViews: 110000, totalViews: 1000000, eng: 42000, cpv: 41.0, time: "7.2s" },
-    { kol: "Chú Đàn", tier: "Micro", cost: 35000000, targetViews: 200000, organicViews: 225000, reupViews: 30000, totalViews: 255000, eng: 32500, cpv: 41.5, time: "6.8s" },
-    { kol: "Thi Thi Miền Tây", tier: "Mid-tier", cost: 15000000, targetViews: 400000, organicViews: 420000, reupViews: 50000, totalViews: 470000, eng: 16200, cpv: 40.2, time: "6.7s" },
-    { kol: "let Nhân cook", tier: "Mid-tier", cost: 30000000, targetViews: 300000, organicViews: 340000, reupViews: 40000, totalViews: 380000, eng: 8500, cpv: 41.8, time: "6.9s" },
-    { kol: "Sườn Sóc Homie", tier: "Mid-tier", cost: 35000000, targetViews: 300000, organicViews: 330000, reupViews: 35000, totalViews: 365000, eng: 9200, cpv: 42.0, time: "6.6s" },
-    { kol: "Châu Kiều My", tier: "Mid-tier", cost: 8000000, targetViews: 400000, organicViews: 450000, reupViews: 45000, totalViews: 495000, eng: 22400, cpv: 39.5, time: "7.1s" },
-    { kol: "Quân Cooking", tier: "Micro", cost: 8000000, targetViews: 200000, organicViews: 235000, reupViews: 25000, totalViews: 260000, eng: 5800, cpv: 39.0, time: "6.8s" },
-    { kol: "My Huyền", tier: "Mid-tier", cost: 15000000, targetViews: 400000, organicViews: 440000, reupViews: 40000, totalViews: 480000, eng: 7200, cpv: 40.5, time: "6.5s" },
-    { kol: "Nấu Ăn Dễ Lắm", tier: "Micro", cost: 5000000, targetViews: 200000, organicViews: 245000, reupViews: 28000, totalViews: 273000, eng: 8900, cpv: 37.8, time: "7.0s" },
-    { kol: "Hảo Thích Vào Bếp", tier: "Micro", cost: 10000000, targetViews: 200000, organicViews: 230000, reupViews: 25000, totalViews: 255000, eng: 6400, cpv: 39.2, time: "7.3s" },
-    { kol: "Bếp Nga Nè", tier: "Nano", cost: 5000000, targetViews: 50000, organicViews: 95000, reupViews: 15000, totalViews: 110000, eng: 2100, cpv: 38.9, time: "7.0s" },
-    { kol: "Mai Hà", tier: "Nano", cost: 15000000, targetViews: 50000, organicViews: 94000, reupViews: 12000, totalViews: 106000, eng: 5200, cpv: 41.0, time: "6.8s" },
-    { kol: "Cơm nhà Bông", tier: "Micro", cost: 5000000, targetViews: 200000, organicViews: 220000, reupViews: 20000, totalViews: 240000, eng: 4800, cpv: 39.5, time: "6.5s" },
-    { kol: "Nhi say Hi", tier: "Micro", cost: 15000000, targetViews: 200000, organicViews: 210000, reupViews: 22000, totalViews: 232000, eng: 3900, cpv: 42.0, time: "6.4s" },
-    { kol: "Út Tình", tier: "Micro", cost: 15000000, targetViews: 200000, organicViews: 215000, reupViews: 20000, totalViews: 235000, eng: 4600, cpv: 41.8, time: "6.5s" },
-    { kol: "Bùi Khánh Hà", tier: "Micro", cost: 30000000, targetViews: 200000, organicViews: 185000, reupViews: 15000, totalViews: 200000, eng: 1800, cpv: 49.5, time: "6.0s" },
-    { kol: "Gia đình Sầu", tier: "Micro", cost: 15000000, targetViews: 200000, organicViews: 190000, reupViews: 18000, totalViews: 208000, eng: 12800, cpv: 51.0, time: "6.0s" },
-    { kol: "Mẹ Bảo Bối", tier: "Micro", cost: 15000000, targetViews: 200000, organicViews: 192000, reupViews: 16000, totalViews: 208000, eng: 2200, cpv: 50.2, time: "6.0s" },
-    { kol: "Emmer Sweet", tier: "Mid-tier", cost: 44000000, targetViews: 1000000, organicViews: 631000, reupViews: 75000, totalViews: 706000, eng: 23000, cpv: 46.2, time: "6.2s" },
-    { kol: "Trang Tấm", tier: "Mid-tier", cost: 38000000, targetViews: 600000, organicViews: 662000, reupViews: 80000, totalViews: 742000, eng: 36200, cpv: 48.0, time: "6.1s" }
+    { kol: "Min Cookie", tier: "Mid-tier", cost: 28000000, lyViews: "273K", yoy: "+90.1%", targetViews: 500000, organicViews: 520000, reupViews: 85000, totalViews: 605000, eng: 24200, cpv: 35.2, time: "7.8s" },
+    { kol: "Bon đây nè", tier: "Macro", cost: 34000000, lyViews: "1.24M", yoy: "-34.0%", targetViews: 800000, organicViews: 820000, reupViews: 95000, totalViews: 915000, eng: 34000, cpv: 40.1, time: "7.5s" },
+    { kol: "Ăn gì Thương ơi", tier: "Mid-tier", cost: 15400000, lyViews: "681K", yoy: "+26.4%", targetViews: 400000, organicViews: 860000, reupViews: 120000, totalViews: 980000, eng: 36500, cpv: 38.5, time: "8.4s" },
+    { kol: "Khánh Linh", tier: "Macro", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 400000, organicViews: 430000, reupViews: 60000, totalViews: 490000, eng: 19800, cpv: 39.0, time: "7.1s" },
+    { kol: "taydayroi", tier: "Micro", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 50000, organicViews: 65000, reupViews: 15000, totalViews: 80000, eng: 4200, cpv: 41.0, time: "37.8s" },
+    { kol: "Babykopo Home", tier: "Macro", cost: 35000000, lyViews: "Mới", yoy: "—", targetViews: 500000, organicViews: 890000, reupViews: 110000, totalViews: 1000000, eng: 42000, cpv: 41.0, time: "7.2s" },
+    { kol: "Chú Đàn", tier: "Micro", cost: 35000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 225000, reupViews: 30000, totalViews: 255000, eng: 32500, cpv: 41.5, time: "6.8s" },
+    { kol: "Thi Thi Miền Tây", tier: "Mid-tier", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 400000, organicViews: 420000, reupViews: 50000, totalViews: 470000, eng: 16200, cpv: 40.2, time: "6.7s" },
+    { kol: "let Nhân cook", tier: "Mid-tier", cost: 30000000, lyViews: "Mới", yoy: "—", targetViews: 300000, organicViews: 340000, reupViews: 40000, totalViews: 380000, eng: 8500, cpv: 41.8, time: "6.9s" },
+    { kol: "Sườn Sóc Homie", tier: "Mid-tier", cost: 35000000, lyViews: "Mới", yoy: "—", targetViews: 300000, organicViews: 330000, reupViews: 35000, totalViews: 365000, eng: 9200, cpv: 42.0, time: "6.6s" },
+    { kol: "Châu Kiều My", tier: "Mid-tier", cost: 8000000, lyViews: "Mới", yoy: "—", targetViews: 400000, organicViews: 450000, reupViews: 45000, totalViews: 495000, eng: 22400, cpv: 39.5, time: "7.1s" },
+    { kol: "Quân Cooking", tier: "Micro", cost: 8000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 235000, reupViews: 25000, totalViews: 260000, eng: 5800, cpv: 39.0, time: "6.8s" },
+    { kol: "My Huyền", tier: "Mid-tier", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 400000, organicViews: 440000, reupViews: 40000, totalViews: 480000, eng: 7200, cpv: 40.5, time: "6.5s" },
+    { kol: "Nấu Ăn Dễ Lắm", tier: "Micro", cost: 5000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 245000, reupViews: 28000, totalViews: 273000, eng: 8900, cpv: 37.8, time: "7.0s" },
+    { kol: "Hảo Thích Vào Bếp", tier: "Micro", cost: 10000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 230000, reupViews: 25000, totalViews: 255000, eng: 6400, cpv: 39.2, time: "7.3s" },
+    { kol: "Bếp Nga Nè", tier: "Nano", cost: 5000000, lyViews: "Mới", yoy: "—", targetViews: 50000, organicViews: 95000, reupViews: 15000, totalViews: 110000, eng: 2100, cpv: 38.9, time: "7.0s" },
+    { kol: "Mai Hà", tier: "Nano", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 50000, organicViews: 94000, reupViews: 12000, totalViews: 106000, eng: 5200, cpv: 41.0, time: "6.8s" },
+    { kol: "Cơm nhà Bông", tier: "Micro", cost: 5000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 220000, reupViews: 20000, totalViews: 240000, eng: 4800, cpv: 39.5, time: "6.5s" },
+    { kol: "Nhi say Hi", tier: "Micro", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 210000, reupViews: 22000, totalViews: 232000, eng: 3900, cpv: 42.0, time: "6.4s" },
+    { kol: "Út Tình", tier: "Micro", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 215000, reupViews: 20000, totalViews: 235000, eng: 4600, cpv: 41.8, time: "6.5s" },
+    { kol: "Bùi Khánh Hà", tier: "Micro", cost: 30000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 185000, reupViews: 15000, totalViews: 200000, eng: 1800, cpv: 49.5, time: "6.0s" },
+    { kol: "Gia đình Sầu", tier: "Micro", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 190000, reupViews: 18000, totalViews: 208000, eng: 12800, cpv: 51.0, time: "6.0s" },
+    { kol: "Mẹ Bảo Bối", tier: "Micro", cost: 15000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 192000, reupViews: 16000, totalViews: 208000, eng: 2200, cpv: 50.2, time: "6.0s" },
+    { kol: "Emmer Sweet", tier: "Mid-tier", cost: 44000000, lyViews: "721K", yoy: "-12.5%", targetViews: 1000000, organicViews: 631000, reupViews: 75000, totalViews: 706000, eng: 23000, cpv: 46.2, time: "6.2s" },
+    { kol: "Trang Tấm", tier: "Mid-tier", cost: 38000000, lyViews: "961K", yoy: "-31.1%", targetViews: 600000, organicViews: 662000, reupViews: 80000, totalViews: 742000, eng: 36200, cpv: 48.0, time: "6.1s" }
   ]
 };
 
@@ -335,36 +329,31 @@ const DATA_VINEGAR = {
     }
   ],
   topViews: [
-    { name: "Trang Tấm", tier: "Mid-tier", target: "600K", actual: "718K", diff: "+19.7%" },
-    { name: "Khánh Linh", tier: "Macro", target: "400K", actual: "341K", diff: "-14.7%" },
-    { name: "Linh nấu", tier: "Mid-tier", target: "300K", actual: "284K", diff: "-5.3%" }
-  ],
-  lowViews: [
-    { name: "Nấu Ăn Dễ Lắm", tier: "Micro", target: "150K", actual: "37K", diff: "-75.3%" },
-    { name: "TOE NẤU GÌ ĐÓ", tier: "Micro", target: "200K", actual: "66K", diff: "-67.0%" },
-    { name: "Ăn gì Thương ơi", tier: "Mid-tier", target: "250K", actual: "99K", diff: "-60.5%" }
+    { name: "Trang Tấm", target: "600K", actual: "718K", diff: "+19.7%" },
+    { name: "Khánh Linh", target: "400K", actual: "341K", diff: "-14.7%" },
+    { name: "Linh nấu", target: "300K", actual: "284K", diff: "-5.3%" }
   ],
   topEng: [
-    { name: "Trang Tấm", tier: "Mid-tier", value: "48.97K tương tác", sub: "Chiếm 68% Saves toàn chiến dịch" },
-    { name: "Châu Kiều My", tier: "Mid-tier", value: "5.49K tương tác", sub: "Top 2 tương tác" },
-    { name: "My Huyền", tier: "Micro", value: "3.78K tương tác", sub: "Top 3 tương tác" }
+    { name: "Trang Tấm", value: "48.97K tương tác" },
+    { name: "Châu Kiều My", value: "5.49K tương tác" },
+    { name: "My Huyền", value: "3.78K tương tác" }
   ],
   topTime: [
-    { name: "Cơm nhà bếp xưa", tier: "Nano", value: "3 phút 29s", sub: "Thời lượng video dài nhất" },
-    { name: "Ăn gì Thương ơi", tier: "Mid-tier", value: "3 phút 16s", sub: "Top 2 thời lượng" },
-    { name: "Trang Tấm", tier: "Mid-tier", value: "2 phút 49s", sub: "Top 3 thời lượng" }
+    { name: "Cơm nhà bếp xưa", value: "3 phút 29s" },
+    { name: "Ăn gì Thương ơi", value: "3 phút 16s" },
+    { name: "Trang Tấm", value: "2 phút 49s" }
   ],
   kols: [
-    { kol: "Trang Tấm", tier: "Mid-tier", cost: 38000000, targetViews: 600000, organicViews: 718000, reupViews: 120000, totalViews: 838000, eng: 48970, cpv: 38.0, time: "2m49s" },
-    { kol: "Khánh Linh", tier: "Macro", cost: 25000000, targetViews: 400000, organicViews: 341329, reupViews: 60000, totalViews: 401329, eng: 2449, cpv: 42.0, time: "1m28s" },
-    { kol: "Linh nấu", tier: "Mid-tier", cost: 18000000, targetViews: 300000, organicViews: 283832, reupViews: 45000, totalViews: 328832, eng: 2276, cpv: 41.5, time: "1m45s" },
-    { kol: "My Huyền", tier: "Micro", cost: 12000000, targetViews: 200000, organicViews: 195569, reupViews: 30000, totalViews: 225569, eng: 3784, cpv: 43.0, time: "1m31s" },
-    { kol: "Châu Kiều My", tier: "Mid-tier", cost: 18000000, targetViews: 300000, organicViews: 179723, reupViews: 35000, totalViews: 214723, eng: 5494, cpv: 44.0, time: "2m08s" },
-    { kol: "Nông Thôn Mới", tier: "Micro", cost: 12000000, targetViews: 200000, organicViews: 123992, reupViews: 25000, totalViews: 148992, eng: 461, cpv: 45.0, time: "2m29s" },
-    { kol: "Ăn gì Thương ơi", tier: "Mid-tier", cost: 15000000, targetViews: 250000, organicViews: 98667, reupViews: 20000, totalViews: 118667, eng: 2226, cpv: 46.0, time: "3m16s" },
-    { kol: "TOE NẤU GÌ ĐÓ", tier: "Micro", cost: 12000000, targetViews: 200000, organicViews: 65663, reupViews: 15000, totalViews: 80663, eng: 2391, cpv: 48.0, time: "2m12s" },
-    { kol: "Nấu Ăn Dễ Lắm", tier: "Micro", cost: 8000000, targetViews: 150000, organicViews: 37429, reupViews: 10000, totalViews: 47429, eng: 1101, cpv: 49.0, time: "1m33s" },
-    { kol: "Cơm nhà bếp xưa", tier: "Nano", cost: 5000000, targetViews: 100000, organicViews: 32573, reupViews: 8000, totalViews: 40573, eng: 1871, cpv: 47.0, time: "3m29s" }
+    { kol: "Trang Tấm", tier: "Mid-tier", cost: 38000000, lyViews: "Mới", yoy: "—", targetViews: 600000, organicViews: 718000, reupViews: 120000, totalViews: 838000, eng: 48970, cpv: 38.0, time: "2m49s" },
+    { kol: "Khánh Linh", tier: "Macro", cost: 25000000, lyViews: "662K", yoy: "-48.4%", targetViews: 400000, organicViews: 341329, reupViews: 60000, totalViews: 401329, eng: 2449, cpv: 42.0, time: "1m28s" },
+    { kol: "Linh nấu", tier: "Mid-tier", cost: 18000000, lyViews: "68K", yoy: "+317.4%", targetViews: 300000, organicViews: 283832, reupViews: 45000, totalViews: 328832, eng: 2276, cpv: 41.5, time: "1m45s" },
+    { kol: "My Huyền", tier: "Micro", cost: 12000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 195569, reupViews: 30000, totalViews: 225569, eng: 3784, cpv: 43.0, time: "1m31s" },
+    { kol: "Châu Kiều My", tier: "Mid-tier", cost: 18000000, lyViews: "Mới", yoy: "—", targetViews: 300000, organicViews: 179723, reupViews: 35000, totalViews: 214723, eng: 5494, cpv: 44.0, time: "2m08s" },
+    { kol: "Nông Thôn Mới", tier: "Micro", cost: 12000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 123992, reupViews: 25000, totalViews: 148992, eng: 461, cpv: 45.0, time: "2m29s" },
+    { kol: "Ăn gì Thương ơi", tier: "Mid-tier", cost: 15000000, lyViews: "374K", yoy: "-73.6%", targetViews: 250000, organicViews: 98667, reupViews: 20000, totalViews: 118667, eng: 2226, cpv: 46.0, time: "3m16s" },
+    { kol: "TOE NẤU GÌ ĐÓ", tier: "Micro", cost: 12000000, lyViews: "Mới", yoy: "—", targetViews: 200000, organicViews: 65663, reupViews: 15000, totalViews: 80663, eng: 2391, cpv: 48.0, time: "2m12s" },
+    { kol: "Nấu Ăn Dễ Lắm", tier: "Micro", cost: 8000000, lyViews: "Mới", yoy: "—", targetViews: 150000, organicViews: 37429, reupViews: 10000, totalViews: 47429, eng: 1101, cpv: 49.0, time: "1m33s" },
+    { kol: "Cơm nhà bếp xưa", tier: "Nano", cost: 5000000, lyViews: "Mới", yoy: "—", targetViews: 100000, organicViews: 32573, reupViews: 8000, totalViews: 40573, eng: 1871, cpv: 47.0, time: "3m29s" }
   ]
 };
 
@@ -379,7 +368,7 @@ export default function DashboardView({ onOpen = () => {} }) {
 
   // Sorted KOLs
   const sortedKols = useMemo(() => {
-    let list = data.kols.filter(k => !kolSearch || k.kol.toLowerCase().includes(kolSearch.toLowerCase()));
+    let list = data.kols.filter(k => !kolSearch || k.kol.toLowerCase().includes(kolSearch.toLowerCase()) || (k.tier && k.tier.toLowerCase().includes(kolSearch.toLowerCase())));
     list.sort((a, b) => {
       let vA = a[sortCol];
       let vB = b[sortCol];
@@ -594,7 +583,7 @@ export default function DashboardView({ onOpen = () => {} }) {
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {data.topViews.map((k, i) => (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", background: "#F8FAFC", borderRadius: 8, border: "1px solid #F1F5F9", whiteSpace: "nowrap" }}>
+                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", background: "#F8FAFC", borderRadius: 8, border: "1px solid #F1F5F9", whiteSpace: "nowrap" }}>
                     <span style={{ fontWeight: 700, color: "#0F172A", fontSize: 12 }}>{k.name}</span>
                     <div style={{ textAlign: "right", whiteSpace: "nowrap" }}>
                       <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 700, color: "#0D9488" }}>{k.actual}</span>
@@ -613,11 +602,8 @@ export default function DashboardView({ onOpen = () => {} }) {
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {data.topEng.map((k, i) => (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", background: "#F8FAFC", borderRadius: 8, border: "1px solid #F1F5F9", whiteSpace: "nowrap" }}>
-                    <div>
-                      <div style={{ fontWeight: 700, color: "#0F172A", fontSize: 12 }}>{k.name}</div>
-                      <div style={{ fontSize: 10, color: "#64748B" }}>{k.sub}</div>
-                    </div>
+                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", background: "#F8FAFC", borderRadius: 8, border: "1px solid #F1F5F9", whiteSpace: "nowrap" }}>
+                    <span style={{ fontWeight: 700, color: "#0F172A", fontSize: 12 }}>{k.name}</span>
                     <div style={{ textAlign: "right", whiteSpace: "nowrap" }}>
                       <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#0284C7", fontSize: 12 }}>{k.value}</span>
                     </div>
@@ -633,11 +619,8 @@ export default function DashboardView({ onOpen = () => {} }) {
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {data.topTime.map((k, i) => (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", background: "#F8FAFC", borderRadius: 8, border: "1px solid #F1F5F9", whiteSpace: "nowrap" }}>
-                    <div>
-                      <div style={{ fontWeight: 700, color: "#0F172A", fontSize: 12 }}>{k.name}</div>
-                      <div style={{ fontSize: 10, color: "#64748B" }}>{k.sub}</div>
-                    </div>
+                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 12px", background: "#F8FAFC", borderRadius: 8, border: "1px solid #F1F5F9", whiteSpace: "nowrap" }}>
+                    <span style={{ fontWeight: 700, color: "#0F172A", fontSize: 12 }}>{k.name}</span>
                     <div style={{ textAlign: "right", whiteSpace: "nowrap" }}>
                       <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#7C3AED", fontSize: 12 }}>{k.value}</span>
                     </div>
@@ -652,7 +635,7 @@ export default function DashboardView({ onOpen = () => {} }) {
       )}
 
       {/* =========================================================================
-          TAB 2: BẢNG CHI TIẾT TỪNG KOL (THUẦN TIẾNG VIỆT + PHÂN TRANG / CUỘN ĐỦ 25 KOLS)
+          TAB 2: BẢNG CHI TIẾT TỪNG KOL (KÈM SỐ LIỆU LỊCH SỬ CÙNG KỲ FY25)
          ========================================================================= */}
       {viewTab === "kols" && (
         <div style={{ 
@@ -687,7 +670,7 @@ export default function DashboardView({ onOpen = () => {} }) {
               </span>
             </div>
 
-            {/* Quick Filter / Page Helper */}
+            {/* Quick Filter Buttons */}
             <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11 }}>
               <span style={{ color: "#64748B", fontWeight: 700 }}>Xem nhanh:</span>
               <button 
@@ -740,6 +723,9 @@ export default function DashboardView({ onOpen = () => {} }) {
                   <th onClick={() => handleSort("cost")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
                     Chi phí booking {sortCol === "cost" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
+                  <th style={{ padding: "10px 12px", textAlign: "right", fontWeight: 800, color: "#64748B", whiteSpace: "nowrap" }}>
+                    Cùng kỳ FY25
+                  </th>
                   <th onClick={() => handleSort("targetViews")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
                     Mục tiêu lượt xem {sortCol === "targetViews" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
@@ -754,6 +740,9 @@ export default function DashboardView({ onOpen = () => {} }) {
                   </th>
                   <th onClick={() => handleSort("pct")} style={{ padding: "10px 12px", textAlign: "center", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
                     % Đạt KPI lượt xem {sortCol === "pct" && (sortDir === "asc" ? "▲" : "▼")}
+                  </th>
+                  <th style={{ padding: "10px 12px", textAlign: "center", fontWeight: 800, whiteSpace: "nowrap" }}>
+                    Tăng trưởng YoY
                   </th>
                   <th onClick={() => handleSort("eng")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
                     Lượt tương tác {sortCol === "eng" && (sortDir === "asc" ? "▲" : "▼")}
@@ -794,6 +783,9 @@ export default function DashboardView({ onOpen = () => {} }) {
                         {(k.cost / 1000000).toFixed(1)}M
                       </td>
                       <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#64748B", whiteSpace: "nowrap" }}>
+                        {k.lyViews}
+                      </td>
+                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#64748B", whiteSpace: "nowrap" }}>
                         {k.targetViews.toLocaleString()}
                       </td>
                       <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
@@ -819,6 +811,20 @@ export default function DashboardView({ onOpen = () => {} }) {
                           {pct}%
                         </span>
                       </td>
+                      <td style={{ padding: "10px 12px", textAlign: "center", whiteSpace: "nowrap" }}>
+                        <span style={{ 
+                          display: "inline-block",
+                          padding: "2px 6px", 
+                          borderRadius: 4, 
+                          background: k.yoy.startsWith("+") ? "#CCFBF1" : k.yoy.startsWith("-") ? "#FFE4E6" : "#F1F5F9",
+                          color: k.yoy.startsWith("+") ? "#0D9488" : k.yoy.startsWith("-") ? "#E11D48" : "#64748B",
+                          fontWeight: 800,
+                          fontSize: 11,
+                          whiteSpace: "nowrap"
+                        }}>
+                          {k.yoy}
+                        </span>
+                      </td>
                       <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
                         {k.eng.toLocaleString()}
                       </td>
@@ -839,6 +845,9 @@ export default function DashboardView({ onOpen = () => {} }) {
                   <td>—</td>
                   <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
                     {(sortedKols.reduce((a, b) => a + b.cost, 0) / 1000000).toFixed(1)}M
+                  </td>
+                  <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#64748B", whiteSpace: "nowrap" }}>
+                    {data.key === "MSG" ? "7.49M" : "4.05M"}
                   </td>
                   <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
                     {sortedKols.reduce((a, b) => a + b.targetViews, 0).toLocaleString()}
@@ -863,6 +872,11 @@ export default function DashboardView({ onOpen = () => {} }) {
                         </span>
                       );
                     })()}
+                  </td>
+                  <td style={{ padding: "10px 12px", textAlign: "center", whiteSpace: "nowrap" }}>
+                    <span style={{ padding: "2px 6px", borderRadius: 4, background: data.key === "MSG" ? "#CCFBF1" : "#FFE4E6", color: data.key === "MSG" ? "#0D9488" : "#E11D48", fontWeight: 800 }}>
+                      {data.key === "MSG" ? "+17.9%" : "-48.7%"}
+                    </span>
                   </td>
                   <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
                     {sortedKols.reduce((a, b) => a + b.eng, 0).toLocaleString()}
