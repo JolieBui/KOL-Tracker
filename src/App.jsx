@@ -3659,6 +3659,8 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels = {} }) => {
             const colIndex = idx % 7;
             const isWeekend = colIndex >= 5;
 
+            const isBottomLeft = idx === cells.length - 7;
+
             return (
               <div
                 key={idx}
@@ -3680,8 +3682,12 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels = {} }) => {
                   overflow: "hidden",
                   transition: "background 0.1s ease",
                   position: "relative",
-                  outline: isDragOver ? "2px dashed var(--accent)" : isToday ? "2px solid var(--accent)" : "none",
-                  outlineOffset: -2,
+                  boxShadow: isDragOver 
+                    ? "inset 0 0 0 2px var(--accent)" 
+                    : isToday 
+                      ? "inset 0 0 0 1.5px var(--accent)" 
+                      : "none",
+                  borderBottomLeftRadius: isBottomLeft ? 16 : 0,
                   zIndex: isToday ? 2 : 1
                 }}
               >
@@ -5823,14 +5829,14 @@ const [view, setView] = useState("table");
         {/* Main Content Card Container */}
         <div style={{ 
           background: "var(--card)", 
-          borderRadius: 24, 
+          borderRadius: 16, 
           border: "1px solid var(--line)", 
           overflow: "hidden", 
           flex: 1, 
           display: "flex", 
           flexDirection: "column", 
           minHeight: 0,
-          boxShadow: "0 8px 30px rgba(72, 67, 92, 0.015)"
+          boxShadow: "0 4px 20px rgba(46, 56, 64, 0.04)"
         }}>
           <ViewErrorBoundary>
             {view === "table" && <TableView rows={filtered} statusMap={statusMap} statusStages={statusStages} onOpen={r => setSelected(r)} onSave={(id, changes) => { setData(prev => prev.map(item => item.id === id ? { ...item, ...changes } : item)); }} campaignLabels={campaignLabels} />}
