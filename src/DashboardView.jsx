@@ -58,7 +58,7 @@ const DATA_MSG = {
       barPct: 64.6
     },
     {
-      metric: "Tổng Ngân Sách (Budget)",
+      metric: "Tổng Ngân Sách (Booking + Media)",
       unit: "VNĐ",
       ly: "501.72M",
       target: "720.18M",
@@ -70,7 +70,7 @@ const DATA_MSG = {
       barPct: 100
     },
     {
-      metric: "Chi Phí Booking KOL",
+      metric: "├── Chi Phí Booking KOL (25 KOLs)",
       unit: "VNĐ",
       ly: "501.72M",
       target: "500.40M",
@@ -82,13 +82,13 @@ const DATA_MSG = {
       barPct: 100
     },
     {
-      metric: "Chi Phí Media Spend",
+      metric: "└── Chi Phí Media Paid Ads (Ads Boost)",
       unit: "VNĐ",
-      ly: "0",
+      ly: "0đ",
       target: "154.71M",
       actual: "219.78M",
       diffTarget: "+42.1%",
-      diffLY: "+219.8M",
+      diffLY: "+219.78M",
       isTargetGood: true,
       isLYGood: true,
       barPct: 100
@@ -226,7 +226,7 @@ const DATA_VINEGAR = {
       barPct: 52.9
     },
     {
-      metric: "Tổng Ngân Sách (Budget)",
+      metric: "Tổng Ngân Sách (Booking + Media)",
       unit: "VNĐ",
       ly: "442.24M",
       target: "200.00M",
@@ -238,7 +238,7 @@ const DATA_VINEGAR = {
       barPct: 100
     },
     {
-      metric: "Chi Phí Booking KOL",
+      metric: "├── Chi Phí Booking KOL (10 KOLs)",
       unit: "VNĐ",
       ly: "324.00M",
       target: "178.00M",
@@ -250,9 +250,9 @@ const DATA_VINEGAR = {
       barPct: 100
     },
     {
-      metric: "Chi Phí Media Spend",
+      metric: "└── Chi Phí Media Paid Ads (Ads Boost)",
       unit: "VNĐ",
-      ly: "0",
+      ly: "0đ",
       target: "38.51M",
       actual: "22.00M",
       diffTarget: "-42.9%",
@@ -626,7 +626,7 @@ export default function DashboardView({ onOpen = () => {} }) {
                   </th>
                   <th style={{ padding: "10px 10px", textAlign: "center", fontWeight: 700, whiteSpace: "nowrap" }}>Tier</th>
                   <th onClick={() => handleSort("cost")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
-                    Cost {sortCol === "cost" && (sortDir === "asc" ? "▲" : "▼")}
+                    Cost Booking {sortCol === "cost" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
                   <th onClick={() => handleSort("targetViews")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
                     Target {sortCol === "targetViews" && (sortDir === "asc" ? "▲" : "▼")}
