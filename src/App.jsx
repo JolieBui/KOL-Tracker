@@ -4290,57 +4290,57 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
           ))}
         </div>
 
-        {/* Filter bar */}
-        <div className="kt-scrollbar" style={{ display: "flex", gap: 8, flexWrap: "nowrap", alignItems: "center", overflowX: "auto", paddingBottom: 4 }}>
+        {/* Filter bar - Compact Single Row, No Scrolling */}
+        <div style={{ display: "flex", gap: 5, flexWrap: "nowrap", alignItems: "center", width: "100%" }}>
           <input
             className="kt-input"
-            placeholder="🔍 Tìm tên KOL..."
+            placeholder="🔍 Tìm KOL..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ flex: "0 0 140px", width: 140 }}
+            style={{ flex: "1.2 1 90px", minWidth: 80, padding: "5px 8px", fontSize: 11.5 }}
           />
-          <select className="kt-select" value={filterCampaign} onChange={e => setFilterCampaign(e.target.value)} style={{ flex: "0 0 auto", minWidth: 130, width: "auto" }}>
-            <option value="all">Tất cả Dự án</option>
+          <select className="kt-select" value={filterCampaign} onChange={e => setFilterCampaign(e.target.value)} style={{ flex: "1 1 75px", minWidth: 65, padding: "5px 6px", fontSize: 11.5 }}>
+            <option value="all">Dự án</option>
             {dynamicCampaigns.map(c => <option key={c.key} value={c.key}>{campaignLabels[c.key] || c.label}</option>)}
           </select>
-          <select className="kt-select" value={filterTier} onChange={e => setFilterTier(e.target.value)} style={{ flex: "0 0 auto", minWidth: 120, width: "auto" }}>
-            <option value="all">Tất cả Tier</option>
+          <select className="kt-select" value={filterTier} onChange={e => setFilterTier(e.target.value)} style={{ flex: "1 1 65px", minWidth: 60, padding: "5px 6px", fontSize: 11.5 }}>
+            <option value="all">Tier</option>
             {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
           </select>
 
-          <select className="kt-select" value={filterPhase} onChange={e => setFilterPhase(e.target.value)} style={{ flex: "0 0 auto", minWidth: 145, width: "auto" }}>
-            <option value="all">Tất cả Thời điểm</option>
+          <select className="kt-select" value={filterPhase} onChange={e => setFilterPhase(e.target.value)} style={{ flex: "1 1 80px", minWidth: 70, padding: "5px 6px", fontSize: 11.5 }}>
+            <option value="all">Thời điểm</option>
             <option value="Phase 1">Phase 1</option>
             <option value="Phase 2">Phase 2</option>
           </select>
-          <select className="kt-select" value={filterCost} onChange={e => setFilterCost(e.target.value)} style={{ flex: "0 0 auto", minWidth: 135, width: "auto" }}>
-            <option value="all">Tất cả Chi phí</option>
+          <select className="kt-select" value={filterCost} onChange={e => setFilterCost(e.target.value)} style={{ flex: "1 1 70px", minWidth: 65, padding: "5px 6px", fontSize: 11.5 }}>
+            <option value="all">Chi phí</option>
             {COST_BUCKETS.map(b => <option key={b.key} value={b.key}>{b.label}</option>)}
           </select>
-          <select className="kt-select" value={filterViews} onChange={e => setFilterViews(e.target.value)} style={{ flex: "0 0 auto", minWidth: 130, width: "auto" }}>
-            <option value="all">Tất cả Views</option>
+          <select className="kt-select" value={filterViews} onChange={e => setFilterViews(e.target.value)} style={{ flex: "1 1 65px", minWidth: 60, padding: "5px 6px", fontSize: 11.5 }}>
+            <option value="all">Views</option>
             {VIEWS_BUCKETS.map(b => <option key={b.key} value={b.key}>{b.label}</option>)}
           </select>
-          <select className="kt-select" value={filterEng} onChange={e => setFilterEng(e.target.value)} style={{ flex: "0 0 auto", minWidth: 145, width: "auto" }}>
-            <option value="all">Tất cả Tương tác (Eng)</option>
+          <select className="kt-select" value={filterEng} onChange={e => setFilterEng(e.target.value)} style={{ flex: "1 1 65px", minWidth: 60, padding: "5px 6px", fontSize: 11.5 }}>
+            <option value="all">Eng</option>
             {ENG_BUCKETS.map(b => <option key={b.key} value={b.key}>{b.label}</option>)}
           </select>
-          <select className="kt-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ flex: "0 0 auto", minWidth: 140, width: "auto" }}>
-            <option value="all">Tất cả Tiến độ</option>
+          <select className="kt-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ flex: "1 1 75px", minWidth: 65, padding: "5px 6px", fontSize: 11.5 }}>
+            <option value="all">Tiến độ</option>
             {statusStages.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
           </select>
-          <select className="kt-select" value={sortOrder} onChange={e => setSortOrder(e.target.value)} style={{ flex: "0 0 auto", minWidth: 160, width: "auto", background: "var(--surface)", border: "1px solid var(--line)" }}>
-            <option value="default">Sắp xếp: Mặc định (A-Z)</option>
+          <select className="kt-select" value={sortOrder} onChange={e => setSortOrder(e.target.value)} style={{ flex: "1.1 1 85px", minWidth: 80, padding: "5px 6px", fontSize: 11.5, background: "var(--surface)", border: "1px solid var(--line)" }}>
+            <option value="default">Sắp xếp (A-Z)</option>
             <option value="costAsc">Chi phí: Thấp ➝ Cao</option>
             <option value="costDesc">Chi phí: Cao ➝ Thấp</option>
-            <option value="viewAsc">Lượt xem: Thấp ➝ Cao</option>
-            <option value="viewDesc">Lượt xem: Cao ➝ Thấp</option>
-            <option value="engAsc">Tương tác: Thấp ➝ Cao</option>
-            <option value="engDesc">Tương tác: Cao ➝ Thấp</option>
+            <option value="viewAsc">Views: Thấp ➝ Cao</option>
+            <option value="viewDesc">Views: Cao ➝ Thấp</option>
+            <option value="engAsc">Eng: Thấp ➝ Cao</option>
+            <option value="engDesc">Eng: Cao ➝ Thấp</option>
           </select>
           {hasActiveFilters && (
-            <button className="kt-btn kt-btn-ghost" onClick={clearFilters} style={{ flex: "0 0 auto", padding: "8px 14px", whiteSpace: "nowrap" }}>
-              ✕ Xoá lọc ({activeFilterCount})
+            <button className="kt-btn kt-btn-ghost" onClick={clearFilters} style={{ flex: "0 0 auto", padding: "5px 8px", fontSize: 11, whiteSpace: "nowrap" }}>
+              ✕ Bỏ lọc ({activeFilterCount})
             </button>
           )}
         </div>
