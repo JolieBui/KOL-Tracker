@@ -1,90 +1,146 @@
 import React, { useState, useMemo } from "react";
 
 /* =========================================================================
-   EXACT AUDITED DATA FROM FY26 HALF YEAR REPORTS
+   SỐ LIỆU XÁC THỰC TỪ 2 FILE BÁO CÁO FY26 (MSG & VINEGAR)
    ========================================================================= */
-const MSG_DATA = {
+const DATA_MSG = {
   key: "MSG",
   name: "MSG",
   kolCount: 25,
-  period: "W4 June 26 – W1 Aug 26 (6 tuần)",
+  period: "W4 June 26 – W1 Aug 26",
   metrics: [
     {
-      name: "1. Tổng Lượt Xem (Total Views)",
-      unit: "Views",
-      ly: 7492067, lyStr: "7.49M",
-      target: 8150000, targetStr: "8.15M",
-      actual: 20000000, actualStr: "20.00M",
-      diffTargetPct: "+145.4%", diffTargetAbs: "+11.85M", targetGood: true,
-      diffLYPct: "+166.9%", diffLYAbs: "+12.51M", lyGood: true,
-      progressPct: 100,
-      note: "Organic đạt 8.83M (+8.3% KPI), Reup FB góp 1.20M, Media góp 9.97M"
+      metric: "Total Views (kèm Reup)",
+      unit: "View",
+      ly: "7.49M",
+      target: "8.15M",
+      actual: "20.00M",
+      diffTarget: "+145.4%",
+      diffLY: "+166.9%",
+      isTargetGood: true,
+      isLYGood: true,
+      barPct: 100
     },
     {
-      name: "2. Lượt Xem Tự Nhiên (Organic TikTok)",
-      unit: "Views",
-      ly: 7492067, lyStr: "7.49M",
-      target: 8150000, targetStr: "8.15M",
-      actual: 8830000, actualStr: "8.83M",
-      diffTargetPct: "+8.3%", diffTargetAbs: "+680K", targetGood: true,
-      diffLYPct: "+17.9%", diffLYAbs: "+1.34M", lyGood: true,
-      progressPct: 108.3,
-      note: "Vượt chỉ tiêu tự nhiên bất chấp ảnh hưởng mùa World Cup"
+      metric: "Organic Views (TikTok)",
+      unit: "View",
+      ly: "7.49M",
+      target: "8.15M",
+      actual: "8.83M",
+      diffTarget: "+8.3%",
+      diffLY: "+17.9%",
+      isTargetGood: true,
+      isLYGood: true,
+      barPct: 100
     },
     {
-      name: "3. Chi Phí / View 6s (CPV)",
-      unit: "VNĐ/view",
-      ly: 52.0, lyStr: "52.0đ",
-      target: 65.0, targetStr: "65.0đ",
-      actual: 42.01, actualStr: "42.01đ",
-      diffTargetPct: "-35.4%", diffTargetAbs: "-22.99đ", targetGood: true, // Lower is better
-      diffLYPct: "-19.2%", diffLYAbs: "-9.99đ", lyGood: true,
-      progressPct: 64.6, // 42/65
-      note: "Tiết kiệm 35.4% nhờ thuật toán TikTok auto-optimize ngân sách"
+      metric: "Reup Views (Facebook)",
+      unit: "View",
+      ly: "0",
+      target: "—",
+      actual: "1.20M",
+      diffTarget: "+14.5% tỷ trọng",
+      diffLY: "+1.20M",
+      isTargetGood: true,
+      isLYGood: true,
+      barPct: 100
     },
     {
-      name: "4. Tổng Ngân Sách Thực Chi",
+      metric: "CPV 6s (Chi phí/view 6s)",
       unit: "VNĐ",
-      ly: 501715977, lyStr: "501.7M",
-      target: 144722071, targetStr: "144.7M",
-      actual: 720182071, actualStr: "720.18M",
-      diffTargetPct: "+397.6%", diffTargetAbs: "+575.46M", targetGood: null,
-      diffLYPct: "+43.5%", diffLYAbs: "+218.47M", lyGood: null,
-      progressPct: 100,
-      note: "Booking: 500.4M (25 KOLs) • Media Spend: 219.78M"
+      ly: "52.00đ",
+      target: "65.00đ",
+      actual: "42.01đ",
+      diffTarget: "-35.4%",
+      diffLY: "-19.2%",
+      isTargetGood: true,
+      isLYGood: true,
+      barPct: 64.6
     },
     {
-      name: "5. Tương Tác Tự Nhiên (Engagement)",
+      metric: "Tổng Ngân Sách (Budget)",
+      unit: "VNĐ",
+      ly: "501.7M",
+      target: "144.7M",
+      actual: "720.18M",
+      diffTarget: "+397.6%",
+      diffLY: "+43.5%",
+      isTargetGood: null,
+      isLYGood: null,
+      barPct: 100
+    },
+    {
+      metric: "Chi Phí Booking KOL",
+      unit: "VNĐ",
+      ly: "501.7M",
+      target: "144.7M",
+      actual: "500.40M",
+      diffTarget: "+245.8%",
+      diffLY: "-0.3%",
+      isTargetGood: null,
+      isLYGood: null,
+      barPct: 100
+    },
+    {
+      metric: "Chi Phí Media Spend",
+      unit: "VNĐ",
+      ly: "0",
+      target: "0",
+      actual: "219.78M",
+      diffTarget: "+219.8M",
+      diffLY: "+219.8M",
+      isTargetGood: null,
+      isLYGood: null,
+      barPct: 100
+    },
+    {
+      metric: "Organic Engagement",
       unit: "Lượt",
-      ly: 340531, lyStr: "340.5K",
-      target: 263622, targetStr: "263.6K",
-      actual: 244000, actualStr: "244.0K",
-      diffTargetPct: "-7.5%", diffTargetAbs: "-19.6K", targetGood: false,
-      diffLYPct: "-28.4%", diffLYAbs: "-96.5K", lyGood: false,
-      progressPct: 92.5,
-      note: "Reactions/Comments giảm nhưng Shares (+52%) và Saves (+21%) tăng mạnh"
+      ly: "340.5K",
+      target: "263.6K",
+      actual: "244.0K",
+      diffTarget: "-7.5%",
+      diffLY: "-28.4%",
+      isTargetGood: false,
+      isLYGood: false,
+      barPct: 92.5
     },
     {
-      name: "6. Thời Lượng Xem TB (Avg. View Time)",
+      metric: "Avg. View Time",
       unit: "Giây",
-      ly: 20.8, lyStr: "20.8s",
-      target: 6.0, targetStr: "6.0s",
-      actual: 7.2, actualStr: "7.2s",
-      diffTargetPct: "+20.0%", diffTargetAbs: "+1.2s", targetGood: true,
-      diffLYPct: "-65.4%", diffLYAbs: "-13.6s", lyGood: null,
-      progressPct: 120,
-      note: "100% video đều vượt benchmark 6s nhờ quy tắc Hook 6s đầu"
+      ly: "20.8s",
+      target: "6.0s",
+      actual: "7.2s",
+      diffTarget: "+20.0%",
+      diffLY: "-65.4%",
+      isTargetGood: true,
+      isLYGood: null,
+      barPct: 100
+    },
+    {
+      metric: "VTR (Hoàn thành 100%)",
+      unit: "%",
+      ly: "3.78%",
+      target: "—",
+      actual: "3.78%",
+      diffTarget: "—",
+      diffLY: "0.0%",
+      isTargetGood: null,
+      isLYGood: true,
+      barPct: 100
     }
   ],
   topKols: [
-    { name: "Ăn gì Thương ơi", tier: "Mid-tier", target: "400K", actual: "860K", pct: "+115.0%", diff: "+460K" },
-    { name: "Min Cookie", tier: "Mid-tier", target: "500K", actual: "520K", pct: "+4.0%", diff: "+20K" },
-    { name: "Bon đây nè", tier: "Macro", target: "800K", actual: "820K", pct: "+2.5%", diff: "+20K" },
-    { name: "Khánh Linh", tier: "Macro", target: "400K", actual: "430K", pct: "+7.5%", diff: "+30K" }
+    { name: "Ăn gì Thương ơi", tier: "Mid-tier", target: "400K", actual: "860K", diff: "+115.0%" },
+    { name: "Min Cookie", tier: "Mid-tier", target: "500K", actual: "520K", diff: "+4.0%" },
+    { name: "Bon đây nè", tier: "Macro", target: "800K", actual: "820K", diff: "+2.5%" },
+    { name: "Khánh Linh", tier: "Macro", target: "400K", actual: "430K", diff: "+7.5%" }
   ],
   lowKols: [
-    { name: "Emmer Sweet", tier: "Mid-tier", target: "1.0M", actual: "631K", pct: "-36.9%", diff: "-369K", reason: "Bị giảm do ép timeline 30-40s" },
-    { name: "Trang Tấm", tier: "Mid-tier", target: "600K", actual: "662K", pct: "+10.3%", diff: "+62K", reason: "Tương tác giảm -31% vs FY25" }
+    { name: "Emmer Sweet", tier: "Mid-tier", target: "1.00M", actual: "631K", diff: "-36.9%" },
+    { name: "Bùi Khánh Hà", tier: "Micro", target: "200K", actual: "185K", diff: "-7.5%" },
+    { name: "Gia đình Sầu", tier: "Micro", target: "200K", actual: "190K", diff: "-5.0%" },
+    { name: "Mẹ Bảo Bối", tier: "Micro", target: "200K", actual: "192K", diff: "-4.0%" }
   ],
   kols: [
     { kol: "Min Cookie", tier: "Mid-tier", cost: 28000000, targetViews: 500000, organicViews: 520000, reupViews: 85000, totalViews: 605000, eng: 24200, cpv: 35.2, time: "7.8s" },
@@ -115,87 +171,130 @@ const MSG_DATA = {
   ]
 };
 
-const VINEGAR_DATA = {
+const DATA_VINEGAR = {
   key: "VINEGAR",
   name: "Vinegar",
   kolCount: 10,
-  period: "W4 June 26 – W1 Aug 26 (6 tuần)",
+  period: "W4 June 26 – W1 Aug 26",
   metrics: [
     {
-      name: "1. Tổng Lượt Xem (Total Views)",
-      unit: "Views",
-      ly: 4048198, lyStr: "4.05M",
-      target: 2900000, targetStr: "2.90M",
-      actual: 7400000, actualStr: "7.40M",
-      diffTargetPct: "+155.2%", diffTargetAbs: "+4.50M", targetGood: true,
-      diffLYPct: "+82.8%", diffLYAbs: "+3.35M", lyGood: true,
-      progressPct: 100,
-      note: "Organic đạt 2.08M, Reup FB đạt 1.15M, Media Ads hỗ trợ"
+      metric: "Total Views (kèm Reup)",
+      unit: "View",
+      ly: "4.05M",
+      target: "2.90M",
+      actual: "7.40M",
+      diffTarget: "+155.2%",
+      diffLY: "+82.8%",
+      isTargetGood: true,
+      isLYGood: true,
+      barPct: 100
     },
     {
-      name: "2. Lượt Xem Tự Nhiên (Organic TikTok)",
-      unit: "Views",
-      ly: 4048198, lyStr: "4.05M",
-      target: 2900000, targetStr: "2.90M",
-      actual: 2076777, actualStr: "2.08M",
-      diffTargetPct: "-28.4%", diffTargetAbs: "-823K", targetGood: false,
-      diffLYPct: "-48.7%", diffLYAbs: "-1.97M", lyGood: false,
-      progressPct: 71.6,
-      note: "Do ngân sách giảm 58% và giảm từ 17 KOLs xuống 10 KOLs"
+      metric: "Organic Views (TikTok)",
+      unit: "View",
+      ly: "4.05M",
+      target: "2.90M",
+      actual: "2.08M",
+      diffTarget: "-28.4%",
+      diffLY: "-48.7%",
+      isTargetGood: false,
+      isLYGood: false,
+      barPct: 71.6
     },
     {
-      name: "3. Chi Phí / View 6s (CPV)",
-      unit: "VNĐ/view",
-      ly: 75.0, lyStr: "75.0đ",
-      target: 85.0, targetStr: "85.0đ",
-      actual: 45.0, actualStr: "45.00đ",
-      diffTargetPct: "-47.1%", diffTargetAbs: "-40.00đ", targetGood: true,
-      diffLYPct: "-40.0%", diffLYAbs: "-30.00đ", lyGood: true,
-      progressPct: 52.9,
-      note: "CPV giảm sâu xuất sắc nhờ gom ngân sách chung cho TikTok tự tối ưu"
+      metric: "Reup Views (Facebook)",
+      unit: "View",
+      ly: "0",
+      target: "—",
+      actual: "1.15M",
+      diffTarget: "+35.6% tỷ trọng",
+      diffLY: "+1.15M",
+      isTargetGood: true,
+      isLYGood: true,
+      barPct: 100
     },
     {
-      name: "4. Tổng Ngân Sách Thực Chi",
+      metric: "CPV 6s (Chi phí/view 6s)",
       unit: "VNĐ",
-      ly: 324000000, lyStr: "324.0M",
-      target: 178000000, targetStr: "178.0M",
-      actual: 178000000, actualStr: "178.00M",
-      diffTargetPct: "0.0%", diffTargetAbs: "0đ", targetGood: true,
-      diffLYPct: "-58.0%", diffLYAbs: "-146.0M", lyGood: true,
-      progressPct: 100,
-      note: "Tiết kiệm 58% ngân sách so với FY25, chỉ chạy 10 KOLs chất lượng"
+      ly: "75.00đ",
+      target: "85.00đ",
+      actual: "45.00đ",
+      diffTarget: "-47.1%",
+      diffLY: "-40.0%",
+      isTargetGood: true,
+      isLYGood: true,
+      barPct: 52.9
     },
     {
-      name: "5. Tương Tác Tự Nhiên (Engagement)",
+      metric: "Tổng Ngân Sách (Budget)",
+      unit: "VNĐ",
+      ly: "324.0M",
+      target: "178.0M",
+      actual: "178.00M",
+      diffTarget: "0.0%",
+      diffLY: "-58.0%",
+      isTargetGood: true,
+      isLYGood: true,
+      barPct: 100
+    },
+    {
+      metric: "Chi Phí Booking KOL",
+      unit: "VNĐ",
+      ly: "324.0M",
+      target: "178.0M",
+      actual: "178.00M",
+      diffTarget: "0.0%",
+      diffLY: "-58.0%",
+      isTargetGood: true,
+      isLYGood: true,
+      barPct: 100
+    },
+    {
+      metric: "Organic Engagement",
       unit: "Lượt",
-      ly: 170655, lyStr: "170.7K",
-      target: 114000, targetStr: "114.0K",
-      actual: 71021, actualStr: "71.0K",
-      diffTargetPct: "-37.7%", diffTargetAbs: "-43.0K", targetGood: false,
-      diffLYPct: "-58.4%", diffLYAbs: "-99.6K", lyGood: false,
-      progressPct: 62.3,
-      note: "Trang Tấm với món Bò Nhúng Giấm chiếm 68% tổng lượt Lưu (Saves)"
+      ly: "170.7K",
+      target: "114.0K",
+      actual: "71.0K",
+      diffTarget: "-37.7%",
+      diffLY: "-58.4%",
+      isTargetGood: false,
+      isLYGood: false,
+      barPct: 62.3
     },
     {
-      name: "6. Hiệu Suất TB / KOL (Avg. View / KOL)",
-      unit: "Views/KOL",
-      ly: 261000, lyStr: "261K",
-      target: 290000, targetStr: "290K",
-      actual: 323000, actualStr: "323K",
-      diffTargetPct: "+11.4%", diffTargetAbs: "+33K", targetGood: true,
-      diffLYPct: "+23.8%", diffLYAbs: "+62K", lyGood: true,
-      progressPct: 111.4,
-      note: "Hiệu suất trung bình mỗi KOL tăng 24% so với năm trước"
+      metric: "Avg. View / KOL",
+      unit: "View",
+      ly: "261K",
+      target: "290K",
+      actual: "323K",
+      diffTarget: "+11.4%",
+      diffLY: "+23.8%",
+      isTargetGood: true,
+      isLYGood: true,
+      barPct: 100
+    },
+    {
+      metric: "Avg. View Time",
+      unit: "Giây",
+      ly: "120s",
+      target: "90s",
+      actual: "135s",
+      diffTarget: "+50.0%",
+      diffLY: "+12.5%",
+      isTargetGood: true,
+      isLYGood: true,
+      barPct: 100
     }
   ],
   topKols: [
-    { name: "Trang Tấm", tier: "Mid-tier", target: "600K", actual: "718K", pct: "+19.7%", diff: "+118K", dish: "Bò nhúng giấm (68% Saves)" },
-    { name: "Khánh Linh", tier: "Macro", target: "400K", actual: "341K", pct: "-14.7%", diff: "-59K", dish: "Mì lạnh HQ + Gỏi bò" },
-    { name: "Linh nấu", tier: "Mid-tier", target: "300K", actual: "284K", pct: "-5.3%", diff: "-16K", dish: "Nộm hoa chuối" }
+    { name: "Trang Tấm", tier: "Mid-tier", target: "600K", actual: "718K", diff: "+19.7%" },
+    { name: "Khánh Linh", tier: "Macro", target: "400K", actual: "341K", diff: "-14.7%" },
+    { name: "Linh nấu", tier: "Mid-tier", target: "300K", actual: "284K", diff: "-5.3%" }
   ],
   lowKols: [
-    { name: "Nấu Ăn Dễ Lắm", tier: "Micro", target: "150K", actual: "37K", pct: "-75.3%", diff: "-113K", reason: "Món gỏi mực xoài kén người xem" },
-    { name: "TOE NẤU GÌ ĐÓ", tier: "Micro", target: "200K", actual: "66K", pct: "-67.0%", diff: "-134K", reason: "Món nộm rau muống ít tương tác" }
+    { name: "Nấu Ăn Dễ Lắm", tier: "Micro", target: "150K", actual: "37K", diff: "-75.3%" },
+    { name: "TOE NẤU GÌ ĐÓ", tier: "Micro", target: "200K", actual: "66K", diff: "-67.0%" },
+    { name: "Ăn gì Thương ơi", tier: "Mid-tier", target: "250K", actual: "99K", diff: "-60.5%" }
   ],
   kols: [
     { kol: "Trang Tấm", tier: "Mid-tier", cost: 38000000, targetViews: 600000, organicViews: 718000, reupViews: 120000, totalViews: 838000, eng: 48970, cpv: 38.0, time: "2m49s" },
@@ -218,7 +317,7 @@ export default function DashboardView({ onOpen = () => {} }) {
   const [sortCol, setSortCol] = useState("totalViews");
   const [sortDir, setSortDir] = useState("desc");
 
-  const data = projectKey === "MSG" ? MSG_DATA : VINEGAR_DATA;
+  const data = projectKey === "MSG" ? DATA_MSG : DATA_VINEGAR;
 
   // Sorted KOLs
   const sortedKols = useMemo(() => {
@@ -242,38 +341,36 @@ export default function DashboardView({ onOpen = () => {} }) {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", overflowY: "auto", background: "#F8FAFC", padding: "20px 24px", gap: 18 }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", overflowY: "auto", background: "#FAF7F2", padding: "16px 20px", gap: 14 }}>
       
-      {/* ── TOP EXECUTIVE CONTROL BAR ── */}
+      {/* ── TOP CONTROL BAR ── */}
       <div style={{ 
         background: "#FFFFFF", 
-        borderRadius: 14, 
-        border: "1px solid #E2E8F0", 
-        padding: "12px 20px", 
+        borderRadius: 12, 
+        border: "1px solid #E6DDD6", 
+        padding: "10px 16px", 
         display: "flex", 
         justifyContent: "space-between", 
         alignItems: "center", 
-        flexWrap: "wrap", 
-        gap: 12,
-        boxShadow: "0 1px 4px rgba(0,0,0,0.03)"
+        flexWrap: "nowrap",
+        gap: 12
       }}>
-        {/* Project Selector Pills */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 12, fontWeight: 800, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.05em" }}>DỰ ÁN:</span>
-          <div style={{ display: "flex", gap: 6, background: "#F1F5F9", padding: 4, borderRadius: 12 }}>
+        {/* Project Selector */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap" }}>
+          <span style={{ fontSize: 11, fontWeight: 800, color: "#8C7A6B", textTransform: "uppercase" }}>DỰ ÁN:</span>
+          <div style={{ display: "flex", gap: 4, background: "#F7F4EE", padding: 3, borderRadius: 10 }}>
             <button 
               onClick={() => { setProjectKey("MSG"); setKolSearch(""); }}
               style={{
-                padding: "8px 20px",
-                borderRadius: 9,
-                fontSize: 13,
+                padding: "6px 18px",
+                borderRadius: 8,
+                fontSize: 12,
                 fontWeight: 800,
                 cursor: "pointer",
                 border: "none",
-                background: projectKey === "MSG" ? "#0F766E" : "transparent",
-                color: projectKey === "MSG" ? "#FFFFFF" : "#334155",
-                boxShadow: projectKey === "MSG" ? "0 2px 6px rgba(15, 118, 110, 0.25)" : "none",
-                transition: "all 0.15s"
+                background: projectKey === "MSG" ? "#3B9686" : "transparent",
+                color: projectKey === "MSG" ? "#FFFFFF" : "#2E3840",
+                whiteSpace: "nowrap"
               }}
             >
               MSG
@@ -281,16 +378,15 @@ export default function DashboardView({ onOpen = () => {} }) {
             <button 
               onClick={() => { setProjectKey("VINEGAR"); setKolSearch(""); }}
               style={{
-                padding: "8px 20px",
-                borderRadius: 9,
-                fontSize: 13,
+                padding: "6px 18px",
+                borderRadius: 8,
+                fontSize: 12,
                 fontWeight: 800,
                 cursor: "pointer",
                 border: "none",
-                background: projectKey === "VINEGAR" ? "#0369A1" : "transparent",
-                color: projectKey === "VINEGAR" ? "#FFFFFF" : "#334155",
-                boxShadow: projectKey === "VINEGAR" ? "0 2px 6px rgba(3, 105, 161, 0.25)" : "none",
-                transition: "all 0.15s"
+                background: projectKey === "VINEGAR" ? "#4A88BA" : "transparent",
+                color: projectKey === "VINEGAR" ? "#FFFFFF" : "#2E3840",
+                whiteSpace: "nowrap"
               }}
             >
               Vinegar
@@ -299,157 +395,126 @@ export default function DashboardView({ onOpen = () => {} }) {
         </div>
 
         {/* View Switcher */}
-        <div style={{ display: "flex", gap: 6, background: "#F1F5F9", padding: 4, borderRadius: 12 }}>
+        <div style={{ display: "flex", gap: 4, background: "#F7F4EE", padding: 3, borderRadius: 10, whiteSpace: "nowrap" }}>
           <button 
             onClick={() => setViewTab("compare")}
             style={{
-              padding: "7px 16px",
+              padding: "6px 14px",
               borderRadius: 8,
               fontSize: 12,
               fontWeight: 800,
               cursor: "pointer",
               border: "none",
               background: viewTab === "compare" ? "#FFFFFF" : "transparent",
-              color: viewTab === "compare" ? "#0F172A" : "#64748B",
-              boxShadow: viewTab === "compare" ? "0 1px 4px rgba(0,0,0,0.08)" : "none"
+              color: viewTab === "compare" ? "#2E3840" : "#8C7A6B",
+              boxShadow: viewTab === "compare" ? "0 1px 3px rgba(0,0,0,0.06)" : "none",
+              whiteSpace: "nowrap"
             }}
           >
-            📊 Bảng So Sánh Chỉ Số (Executive Compare)
+            📊 Bảng So Sánh Chỉ Số
           </button>
           <button 
             onClick={() => setViewTab("kols")}
             style={{
-              padding: "7px 16px",
+              padding: "6px 14px",
               borderRadius: 8,
               fontSize: 12,
               fontWeight: 800,
               cursor: "pointer",
               border: "none",
               background: viewTab === "kols" ? "#FFFFFF" : "transparent",
-              color: viewTab === "kols" ? "#0F172A" : "#64748B",
-              boxShadow: viewTab === "kols" ? "0 1px 4px rgba(0,0,0,0.08)" : "none"
+              color: viewTab === "kols" ? "#2E3840" : "#8C7A6B",
+              boxShadow: viewTab === "kols" ? "0 1px 3px rgba(0,0,0,0.06)" : "none",
+              whiteSpace: "nowrap"
             }}
           >
-            📋 Chi Tiết Từng KOL ({data.kolCount})
+            📋 Chi Tiết {data.kolCount} KOLs
           </button>
         </div>
       </div>
 
       {/* =========================================================================
-          SECTION 1: UNIFIED EXECUTIVE COMPARISON TABLE (CỰC KỲ DỄ ĐỌC & SO SÁNH)
+          TAB 1: BẢNG SO SÁNH CHỈ SỐ (EXACT NUMBERS, ZERO WRAP, CLEAN ALIGNMENT)
          ========================================================================= */}
       {viewTab === "compare" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           
-          {/* MAIN COMPARISON MATRIX */}
+          {/* MAIN MATRIX */}
           <div style={{ 
             background: "#FFFFFF", 
-            borderRadius: 16, 
-            border: "1px solid #E2E8F0", 
-            overflow: "hidden", 
-            boxShadow: "0 2px 10px rgba(0,0,0,0.02)" 
+            borderRadius: 14, 
+            border: "1px solid #E6DDD6", 
+            overflow: "hidden" 
           }}>
-            <div style={{ padding: "16px 22px", borderBottom: "1px solid #E2E8F0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div>
-                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#0F172A" }}>
-                  BẢNG ĐỐI CHIẾU CHỈ SỐ: {data.name.toUpperCase()}
-                </h3>
-                <span style={{ fontSize: 12, color: "#64748B" }}>Thời gian: {data.period} • Quy mô: {data.kolCount} KOLs</span>
+            <div style={{ padding: "12px 18px", borderBottom: "1px solid #E6DDD6", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ fontWeight: 800, fontSize: 14, color: "#2E3840" }}>
+                ĐỐI CHIẾU CHỈ SỐ: {data.name.toUpperCase()} ({data.kolCount} KOLS)
               </div>
-              <span style={{ fontSize: 12, fontWeight: 700, color: "#0F766E", background: "#CCFBF1", padding: "4px 10px", borderRadius: 8 }}>
-                ● Dữ liệu Báo Cáo FY26
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#8C7A6B" }}>
+                {data.period}
               </span>
             </div>
 
             <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
                 <thead>
-                  <tr style={{ background: "#F8FAFC", borderBottom: "2px solid #E2E8F0", color: "#475569", textAlign: "left" }}>
-                    <th style={{ padding: "14px 20px", fontWeight: 800 }}>CHỈ SỐ ĐO LƯỜNG</th>
-                    <th style={{ padding: "14px 16px", textAlign: "right", fontWeight: 800, color: "#64748B" }}>CÙNG KỲ (LY FY25)</th>
-                    <th style={{ padding: "14px 16px", textAlign: "right", fontWeight: 800, color: "#D97706" }}>KẾ HOẠCH (TARGET)</th>
-                    <th style={{ padding: "14px 16px", textAlign: "right", fontWeight: 800, color: "#0F766E" }}>THỰC TẾ (ACTUAL FY26)</th>
-                    <th style={{ padding: "14px 16px", textAlign: "center", fontWeight: 800 }}>SO VỚI KPI</th>
-                    <th style={{ padding: "14px 16px", textAlign: "center", fontWeight: 800 }}>SO VỚI CÙNG KỲ (YoY)</th>
-                    <th style={{ padding: "14px 20px", width: 220, fontWeight: 800 }}>TIẾN ĐỘ / TỶ LỆ</th>
+                  <tr style={{ background: "#FAF7F2", borderBottom: "2px solid #E6DDD6", color: "#68584E" }}>
+                    <th style={{ padding: "10px 16px", textAlign: "left", fontWeight: 800, whiteSpace: "nowrap" }}>CHỈ SỐ</th>
+                    <th style={{ padding: "10px 14px", textAlign: "right", fontWeight: 800, color: "#8C7A6B", whiteSpace: "nowrap" }}>LY (FY25)</th>
+                    <th style={{ padding: "10px 14px", textAlign: "right", fontWeight: 800, color: "#C98A26", whiteSpace: "nowrap" }}>TARGET (KPI)</th>
+                    <th style={{ padding: "10px 14px", textAlign: "right", fontWeight: 800, color: "#3B9686", whiteSpace: "nowrap" }}>ACTUAL (FY26)</th>
+                    <th style={{ padding: "10px 14px", textAlign: "center", fontWeight: 800, whiteSpace: "nowrap" }}>VS TARGET</th>
+                    <th style={{ padding: "10px 14px", textAlign: "center", fontWeight: 800, whiteSpace: "nowrap" }}>VS LY (YoY)</th>
                   </tr>
                 </thead>
                 <tbody>
                   {data.metrics.map((m, idx) => (
-                    <tr key={idx} style={{ borderBottom: "1px solid #F1F5F9", background: idx % 2 === 0 ? "#FFFFFF" : "#FAFBFD" }}>
+                    <tr key={idx} style={{ borderBottom: "1px solid #F2ECE4", background: idx % 2 === 0 ? "#FFFFFF" : "#FAF8F5" }}>
                       
-                      {/* Metric Name */}
-                      <td style={{ padding: "16px 20px", fontWeight: 700, color: "#0F172A" }}>
-                        <div style={{ fontSize: 14 }}>{m.name}</div>
-                        <div style={{ fontSize: 11, color: "#94A3B8", fontWeight: 500, marginTop: 2 }}>{m.note}</div>
+                      <td style={{ padding: "12px 16px", fontWeight: 700, color: "#2E3840", whiteSpace: "nowrap" }}>
+                        {m.metric}
                       </td>
 
-                      {/* LY */}
-                      <td style={{ padding: "16px 16px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 600, color: "#64748B", fontSize: 14 }}>
-                        {m.lyStr}
+                      <td style={{ padding: "12px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#8C7A6B", whiteSpace: "nowrap" }}>
+                        {m.ly}
                       </td>
 
-                      {/* Target */}
-                      <td style={{ padding: "16px 16px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 700, color: "#B45309", fontSize: 14 }}>
-                        {m.targetStr}
+                      <td style={{ padding: "12px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 700, color: "#C98A26", whiteSpace: "nowrap" }}>
+                        {m.target}
                       </td>
 
-                      {/* Actual */}
-                      <td style={{ padding: "16px 16px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#0F766E", fontSize: 15 }}>
-                        {m.actualStr}
+                      <td style={{ padding: "12px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#3B9686", fontSize: 13, whiteSpace: "nowrap" }}>
+                        {m.actual}
                       </td>
 
-                      {/* Diff vs Target */}
-                      <td style={{ padding: "16px 16px", textAlign: "center" }}>
-                        <div style={{ 
-                          display: "inline-flex", 
-                          alignItems: "center", 
-                          gap: 4, 
-                          padding: "4px 10px", 
-                          borderRadius: 8, 
-                          background: m.targetGood === true ? "#DCFCE7" : m.targetGood === false ? "#FEE2E2" : "#F1F5F9",
-                          color: m.targetGood === true ? "#15803D" : m.targetGood === false ? "#B91C1C" : "#475569",
+                      <td style={{ padding: "12px 14px", textAlign: "center", whiteSpace: "nowrap" }}>
+                        <span style={{ 
+                          display: "inline-block",
+                          padding: "3px 8px", 
+                          borderRadius: 6, 
+                          background: m.isTargetGood === true ? "#D0E9E6" : m.isTargetGood === false ? "#FACDD0" : "#F7F4EE",
+                          color: m.isTargetGood === true ? "#3B9686" : m.isTargetGood === false ? "#D45B6A" : "#2E3840",
                           fontWeight: 800,
-                          fontSize: 12
+                          fontSize: 11,
+                          whiteSpace: "nowrap"
                         }}>
-                          {m.targetGood === true ? "▲" : m.targetGood === false ? "▼" : "●"} {m.diffTargetPct}
-                          <span style={{ fontSize: 10, fontWeight: 600, opacity: 0.85 }}>({m.diffTargetAbs})</span>
-                        </div>
+                          {m.diffTarget}
+                        </span>
                       </td>
 
-                      {/* Diff vs LY */}
-                      <td style={{ padding: "16px 16px", textAlign: "center" }}>
-                        <div style={{ 
-                          display: "inline-flex", 
-                          alignItems: "center", 
-                          gap: 4, 
-                          padding: "4px 10px", 
-                          borderRadius: 8, 
-                          background: m.lyGood === true ? "#DCFCE7" : m.lyGood === false ? "#FEE2E2" : "#F1F5F9",
-                          color: m.lyGood === true ? "#15803D" : m.lyGood === false ? "#B91C1C" : "#475569",
+                      <td style={{ padding: "12px 14px", textAlign: "center", whiteSpace: "nowrap" }}>
+                        <span style={{ 
+                          display: "inline-block",
+                          padding: "3px 8px", 
+                          borderRadius: 6, 
+                          background: m.isLYGood === true ? "#D0E9E6" : m.isLYGood === false ? "#FACDD0" : "#F7F4EE",
+                          color: m.isLYGood === true ? "#3B9686" : m.isLYGood === false ? "#D45B6A" : "#2E3840",
                           fontWeight: 800,
-                          fontSize: 12
+                          fontSize: 11,
+                          whiteSpace: "nowrap"
                         }}>
-                          {m.lyGood === true ? "▲" : m.lyGood === false ? "▼" : "●"} {m.diffLYPct}
-                          <span style={{ fontSize: 10, fontWeight: 600, opacity: 0.85 }}>({m.diffLYAbs})</span>
-                        </div>
-                      </td>
-
-                      {/* Visual Bar Comparison */}
-                      <td style={{ padding: "16px 20px" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                          <div style={{ flex: 1, height: 10, background: "#E2E8F0", borderRadius: 6, overflow: "hidden" }}>
-                            <div style={{ 
-                              width: `${Math.min(100, m.progressPct)}%`, 
-                              height: "100%", 
-                              background: m.targetGood === false ? "#EF4444" : "#0D9488", 
-                              borderRadius: 6 
-                            }} />
-                          </div>
-                          <span style={{ fontSize: 11, fontWeight: 800, color: "#475569", fontFamily: "'IBM Plex Mono', monospace", width: 40, textAlign: "right" }}>
-                            {m.progressPct.toFixed(0)}%
-                          </span>
-                        </div>
+                          {m.diffLY}
+                        </span>
                       </td>
 
                     </tr>
@@ -459,57 +524,41 @@ export default function DashboardView({ onOpen = () => {} }) {
             </div>
           </div>
 
-          {/* TWO SIDE-BY-SIDE PANELS: TOP PERFORMERS vs ACTION NEEDED */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: 16 }}>
+          {/* 2 SIDE-BY-SIDE PANELS (TOP vs LOW) */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 12 }}>
             
             {/* TOP PERFORMERS */}
-            <div style={{ background: "#FFFFFF", borderRadius: 16, border: "1px solid #E2E8F0", padding: "18px 20px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                <span style={{ fontSize: 13, fontWeight: 800, color: "#15803D", letterSpacing: "0.03em" }}>
-                  🌟 TOP KOL HIỆU SUẤT CAO NHẤT (VƯỢT KPI)
-                </span>
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#15803D", background: "#DCFCE7", padding: "3px 8px", borderRadius: 6 }}>
-                  Vượt trội
-                </span>
+            <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E6DDD6", padding: "14px 16px" }}>
+              <div style={{ fontSize: 12, fontWeight: 800, color: "#3B9686", marginBottom: 10, whiteSpace: "nowrap" }}>
+                🟢 TOP VƯỢT KPI
               </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {data.topKols.map((k, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", background: "#F8FAFC", borderRadius: 10, border: "1px solid #F1F5F9" }}>
-                    <div>
-                      <div style={{ fontWeight: 800, color: "#0F172A", fontSize: 13 }}>{k.name} <span style={{ fontSize: 11, color: "#64748B", fontWeight: 600 }}>({k.tier})</span></div>
-                      {k.dish && <div style={{ fontSize: 11, color: "#0D9488", fontWeight: 600 }}>🍲 {k.dish}</div>}
-                    </div>
+                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", background: "#FAF7F2", borderRadius: 8, whiteSpace: "nowrap" }}>
+                    <span style={{ fontWeight: 700, color: "#2E3840", fontSize: 12 }}>{k.name} ({k.tier})</span>
                     <div style={{ textAlign: "right" }}>
-                      <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#0F766E", fontSize: 14 }}>{k.actual} <span style={{ fontSize: 11, color: "#94A3B8" }}>/ {k.target}</span></div>
-                      <div style={{ fontSize: 11, fontWeight: 800, color: "#15803D" }}>▲ {k.pct} ({k.diff})</div>
+                      <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 700, color: "#3B9686" }}>{k.actual}</span>
+                      <span style={{ fontSize: 10, color: "#8C7A6B" }}> / {k.target}</span>
+                      <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 800, color: "#3B9686" }}>{k.diff}</span>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* ACTION / DECLINE */}
-            <div style={{ background: "#FFFFFF", borderRadius: 16, border: "1px solid #E2E8F0", padding: "18px 20px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                <span style={{ fontSize: 13, fontWeight: 800, color: "#B91C1C", letterSpacing: "0.03em" }}>
-                  ⚠️ KOL CẦN ĐIỀU CHỈNH / TỐI ƯU MENU
-                </span>
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#B91C1C", background: "#FEE2E2", padding: "3px 8px", borderRadius: 6 }}>
-                  Cần lưu ý
-                </span>
+            {/* ACTION NEEDED */}
+            <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E6DDD6", padding: "14px 16px" }}>
+              <div style={{ fontSize: 12, fontWeight: 800, color: "#D45B6A", marginBottom: 10, whiteSpace: "nowrap" }}>
+                🔴 CẦN TỐI ƯU
               </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {data.lowKols.map((k, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", background: "#F8FAFC", borderRadius: 10, border: "1px solid #F1F5F9" }}>
-                    <div>
-                      <div style={{ fontWeight: 800, color: "#0F172A", fontSize: 13 }}>{k.name} <span style={{ fontSize: 11, color: "#64748B", fontWeight: 600 }}>({k.tier})</span></div>
-                      <div style={{ fontSize: 11, color: "#B91C1C", fontWeight: 600 }}>{k.reason}</div>
-                    </div>
+                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", background: "#FAF7F2", borderRadius: 8, whiteSpace: "nowrap" }}>
+                    <span style={{ fontWeight: 700, color: "#2E3840", fontSize: 12 }}>{k.name} ({k.tier})</span>
                     <div style={{ textAlign: "right" }}>
-                      <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#0F172A", fontSize: 14 }}>{k.actual} <span style={{ fontSize: 11, color: "#94A3B8" }}>/ {k.target}</span></div>
-                      <div style={{ fontSize: 11, fontWeight: 800, color: "#B91C1C" }}>▼ {k.pct} ({k.diff})</div>
+                      <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 700, color: "#D45B6A" }}>{k.actual}</span>
+                      <span style={{ fontSize: 10, color: "#8C7A6B" }}> / {k.target}</span>
+                      <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 800, color: "#D45B6A" }}>{k.diff}</span>
                     </div>
                   </div>
                 ))}
@@ -522,131 +571,129 @@ export default function DashboardView({ onOpen = () => {} }) {
       )}
 
       {/* =========================================================================
-          SECTION 2: FULL SPREADSHEET TABLE OF ALL KOLS (DỄ XẾP HẠNG & TÌM KIẾM)
+          TAB 2: BẢNG CHI TIẾT TỪNG KOL
          ========================================================================= */}
       {viewTab === "kols" && (
         <div style={{ 
           background: "#FFFFFF", 
-          borderRadius: 16, 
-          border: "1px solid #E2E8F0", 
-          overflow: "hidden", 
-          boxShadow: "0 2px 10px rgba(0,0,0,0.02)" 
+          borderRadius: 14, 
+          border: "1px solid #E6DDD6", 
+          overflow: "hidden" 
         }}>
-          {/* Header controls */}
-          <div style={{ padding: "14px 20px", borderBottom: "1px solid #E2E8F0", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
+          <div style={{ padding: "10px 16px", borderBottom: "1px solid #E6DDD6", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "nowrap", gap: 10 }}>
             <input 
-              placeholder={`🔍 Tìm kiếm KOL trong ${data.name}...`}
+              placeholder={`🔍 Tìm KOL trong ${data.name}...`}
               value={kolSearch}
               onChange={e => setKolSearch(e.target.value)}
               style={{
-                width: 280,
-                padding: "8px 14px",
-                fontSize: 13,
-                borderRadius: 10,
-                border: "1px solid #CBD5E1",
+                width: 220,
+                padding: "6px 12px",
+                fontSize: 12,
+                borderRadius: 8,
+                border: "1px solid #E6DDD6",
                 outline: "none",
-                background: "#F8FAFC"
+                background: "#FAF7F2"
               }}
             />
-            <span style={{ fontSize: 12, color: "#64748B", fontWeight: 600 }}>
-              Hiển thị <strong>{sortedKols.length}</strong> / {data.kolCount} KOLs (Bấm tiêu đề cột để Sắp Xếp)
+            <span style={{ fontSize: 11, color: "#8C7A6B", fontWeight: 600, whiteSpace: "nowrap" }}>
+              {sortedKols.length} / {data.kolCount} KOLs
             </span>
           </div>
 
           <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
               <thead>
-                <tr style={{ background: "#F8FAFC", borderBottom: "2px solid #E2E8F0", color: "#475569" }}>
-                  <th onClick={() => handleSort("kol")} style={{ padding: "12px 18px", textAlign: "left", cursor: "pointer", fontWeight: 800 }}>
-                    Tên KOL {sortCol === "kol" && (sortDir === "asc" ? "▲" : "▼")}
+                <tr style={{ background: "#FAF7F2", borderBottom: "2px solid #E6DDD6", color: "#68584E" }}>
+                  <th onClick={() => handleSort("kol")} style={{ padding: "10px 14px", textAlign: "left", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
+                    KOL {sortCol === "kol" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
-                  <th style={{ padding: "12px 12px", textAlign: "center", fontWeight: 700 }}>Tier</th>
-                  <th onClick={() => handleSort("cost")} style={{ padding: "12px 14px", textAlign: "right", cursor: "pointer", fontWeight: 800 }}>
-                    Cost (VNĐ) {sortCol === "cost" && (sortDir === "asc" ? "▲" : "▼")}
+                  <th style={{ padding: "10px 10px", textAlign: "center", fontWeight: 700, whiteSpace: "nowrap" }}>Tier</th>
+                  <th onClick={() => handleSort("cost")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
+                    Cost {sortCol === "cost" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
-                  <th onClick={() => handleSort("targetViews")} style={{ padding: "12px 14px", textAlign: "right", cursor: "pointer", fontWeight: 800 }}>
-                    Target View {sortCol === "targetViews" && (sortDir === "asc" ? "▲" : "▼")}
+                  <th onClick={() => handleSort("targetViews")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
+                    Target {sortCol === "targetViews" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
-                  <th onClick={() => handleSort("organicViews")} style={{ padding: "12px 14px", textAlign: "right", cursor: "pointer", fontWeight: 800 }}>
-                    Organic View {sortCol === "organicViews" && (sortDir === "asc" ? "▲" : "▼")}
+                  <th onClick={() => handleSort("organicViews")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
+                    Organic {sortCol === "organicViews" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
-                  <th onClick={() => handleSort("reupViews")} style={{ padding: "12px 14px", textAlign: "right", cursor: "pointer", fontWeight: 800, color: "#0284C7" }}>
-                    FB Reup {sortCol === "reupViews" && (sortDir === "asc" ? "▲" : "▼")}
+                  <th onClick={() => handleSort("reupViews")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, color: "#4A88BA", whiteSpace: "nowrap" }}>
+                    Reup {sortCol === "reupViews" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
-                  <th onClick={() => handleSort("totalViews")} style={{ padding: "12px 14px", textAlign: "right", cursor: "pointer", fontWeight: 800, color: "#0F766E" }}>
-                    Total View {sortCol === "totalViews" && (sortDir === "asc" ? "▲" : "▼")}
+                  <th onClick={() => handleSort("totalViews")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, color: "#3B9686", whiteSpace: "nowrap" }}>
+                    Total {sortCol === "totalViews" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
-                  <th onClick={() => handleSort("pct")} style={{ padding: "12px 14px", textAlign: "center", cursor: "pointer", fontWeight: 800 }}>
-                    % Đạt Target {sortCol === "pct" && (sortDir === "asc" ? "▲" : "▼")}
+                  <th onClick={() => handleSort("pct")} style={{ padding: "10px 12px", textAlign: "center", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
+                    % KPI {sortCol === "pct" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
-                  <th onClick={() => handleSort("eng")} style={{ padding: "12px 14px", textAlign: "right", cursor: "pointer", fontWeight: 800 }}>
-                    Tương Tác {sortCol === "eng" && (sortDir === "asc" ? "▲" : "▼")}
+                  <th onClick={() => handleSort("eng")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
+                    Eng {sortCol === "eng" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
-                  <th style={{ padding: "12px 14px", textAlign: "center", fontWeight: 700 }}>Avg Time</th>
-                  <th onClick={() => handleSort("cpv")} style={{ padding: "12px 14px", textAlign: "right", cursor: "pointer", fontWeight: 800 }}>
+                  <th style={{ padding: "10px 10px", textAlign: "center", fontWeight: 700, whiteSpace: "nowrap" }}>Time</th>
+                  <th onClick={() => handleSort("cpv")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
                     CPV 6s {sortCol === "cpv" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {sortedKols.map((k, idx) => {
-                  const diff = k.totalViews - k.targetViews;
                   const pct = ((k.totalViews / k.targetViews) * 100).toFixed(1);
-                  const isGood = diff >= 0;
+                  const isGood = k.totalViews >= k.targetViews;
 
                   return (
                     <tr 
                       key={idx} 
                       onClick={() => onOpen(k)}
                       style={{ 
-                        borderBottom: "1px solid #F1F5F9", 
-                        background: idx % 2 === 0 ? "#FFFFFF" : "#FAFBFD",
+                        borderBottom: "1px solid #F2ECE4", 
+                        background: idx % 2 === 0 ? "#FFFFFF" : "#FAF8F5",
                         cursor: "pointer"
                       }}
                     >
-                      <td style={{ padding: "14px 18px", fontWeight: 800, color: "#0F172A" }}>
+                      <td style={{ padding: "10px 14px", fontWeight: 700, color: "#2E3840", whiteSpace: "nowrap" }}>
                         {k.kol}
                       </td>
-                      <td style={{ padding: "14px 12px", textAlign: "center" }}>
-                        <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 6, background: "#F1F5F9", color: "#475569" }}>
+                      <td style={{ padding: "10px 10px", textAlign: "center", whiteSpace: "nowrap" }}>
+                        <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 6px", borderRadius: 4, background: "#F7F4EE", color: "#68584E" }}>
                           {k.tier}
                         </span>
                       </td>
-                      <td style={{ padding: "14px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
-                        {k.cost.toLocaleString()}đ
+                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
+                        {(k.cost / 1000000).toFixed(1)}M
                       </td>
-                      <td style={{ padding: "14px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#64748B" }}>
+                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#8C7A6B", whiteSpace: "nowrap" }}>
                         {k.targetViews.toLocaleString()}
                       </td>
-                      <td style={{ padding: "14px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
+                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
                         {k.organicViews.toLocaleString()}
                       </td>
-                      <td style={{ padding: "14px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#0284C7", fontWeight: 600 }}>
+                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#4A88BA", whiteSpace: "nowrap" }}>
                         +{k.reupViews.toLocaleString()}
                       </td>
-                      <td style={{ padding: "14px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#0F172A", fontSize: 14 }}>
+                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#2E3840", whiteSpace: "nowrap" }}>
                         {k.totalViews.toLocaleString()}
                       </td>
-                      <td style={{ padding: "14px 14px", textAlign: "center" }}>
+                      <td style={{ padding: "10px 12px", textAlign: "center", whiteSpace: "nowrap" }}>
                         <span style={{ 
                           display: "inline-block",
-                          padding: "3px 8px", 
-                          borderRadius: 6, 
-                          background: isGood ? "#DCFCE7" : "#FEE2E2", 
-                          color: isGood ? "#15803D" : "#B91C1C",
+                          padding: "2px 6px", 
+                          borderRadius: 4, 
+                          background: isGood ? "#D0E9E6" : "#FACDD0", 
+                          color: isGood ? "#3B9686" : "#D45B6A",
                           fontWeight: 800,
-                          fontSize: 12
+                          fontSize: 11,
+                          whiteSpace: "nowrap"
                         }}>
-                          {isGood ? "▲" : "▼"} {pct}%
+                          {pct}%
                         </span>
                       </td>
-                      <td style={{ padding: "14px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
+                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
                         {k.eng.toLocaleString()}
                       </td>
-                      <td style={{ padding: "14px 14px", textAlign: "center", fontWeight: 700, color: "#334155" }}>
+                      <td style={{ padding: "10px 10px", textAlign: "center", fontWeight: 700, whiteSpace: "nowrap" }}>
                         {k.time}
                       </td>
-                      <td style={{ padding: "14px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: k.cpv <= 45 ? "#15803D" : "#0F172A", fontWeight: 700 }}>
+                      <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: k.cpv <= 45 ? "#3B9686" : "#2E3840", fontWeight: 700, whiteSpace: "nowrap" }}>
                         {k.cpv}đ
                       </td>
                     </tr>
@@ -654,41 +701,41 @@ export default function DashboardView({ onOpen = () => {} }) {
                 })}
               </tbody>
               <tfoot>
-                <tr style={{ background: "#F1F5F9", borderTop: "2px solid #CBD5E1", fontWeight: 800, color: "#0F172A" }}>
-                  <td style={{ padding: "14px 18px" }}>TỔNG CỘNG ({sortedKols.length} KOLs)</td>
+                <tr style={{ background: "#F7F4EE", borderTop: "2px solid #E6DDD6", fontWeight: 800, color: "#2E3840" }}>
+                  <td style={{ padding: "10px 14px", whiteSpace: "nowrap" }}>TỔNG ({sortedKols.length})</td>
                   <td>—</td>
-                  <td style={{ padding: "14px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
-                    {sortedKols.reduce((a, b) => a + b.cost, 0).toLocaleString()}đ
+                  <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
+                    {(sortedKols.reduce((a, b) => a + b.cost, 0) / 1000000).toFixed(1)}M
                   </td>
-                  <td style={{ padding: "14px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
+                  <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
                     {sortedKols.reduce((a, b) => a + b.targetViews, 0).toLocaleString()}
                   </td>
-                  <td style={{ padding: "14px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
+                  <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
                     {sortedKols.reduce((a, b) => a + b.organicViews, 0).toLocaleString()}
                   </td>
-                  <td style={{ padding: "14px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#0284C7" }}>
+                  <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#4A88BA", whiteSpace: "nowrap" }}>
                     +{sortedKols.reduce((a, b) => a + b.reupViews, 0).toLocaleString()}
                   </td>
-                  <td style={{ padding: "14px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#0F766E", fontSize: 14 }}>
+                  <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#3B9686", whiteSpace: "nowrap" }}>
                     {sortedKols.reduce((a, b) => a + b.totalViews, 0).toLocaleString()}
                   </td>
-                  <td style={{ padding: "14px 14px", textAlign: "center" }}>
+                  <td style={{ padding: "10px 12px", textAlign: "center", whiteSpace: "nowrap" }}>
                     {(() => {
                       const t = sortedKols.reduce((a, b) => a + b.targetViews, 0);
                       const a = sortedKols.reduce((a, b) => a + b.totalViews, 0);
                       const p = t > 0 ? ((a / t) * 100).toFixed(1) : 0;
                       return (
-                        <span style={{ padding: "4px 10px", borderRadius: 6, background: a >= t ? "#0F766E" : "#B91C1C", color: "#FFFFFF", fontWeight: 800 }}>
-                          {a >= t ? "▲" : "▼"} {p}%
+                        <span style={{ padding: "2px 6px", borderRadius: 4, background: a >= t ? "#3B9686" : "#D45B6A", color: "#FFFFFF", fontWeight: 800 }}>
+                          {p}%
                         </span>
                       );
                     })()}
                   </td>
-                  <td style={{ padding: "14px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace" }}>
+                  <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap" }}>
                     {sortedKols.reduce((a, b) => a + b.eng, 0).toLocaleString()}
                   </td>
-                  <td style={{ padding: "14px 14px", textAlign: "center" }}>TB 7.2s</td>
-                  <td style={{ padding: "14px 14px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#15803D" }}>
+                  <td style={{ padding: "10px 10px", textAlign: "center", whiteSpace: "nowrap" }}>TB</td>
+                  <td style={{ padding: "10px 12px", textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", color: "#3B9686", whiteSpace: "nowrap" }}>
                     TB {(sortedKols.reduce((a, b) => a + b.cpv, 0) / (sortedKols.length || 1)).toFixed(1)}đ
                   </td>
                 </tr>
