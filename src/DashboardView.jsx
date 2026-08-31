@@ -717,26 +717,26 @@ export default function DashboardView({ onOpen = () => {} }) {
                     Chi phí booking {sortCol === "cost" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
                   <th onClick={() => handleSort("targetViews")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
-                    Mục tiêu view {sortCol === "targetViews" && (sortDir === "asc" ? "▲" : "▼")}
+                    Mục tiêu lượt xem {sortCol === "targetViews" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
                   <th onClick={() => handleSort("organicViews")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
-                    View tự nhiên {sortCol === "organicViews" && (sortDir === "asc" ? "▲" : "▼")}
+                    Lượt xem tự nhiên {sortCol === "organicViews" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
                   <th onClick={() => handleSort("reupViews")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, color: "#0284C7", whiteSpace: "nowrap" }}>
-                    View reup {sortCol === "reupViews" && (sortDir === "asc" ? "▲" : "▼")}
+                    Lượt xem reup {sortCol === "reupViews" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
                   <th onClick={() => handleSort("totalViews")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, color: "#0D9488", whiteSpace: "nowrap" }}>
-                    Tổng view {sortCol === "totalViews" && (sortDir === "asc" ? "▲" : "▼")}
+                    Tổng lượt xem {sortCol === "totalViews" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
                   <th onClick={() => handleSort("pct")} style={{ padding: "10px 12px", textAlign: "center", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
-                    % Đạt {sortCol === "pct" && (sortDir === "asc" ? "▲" : "▼")}
+                    % Đạt KPI lượt xem {sortCol === "pct" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
                   <th onClick={() => handleSort("eng")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
-                    Tương tác {sortCol === "eng" && (sortDir === "asc" ? "▲" : "▼")}
+                    Lượt tương tác {sortCol === "eng" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
-                  <th style={{ padding: "10px 10px", textAlign: "center", fontWeight: 700, whiteSpace: "nowrap" }}>Thời lượng</th>
+                  <th style={{ padding: "10px 10px", textAlign: "center", fontWeight: 700, whiteSpace: "nowrap" }}>Thời lượng xem</th>
                   <th onClick={() => handleSort("cpv")} style={{ padding: "10px 12px", textAlign: "right", cursor: "pointer", fontWeight: 800, whiteSpace: "nowrap" }}>
-                    CPV 6s {sortCol === "cpv" && (sortDir === "asc" ? "▲" : "▼")}
+                    Chi phí CPV 6s {sortCol === "cpv" && (sortDir === "asc" ? "▲" : "▼")}
                   </th>
                 </tr>
               </thead>
