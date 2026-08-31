@@ -1152,42 +1152,58 @@ export default function DashboardView({
             {/* Body: Grid of Key Metrics */}
             <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: 12 }}>
               
-              {/* Row 1: Cost & KPI View Achievement */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                <div style={{ background: "#F8FAFC", padding: "12px 14px", borderRadius: 10, border: "1px solid #F1F5F9" }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "#64748B" }}>💰 Chi phí booking</div>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: "#0F172A", marginTop: 4, fontFamily: "'IBM Plex Mono', monospace" }}>
-                    {(activeDetailKol.cost / 1000000).toFixed(1)}M VNĐ
-                  </div>
-                </div>
+              {/* Row 1: Cost & % KPI (Không reup vs Có reup) */}
+              {(() => {
+                const orgPct = activeDetailKol.targetViews > 0 ? ((activeDetailKol.organicViews / activeDetailKol.targetViews) * 100).toFixed(1) : 0;
+                const totPct = activeDetailKol.targetViews > 0 ? ((activeDetailKol.totalViews / activeDetailKol.targetViews) * 100).toFixed(1) : 0;
+                const isOrgGood = activeDetailKol.organicViews >= activeDetailKol.targetViews;
+                const isTotGood = activeDetailKol.totalViews >= activeDetailKol.targetViews;
 
-                <div style={{ background: activeDetailKol.totalViews >= activeDetailKol.targetViews ? "#F0FDF4" : "#FFF1F2", padding: "12px 14px", borderRadius: 10, border: activeDetailKol.totalViews >= activeDetailKol.targetViews ? "1px solid #BBF7D0" : "1px solid #FECDD3" }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: activeDetailKol.totalViews >= activeDetailKol.targetViews ? "#16A34A" : "#E11D48" }}>🎯 % Đạt KPI Lượt xem</div>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: activeDetailKol.totalViews >= activeDetailKol.targetViews ? "#15803D" : "#BE123C", marginTop: 4 }}>
-                    {((activeDetailKol.totalViews / activeDetailKol.targetViews) * 100).toFixed(1)}%
+                return (
+                  <div style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr 1fr", gap: 8 }}>
+                    <div style={{ background: "#F8FAFC", padding: "10px 12px", borderRadius: 10, border: "1px solid #F1F5F9" }}>
+                      <div style={{ fontSize: 10.5, fontWeight: 700, color: "#64748B" }}>💰 Chi phí booking</div>
+                      <div style={{ fontSize: 14.5, fontWeight: 800, color: "#0F172A", marginTop: 3, fontFamily: "'IBM Plex Mono', monospace" }}>
+                        {(activeDetailKol.cost / 1000000).toFixed(1)}M VNĐ
+                      </div>
+                    </div>
+
+                    <div style={{ background: isOrgGood ? "#F0FDF4" : "#FFF1F2", padding: "10px 12px", borderRadius: 10, border: isOrgGood ? "1px solid #BBF7D0" : "1px solid #FECDD3" }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: isOrgGood ? "#16A34A" : "#E11D48" }}>🎯 % KPI (Không reup)</div>
+                      <div style={{ fontSize: 14.5, fontWeight: 800, color: isOrgGood ? "#15803D" : "#BE123C", marginTop: 3 }}>
+                        {orgPct}%
+                      </div>
+                    </div>
+
+                    <div style={{ background: isTotGood ? "#F0FDF4" : "#FFF1F2", padding: "10px 12px", borderRadius: 10, border: isTotGood ? "1px solid #BBF7D0" : "1px solid #FECDD3" }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: isTotGood ? "#16A34A" : "#E11D48" }}>🚀 % KPI (Có reup)</div>
+                      <div style={{ fontSize: 14.5, fontWeight: 800, color: isTotGood ? "#15803D" : "#BE123C", marginTop: 3 }}>
+                        {totPct}%
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                );
+              })()}
 
               {/* Row 2: View Breakdown */}
               <div style={{ background: "#F8FAFC", padding: "12px 14px", borderRadius: 10, border: "1px solid #F1F5F9" }}>
                 <div style={{ fontSize: 11, fontWeight: 800, color: "#475569", marginBottom: 8 }}>📊 CHI TIẾT LƯỢT XEM (VIEWS)</div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, textAlign: "center" }}>
                   <div>
-                    <div style={{ fontSize: 10, color: "#64748B" }}>Mục tiêu</div>
+                    <div style={{ fontSize: 10, color: "#64748B" }}>Mục tiêu cam kết</div>
                     <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A", marginTop: 2 }}>{activeDetailKol.targetViews.toLocaleString()}</div>
                   </div>
                   <div>
-                    <div style={{ fontSize: 10, color: "#64748B" }}>Tự nhiên (TikTok)</div>
+                    <div style={{ fontSize: 10, color: "#0F172A" }}>Không reup (Tự nhiên)</div>
                     <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A", marginTop: 2 }}>{activeDetailKol.organicViews.toLocaleString()}</div>
                   </div>
                   <div>
-                    <div style={{ fontSize: 10, color: "#0284C7" }}>Reup (Facebook)</div>
+                    <div style={{ fontSize: 10, color: "#0284C7" }}>Reup (Quảng cáo)</div>
                     <div style={{ fontSize: 13, fontWeight: 700, color: "#0284C7", marginTop: 2 }}>+{activeDetailKol.reupViews.toLocaleString()}</div>
                   </div>
                 </div>
                 <div style={{ marginTop: 10, paddingTop: 8, borderTop: "1px solid #E2E8F0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: 11, fontWeight: 800, color: "#0F172A" }}>Tổng lượt xem gộp:</span>
+                  <span style={{ fontSize: 11, fontWeight: 800, color: "#0F172A" }}>Tổng lượt xem (Có reup):</span>
                   <span style={{ fontSize: 14, fontWeight: 800, color: "#0D9488", fontFamily: "'IBM Plex Mono', monospace" }}>{activeDetailKol.totalViews.toLocaleString()} views</span>
                 </div>
               </div>
