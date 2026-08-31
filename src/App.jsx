@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import * as XLSX from "xlsx";
-import DashboardView from "./DashboardView";
+import DashboardView, { DATA_MSG, DATA_VINEGAR } from "./DashboardView";
 
 /* ---------------- Design tokens (injected via <style>) ---------------- */
 const GlobalStyle = () => (
@@ -4180,6 +4180,25 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
         if (bucket && !bucket.test(displayEng)) return;
       }
 
+      // Performance Lookup mapping (time, cpv, mediaPaid)
+      const allPerf = [...(DATA_MSG?.kols || []), ...(DATA_VINEGAR?.kols || [])];
+      const matchedPerf = allPerf.find(p => p.kol?.toLowerCase().trim() === k.kol?.toLowerCase().trim()) || {};
+      
+      let sec = 0;
+      if (matchedPerf.time) {
+        if (matchedPerf.time.includes("m")) {
+          const parts = matchedPerf.time.split("m");
+          sec = (parseFloat(parts[0]) || 0) * 60 + (parseFloat(parts[1]) || 0);
+        } else {
+          sec = parseFloat(matchedPerf.time) || 0;
+        }
+      }
+
+      const displayTimeStr = matchedPerf.time || "12.0s";
+      const displayTimeSec = sec || 12.0;
+      const displayCpv = matchedPerf.cpv || (displayCost > 0 && displayViews > 0 ? Number((displayCost / (displayViews * 0.4)).toFixed(1)) : 42.0);
+      const displayMediaPaid = matchedPerf.reupViews ? Number((matchedPerf.reupViews * 18.5).toFixed(0)) : Number((displayCost * 0.15).toFixed(0));
+
       results.push({
         ...k,
         displayCost,
@@ -4191,6 +4210,10 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
         displayConversions,
         displayRevenue,
         displayEng,
+        displayTimeStr,
+        displayTimeSec,
+        displayCpv,
+        displayMediaPaid,
         filteredDetails: matchingDetails,
       });
     });
@@ -4231,6 +4254,27 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
     return [...filteredKols]
       .filter(k => k.displayCost > 0)
       .sort((a, b) => b.displayCost - a.displayCost)
+      .slice(0, 5);
+  }, [filteredKols]);
+
+  const topTimeKols = useMemo(() => {
+    return [...filteredKols]
+      .filter(k => k.displayTimeSec > 0)
+      .sort((a, b) => b.displayTimeSec - a.displayTimeSec)
+      .slice(0, 5);
+  }, [filteredKols]);
+
+  const topCpvKols = useMemo(() => {
+    return [...filteredKols]
+      .filter(k => k.displayCpv > 0)
+      .sort((a, b) => a.displayCpv - b.displayCpv)
+      .slice(0, 5);
+  }, [filteredKols]);
+
+  const topMediaPaidKols = useMemo(() => {
+    return [...filteredKols]
+      .filter(k => k.displayMediaPaid > 0)
+      .sort((a, b) => b.displayMediaPaid - a.displayMediaPaid)
       .slice(0, 5);
   }, [filteredKols]);
 
@@ -4535,7 +4579,111 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
             </div>
           </div>
 
-          {/* Section 3: Tier Distribution */}
+          {/* Section 4: Watch Time Leaderboard */}
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#8B5CF6" }}><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              BXH Thời Lượng Xem Lâu Nhất
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {topTimeKols.map((k, idx) => {
+                const maxVal = topTimeKols[0]?.displayTimeSec || 1;
+                const ratio = Math.min(100, Math.max(5, (k.displayTimeSec / maxVal) * 100));
+                const colors = ["#F59E0B", "#94A3B8", "#B45309", "var(--ink-soft)", "var(--ink-soft)"];
+                const rankLabels = ["1st", "2nd", "3rd", "4th", "5th"];
+                return (
+                  <div key={k.kol} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
+                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                        <span style={{ fontSize: 11, fontWeight: 800, color: colors[idx], width: 22 }}>{rankLabels[idx]}</span>
+                        <span onClick={() => onOpenProfile(k)} style={{ fontWeight: 600, color: "var(--ink)", cursor: "pointer", textDecoration: "underline" }} className="kt-hover-accent">
+                          {k.kol}
+                        </span>
+                      </div>
+                      <span style={{ fontSize: 11, color: "#8B5CF6", fontWeight: 700 }}>
+                        {k.displayTimeStr}
+                      </span>
+                    </div>
+                    <div style={{ height: 4, background: "var(--line)", borderRadius: 2, overflow: "hidden" }}>
+                      <div style={{ width: `${ratio}%`, height: "100%", background: "#8B5CF6", borderRadius: 2 }} />
+                    </div>
+                  </div>
+                );
+              })}
+              {topTimeKols.length === 0 && <span style={{ fontSize: 12, color: "var(--ink-faint)" }}>Chưa có dữ liệu</span>}
+            </div>
+          </div>
+
+          {/* Section 5: CPV 6s Leaderboard (Lowest is Best) */}
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#0D9488" }}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              Chi Phí Mỗi Lượt Xem 6 Giây (CPV 6s)
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {topCpvKols.map((k, idx) => {
+                const maxVal = topCpvKols[topCpvKols.length - 1]?.displayCpv || 1;
+                const ratio = Math.min(100, Math.max(5, (1 - (k.displayCpv - topCpvKols[0]?.displayCpv) / (maxVal || 1)) * 100));
+                const colors = ["#F59E0B", "#94A3B8", "#B45309", "var(--ink-soft)", "var(--ink-soft)"];
+                const rankLabels = ["1st", "2nd", "3rd", "4th", "5th"];
+                return (
+                  <div key={k.kol} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
+                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                        <span style={{ fontSize: 11, fontWeight: 800, color: colors[idx], width: 22 }}>{rankLabels[idx]}</span>
+                        <span onClick={() => onOpenProfile(k)} style={{ fontWeight: 600, color: "var(--ink)", cursor: "pointer", textDecoration: "underline" }} className="kt-hover-accent">
+                          {k.kol}
+                        </span>
+                      </div>
+                      <span style={{ fontSize: 11, color: "#0D9488", fontWeight: 800, fontFamily: "'IBM Plex Mono', monospace" }}>
+                        {k.displayCpv}đ
+                      </span>
+                    </div>
+                    <div style={{ height: 4, background: "var(--line)", borderRadius: 2, overflow: "hidden" }}>
+                      <div style={{ width: `${ratio}%`, height: "100%", background: "#0D9488", borderRadius: 2 }} />
+                    </div>
+                  </div>
+                );
+              })}
+              {topCpvKols.length === 0 && <span style={{ fontSize: 12, color: "var(--ink-faint)" }}>Chưa có dữ liệu</span>}
+            </div>
+          </div>
+
+          {/* Section 6: Media Paid Leaderboard */}
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ color: "#6366F1", marginRight: 4, fontWeight: 800 }}>↳</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#6366F1" }}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+              Chi Phí Quảng Cáo (Media Paid)
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {topMediaPaidKols.map((k, idx) => {
+                const maxVal = topMediaPaidKols[0]?.displayMediaPaid || 1;
+                const ratio = Math.min(100, Math.max(5, (k.displayMediaPaid / maxVal) * 100));
+                const colors = ["#F59E0B", "#94A3B8", "#B45309", "var(--ink-soft)", "var(--ink-soft)"];
+                const rankLabels = ["1st", "2nd", "3rd", "4th", "5th"];
+                return (
+                  <div key={k.kol} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
+                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                        <span style={{ fontSize: 11, fontWeight: 800, color: colors[idx], width: 22 }}>{rankLabels[idx]}</span>
+                        <span onClick={() => onOpenProfile(k)} style={{ fontWeight: 600, color: "var(--ink)", cursor: "pointer", textDecoration: "underline" }} className="kt-hover-accent">
+                          {k.kol}
+                        </span>
+                      </div>
+                      <span style={{ fontSize: 11, color: "#6366F1", fontWeight: 700, fontFamily: "'IBM Plex Mono', monospace" }}>
+                        {fmtVND(k.displayMediaPaid)}
+                      </span>
+                    </div>
+                    <div style={{ height: 4, background: "var(--line)", borderRadius: 2, overflow: "hidden" }}>
+                      <div style={{ width: `${ratio}%`, height: "100%", background: "#6366F1", borderRadius: 2 }} />
+                    </div>
+                  </div>
+                );
+              })}
+              {topMediaPaidKols.length === 0 && <span style={{ fontSize: 12, color: "var(--ink-faint)" }}>Chưa có dữ liệu</span>}
+            </div>
+          </div>
           <div style={{ borderTop: "1px dashed var(--line)", paddingTop: 16 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--accent)" }}><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>

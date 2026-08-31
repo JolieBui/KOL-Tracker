@@ -3,7 +3,7 @@ import React, { useState, useMemo } from "react";
 /* =========================================================================
    SỐ LIỆU XÁC THỰC TỪ 2 FILE BÁO CÁO FY26 (MSG & VINEGAR) - CHUẨN XÁC 100%
    ========================================================================= */
-const DATA_MSG = {
+export const DATA_MSG = {
   key: "MSG",
   name: "MSG",
   kolCount: 25,
@@ -206,7 +206,7 @@ const DATA_MSG = {
   ]
 };
 
-const DATA_VINEGAR = {
+export const DATA_VINEGAR = {
   key: "VINEGAR",
   name: "Vinegar",
   kolCount: 10,
