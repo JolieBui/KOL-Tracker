@@ -583,7 +583,6 @@ const CUSTOM_INITIALS = {
   "lnc":    ["let nhân cook", "let nhan cook"],
   "cllm":   ["cờ ly làm mẹ", "co ly lam me"],
   "tv":     ["tiền võ", "tien vo"],
-  "htvb":   ["hảo thích vào bếp", "hao thich vao bep"],
   "bdfml":  ["bích đức family", "bich duc family", "🌱 bích đức' family 🍎"],
   "bbkph":  ["babykopo home", "baby kopo home"],
   "hhvlog": ["huỳnh hải vlog", "huynh hai vlog"],
@@ -631,7 +630,6 @@ const CUSTOM_INITIALS = {
   "hvqh89": ["hương vị quê hương 89", "huong vi que huong 89"],
   "motis":  ["mẹ otis", "me otis"],
   "bbn2":   ["bin bun nè", "bin bun ne"],
-  "ckm":    ["châu kiều my", "chau kieu my"],
   "gdmilk": ["gia đình milk nè", "gia dinh milk ne"],
 };
 
@@ -2489,7 +2487,7 @@ const DetailModal = ({ kol, onClose, onSave, onDelete, statusStages, dynamicCamp
     
     let username = "";
     let cleaned = link.trim().split("?")[0].split("#")[0];
-    const atMatch = cleaned.match(/@([a-zA-Z0-9_\.]+)/);
+    const atMatch = cleaned.match(/@([a-zA-Z0-9_.]+)/);
     if (atMatch) {
       username = atMatch[1];
     } else {
@@ -3265,41 +3263,39 @@ const CalendarView = ({ rows, onOpen, onUpdateRow, campaignLabels = {} }) => {
   });
 
   // Calculate detailed monthly stats for the Mini Dashboard
-  const monthStats = useMemo(() => {
-    const list = [];
-    cells.forEach(cell => {
-      if (cell.isCurrentMonth) {
-        const key = `${cell.year}-${cell.month}-${cell.day}`;
-        const items = scheduledMap[key] || [];
-        items.forEach(it => list.push(it));
-      }
-    });
+  const list = [];
+  cells.forEach(cell => {
+    if (cell.isCurrentMonth) {
+      const key = `${cell.year}-${cell.month}-${cell.day}`;
+      const items = scheduledMap[key] || [];
+      items.forEach(it => list.push(it));
+    }
+  });
 
-    const totalScheduled = list.length;
-    const airedList = list.filter(r => r.statusKey === "aired" || r.status === "Đã lên sóng" || (Number(r.views) > 0) || (r.airedLink && r.airedLink.toString().trim().length > 5));
-    const airedCount = airedList.length;
-    const inProgressCount = totalScheduled - airedCount;
-    const totalCost = list.reduce((s, r) => s + (Number(r.cost) || 0), 0);
-    const totalViews = list.reduce((s, r) => s + (Number(r.views) || 0), 0);
-    const totalEng = list.reduce((s, r) => s + (Number(r.engagement) || 0), 0);
+  const totalScheduled = list.length;
+  const airedList = list.filter(r => r.statusKey === "aired" || r.status === "Đã lên sóng" || (Number(r.views) > 0) || (r.airedLink && r.airedLink.toString().trim().length > 5));
+  const airedCount = airedList.length;
+  const inProgressCount = totalScheduled - airedCount;
+  const totalCost = list.reduce((s, r) => s + (Number(r.cost) || 0), 0);
+  const totalViews = list.reduce((s, r) => s + (Number(r.views) || 0), 0);
+  const totalEng = list.reduce((s, r) => s + (Number(r.engagement) || 0), 0);
 
-    const campaignCounts = {};
-    list.forEach(r => {
-      const cKey = resolveCampaignKey(r) || "Khác";
-      campaignCounts[cKey] = (campaignCounts[cKey] || 0) + 1;
-    });
+  const campaignCounts = {};
+  list.forEach(r => {
+    const cKey = resolveCampaignKey(r) || "Khác";
+    campaignCounts[cKey] = (campaignCounts[cKey] || 0) + 1;
+  });
 
-    return {
-      list,
-      totalScheduled,
-      airedCount,
-      inProgressCount,
-      totalCost,
-      totalViews,
-      totalEng,
-      campaignCounts
-    };
-  }, [cells, scheduledMap]);
+  const monthStats = {
+    list,
+    totalScheduled,
+    airedCount,
+    inProgressCount,
+    totalCost,
+    totalViews,
+    totalEng,
+    campaignCounts
+  };
 
   const handleDrop = (e, cell) => {
     e.preventDefault();
@@ -4723,7 +4719,7 @@ const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpe
     
     let username = "";
     let cleaned = link.trim().split("?")[0].split("#")[0];
-    const atMatch = cleaned.match(/@([a-zA-Z0-9_\.]+)/);
+    const atMatch = cleaned.match(/@([a-zA-Z0-9_.]+)/);
     if (atMatch) {
       username = atMatch[1];
     } else {
@@ -5960,7 +5956,6 @@ const [view, setView] = useState("table");
           existingData={data}
           statusLabelToKey={statusLabelToKey}
           statusMap={statusMap}
-          statusLabelToKey={statusLabelToKey}
           onClose={() => setShowDualImport(false)}
           onConfirm={handleDualFileMerge}
           onImportSingle={importSingleFile}
