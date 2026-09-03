@@ -4472,235 +4472,358 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
         </div>
 
         {/* Right Column: Leaderboard Sidebar */}
-        <div className="kt-scrollbar kt-profile-sidebar">
+        <div className="kt-scrollbar kt-profile-sidebar" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           
           {/* Section 1: Views Leaderboard */}
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#F59E0B" }}><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
-              BXH Lượt Xem (Views)
+          <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E2E8F0", padding: "14px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+            <div style={{ fontSize: 12, fontWeight: 800, color: "#0284C7", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ fontSize: 14 }}>🏆</span>
+              BXH LƯỢT XEM (VIEWS)
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {topViewsKols.map((k, idx) => {
-                const maxVal = topViewsKols[0]?.displayViews || 1;
-                const ratio = Math.min(100, Math.max(5, (k.displayViews / maxVal) * 100));
-                const colors = ["#F59E0B", "#94A3B8", "#B45309", "var(--ink-soft)", "var(--ink-soft)"];
+                const rankBg = idx === 0 ? "#FEF3C7" : idx === 1 ? "#E2E8F0" : idx === 2 ? "#FFEDD5" : "#F1F5F9";
+                const rankColor = idx === 0 ? "#D97706" : idx === 1 ? "#475569" : idx === 2 ? "#C2410C" : "#64748B";
                 const rankLabels = ["1st", "2nd", "3rd", "4th", "5th"];
                 return (
-                  <div key={k.kol} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
-                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                        <span style={{ fontSize: 11, fontWeight: 800, color: colors[idx], width: 22 }}>{rankLabels[idx]}</span>
-                        <span onClick={() => onOpenProfile(k)} style={{ fontWeight: 600, color: "var(--ink)", cursor: "pointer", textDecoration: "underline" }} className="kt-hover-accent">
-                          {k.kol}
-                        </span>
-                      </div>
-                      <span style={{ fontSize: 11, color: "var(--blue)", fontWeight: 700 }}>
-                        {k.displayViews >= 1000000 ? `${(k.displayViews / 1000000).toFixed(1)}M` : k.displayViews.toLocaleString()}
+                  <div 
+                    key={k.kol} 
+                    onClick={() => onOpenProfile(k)}
+                    style={{ 
+                      display: "flex", 
+                      justifyContent: "space-between", 
+                      alignItems: "center", 
+                      padding: "8px 10px", 
+                      background: "#F8FAFC", 
+                      borderRadius: 8, 
+                      border: "1px solid #F1F5F9",
+                      cursor: "pointer",
+                      transition: "all 0.15s ease"
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.background = "#EFF6FF";
+                      e.currentTarget.style.borderColor = "#93C5FD";
+                      e.currentTarget.style.boxShadow = "0 2px 6px rgba(59, 130, 246, 0.15)";
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.background = "#F8FAFC";
+                      e.currentTarget.style.borderColor = "#F1F5F9";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 10, fontWeight: 800, padding: "2px 6px", borderRadius: 4, background: rankBg, color: rankColor, fontFamily: "'IBM Plex Mono', monospace" }}>
+                        {rankLabels[idx]}
+                      </span>
+                      <span style={{ fontWeight: 700, color: "#0F172A", fontSize: 12 }}>
+                        {k.kol}
                       </span>
                     </div>
-                    <div style={{ height: 4, background: "var(--line)", borderRadius: 2, overflow: "hidden" }}>
-                      <div style={{ width: `${ratio}%`, height: "100%", background: "var(--blue)", borderRadius: 2 }} />
-                    </div>
+                    <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#0284C7", fontSize: 12 }}>
+                      {k.displayViews >= 1000000 ? `${(k.displayViews / 1000000).toFixed(1)}M` : k.displayViews.toLocaleString()}
+                    </span>
                   </div>
                 );
               })}
-              {topViewsKols.length === 0 && <span style={{ fontSize: 12, color: "var(--ink-faint)" }}>Chưa có dữ liệu</span>}
+              {topViewsKols.length === 0 && <span style={{ fontSize: 12, color: "#94A3B8" }}>Chưa có dữ liệu</span>}
             </div>
           </div>
 
           {/* Section 2: Engagement Leaderboard */}
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--ok)" }}><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
-              BXH Tương Tác (Eng)
+          <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E2E8F0", padding: "14px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+            <div style={{ fontSize: 12, fontWeight: 800, color: "#15803D", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ fontSize: 14 }}>❤️</span>
+              BXH TƯƠNG TÁC (ENGAGEMENT)
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {topEngKols.map((k, idx) => {
-                const maxVal = topEngKols[0]?.displayEng || 1;
-                const ratio = Math.min(100, Math.max(5, (k.displayEng / maxVal) * 100));
-                const colors = ["#F59E0B", "#94A3B8", "#B45309", "var(--ink-soft)", "var(--ink-soft)"];
+                const rankBg = idx === 0 ? "#FEF3C7" : idx === 1 ? "#E2E8F0" : idx === 2 ? "#FFEDD5" : "#F1F5F9";
+                const rankColor = idx === 0 ? "#D97706" : idx === 1 ? "#475569" : idx === 2 ? "#C2410C" : "#64748B";
                 const rankLabels = ["1st", "2nd", "3rd", "4th", "5th"];
                 return (
-                  <div key={k.kol} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
-                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                        <span style={{ fontSize: 11, fontWeight: 800, color: colors[idx], width: 22 }}>{rankLabels[idx]}</span>
-                        <span onClick={() => onOpenProfile(k)} style={{ fontWeight: 600, color: "var(--ink)", cursor: "pointer", textDecoration: "underline" }} className="kt-hover-accent">
-                          {k.kol}
-                        </span>
-                      </div>
-                      <span style={{ fontSize: 11, color: "var(--ok)", fontWeight: 700 }}>
-                        {k.displayEng >= 1000000 ? `${(k.displayEng / 1000000).toFixed(1)}M` : k.displayEng.toLocaleString()}
+                  <div 
+                    key={k.kol} 
+                    onClick={() => onOpenProfile(k)}
+                    style={{ 
+                      display: "flex", 
+                      justifyContent: "space-between", 
+                      alignItems: "center", 
+                      padding: "8px 10px", 
+                      background: "#F8FAFC", 
+                      borderRadius: 8, 
+                      border: "1px solid #F1F5F9",
+                      cursor: "pointer",
+                      transition: "all 0.15s ease"
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.background = "#F0FDF4";
+                      e.currentTarget.style.borderColor = "#86EFAC";
+                      e.currentTarget.style.boxShadow = "0 2px 6px rgba(22, 163, 74, 0.15)";
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.background = "#F8FAFC";
+                      e.currentTarget.style.borderColor = "#F1F5F9";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 10, fontWeight: 800, padding: "2px 6px", borderRadius: 4, background: rankBg, color: rankColor, fontFamily: "'IBM Plex Mono', monospace" }}>
+                        {rankLabels[idx]}
+                      </span>
+                      <span style={{ fontWeight: 700, color: "#0F172A", fontSize: 12 }}>
+                        {k.kol}
                       </span>
                     </div>
-                    <div style={{ height: 4, background: "var(--line)", borderRadius: 2, overflow: "hidden" }}>
-                      <div style={{ width: `${ratio}%`, height: "100%", background: "var(--ok)", borderRadius: 2 }} />
-                    </div>
+                    <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#15803D", fontSize: 12 }}>
+                      {k.displayEng >= 1000000 ? `${(k.displayEng / 1000000).toFixed(1)}M` : k.displayEng.toLocaleString()}
+                    </span>
                   </div>
                 );
               })}
-              {topEngKols.length === 0 && <span style={{ fontSize: 12, color: "var(--ink-faint)" }}>Chưa có dữ liệu</span>}
+              {topEngKols.length === 0 && <span style={{ fontSize: 12, color: "#94A3B8" }}>Chưa có dữ liệu</span>}
             </div>
           </div>
 
           {/* Section 3: Cost Leaderboard */}
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--accent)" }}><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-              BXH Ngân Sách Booking
+          <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E2E8F0", padding: "14px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+            <div style={{ fontSize: 12, fontWeight: 800, color: "#E11D48", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ fontSize: 14 }}>💰</span>
+              BXH NGÂN SÁCH BOOKING
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {topCostKols.map((k, idx) => {
-                const maxVal = topCostKols[0]?.displayCost || 1;
-                const ratio = Math.min(100, Math.max(5, (k.displayCost / maxVal) * 100));
-                const colors = ["#F59E0B", "#94A3B8", "#B45309", "var(--ink-soft)", "var(--ink-soft)"];
+                const rankBg = idx === 0 ? "#FEF3C7" : idx === 1 ? "#E2E8F0" : idx === 2 ? "#FFEDD5" : "#F1F5F9";
+                const rankColor = idx === 0 ? "#D97706" : idx === 1 ? "#475569" : idx === 2 ? "#C2410C" : "#64748B";
                 const rankLabels = ["1st", "2nd", "3rd", "4th", "5th"];
                 return (
-                  <div key={k.kol} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
-                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                        <span style={{ fontSize: 11, fontWeight: 800, color: colors[idx], width: 22 }}>{rankLabels[idx]}</span>
-                        <span onClick={() => onOpenProfile(k)} style={{ fontWeight: 600, color: "var(--ink)", cursor: "pointer", textDecoration: "underline" }} className="kt-hover-accent">
-                          {k.kol}
-                        </span>
-                      </div>
-                      <span style={{ fontSize: 11, color: "var(--accent)", fontWeight: 700 }}>
-                        {fmtVND(k.displayCost)}
+                  <div 
+                    key={k.kol} 
+                    onClick={() => onOpenProfile(k)}
+                    style={{ 
+                      display: "flex", 
+                      justifyContent: "space-between", 
+                      alignItems: "center", 
+                      padding: "8px 10px", 
+                      background: "#F8FAFC", 
+                      borderRadius: 8, 
+                      border: "1px solid #F1F5F9",
+                      cursor: "pointer",
+                      transition: "all 0.15s ease"
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.background = "#FFF1F2";
+                      e.currentTarget.style.borderColor = "#FDA4AF";
+                      e.currentTarget.style.boxShadow = "0 2px 6px rgba(225, 29, 72, 0.15)";
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.background = "#F8FAFC";
+                      e.currentTarget.style.borderColor = "#F1F5F9";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 10, fontWeight: 800, padding: "2px 6px", borderRadius: 4, background: rankBg, color: rankColor, fontFamily: "'IBM Plex Mono', monospace" }}>
+                        {rankLabels[idx]}
+                      </span>
+                      <span style={{ fontWeight: 700, color: "#0F172A", fontSize: 12 }}>
+                        {k.kol}
                       </span>
                     </div>
-                    <div style={{ height: 4, background: "var(--line)", borderRadius: 2, overflow: "hidden" }}>
-                      <div style={{ width: `${ratio}%`, height: "100%", background: "var(--accent)", borderRadius: 2 }} />
-                    </div>
+                    <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#E11D48", fontSize: 12 }}>
+                      {fmtVND(k.displayCost)}
+                    </span>
                   </div>
                 );
               })}
-              {topCostKols.length === 0 && <span style={{ fontSize: 12, color: "var(--ink-faint)" }}>Chưa có dữ liệu</span>}
+              {topCostKols.length === 0 && <span style={{ fontSize: 12, color: "#94A3B8" }}>Chưa có dữ liệu</span>}
             </div>
           </div>
 
           {/* Section 4: Watch Time Leaderboard */}
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#8B5CF6" }}><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-              BXH Thời Lượng Xem Lâu Nhất
+          <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E2E8F0", padding: "14px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+            <div style={{ fontSize: 12, fontWeight: 800, color: "#7C3AED", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ fontSize: 14 }}>⏱️</span>
+              BXH THỜI LƯỢNG XEM LÂU NHẤT
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {topTimeKols.map((k, idx) => {
-                const maxVal = topTimeKols[0]?.displayTimeSec || 1;
-                const ratio = Math.min(100, Math.max(5, (k.displayTimeSec / maxVal) * 100));
-                const colors = ["#F59E0B", "#94A3B8", "#B45309", "var(--ink-soft)", "var(--ink-soft)"];
+                const rankBg = idx === 0 ? "#FEF3C7" : idx === 1 ? "#E2E8F0" : idx === 2 ? "#FFEDD5" : "#F1F5F9";
+                const rankColor = idx === 0 ? "#D97706" : idx === 1 ? "#475569" : idx === 2 ? "#C2410C" : "#64748B";
                 const rankLabels = ["1st", "2nd", "3rd", "4th", "5th"];
                 return (
-                  <div key={k.kol} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
-                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                        <span style={{ fontSize: 11, fontWeight: 800, color: colors[idx], width: 22 }}>{rankLabels[idx]}</span>
-                        <span onClick={() => onOpenProfile(k)} style={{ fontWeight: 600, color: "var(--ink)", cursor: "pointer", textDecoration: "underline" }} className="kt-hover-accent">
-                          {k.kol}
-                        </span>
-                      </div>
-                      <span style={{ fontSize: 11, color: "#8B5CF6", fontWeight: 700 }}>
-                        {k.displayTimeStr}
+                  <div 
+                    key={k.kol} 
+                    onClick={() => onOpenProfile(k)}
+                    style={{ 
+                      display: "flex", 
+                      justifyContent: "space-between", 
+                      alignItems: "center", 
+                      padding: "8px 10px", 
+                      background: "#F8FAFC", 
+                      borderRadius: 8, 
+                      border: "1px solid #F1F5F9",
+                      cursor: "pointer",
+                      transition: "all 0.15s ease"
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.background = "#FAF5FF";
+                      e.currentTarget.style.borderColor = "#D8B4FE";
+                      e.currentTarget.style.boxShadow = "0 2px 6px rgba(124, 58, 237, 0.15)";
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.background = "#F8FAFC";
+                      e.currentTarget.style.borderColor = "#F1F5F9";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 10, fontWeight: 800, padding: "2px 6px", borderRadius: 4, background: rankBg, color: rankColor, fontFamily: "'IBM Plex Mono', monospace" }}>
+                        {rankLabels[idx]}
+                      </span>
+                      <span style={{ fontWeight: 700, color: "#0F172A", fontSize: 12 }}>
+                        {k.kol}
                       </span>
                     </div>
-                    <div style={{ height: 4, background: "var(--line)", borderRadius: 2, overflow: "hidden" }}>
-                      <div style={{ width: `${ratio}%`, height: "100%", background: "#8B5CF6", borderRadius: 2 }} />
-                    </div>
+                    <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#7C3AED", fontSize: 12 }}>
+                      {k.displayTimeStr}
+                    </span>
                   </div>
                 );
               })}
-              {topTimeKols.length === 0 && <span style={{ fontSize: 12, color: "var(--ink-faint)" }}>Chưa có dữ liệu</span>}
+              {topTimeKols.length === 0 && <span style={{ fontSize: 12, color: "#94A3B8" }}>Chưa có dữ liệu</span>}
             </div>
           </div>
 
-          {/* Section 5: CPV 6s Leaderboard (Lowest is Best) */}
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#15803D" }}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-              Chi Phí Mỗi Lượt Xem 6 Giây (CPV 6s)
+          {/* Section 5: CPV 6s Leaderboard */}
+          <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E2E8F0", padding: "14px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+            <div style={{ fontSize: 12, fontWeight: 800, color: "#15803D", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ fontSize: 14 }}>⚡</span>
+              BXH TỐI ƯU CPV 6S
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {topCpvKols.map((k, idx) => {
-                const maxVal = topCpvKols[topCpvKols.length - 1]?.displayCpv || 1;
-                const ratio = Math.min(100, Math.max(5, (1 - (k.displayCpv - topCpvKols[0]?.displayCpv) / (maxVal || 1)) * 100));
-                const colors = ["#F59E0B", "#94A3B8", "#B45309", "var(--ink-soft)", "var(--ink-soft)"];
+                const rankBg = idx === 0 ? "#FEF3C7" : idx === 1 ? "#E2E8F0" : idx === 2 ? "#FFEDD5" : "#F1F5F9";
+                const rankColor = idx === 0 ? "#D97706" : idx === 1 ? "#475569" : idx === 2 ? "#C2410C" : "#64748B";
                 const rankLabels = ["1st", "2nd", "3rd", "4th", "5th"];
                 return (
-                  <div key={k.kol} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
-                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                        <span style={{ fontSize: 11, fontWeight: 800, color: colors[idx], width: 22 }}>{rankLabels[idx]}</span>
-                        <span onClick={() => onOpenProfile(k)} style={{ fontWeight: 600, color: "var(--ink)", cursor: "pointer", textDecoration: "underline" }} className="kt-hover-accent">
-                          {k.kol}
-                        </span>
-                      </div>
-                      <span style={{ fontSize: 11, color: "#15803D", fontWeight: 800, fontFamily: "'IBM Plex Mono', monospace" }}>
-                        {k.displayCpv}đ
+                  <div 
+                    key={k.kol} 
+                    onClick={() => onOpenProfile(k)}
+                    style={{ 
+                      display: "flex", 
+                      justifyContent: "space-between", 
+                      alignItems: "center", 
+                      padding: "8px 10px", 
+                      background: "#F8FAFC", 
+                      borderRadius: 8, 
+                      border: "1px solid #F1F5F9",
+                      cursor: "pointer",
+                      transition: "all 0.15s ease"
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.background = "#F0FDF4";
+                      e.currentTarget.style.borderColor = "#86EFAC";
+                      e.currentTarget.style.boxShadow = "0 2px 6px rgba(21, 128, 61, 0.15)";
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.background = "#F8FAFC";
+                      e.currentTarget.style.borderColor = "#F1F5F9";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 10, fontWeight: 800, padding: "2px 6px", borderRadius: 4, background: rankBg, color: rankColor, fontFamily: "'IBM Plex Mono', monospace" }}>
+                        {rankLabels[idx]}
+                      </span>
+                      <span style={{ fontWeight: 700, color: "#0F172A", fontSize: 12 }}>
+                        {k.kol}
                       </span>
                     </div>
-                    <div style={{ height: 4, background: "var(--line)", borderRadius: 2, overflow: "hidden" }}>
-                      <div style={{ width: `${ratio}%`, height: "100%", background: "#15803D", borderRadius: 2 }} />
-                    </div>
+                    <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#15803D", fontSize: 12 }}>
+                      {k.displayCpv}đ
+                    </span>
                   </div>
                 );
               })}
-              {topCpvKols.length === 0 && <span style={{ fontSize: 12, color: "var(--ink-faint)" }}>Chưa có dữ liệu</span>}
+              {topCpvKols.length === 0 && <span style={{ fontSize: 12, color: "#94A3B8" }}>Chưa có dữ liệu</span>}
             </div>
           </div>
 
           {/* Section 6: Media Paid Leaderboard */}
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ color: "#6366F1", marginRight: 4, fontWeight: 800 }}>↳</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#6366F1" }}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-              Chi Phí Quảng Cáo (Media Paid)
+          <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E2E8F0", padding: "14px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+            <div style={{ fontSize: 12, fontWeight: 800, color: "#6366F1", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ fontSize: 14 }}>📢</span>
+              CHI PHÍ QUẢNG CÁO (MEDIA PAID)
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {topMediaPaidKols.map((k, idx) => {
-                const maxVal = topMediaPaidKols[0]?.displayMediaPaid || 1;
-                const ratio = Math.min(100, Math.max(5, (k.displayMediaPaid / maxVal) * 100));
-                const colors = ["#F59E0B", "#94A3B8", "#B45309", "var(--ink-soft)", "var(--ink-soft)"];
+                const rankBg = idx === 0 ? "#FEF3C7" : idx === 1 ? "#E2E8F0" : idx === 2 ? "#FFEDD5" : "#F1F5F9";
+                const rankColor = idx === 0 ? "#D97706" : idx === 1 ? "#475569" : idx === 2 ? "#C2410C" : "#64748B";
                 const rankLabels = ["1st", "2nd", "3rd", "4th", "5th"];
                 return (
-                  <div key={k.kol} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
-                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                        <span style={{ fontSize: 11, fontWeight: 800, color: colors[idx], width: 22 }}>{rankLabels[idx]}</span>
-                        <span onClick={() => onOpenProfile(k)} style={{ fontWeight: 600, color: "var(--ink)", cursor: "pointer", textDecoration: "underline" }} className="kt-hover-accent">
-                          {k.kol}
-                        </span>
-                      </div>
-                      <span style={{ fontSize: 11, color: "#6366F1", fontWeight: 700, fontFamily: "'IBM Plex Mono', monospace" }}>
-                        {fmtVND(k.displayMediaPaid)}
+                  <div 
+                    key={k.kol} 
+                    onClick={() => onOpenProfile(k)}
+                    style={{ 
+                      display: "flex", 
+                      justifyContent: "space-between", 
+                      alignItems: "center", 
+                      padding: "8px 10px", 
+                      background: "#F8FAFC", 
+                      borderRadius: 8, 
+                      border: "1px solid #F1F5F9",
+                      cursor: "pointer",
+                      transition: "all 0.15s ease"
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.background = "#EEF2FF";
+                      e.currentTarget.style.borderColor = "#A5B4FC";
+                      e.currentTarget.style.boxShadow = "0 2px 6px rgba(99, 102, 241, 0.15)";
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.background = "#F8FAFC";
+                      e.currentTarget.style.borderColor = "#F1F5F9";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 10, fontWeight: 800, padding: "2px 6px", borderRadius: 4, background: rankBg, color: rankColor, fontFamily: "'IBM Plex Mono', monospace" }}>
+                        {rankLabels[idx]}
+                      </span>
+                      <span style={{ fontWeight: 700, color: "#0F172A", fontSize: 12 }}>
+                        {k.kol}
                       </span>
                     </div>
-                    <div style={{ height: 4, background: "var(--line)", borderRadius: 2, overflow: "hidden" }}>
-                      <div style={{ width: `${ratio}%`, height: "100%", background: "#6366F1", borderRadius: 2 }} />
-                    </div>
+                    <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#6366F1", fontSize: 12 }}>
+                      {fmtVND(k.displayMediaPaid)}
+                    </span>
                   </div>
                 );
               })}
-              {topMediaPaidKols.length === 0 && <span style={{ fontSize: 12, color: "var(--ink-faint)" }}>Chưa có dữ liệu</span>}
+              {topMediaPaidKols.length === 0 && <span style={{ fontSize: 12, color: "#94A3B8" }}>Chưa có dữ liệu</span>}
             </div>
           </div>
-          <div style={{ borderTop: "1px dashed var(--line)", paddingTop: 16 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--accent)" }}><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-              Phân Bổ Phân Hạng Tier
+
+          {/* Section 7: Tier Breakdown */}
+          <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E2E8F0", padding: "14px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+            <div style={{ fontSize: 12, fontWeight: 800, color: "#D97706", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ fontSize: 14 }}>👥</span>
+              PHÂN BỔ PHÂN HẠNG TIER
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {tierStats.map(([tier, count]) => {
                 const total = filteredKols.length || 1;
                 const ratio = (count / total) * 100;
                 return (
-                  <div key={tier} style={{ fontSize: 12 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
-                      <span style={{ fontWeight: 600, color: "var(--ink)" }}>{tier}</span>
-                      <span style={{ color: "var(--ink-soft)" }}><strong>{count}</strong> KOLs ({Math.round(ratio)}%)</span>
+                  <div key={tier} style={{ background: "#F8FAFC", padding: "8px 10px", borderRadius: 8, border: "1px solid #F1F5F9" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5, fontSize: 12 }}>
+                      <span style={{ fontWeight: 700, color: "#0F172A" }}>{tier}</span>
+                      <span style={{ color: "#64748B", fontSize: 11, fontFamily: "'IBM Plex Mono', monospace" }}>
+                        <strong style={{ color: "#0F172A" }}>{count}</strong> KOLs ({Math.round(ratio)}%)
+                      </span>
                     </div>
-                    <div style={{ height: 6, background: "var(--line)", borderRadius: 3, overflow: "hidden" }}>
-                      <div style={{ width: `${ratio}%`, height: "100%", background: "var(--accent)", borderRadius: 3 }} />
+                    <div style={{ height: 5, background: "#E2E8F0", borderRadius: 3, overflow: "hidden" }}>
+                      <div style={{ width: `${ratio}%`, height: "100%", background: "#D97706", borderRadius: 3 }} />
                     </div>
                   </div>
                 );
