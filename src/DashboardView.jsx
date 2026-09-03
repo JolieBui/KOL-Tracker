@@ -11,24 +11,24 @@ export const DATA_MSG = {
   highlights: [
     {
       icon: "🚀",
-      value: "+8.6%",
+      value: "20.09M",
       valueColor: "#15803D",
-      label: "Organic View vs Target",
-      sub: "8.85M vs 8.15M KPI (+18.1% vs LY)"
+      label: "Tổng lượt xem chiến dịch",
+      sub: "Organic 8.85M | Paid 9.98M | Reup 1.26M"
     },
     {
       icon: "⚡",
       value: "42.01đ",
       valueColor: "#15803D",
       label: "Tối ưu CPV 6s (-35.4%)",
-      sub: "Mục tiêu 65đ | LY 52đ"
+      sub: "Mục tiêu 65đ | Cùng kỳ 52đ"
     },
     {
       icon: "💰",
       value: "720.18M",
       valueColor: "#15803D",
       label: "Ngân sách (incl AF)",
-      sub: "Giải ngân 100% mục tiêu"
+      sub: "Booking 500.4M (25 KOLs)"
     },
     {
       icon: "👥",
@@ -40,19 +40,21 @@ export const DATA_MSG = {
   ],
   metrics: [
     {
-      metric: "Tổng ngân sách (Budget include AF)",
-      unit: "VNĐ",
-      ly: "501.72M",
-      target: "720.18M",
-      actual: "720.18M",
-      diffTarget: "100.0%",
-      diffLY: "+43.5%",
+      metric: "Tổng lượt xem toàn chiến dịch (Total Views)",
+      level: 0,
+      unit: "Lượt",
+      ly: "19.32M",
+      target: "8.15M",
+      actual: "20.09M",
+      diffTarget: "+146.5%",
+      diffLY: "+4.0%",
       isTargetGood: true,
       isLYGood: true,
       barPct: 100
     },
     {
       metric: "Lượt xem tự nhiên (Organic View)",
+      level: 1,
       unit: "Lượt",
       ly: "7.49M",
       target: "8.15M",
@@ -64,7 +66,34 @@ export const DATA_MSG = {
       barPct: 100
     },
     {
+      metric: "Lượt xem quảng cáo (Paid View 6s)",
+      level: 1,
+      unit: "Lượt",
+      ly: "6.01M",
+      target: "—",
+      actual: "9.98M",
+      diffTarget: "—",
+      diffLY: "+66.1%",
+      isTargetGood: null,
+      isLYGood: true,
+      barPct: 100
+    },
+    {
+      metric: "Lượt xem reup (Facebook Reup)",
+      level: 1,
+      unit: "Lượt",
+      ly: "5.82M",
+      target: "—",
+      actual: "1.26M",
+      diffTarget: "—",
+      diffLY: "-78.4%",
+      isTargetGood: null,
+      isLYGood: false,
+      barPct: 100
+    },
+    {
       metric: "Chi phí mỗi lượt xem 6 giây (Cost per paid view 6s)",
+      level: 0,
       unit: "VNĐ",
       ly: "52.00đ",
       target: "65.00đ",
@@ -76,7 +105,34 @@ export const DATA_MSG = {
       barPct: 64.6
     },
     {
+      metric: "Tổng ngân sách (Budget include AF)",
+      level: 0,
+      unit: "VNĐ",
+      ly: "501.72M",
+      target: "720.18M",
+      actual: "720.18M",
+      diffTarget: "100.0%",
+      diffLY: "+43.5%",
+      isTargetGood: true,
+      isLYGood: true,
+      barPct: 100
+    },
+    {
+      metric: "Chi phí booking 25 KOLs",
+      level: 1,
+      unit: "VNĐ",
+      ly: "383.50M",
+      target: "—",
+      actual: "500.40M",
+      diffTarget: "—",
+      diffLY: "+30.5%",
+      isTargetGood: null,
+      isLYGood: null,
+      barPct: 100
+    },
+    {
       metric: "Lượt tương tác tự nhiên (Organic Engagement)",
+      level: 0,
       unit: "Lượt",
       ly: "340.5K",
       target: "253.6K",
@@ -88,7 +144,21 @@ export const DATA_MSG = {
       barPct: 96.5
     },
     {
+      metric: "Tổng tương tác toàn chiến dịch (Total Engagement)",
+      level: 1,
+      unit: "Lượt",
+      ly: "445.1K",
+      target: "—",
+      actual: "325.2K",
+      diffTarget: "—",
+      diffLY: "-26.9%",
+      isTargetGood: null,
+      isLYGood: false,
+      barPct: 100
+    },
+    {
       metric: "Thời lượng xem trung bình (Avg View Time)",
+      level: 0,
       unit: "Giây",
       ly: "20.8s",
       target: "—",
@@ -101,6 +171,7 @@ export const DATA_MSG = {
     },
     {
       metric: "Tỷ lệ xem hết video (VTR 100%)",
+      level: 0,
       unit: "%",
       ly: "3.78%",
       target: "—",
@@ -166,25 +237,25 @@ export const DATA_VINEGAR = {
   period: "10/07 – 25/07 (Tuần 2 – Tuần 4 Tháng 7)",
   highlights: [
     {
-      icon: "💰",
-      value: "200.00M",
+      icon: "🚀",
+      value: "7.41M",
       valueColor: "#15803D",
-      label: "Ngân sách (incl AF)",
-      sub: "Tiết kiệm -54.8% vs 442M LY"
+      label: "Tổng lượt xem chiến dịch",
+      sub: "Organic 2.08M | Paid 4.17M | Reup 1.16M"
     },
     {
       icon: "⚡",
       value: "45.00đ",
       valueColor: "#15803D",
       label: "Tối ưu CPV 6s (-47.1%)",
-      sub: "Mục tiêu 85đ | LY 75đ"
+      sub: "Mục tiêu 85đ | Cùng kỳ 75đ"
     },
     {
-      icon: "🎯",
-      value: "70.4%",
-      valueColor: "#D97706",
-      label: "Organic View / Target",
-      sub: "2.08M vs 2.95M mục tiêu"
+      icon: "💰",
+      value: "200.00M",
+      valueColor: "#15803D",
+      label: "Ngân sách (incl AF)",
+      sub: "Tiết kiệm -54.8% vs 442M LY"
     },
     {
       icon: "👥",
@@ -196,19 +267,21 @@ export const DATA_VINEGAR = {
   ],
   metrics: [
     {
-      metric: "Tổng ngân sách (Budget include AF)",
-      unit: "VNĐ",
-      ly: "442.24M",
-      target: "200.00M",
-      actual: "200.00M",
-      diffTarget: "100.0%",
-      diffLY: "-54.8%",
+      metric: "Tổng lượt xem toàn chiến dịch (Total Views)",
+      level: 0,
+      unit: "Lượt",
+      ly: "10.17M",
+      target: "2.95M",
+      actual: "7.41M",
+      diffTarget: "+151.2%",
+      diffLY: "-27.1%",
       isTargetGood: true,
-      isLYGood: true,
+      isLYGood: false,
       barPct: 100
     },
     {
       metric: "Lượt xem tự nhiên (Organic View)",
+      level: 1,
       unit: "Lượt",
       ly: "4.05M",
       target: "2.95M",
@@ -220,7 +293,34 @@ export const DATA_VINEGAR = {
       barPct: 70.4
     },
     {
+      metric: "Lượt xem quảng cáo (Paid Video View)",
+      level: 1,
+      unit: "Lượt",
+      ly: "5.72M",
+      target: "—",
+      actual: "4.17M",
+      diffTarget: "—",
+      diffLY: "-27.1%",
+      isTargetGood: null,
+      isLYGood: false,
+      barPct: 100
+    },
+    {
+      metric: "Lượt xem reup (Reup View)",
+      level: 1,
+      unit: "Lượt",
+      ly: "399.4K",
+      target: "—",
+      actual: "1.16M",
+      diffTarget: "—",
+      diffLY: "+190.0%",
+      isTargetGood: null,
+      isLYGood: true,
+      barPct: 100
+    },
+    {
       metric: "Chi phí mỗi lượt xem 6 giây (Cost per paid view 6s)",
+      level: 0,
       unit: "VNĐ",
       ly: "75.00đ",
       target: "85.00đ",
@@ -232,7 +332,47 @@ export const DATA_VINEGAR = {
       barPct: 52.9
     },
     {
+      metric: "Tổng ngân sách (Budget include AF)",
+      level: 0,
+      unit: "VNĐ",
+      ly: "442.24M",
+      target: "200.00M",
+      actual: "200.00M",
+      diffTarget: "100.0%",
+      diffLY: "-54.8%",
+      isTargetGood: true,
+      isLYGood: true,
+      barPct: 100
+    },
+    {
+      metric: "Chi phí booking 10 KOLs",
+      level: 1,
+      unit: "VNĐ",
+      ly: "324.00M",
+      target: "139.13M",
+      actual: "136.40M",
+      diffTarget: "-2.0%",
+      diffLY: "-57.9%",
+      isTargetGood: true,
+      isLYGood: true,
+      barPct: 98.0
+    },
+    {
+      metric: "Chi phí quảng cáo (Media Paid)",
+      level: 1,
+      unit: "VNĐ",
+      ly: "60.56M",
+      target: "34.78M",
+      actual: "38.50M",
+      diffTarget: "+10.7%",
+      diffLY: "-36.4%",
+      isTargetGood: false,
+      isLYGood: true,
+      barPct: 100
+    },
+    {
       metric: "Lượt tương tác tự nhiên (Organic Engagement)",
+      level: 0,
       unit: "Lượt",
       ly: "170.7K",
       target: "114.0K",
@@ -244,7 +384,21 @@ export const DATA_VINEGAR = {
       barPct: 62.3
     },
     {
+      metric: "Tổng tương tác toàn chiến dịch (Total Engagement)",
+      level: 1,
+      unit: "Lượt",
+      ly: "203.2K",
+      target: "—",
+      actual: "103.9K",
+      diffTarget: "—",
+      diffLY: "-48.9%",
+      isTargetGood: null,
+      isLYGood: false,
+      barPct: 100
+    },
+    {
       metric: "Thời lượng xem trung bình (Avg View Time)",
+      level: 0,
       unit: "Giây",
       ly: "13.0s",
       target: "—",
@@ -257,6 +411,7 @@ export const DATA_VINEGAR = {
     },
     {
       metric: "Tỷ lệ xem hết video (VTR 100%)",
+      level: 0,
       unit: "%",
       ly: "2.27%",
       target: "—",
