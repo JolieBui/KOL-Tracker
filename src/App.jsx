@@ -834,13 +834,14 @@ const emptyKOL = () => ({
   codeAds: "",               // Code ads (Có/Không/mô tả)
   reupLink: "",              // Reup Link
   brandReup: "",             // Brand Reup
+  phaseTags: "Phase 1",      // Mặc định Phase 1
   updatedAt: new Date().toISOString().slice(0, 10),
 });
 
 const SEED_DATA = [
-  {"id":"CA-1","campaign":"Campaign A","kol":"Demo KOL A","link":"https://www.tiktok.com","follower":"100K","type":"Micro","location":"Urban","group":"Food Reviewer","cost":5000000,"addonFee":"- Code ads","statusKey":"waiting_food","monAn":"Salad rau củ","ngayGuiScript":"","ngayGuiDemo":"","ngayAir":"","airedLink":"","airedFb":"","giftSent":""},
-  {"id":"CB-2","campaign":"Campaign B","kol":"Demo KOL A","link":"https://www.tiktok.com","follower":"100K","type":"Micro","location":"Urban","group":"Food Reviewer","cost":8000000,"addonFee":"- Link showcase","statusKey":"doing_demo","monAn":"Mì xào","ngayGuiScript":"","ngayGuiDemo":"","ngayAir":"","airedLink":"","airedFb":"","giftSent":""},
-  {"id":"CB-1","campaign":"Campaign B","kol":"Demo KOL B","link":"https://www.tiktok.com","follower":"500K","type":"Mid-tier","location":"Urban","group":"Lifestyle","cost":15000000,"addonFee":"- Link showcase","statusKey":"aired","monAn":"Cơm nắm rong biển","ngayGuiScript":"","ngayGuiDemo":"","ngayAir":"15/8","airedLink":"https://www.tiktok.com","airedFb":"","giftSent":""}
+  {"id":"CA-1","campaign":"Campaign A","kol":"Demo KOL A","link":"https://www.tiktok.com","follower":"100K","type":"Micro","location":"Urban","group":"Food Reviewer","cost":5000000,"addonFee":"- Code ads","statusKey":"waiting_food","monAn":"Salad rau củ","ngayGuiScript":"","ngayGuiDemo":"","ngayAir":"","airedLink":"","airedFb":"","giftSent":"","phaseTags":"Phase 1"},
+  {"id":"CB-2","campaign":"Campaign B","kol":"Demo KOL A","link":"https://www.tiktok.com","follower":"100K","type":"Micro","location":"Urban","group":"Food Reviewer","cost":8000000,"addonFee":"- Link showcase","statusKey":"doing_demo","monAn":"Mì xào","ngayGuiScript":"","ngayGuiDemo":"","ngayAir":"","airedLink":"","airedFb":"","giftSent":"","phaseTags":"Phase 1"},
+  {"id":"CB-1","campaign":"Campaign B","kol":"Demo KOL B","link":"https://www.tiktok.com","follower":"500K","type":"Mid-tier","location":"Urban","group":"Lifestyle","cost":15000000,"addonFee":"- Link showcase","statusKey":"aired","monAn":"Cơm nắm rong biển","ngayGuiScript":"","ngayGuiDemo":"","ngayAir":"15/8","airedLink":"https://www.tiktok.com","airedFb":"","giftSent":"","phaseTags":"Phase 1"}
 ];
 
 /* ================================================================
@@ -925,6 +926,10 @@ const applyMapping = (rawRows, mapping, statusLabelToKey) => {
       if (hasAiredLink || hasAiredDate) {
         out.statusKey = "aired";
       }
+    }
+
+    if (!out.phaseTags || out.phaseTags.trim() === "") {
+      out.phaseTags = "Phase 1";
     }
 
     return out;
@@ -4102,8 +4107,10 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
       entry.totalConversions += Number(r.conversions) || 0;
       entry.totalRevenue += Number(r.revenue) || 0;
 
-      // Zeitlich phaseTags manually chosen
-      (r.phaseTags || "").split(",").map(s => s.trim()).filter(Boolean).forEach(p => entry.phases.add(p));
+      // Zeitlich phaseTags manually chosen (default Phase 1 for all KOLs)
+      const tags = (r.phaseTags || "Phase 1").split(",").map(s => s.trim()).filter(Boolean);
+      if (tags.length === 0) tags.push("Phase 1");
+      tags.forEach(p => entry.phases.add(p));
 
       entry.campaignDetails.push(r);
 
@@ -4966,10 +4973,11 @@ const MediaPerformanceView = ({ rows, onOpenProfile, campaignLabels, search = ""
 };
 
 const ProfileDetailModal = ({ kol, onClose, campaignLabels, onSaveProfile, onOpenRow, statusMap }) => {
+  const initialPhases = (kol.phases && kol.phases.size > 0) ? Array.from(kol.phases) : ["Phase 1"];
   const [form, setForm] = useState({
     kol: kol.kol || "", follower: kol.follower || "", type: kol.type || "",
     group: kol.group || "", link: kol.link || "",
-    phase: Array.from(kol.phases || []),
+    phase: initialPhases,
   });
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
   const togglePhase = (p) => setForm(f => ({
@@ -5414,10 +5422,14 @@ export default function App() {
       const synced = cleaned.map(row => {
         const link = row.airedLink ? row.airedLink.toString().trim() : "";
         const isLinkAired = link && !["air", "aired", "—", "-"].includes(link.toLowerCase()) && (/^https?:\/\//i.test(link) || (link.includes(".") && !link.includes(" ")));
+        let updated = row;
         if (isLinkAired && row.statusKey !== "aired") {
-          return { ...row, statusKey: "aired" };
+          updated = { ...updated, statusKey: "aired" };
         }
-        return row;
+        if (!updated.phaseTags || updated.phaseTags.trim() === "") {
+          updated = { ...updated, phaseTags: "Phase 1" };
+        }
+        return updated;
       });
       return synced;
     } catch {
@@ -5913,7 +5925,9 @@ const [view, setView] = useState("table");
       profile.totalConversions += Number(r.conversions) || 0;
       profile.totalRevenue += Number(r.revenue) || 0;
 
-      (r.phaseTags || "").split(",").map(s => s.trim()).filter(Boolean).forEach(p => profile.phases.add(p));
+      const pTags = (r.phaseTags || "Phase 1").split(",").map(s => s.trim()).filter(Boolean);
+      if (pTags.length === 0) pTags.push("Phase 1");
+      pTags.forEach(p => profile.phases.add(p));
       profile.campaignDetails.push(r);
 
       if (!profile.follower && r.follower) profile.follower = r.follower;
