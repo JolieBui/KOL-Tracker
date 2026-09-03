@@ -4121,6 +4121,12 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
       if (!entry.link && r.link) entry.link = r.link;
     });
 
+    Object.values(map).forEach(entry => {
+      if (entry.phases.size === 0) {
+        entry.phases.add("Phase 1");
+      }
+    });
+
     return Object.values(map).sort((a, b) => a.kol.localeCompare(b.kol, "vi"));
   }, [rows]);
 
@@ -4433,15 +4439,11 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
                   )}
 
                   <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", fontSize: 11 }}>
-                    {phasesArr.length > 0 ? (
-                      phasesArr.map(p => (
-                        <span key={p} className="kt-badge" style={{ background: p === "Phase 1" ? "#FFAFA322" : "#A2C2E822", color: p === "Phase 1" ? "#D4826A" : "#4F83E1", border: `1px solid ${p === "Phase 1" ? "#FFAFA355" : "#4F83E155"}`, fontSize: 10 }}>
-                          {p}
-                        </span>
-                      ))
-                    ) : (
-                      <span style={{ color: "var(--ink-faint)" }}>Chưa chọn thời điểm hợp tác</span>
-                    )}
+                    {phasesArr.map(p => (
+                      <span key={p} className="kt-badge" style={{ background: p === "Phase 1" ? "#FFAFA322" : "#A2C2E822", color: p === "Phase 1" ? "#D4826A" : "#4F83E1", border: `1px solid ${p === "Phase 1" ? "#FFAFA355" : "#4F83E155"}`, fontSize: 10 }}>
+                        {p}
+                      </span>
+                    ))}
                   </div>
 
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, borderTop: "1px dashed var(--line)", paddingTop: 10, fontSize: 11, textAlign: "center" }}>
@@ -5401,8 +5403,12 @@ export default function App() {
       const s = localStorage.getItem(LS_KEY);
       const parsed = s ? JSON.parse(s) : SEED_DATA;
 
-      // One-time cleanup: strip auto-generated fake performance data
+      // One-time cleanup: strip auto-generated fake performance data and ensure Phase 1
       const cleaned = parsed.map(r => {
+        let updated = { ...r };
+        if (!updated.phaseTags || updated.phaseTags.trim() === "") {
+          updated.phaseTags = "Phase 1";
+        }
         const conv = Number(r.conversions) || 0;
         const rev = Number(r.revenue) || 0;
         const atc = Number(r.addToCart) || 0;
@@ -5410,13 +5416,13 @@ export default function App() {
         const isFakeATC = conv > 0 && atc === conv * 5;
         if (isFakeRevenue && isFakeATC) {
           return {
-            ...r,
+            ...updated,
             adSpend: 0, conversions: 0, addToCart: 0, revenue: 0,
             views: 0, likes: 0, comments: 0, saves: 0, shares: 0,
             estView: r.estView || 0, estEng: r.estEng || 0,
           };
         }
-        return r;
+        return updated;
       });
 
       const synced = cleaned.map(row => {
@@ -5562,14 +5568,18 @@ const [view, setView] = useState("table");
     rawSetData(prev => {
       const resolved = typeof nextVal === 'function' ? nextVal(prev) : nextVal;
       
-      // Auto-sync statusKey to 'aired' if airedLink is set and valid
+      // Auto-sync statusKey to 'aired' if airedLink is set and valid + ensure Phase 1
       const synced = resolved.map(row => {
         const link = row.airedLink ? row.airedLink.toString().trim() : "";
         const isLinkAired = link && !["air", "aired", "—", "-"].includes(link.toLowerCase()) && (/^https?:\/\//i.test(link) || (link.includes(".") && !link.includes(" ")));
+        let updated = row;
         if (isLinkAired && row.statusKey !== "aired") {
-          return { ...row, statusKey: "aired" };
+          updated = { ...updated, statusKey: "aired" };
         }
-        return row;
+        if (!updated.phaseTags || updated.phaseTags.trim() === "") {
+          updated = { ...updated, phaseTags: "Phase 1" };
+        }
+        return updated;
       });
 
       if (JSON.stringify(prev) !== JSON.stringify(synced)) {
