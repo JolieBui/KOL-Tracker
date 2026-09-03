@@ -24,8 +24,8 @@ const GlobalStyle = () => (
       --accent-bg:  #FFE4E6; /* Rose Tint */
       --accent-soft: #FECDD3;
       
-      --ok:         #0D9488; /* Teal Mint */
-      --ok-bg:      #CCFBF1; /* Light Teal Wash */
+      --ok:         #15803D; /* Soothing Forest Green */
+      --ok-bg:      #DCFCE7; /* Soft Calm Green Wash */
       --warn:       #D97706; /* Amber */
       --warn-bg:    #FEF3C7; /* Light Amber Wash */
       --danger:     #E11D48; /* Rose Red */
@@ -4617,7 +4617,7 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
           {/* Section 5: CPV 6s Leaderboard (Lowest is Best) */}
           <div>
             <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#0D9488" }}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#15803D" }}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
               Chi Phí Mỗi Lượt Xem 6 Giây (CPV 6s)
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -4635,12 +4635,12 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
                           {k.kol}
                         </span>
                       </div>
-                      <span style={{ fontSize: 11, color: "#0D9488", fontWeight: 800, fontFamily: "'IBM Plex Mono', monospace" }}>
+                      <span style={{ fontSize: 11, color: "#15803D", fontWeight: 800, fontFamily: "'IBM Plex Mono', monospace" }}>
                         {k.displayCpv}đ
                       </span>
                     </div>
                     <div style={{ height: 4, background: "var(--line)", borderRadius: 2, overflow: "hidden" }}>
-                      <div style={{ width: `${ratio}%`, height: "100%", background: "#0D9488", borderRadius: 2 }} />
+                      <div style={{ width: `${ratio}%`, height: "100%", background: "#15803D", borderRadius: 2 }} />
                     </div>
                   </div>
                 );
