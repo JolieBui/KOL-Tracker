@@ -4026,8 +4026,32 @@ const parseFollowers = (str) => {
   return isNaN(n) ? 0 : n;
 };
 
+const KOL_PROFILE_PALETTES = {
+  "Bon đây nè": { bg: "#EFF6FF", border: "#3B82F6", text: "#1D4ED8", dot: "#2563EB", badgeBg: "#DBEAFE" },
+  "Emmer Sweet": { bg: "#FAF5FF", border: "#A855F7", text: "#6B21A8", dot: "#9333EA", badgeBg: "#F3E8FF" },
+  "Trang Tấm": { bg: "#F0FDF4", border: "#16A34A", text: "#15803D", dot: "#16A34A", badgeBg: "#DCFCE7" },
+  "Út Tình": { bg: "#FFF7ED", border: "#F97316", text: "#C2410C", dot: "#EA580C", badgeBg: "#FFEDD5" },
+  "Khánh Linh": { bg: "#F0FDF4", border: "#16A34A", text: "#15803D", dot: "#16A34A", badgeBg: "#DCFCE7" },
+  "Min Cookie": { bg: "#FFF1F2", border: "#F43F5E", text: "#BE123C", dot: "#E11D48", badgeBg: "#FFE4E6" },
+  "Min cookie": { bg: "#FFF1F2", border: "#F43F5E", text: "#BE123C", dot: "#E11D48", badgeBg: "#FFE4E6" },
+  "taydayroi": { bg: "#EEF2FF", border: "#6366F1", text: "#3730A3", dot: "#4F46E5", badgeBg: "#E0E7FF" },
+  "Linh nấu": { bg: "#FEFCE8", border: "#EAB308", text: "#854D0E", dot: "#CA8A04", badgeBg: "#FEF08A" },
+  "Châu Kiều My": { bg: "#FDF2F8", border: "#EC4899", text: "#9D174D", dot: "#DB2777", badgeBg: "#FCE7F3" },
+  "My Huyền": { bg: "#F0FDF4", border: "#16A34A", text: "#15803D", dot: "#16A34A", badgeBg: "#DCFCE7" },
+  "Cơm nhà bếp xưa": { bg: "#F5F3FF", border: "#8B5CF6", text: "#5B21B6", dot: "#7C3AED", badgeBg: "#EDE9FE" },
+  "Ăn gì Thương ơi": { bg: "#FFFBEB", border: "#F59E0B", text: "#B45309", dot: "#D97706", badgeBg: "#FEF3C7" },
+  "Babykopo Home": { bg: "#FFF7ED", border: "#F97316", text: "#C2410C", dot: "#EA580C", badgeBg: "#FFEDD5" },
+  "Chú Đàn": { bg: "#F0FDF4", border: "#16A34A", text: "#15803D", dot: "#16A34A", badgeBg: "#DCFCE7" },
+  "Thi Thi Miền Tây": { bg: "#EFF6FF", border: "#3B82F6", text: "#1D4ED8", dot: "#2563EB", badgeBg: "#DBEAFE" },
+  "Cơm nhà Bông": { bg: "#FEFCE8", border: "#EAB308", text: "#854D0E", dot: "#CA8A04", badgeBg: "#FEF08A" },
+  "Nấu Ăn Dễ Lắm": { bg: "#FDF2F8", border: "#EC4899", text: "#9D174D", dot: "#DB2777", badgeBg: "#FCE7F3" },
+  "Nấu Ăn Dễ Lắm 🤤": { bg: "#FDF2F8", border: "#EC4899", text: "#9D174D", dot: "#DB2777", badgeBg: "#FCE7F3" },
+  "Gia đình Sầu Rất Ngầu": { bg: "#F5F3FF", border: "#8B5CF6", text: "#5B21B6", dot: "#7C3AED", badgeBg: "#EDE9FE" },
+};
 
-
+const getKolProfileColor = (name) => {
+  return KOL_PROFILE_PALETTES[name] || { bg: "#EFF6FF", border: "#3B82F6", text: "#1D4ED8", dot: "#2563EB", badgeBg: "#DBEAFE" };
+};
 
 // (Insights components removed)
 
@@ -4063,6 +4087,7 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
   const [filterEng, setFilterEng] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
   const [sortOrder, setSortOrder] = useState("default");
+  const [hoveredKol, setHoveredKol] = useState(null);
 
   const uniqueKols = useMemo(() => {
     const map = {};
@@ -4107,7 +4132,6 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
       entry.totalConversions += Number(r.conversions) || 0;
       entry.totalRevenue += Number(r.revenue) || 0;
 
-      // Zeitlich phaseTags manually chosen (default Phase 1 for all KOLs)
       const tags = (r.phaseTags || "Phase 1").split(",").map(s => s.trim()).filter(Boolean);
       if (tags.length === 0) tags.push("Phase 1");
       tags.forEach(p => entry.phases.add(p));
@@ -4137,13 +4161,9 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
     const results = [];
 
     uniqueKols.forEach(k => {
-      // 1. Filter by KOL name
       if (q && !k.kol.toLowerCase().includes(q)) return;
-
-      // 2. Filter by Tier
       if (filterTier !== "all" && k.type !== filterTier) return;
 
-      // 3. Filter campaign details
       const matchingDetails = k.campaignDetails.filter(r => {
         if (filterCampaign !== "all" && resolveCampaignKey(r) !== filterCampaign) return false;
         if (filterPhase !== "all") {
@@ -4160,42 +4180,28 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
         return true;
       });
 
-      // If user selected campaign/phase/status filter, require at least one matching deal
       if (hasDealFilters && matchingDetails.length === 0) return;
 
       const activeRows = hasDealFilters ? matchingDetails : k.campaignDetails;
 
       const displayCost = activeRows.reduce((s, r) => s + (Number(r.cost) || 0), 0);
       const displayViews = activeRows.reduce((s, r) => s + (Number(r.views) || 0), 0);
-      const displayLikes = activeRows.reduce((s, r) => s + (Number(r.likes) || 0), 0);
-      const displayComments = activeRows.reduce((s, r) => s + (Number(r.comments) || 0), 0);
-      const displayShares = activeRows.reduce((s, r) => s + (Number(r.shares) || 0), 0);
-      const displaySaves = activeRows.reduce((s, r) => s + (Number(r.saves) || 0), 0);
-      const displayConversions = activeRows.reduce((s, r) => s + (Number(r.conversions) || 0), 0);
-      const displayRevenue = activeRows.reduce((s, r) => s + (Number(r.revenue) || 0), 0);
-      const displayEng = displayLikes + displayComments + displayShares;
+      const displayEng = activeRows.reduce((s, r) => s + (Number(r.likes) || 0) + (Number(r.comments) || 0) + (Number(r.shares) || 0), 0);
 
-      // 4. Cost bucket filter
       if (filterCost !== "all") {
         const bucket = COST_BUCKETS.find(b => b.key === filterCost);
         if (bucket && !bucket.test(displayCost)) return;
       }
-
-      // 5. Views bucket filter
       if (filterViews !== "all") {
         const bucket = VIEWS_BUCKETS.find(b => b.key === filterViews);
         if (bucket && !bucket.test(displayViews)) return;
       }
-
-      // 6. Eng bucket filter
       if (filterEng !== "all") {
         const bucket = ENG_BUCKETS.find(b => b.key === filterEng);
         if (bucket && !bucket.test(displayEng)) return;
       }
 
-      // Performance Lookup mapping (time, cpv, mediaPaid)
-      const allPerf = [...(DATA_MSG?.kols || []), ...(DATA_VINEGAR?.kols || [])];
-      const matchedPerf = allPerf.find(p => p.kol?.toLowerCase().trim() === k.kol?.toLowerCase().trim()) || {};
+      const matchedPerf = [...(DATA_MSG?.kols || []), ...(DATA_VINEGAR?.kols || [])].find(p => p.kol?.toLowerCase().trim() === k.kol?.toLowerCase().trim()) || {};
       
       let sec = 0;
       if (matchedPerf.time) {
@@ -4207,107 +4213,54 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
         }
       }
 
-      const displayTimeStr = matchedPerf.time || "12.0s";
-      const displayTimeSec = sec || 12.0;
-      const displayCpv = matchedPerf.cpv || (displayCost > 0 && displayViews > 0 ? Number((displayCost / (displayViews * 0.4)).toFixed(1)) : 42.0);
-      const displayMediaPaid = matchedPerf.reupViews ? Number((matchedPerf.reupViews * 18.5).toFixed(0)) : Number((displayCost * 0.15).toFixed(0));
+      const totalActualAdSpend = activeRows.reduce((s, r) => s + (Number(r.adSpend || r.spend) || 0), 0);
+      const displayMediaPaid = totalActualAdSpend > 0 
+        ? totalActualAdSpend 
+        : (matchedPerf.reupViews ? Number((matchedPerf.reupViews * 18.5).toFixed(0)) : Number((displayCost * 0.15).toFixed(0)));
 
       results.push({
         ...k,
         displayCost,
         displayViews,
-        displayLikes,
-        displayComments,
-        displayShares,
-        displaySaves,
-        displayConversions,
-        displayRevenue,
         displayEng,
-        displayTimeStr,
-        displayTimeSec,
-        displayCpv,
+        displayTimeStr: matchedPerf.time || "12.0s",
+        displayTimeSec: sec || 12.0,
+        displayCpv: matchedPerf.cpv || (displayCost > 0 && displayViews > 0 ? Number((displayCost / (displayViews * 0.4)).toFixed(1)) : 42.0),
         displayMediaPaid,
         filteredDetails: matchingDetails,
       });
     });
 
-    // Apply sorting
-    if (sortOrder === "costAsc") {
-      results.sort((a, b) => a.displayCost - b.displayCost);
-    } else if (sortOrder === "costDesc") {
-      results.sort((a, b) => b.displayCost - a.displayCost);
-    } else if (sortOrder === "viewAsc") {
-      results.sort((a, b) => a.displayViews - b.displayViews);
-    } else if (sortOrder === "viewDesc") {
-      results.sort((a, b) => b.displayViews - a.displayViews);
-    } else if (sortOrder === "engAsc") {
-      results.sort((a, b) => a.displayEng - b.displayEng);
-    } else if (sortOrder === "engDesc") {
-      results.sort((a, b) => b.displayEng - a.displayEng);
-    }
+    if (sortOrder === "costAsc") results.sort((a, b) => a.displayCost - b.displayCost);
+    else if (sortOrder === "costDesc") results.sort((a, b) => b.displayCost - a.displayCost);
+    else if (sortOrder === "viewAsc") results.sort((a, b) => a.displayViews - b.displayViews);
+    else if (sortOrder === "viewDesc") results.sort((a, b) => b.displayViews - a.displayViews);
+    else if (sortOrder === "engAsc") results.sort((a, b) => a.displayEng - b.displayEng);
+    else if (sortOrder === "engDesc") results.sort((a, b) => b.displayEng - a.displayEng);
 
     return results;
   }, [uniqueKols, search, filterCampaign, filterTier, filterPhase, filterCost, filterViews, filterEng, filterStatus, sortOrder]);
 
-  const topViewsKols = useMemo(() => {
-    return [...filteredKols]
-      .filter(k => k.displayViews > 0)
-      .sort((a, b) => b.displayViews - a.displayViews)
-      .slice(0, 5);
-  }, [filteredKols]);
+  const topViewsKols = useMemo(() => [...filteredKols].filter(k => k.displayViews > 0).sort((a, b) => b.displayViews - a.displayViews).slice(0, 5), [filteredKols]);
+  const topEngKols = useMemo(() => [...filteredKols].filter(k => k.displayEng > 0).sort((a, b) => b.displayEng - a.displayEng).slice(0, 5), [filteredKols]);
+  const topCostKols = useMemo(() => [...filteredKols].filter(k => k.displayCost > 0).sort((a, b) => b.displayCost - a.displayCost).slice(0, 5), [filteredKols]);
+  const topTimeKols = useMemo(() => [...filteredKols].filter(k => k.displayTimeSec > 0).sort((a, b) => b.displayTimeSec - a.displayTimeSec).slice(0, 5), [filteredKols]);
+  const topCpvKols = useMemo(() => [...filteredKols].filter(k => k.displayCpv > 0).sort((a, b) => a.displayCpv - b.displayCpv).slice(0, 5), [filteredKols]);
+  const topMediaPaidKols = useMemo(() => [...filteredKols].filter(k => k.displayMediaPaid > 0).sort((a, b) => b.displayMediaPaid - a.displayMediaPaid).slice(0, 5), [filteredKols]);
 
-  const topEngKols = useMemo(() => {
-    return [...filteredKols]
-      .filter(k => k.displayEng > 0)
-      .sort((a, b) => b.displayEng - a.displayEng)
-      .slice(0, 5);
-  }, [filteredKols]);
-
-  const topCostKols = useMemo(() => {
-    return [...filteredKols]
-      .filter(k => k.displayCost > 0)
-      .sort((a, b) => b.displayCost - a.displayCost)
-      .slice(0, 5);
-  }, [filteredKols]);
-
-  const topTimeKols = useMemo(() => {
-    return [...filteredKols]
-      .filter(k => k.displayTimeSec > 0)
-      .sort((a, b) => b.displayTimeSec - a.displayTimeSec)
-      .slice(0, 5);
-  }, [filteredKols]);
-
-  const topCpvKols = useMemo(() => {
-    return [...filteredKols]
-      .filter(k => k.displayCpv > 0)
-      .sort((a, b) => a.displayCpv - b.displayCpv)
-      .slice(0, 5);
-  }, [filteredKols]);
-
-  const topMediaPaidKols = useMemo(() => {
-    return [...filteredKols]
-      .filter(k => k.displayMediaPaid > 0)
-      .sort((a, b) => b.displayMediaPaid - a.displayMediaPaid)
-      .slice(0, 5);
-  }, [filteredKols]);
+  const appearanceMap = useMemo(() => {
+    const map = {};
+    [...topViewsKols, ...topEngKols, ...topCostKols, ...topTimeKols, ...topCpvKols, ...topMediaPaidKols].forEach(item => {
+      if (item && item.kol) map[item.kol] = (map[item.kol] || 0) + 1;
+    });
+    return map;
+  }, [topViewsKols, topEngKols, topCostKols, topTimeKols, topCpvKols, topMediaPaidKols]);
 
   const tierStats = useMemo(() => {
     const counts = {};
-    filteredKols.forEach(k => {
-      if (k.type) counts[k.type] = (counts[k.type] || 0) + 1;
-    });
+    filteredKols.forEach(k => { if (k.type) counts[k.type] = (counts[k.type] || 0) + 1; });
     return Object.entries(counts).sort((a, b) => b[1] - a[1]);
   }, [filteredKols]);
-
-  const activeFilterCount = (search.trim() ? 1 : 0) +
-    (filterCampaign !== "all" ? 1 : 0) +
-    (filterTier !== "all" ? 1 : 0) +
-    (filterPhase !== "all" ? 1 : 0) +
-    (filterCost !== "all" ? 1 : 0) +
-    (filterViews !== "all" ? 1 : 0) +
-    (filterEng !== "all" ? 1 : 0) +
-    (filterStatus !== "all" ? 1 : 0);
-  const hasActiveFilters = activeFilterCount > 0;
 
   const clearFilters = () => {
     setSearch(""); setFilterCampaign("all"); setFilterTier("all");
@@ -4315,23 +4268,83 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
     setFilterEng("all"); setFilterStatus("all"); setSortOrder("default");
   };
 
-  const summary = useMemo(() => ({
-    count: filteredKols.length,
-    totalCost: filteredKols.reduce((s, k) => s + k.displayCost, 0),
-    totalViews: filteredKols.reduce((s, k) => s + k.displayViews, 0),
-    totalEng: filteredKols.reduce((s, k) => s + k.displayEng, 0),
-  }), [filteredKols]);
+  const renderLeaderboardItem = (k, idx, valueDisplay, valueColor = "#0284C7") => {
+    const c = getKolProfileColor(k.kol);
+    const count = appearanceMap[k.kol] || 1;
+    const isHovered = hoveredKol === k.kol;
+    const rankBg = idx === 0 ? "#FEF3C7" : idx === 1 ? "#E2E8F0" : idx === 2 ? "#FFEDD5" : "#F1F5F9";
+    const rankColor = idx === 0 ? "#D97706" : idx === 1 ? "#475569" : idx === 2 ? "#C2410C" : "#64748B";
+    const rankLabels = ["1st", "2nd", "3rd", "4th", "5th"];
+    
+    // Project & Phase badges
+    const primaryCampaign = k.campaigns && k.campaigns.size > 0 ? Array.from(k.campaigns)[0] : null;
+    const campaignName = primaryCampaign ? (campaignLabels[primaryCampaign] || primaryCampaign) : null;
+    const primaryPhase = k.phases && k.phases.size > 0 ? Array.from(k.phases)[0] : "Phase 1";
+
+    return (
+      <div 
+        key={k.kol + idx} 
+        onClick={() => onOpenProfile(k)}
+        onMouseEnter={() => setHoveredKol(k.kol)}
+        onMouseLeave={() => setHoveredKol(null)}
+        title={`KOL: ${k.kol} | Dự án: ${campaignName || "Tất cả"} | Giai đoạn: ${primaryPhase}${count > 1 ? ` (Xuất hiện trong ${count} BXH)` : ""}`}
+        style={{ 
+          display: "flex", 
+          justifyContent: "space-between", 
+          alignItems: "center", 
+          padding: "8px 10px", 
+          background: isHovered ? c.bg : "#F8FAFC", 
+          borderRadius: 8, 
+          border: isHovered ? `1.5px solid ${c.border}` : "1px solid #F1F5F9",
+          boxShadow: isHovered ? `0 3px 12px ${c.border}40` : "none",
+          cursor: "pointer",
+          transition: "all 0.15s ease",
+          transform: isHovered ? "translateY(-1px)" : "none"
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0, overflow: "hidden" }}>
+          <span style={{ fontSize: 10, fontWeight: 800, padding: "2px 5px", borderRadius: 4, background: rankBg, color: rankColor, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>
+            {rankLabels[idx]}
+          </span>
+          <span style={{ width: 7, height: 7, borderRadius: "50%", background: isHovered ? c.dot : "#94A3B8", flexShrink: 0, transition: "all 0.15s ease" }} />
+          <span style={{ fontWeight: 700, color: isHovered ? c.text : "#0F172A", fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+            {k.kol}
+          </span>
+          
+          {count > 1 && (
+            <span style={{ fontSize: 9, fontWeight: 800, padding: "1px 5px", borderRadius: 4, background: c.badgeBg, color: c.text, flexShrink: 0 }}>
+              {count} BXH
+            </span>
+          )}
+          
+          {campaignName && (
+            <span style={{ fontSize: 9, fontWeight: 700, padding: "1px 5px", borderRadius: 3, background: "#E0F2FE", color: "#0369A1", border: "1px solid #BAE6FD", flexShrink: 0 }}>
+              {campaignName}
+            </span>
+          )}
+
+          {primaryPhase && (
+            <span style={{ fontSize: 8.5, fontWeight: 600, padding: "1px 4px", borderRadius: 3, background: "#F1F5F9", color: "#64748B", border: "1px solid #E2E8F0", flexShrink: 0 }}>
+              {primaryPhase}
+            </span>
+          )}
+        </div>
+        <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: isHovered ? c.text : valueColor, fontSize: 12, flexShrink: 0, marginLeft: 6 }}>
+          {valueDisplay}
+        </span>
+      </div>
+    );
+  };
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
-      {/* ── PINNED: Dashboard summary + filter bar stay visible ── */}
       <div style={{ background: "var(--card)", padding: "20px 20px 16px", borderBottom: "1px solid var(--line)", flexShrink: 0 }}>
         <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
           {[
-            { label: "Hồ sơ KOL", value: summary.count, color: "var(--ink)" },
-            { label: "Tổng chi phí", value: fmtVND(summary.totalCost), color: "var(--accent)" },
-            { label: "Tổng Views", value: summary.totalViews.toLocaleString(), color: "var(--blue)" },
-            { label: "Tổng Tương tác (Eng)", value: summary.totalEng.toLocaleString(), color: "var(--ok)" },
+            { label: "Hồ sơ KOL", value: filteredKols.length, color: "var(--ink)" },
+            { label: "Tổng chi phí", value: fmtVND(filteredKols.reduce((s, k) => s + k.displayCost, 0)), color: "var(--accent)" },
+            { label: "Tổng Views", value: filteredKols.reduce((s, k) => s + k.displayViews, 0).toLocaleString(), color: "var(--blue)" },
+            { label: "Tổng Tương tác", value: filteredKols.reduce((s, k) => s + k.displayEng, 0).toLocaleString(), color: "var(--ok)" },
           ].map(s => (
             <div key={s.label} className="kt-card" style={{ padding: "10px 16px", flex: "1 1 160px", minWidth: 160, boxSizing: "border-box" }}>
               <div style={{ fontSize: 11, color: "var(--ink-soft)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap" }}>
@@ -4342,24 +4355,16 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
           ))}
         </div>
 
-        {/* Filter bar - Compact Single Row, No Scrolling */}
         <div style={{ display: "flex", gap: 5, flexWrap: "nowrap", alignItems: "center", width: "100%" }}>
-          <input
-            className="kt-input"
-            placeholder="🔍 Tìm..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            style={{ flex: "1.1 1 80px", minWidth: 70, padding: "5px 7px", fontSize: 11.5 }}
-          />
+          <input className="kt-input" placeholder="🔍 Tìm..." value={search} onChange={e => setSearch(e.target.value)} style={{ flex: "1.1 1 80px", minWidth: 70, padding: "5px 7px", fontSize: 11.5 }} />
           <select className="kt-select" value={filterCampaign} onChange={e => setFilterCampaign(e.target.value)} style={{ flex: "1 1 65px", minWidth: 55, padding: "5px 5px", fontSize: 11.5 }}>
             <option value="all">Dự án</option>
             {dynamicCampaigns.map(c => <option key={c.key} value={c.key}>{campaignLabels[c.key] || c.label}</option>)}
           </select>
           <select className="kt-select" value={filterTier} onChange={e => setFilterTier(e.target.value)} style={{ flex: "1 1 60px", minWidth: 50, padding: "5px 5px", fontSize: 11.5 }}>
             <option value="all">Tier</option>
-            {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+            {["Macro", "Mid-tier", "Micro", "Nano"].map(t => <option key={t} value={t}>{t}</option>)}
           </select>
-
           <select className="kt-select" value={filterPhase} onChange={e => setFilterPhase(e.target.value)} style={{ flex: "1 1 65px", minWidth: 55, padding: "5px 5px", fontSize: 11.5 }}>
             <option value="all">Phase</option>
             <option value="Phase 1">Phase 1</option>
@@ -4381,7 +4386,7 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
             <option value="all">Tiến độ</option>
             {statusStages.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
           </select>
-          <select className="kt-select" value={sortOrder} onChange={e => setSortOrder(e.target.value)} style={{ flex: "1 1 75px", minWidth: 65, padding: "5px 5px", fontSize: 11.5, background: "var(--surface)", border: "1px solid var(--line)" }}>
+          <select className="kt-select" value={sortOrder} onChange={e => setSortOrder(e.target.value)} style={{ flex: "1 1 75px", minWidth: 65, padding: "5px 5px", fontSize: 11.5 }}>
             <option value="default">Sắp xếp</option>
             <option value="costAsc">Chi phí ↑</option>
             <option value="costDesc">Chi phí ↓</option>
@@ -4390,28 +4395,49 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
             <option value="engAsc">Eng ↑</option>
             <option value="engDesc">Eng ↓</option>
           </select>
-          {hasActiveFilters && (
-            <button className="kt-btn kt-btn-ghost" onClick={clearFilters} style={{ flex: "0 0 auto", padding: "5px 7px", fontSize: 11, whiteSpace: "nowrap" }}>
-              ✕ Bỏ lọc
-            </button>
+          {(search || filterCampaign !== "all" || filterTier !== "all" || filterPhase !== "all" || filterCost !== "all" || filterViews !== "all" || filterEng !== "all" || filterStatus !== "all" || sortOrder !== "default") && (
+            <button className="kt-btn kt-btn-ghost" onClick={clearFilters} style={{ flex: "0 0 auto", padding: "5px 7px", fontSize: 11 }}>✕</button>
           )}
         </div>
       </div>
 
-      {/* ── SPLIT BODY ── */}
       <div className="kt-profile-split">
-        
-        {/* Left Column: KOL Cards Grid */}
         <div className="kt-scrollbar" style={{ flex: 1, padding: "20px", overflowY: "auto" }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
             {filteredKols.map(k => {
               const campaignsArr = Array.from(k.campaigns);
               const phasesArr = Array.from(k.phases);
+              const isHovered = hoveredKol === k.kol;
+              const c = getKolProfileColor(k.kol);
+              const count = appearanceMap[k.kol] || 1;
+
               return (
-                <div key={k.kol} className="kt-card kt-anim" style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 12, border: "1px solid var(--line)" }}>
+                <div 
+                  key={k.kol} 
+                  className="kt-card kt-anim" 
+                  onMouseEnter={() => setHoveredKol(k.kol)}
+                  onMouseLeave={() => setHoveredKol(null)}
+                  style={{ 
+                    padding: "16px 20px", 
+                    display: "flex", 
+                    flexDirection: "column", 
+                    gap: 12, 
+                    border: isHovered ? `1.5px solid ${c.border}` : "1px solid var(--line)",
+                    boxShadow: isHovered ? `0 6px 20px ${c.border}25` : undefined,
+                    background: isHovered ? c.bg : "var(--card)",
+                    transition: "all 0.2s ease"
+                  }}
+                >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
                     <div>
-                      <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--ink)", margin: 0 }}>{k.kol}</h3>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <h3 style={{ fontSize: 16, fontWeight: 700, color: isHovered ? c.text : "var(--ink)", margin: 0 }}>{k.kol}</h3>
+                        {count > 1 && (
+                          <span style={{ fontSize: 10, fontWeight: 800, padding: "1px 6px", borderRadius: 4, background: c.badgeBg, color: c.text }}>
+                            {count} BXH
+                          </span>
+                        )}
+                      </div>
                       {k.link && (
                         <a href={k.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: "var(--accent)", textDecoration: "none" }}>
                           TikTok Profile ↗
@@ -4424,20 +4450,15 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
                       </span>
                     )}
                   </div>
-
                   <div style={{ display: "flex", flexWrap: "wrap", columnGap: 16, rowGap: 4, fontSize: 12, color: "var(--ink-soft)" }}>
                     <span>Followers <strong style={{ color: "var(--ink)" }}>{k.follower || "—"}</strong></span>
                     <span>Nhóm <strong style={{ color: "var(--ink)" }}>{k.group || "—"}</strong></span>
                   </div>
-
                   {campaignsArr.length > 0 && (
                     <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", borderTop: "1px dashed var(--line)", paddingTop: 10 }}>
-                      {campaignsArr.map(c => (
-                        <CampaignDot key={c} campaign={c} labels={campaignLabels} />
-                      ))}
+                      {campaignsArr.map(c => <CampaignDot key={c} campaign={c} labels={campaignLabels} />)}
                     </div>
                   )}
-
                   <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", fontSize: 11 }}>
                     {phasesArr.map(p => (
                       <span key={p} className="kt-badge" style={{ background: p === "Phase 1" ? "#FFAFA322" : "#A2C2E822", color: p === "Phase 1" ? "#D4826A" : "#4F83E1", border: `1px solid ${p === "Phase 1" ? "#FFAFA355" : "#4F83E155"}`, fontSize: 10 }}>
@@ -4445,7 +4466,6 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
                       </span>
                     ))}
                   </div>
-
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, borderTop: "1px dashed var(--line)", paddingTop: 10, fontSize: 11, textAlign: "center" }}>
                     <div>
                       <div style={{ color: "var(--ink-soft)" }}>Chi phí</div>
@@ -4460,355 +4480,122 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
                       <strong style={{ color: "var(--ok)" }}>{k.displayEng ? k.displayEng.toLocaleString() : "—"}</strong>
                     </div>
                   </div>
-
                   <button 
                     className="kt-btn kt-btn-ghost" 
                     onClick={() => onOpenProfile(k)} 
                     style={{ width: "100%", justifyContent: "center", padding: "6px", marginTop: 4, display: "flex", alignItems: "center", gap: 6 }}
                   >
                     <span>Chi tiết chiến dịch</span>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                   </button>
                 </div>
               );
             })}
-            {filteredKols.length === 0 && (
-              <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "80px 0", color: "var(--ink-soft)" }}>
-                Không tìm thấy hồ sơ KOL nào phù hợp.
-              </div>
-            )}
           </div>
         </div>
 
-        {/* Right Column: Leaderboard Sidebar */}
         <div className="kt-scrollbar kt-profile-sidebar" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          
-          {/* Section 1: Views Leaderboard */}
+          <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E2E8F0", padding: "12px 14px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <span style={{ fontSize: 11, fontWeight: 800, color: "#475569", textTransform: "uppercase", letterSpacing: "0.04em", display: "flex", alignItems: "center", gap: 5 }}>
+                <span>📁</span> DỰ ÁN BXH
+              </span>
+              <span style={{ fontSize: 11, color: "#94A3B8" }}>
+                {filterCampaign === "all" ? "Tất cả dự án" : (campaignLabels[filterCampaign] || filterCampaign)}
+              </span>
+            </div>
+            <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
+              <button
+                onClick={() => setFilterCampaign("all")}
+                style={{
+                  padding: "4px 9px",
+                  borderRadius: 6,
+                  fontSize: 11,
+                  fontWeight: filterCampaign === "all" ? 700 : 500,
+                  background: filterCampaign === "all" ? "#0F172A" : "#F1F5F9",
+                  color: filterCampaign === "all" ? "#FFFFFF" : "#475569",
+                  border: "none",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease"
+                }}
+              >
+                Tất cả
+              </button>
+              {dynamicCampaigns.map(c => {
+                const active = filterCampaign === c.key;
+                return (
+                  <button
+                    key={c.key}
+                    onClick={() => setFilterCampaign(c.key)}
+                    style={{
+                      padding: "4px 9px",
+                      borderRadius: 6,
+                      fontSize: 11,
+                      fontWeight: active ? 700 : 500,
+                      background: active ? "#0284C7" : "#F1F5F9",
+                      color: active ? "#FFFFFF" : "#475569",
+                      border: "none",
+                      cursor: "pointer",
+                      transition: "all 0.15s ease"
+                    }}
+                  >
+                    {campaignLabels[c.key] || c.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E2E8F0", padding: "14px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
             <div style={{ fontSize: 12, fontWeight: 800, color: "#0284C7", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ fontSize: 14 }}>🏆</span>
-              BXH LƯỢT XEM (VIEWS)
+              <span style={{ fontSize: 14 }}>🏆</span> BXH LƯỢT XEM (VIEWS)
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {topViewsKols.map((k, idx) => {
-                const rankBg = idx === 0 ? "#FEF3C7" : idx === 1 ? "#E2E8F0" : idx === 2 ? "#FFEDD5" : "#F1F5F9";
-                const rankColor = idx === 0 ? "#D97706" : idx === 1 ? "#475569" : idx === 2 ? "#C2410C" : "#64748B";
-                const rankLabels = ["1st", "2nd", "3rd", "4th", "5th"];
-                return (
-                  <div 
-                    key={k.kol} 
-                    onClick={() => onOpenProfile(k)}
-                    style={{ 
-                      display: "flex", 
-                      justifyContent: "space-between", 
-                      alignItems: "center", 
-                      padding: "8px 10px", 
-                      background: "#F8FAFC", 
-                      borderRadius: 8, 
-                      border: "1px solid #F1F5F9",
-                      cursor: "pointer",
-                      transition: "all 0.15s ease"
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.background = "#EFF6FF";
-                      e.currentTarget.style.borderColor = "#93C5FD";
-                      e.currentTarget.style.boxShadow = "0 2px 6px rgba(59, 130, 246, 0.15)";
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.background = "#F8FAFC";
-                      e.currentTarget.style.borderColor = "#F1F5F9";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <span style={{ fontSize: 10, fontWeight: 800, padding: "2px 6px", borderRadius: 4, background: rankBg, color: rankColor, fontFamily: "'IBM Plex Mono', monospace" }}>
-                        {rankLabels[idx]}
-                      </span>
-                      <span style={{ fontWeight: 700, color: "#0F172A", fontSize: 12 }}>
-                        {k.kol}
-                      </span>
-                    </div>
-                    <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#0284C7", fontSize: 12 }}>
-                      {k.displayViews >= 1000000 ? `${(k.displayViews / 1000000).toFixed(1)}M` : k.displayViews.toLocaleString()}
-                    </span>
-                  </div>
-                );
-              })}
-              {topViewsKols.length === 0 && <span style={{ fontSize: 12, color: "#94A3B8" }}>Chưa có dữ liệu</span>}
+              {topViewsKols.map((k, idx) => renderLeaderboardItem(k, idx, k.displayViews >= 1000000 ? `${(k.displayViews / 1000000).toFixed(1)}M` : k.displayViews.toLocaleString(), "#0284C7"))}
             </div>
           </div>
 
-          {/* Section 2: Engagement Leaderboard */}
           <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E2E8F0", padding: "14px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
             <div style={{ fontSize: 12, fontWeight: 800, color: "#15803D", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ fontSize: 14 }}>❤️</span>
-              BXH TƯƠNG TÁC (ENGAGEMENT)
+              <span style={{ fontSize: 14 }}>❤️</span> BXH TƯƠNG TÁC (ENGAGEMENT)
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {topEngKols.map((k, idx) => {
-                const rankBg = idx === 0 ? "#FEF3C7" : idx === 1 ? "#E2E8F0" : idx === 2 ? "#FFEDD5" : "#F1F5F9";
-                const rankColor = idx === 0 ? "#D97706" : idx === 1 ? "#475569" : idx === 2 ? "#C2410C" : "#64748B";
-                const rankLabels = ["1st", "2nd", "3rd", "4th", "5th"];
-                return (
-                  <div 
-                    key={k.kol} 
-                    onClick={() => onOpenProfile(k)}
-                    style={{ 
-                      display: "flex", 
-                      justifyContent: "space-between", 
-                      alignItems: "center", 
-                      padding: "8px 10px", 
-                      background: "#F8FAFC", 
-                      borderRadius: 8, 
-                      border: "1px solid #F1F5F9",
-                      cursor: "pointer",
-                      transition: "all 0.15s ease"
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.background = "#F0FDF4";
-                      e.currentTarget.style.borderColor = "#86EFAC";
-                      e.currentTarget.style.boxShadow = "0 2px 6px rgba(22, 163, 74, 0.15)";
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.background = "#F8FAFC";
-                      e.currentTarget.style.borderColor = "#F1F5F9";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <span style={{ fontSize: 10, fontWeight: 800, padding: "2px 6px", borderRadius: 4, background: rankBg, color: rankColor, fontFamily: "'IBM Plex Mono', monospace" }}>
-                        {rankLabels[idx]}
-                      </span>
-                      <span style={{ fontWeight: 700, color: "#0F172A", fontSize: 12 }}>
-                        {k.kol}
-                      </span>
-                    </div>
-                    <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#15803D", fontSize: 12 }}>
-                      {k.displayEng >= 1000000 ? `${(k.displayEng / 1000000).toFixed(1)}M` : k.displayEng.toLocaleString()}
-                    </span>
-                  </div>
-                );
-              })}
-              {topEngKols.length === 0 && <span style={{ fontSize: 12, color: "#94A3B8" }}>Chưa có dữ liệu</span>}
+              {topEngKols.map((k, idx) => renderLeaderboardItem(k, idx, k.displayEng >= 1000000 ? `${(k.displayEng / 1000000).toFixed(1)}M` : k.displayEng.toLocaleString(), "#15803D"))}
             </div>
           </div>
 
-          {/* Section 3: Cost Leaderboard */}
           <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E2E8F0", padding: "14px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
             <div style={{ fontSize: 12, fontWeight: 800, color: "#E11D48", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ fontSize: 14 }}>💰</span>
-              BXH NGÂN SÁCH BOOKING
+              <span style={{ fontSize: 14 }}>💰</span> BXH NGÂN SÁCH BOOKING
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {topCostKols.map((k, idx) => {
-                const rankBg = idx === 0 ? "#FEF3C7" : idx === 1 ? "#E2E8F0" : idx === 2 ? "#FFEDD5" : "#F1F5F9";
-                const rankColor = idx === 0 ? "#D97706" : idx === 1 ? "#475569" : idx === 2 ? "#C2410C" : "#64748B";
-                const rankLabels = ["1st", "2nd", "3rd", "4th", "5th"];
-                return (
-                  <div 
-                    key={k.kol} 
-                    onClick={() => onOpenProfile(k)}
-                    style={{ 
-                      display: "flex", 
-                      justifyContent: "space-between", 
-                      alignItems: "center", 
-                      padding: "8px 10px", 
-                      background: "#F8FAFC", 
-                      borderRadius: 8, 
-                      border: "1px solid #F1F5F9",
-                      cursor: "pointer",
-                      transition: "all 0.15s ease"
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.background = "#FFF1F2";
-                      e.currentTarget.style.borderColor = "#FDA4AF";
-                      e.currentTarget.style.boxShadow = "0 2px 6px rgba(225, 29, 72, 0.15)";
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.background = "#F8FAFC";
-                      e.currentTarget.style.borderColor = "#F1F5F9";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <span style={{ fontSize: 10, fontWeight: 800, padding: "2px 6px", borderRadius: 4, background: rankBg, color: rankColor, fontFamily: "'IBM Plex Mono', monospace" }}>
-                        {rankLabels[idx]}
-                      </span>
-                      <span style={{ fontWeight: 700, color: "#0F172A", fontSize: 12 }}>
-                        {k.kol}
-                      </span>
-                    </div>
-                    <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#E11D48", fontSize: 12 }}>
-                      {fmtVND(k.displayCost)}
-                    </span>
-                  </div>
-                );
-              })}
-              {topCostKols.length === 0 && <span style={{ fontSize: 12, color: "#94A3B8" }}>Chưa có dữ liệu</span>}
+              {topCostKols.map((k, idx) => renderLeaderboardItem(k, idx, fmtVND(k.displayCost), "#E11D48"))}
             </div>
           </div>
 
-          {/* Section 4: Watch Time Leaderboard */}
           <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E2E8F0", padding: "14px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
             <div style={{ fontSize: 12, fontWeight: 800, color: "#7C3AED", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ fontSize: 14 }}>⏱️</span>
-              BXH THỜI LƯỢNG XEM LÂU NHẤT
+              <span style={{ fontSize: 14 }}>⏱️</span> BXH THỜI LƯỢNG XEM LÂU NHẤT
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {topTimeKols.map((k, idx) => {
-                const rankBg = idx === 0 ? "#FEF3C7" : idx === 1 ? "#E2E8F0" : idx === 2 ? "#FFEDD5" : "#F1F5F9";
-                const rankColor = idx === 0 ? "#D97706" : idx === 1 ? "#475569" : idx === 2 ? "#C2410C" : "#64748B";
-                const rankLabels = ["1st", "2nd", "3rd", "4th", "5th"];
-                return (
-                  <div 
-                    key={k.kol} 
-                    onClick={() => onOpenProfile(k)}
-                    style={{ 
-                      display: "flex", 
-                      justifyContent: "space-between", 
-                      alignItems: "center", 
-                      padding: "8px 10px", 
-                      background: "#F8FAFC", 
-                      borderRadius: 8, 
-                      border: "1px solid #F1F5F9",
-                      cursor: "pointer",
-                      transition: "all 0.15s ease"
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.background = "#FAF5FF";
-                      e.currentTarget.style.borderColor = "#D8B4FE";
-                      e.currentTarget.style.boxShadow = "0 2px 6px rgba(124, 58, 237, 0.15)";
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.background = "#F8FAFC";
-                      e.currentTarget.style.borderColor = "#F1F5F9";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <span style={{ fontSize: 10, fontWeight: 800, padding: "2px 6px", borderRadius: 4, background: rankBg, color: rankColor, fontFamily: "'IBM Plex Mono', monospace" }}>
-                        {rankLabels[idx]}
-                      </span>
-                      <span style={{ fontWeight: 700, color: "#0F172A", fontSize: 12 }}>
-                        {k.kol}
-                      </span>
-                    </div>
-                    <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#7C3AED", fontSize: 12 }}>
-                      {k.displayTimeStr}
-                    </span>
-                  </div>
-                );
-              })}
-              {topTimeKols.length === 0 && <span style={{ fontSize: 12, color: "#94A3B8" }}>Chưa có dữ liệu</span>}
+              {topTimeKols.map((k, idx) => renderLeaderboardItem(k, idx, k.displayTimeStr, "#7C3AED"))}
             </div>
           </div>
 
-          {/* Section 5: CPV 6s Leaderboard */}
           <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E2E8F0", padding: "14px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
             <div style={{ fontSize: 12, fontWeight: 800, color: "#15803D", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ fontSize: 14 }}>⚡</span>
-              BXH TỐI ƯU CPV 6S
+              <span style={{ fontSize: 14 }}>⚡</span> BXH TỐI ƯU CPV 6S
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {topCpvKols.map((k, idx) => {
-                const rankBg = idx === 0 ? "#FEF3C7" : idx === 1 ? "#E2E8F0" : idx === 2 ? "#FFEDD5" : "#F1F5F9";
-                const rankColor = idx === 0 ? "#D97706" : idx === 1 ? "#475569" : idx === 2 ? "#C2410C" : "#64748B";
-                const rankLabels = ["1st", "2nd", "3rd", "4th", "5th"];
-                return (
-                  <div 
-                    key={k.kol} 
-                    onClick={() => onOpenProfile(k)}
-                    style={{ 
-                      display: "flex", 
-                      justifyContent: "space-between", 
-                      alignItems: "center", 
-                      padding: "8px 10px", 
-                      background: "#F8FAFC", 
-                      borderRadius: 8, 
-                      border: "1px solid #F1F5F9",
-                      cursor: "pointer",
-                      transition: "all 0.15s ease"
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.background = "#F0FDF4";
-                      e.currentTarget.style.borderColor = "#86EFAC";
-                      e.currentTarget.style.boxShadow = "0 2px 6px rgba(21, 128, 61, 0.15)";
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.background = "#F8FAFC";
-                      e.currentTarget.style.borderColor = "#F1F5F9";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <span style={{ fontSize: 10, fontWeight: 800, padding: "2px 6px", borderRadius: 4, background: rankBg, color: rankColor, fontFamily: "'IBM Plex Mono', monospace" }}>
-                        {rankLabels[idx]}
-                      </span>
-                      <span style={{ fontWeight: 700, color: "#0F172A", fontSize: 12 }}>
-                        {k.kol}
-                      </span>
-                    </div>
-                    <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#15803D", fontSize: 12 }}>
-                      {k.displayCpv}đ
-                    </span>
-                  </div>
-                );
-              })}
-              {topCpvKols.length === 0 && <span style={{ fontSize: 12, color: "#94A3B8" }}>Chưa có dữ liệu</span>}
+              {topCpvKols.map((k, idx) => renderLeaderboardItem(k, idx, `${k.displayCpv}đ`, "#15803D"))}
             </div>
           </div>
 
-          {/* Section 6: Media Paid Leaderboard */}
           <div style={{ background: "#FFFFFF", borderRadius: 12, border: "1px solid #E2E8F0", padding: "14px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
             <div style={{ fontSize: 12, fontWeight: 800, color: "#6366F1", textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ fontSize: 14 }}>📢</span>
-              CHI PHÍ QUẢNG CÁO (MEDIA PAID)
+              <span style={{ fontSize: 14 }}>📢</span> CHI PHÍ QUẢNG CÁO (MEDIA PAID)
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {topMediaPaidKols.map((k, idx) => {
-                const rankBg = idx === 0 ? "#FEF3C7" : idx === 1 ? "#E2E8F0" : idx === 2 ? "#FFEDD5" : "#F1F5F9";
-                const rankColor = idx === 0 ? "#D97706" : idx === 1 ? "#475569" : idx === 2 ? "#C2410C" : "#64748B";
-                const rankLabels = ["1st", "2nd", "3rd", "4th", "5th"];
-                return (
-                  <div 
-                    key={k.kol} 
-                    onClick={() => onOpenProfile(k)}
-                    style={{ 
-                      display: "flex", 
-                      justifyContent: "space-between", 
-                      alignItems: "center", 
-                      padding: "8px 10px", 
-                      background: "#F8FAFC", 
-                      borderRadius: 8, 
-                      border: "1px solid #F1F5F9",
-                      cursor: "pointer",
-                      transition: "all 0.15s ease"
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.background = "#EEF2FF";
-                      e.currentTarget.style.borderColor = "#A5B4FC";
-                      e.currentTarget.style.boxShadow = "0 2px 6px rgba(99, 102, 241, 0.15)";
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.background = "#F8FAFC";
-                      e.currentTarget.style.borderColor = "#F1F5F9";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <span style={{ fontSize: 10, fontWeight: 800, padding: "2px 6px", borderRadius: 4, background: rankBg, color: rankColor, fontFamily: "'IBM Plex Mono', monospace" }}>
-                        {rankLabels[idx]}
-                      </span>
-                      <span style={{ fontWeight: 700, color: "#0F172A", fontSize: 12 }}>
-                        {k.kol}
-                      </span>
-                    </div>
-                    <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontWeight: 800, color: "#6366F1", fontSize: 12 }}>
-                      {fmtVND(k.displayMediaPaid)}
-                    </span>
-                  </div>
-                );
-              })}
+              {topMediaPaidKols.map((k, idx) => renderLeaderboardItem(k, idx, fmtVND(k.displayMediaPaid), "#6366F1"))}
               {topMediaPaidKols.length === 0 && <span style={{ fontSize: 12, color: "#94A3B8" }}>Chưa có dữ liệu</span>}
             </div>
           </div>
