@@ -290,8 +290,8 @@ const GlobalStyle = () => (
       overflow: hidden;
     }
     .kt-profile-sidebar {
-      width: 340px;
-      min-width: 340px;
+      width: 420px;
+      min-width: 420px;
       border-left: 1px solid var(--line);
       background: var(--card);
       padding: 20px;
@@ -4403,7 +4403,7 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
 
       <div className="kt-profile-split">
         <div className="kt-scrollbar" style={{ flex: 1, padding: "20px", overflowY: "auto" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16 }}>
             {filteredKols.map(k => {
               const campaignsArr = Array.from(k.campaigns);
               const phasesArr = Array.from(k.phases);
