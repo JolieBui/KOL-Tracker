@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import * as XLSX from "xlsx";
 import DashboardView, { DATA_MSG, DATA_VINEGAR } from "./DashboardView";
+import AutomationHub from "./AutomationHub";
+import CommentSentimentView from "./CommentSentimentView";
+import CompetitorPricingView from "./CompetitorPricingView";
 
 /* ---------------- Design tokens (injected via <style>) ---------------- */
 const GlobalStyle = () => (
@@ -2873,9 +2876,11 @@ const StatsBar = ({ rows, currentStatus = "all", onCardClick }) => {
 /* ================================================================
    TABLE VIEW
 ================================================================ */
-const TableView = ({ rows, onOpen, onSave, campaignLabels, statusMap, statusStages }) => {
+const TableView = ({ rows, onOpen, onSave, onDelete, campaignLabels, statusMap, statusStages }) => {
   const [sortKey, setSortKey] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [confirmingBulkDelete, setConfirmingBulkDelete] = useState(false);
 
   const handleSort = (key) => {
     if (sortKey === key) {
@@ -2930,11 +2935,98 @@ const TableView = ({ rows, onOpen, onSave, campaignLabels, statusMap, statusStag
     );
   };
 
+  const allVisibleIds = sortedRows.map(r => r.id);
+  const allSelected = allVisibleIds.length > 0 && allVisibleIds.every(id => selectedIds.has(id));
+  const someSelected = selectedIds.size > 0;
+
+  const toggleAll = () => {
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(allVisibleIds));
+    }
+  };
+
+  const toggleRow = (e, id) => {
+    e.stopPropagation();
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleBulkDelete = () => {
+    if (!onDelete) return;
+    onDelete([...selectedIds]);
+    setSelectedIds(new Set());
+    setConfirmingBulkDelete(false);
+  };
+
   return (
+    <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+
+      {/* ── BULK ACTION TOOLBAR ── */}
+      {someSelected && (
+        <div style={{
+          display: "flex", alignItems: "center", gap: 12,
+          padding: "10px 16px",
+          background: "linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%)",
+          borderBottom: "1px solid var(--accent-soft)",
+          flexShrink: 0,
+          animation: "kt-fade-in 0.2s ease"
+        }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--accent)" }}>
+            ✓ Đã chọn {selectedIds.size} KOL
+          </span>
+          <div style={{ flex: 1 }} />
+          <button className="kt-btn kt-btn-ghost" style={{ fontSize: 12, padding: "5px 10px" }}
+            onClick={() => setSelectedIds(new Set())}>
+            Bỏ chọn
+          </button>
+          {confirmingBulkDelete ? (
+            <>
+              <span style={{ fontSize: 12, color: "var(--danger)", fontWeight: 600 }}>
+                Xác nhận xóa {selectedIds.size} KOL?
+              </span>
+              <button className="kt-btn" style={{
+                fontSize: 12, padding: "5px 12px",
+                background: "var(--danger)", color: "#fff", border: "none", borderRadius: 8
+              }} onClick={handleBulkDelete}>
+                🗑️ Xóa ngay
+              </button>
+              <button className="kt-btn kt-btn-ghost" style={{ fontSize: 12, padding: "5px 10px" }}
+                onClick={() => setConfirmingBulkDelete(false)}>
+                Hủy
+              </button>
+            </>
+          ) : (
+            <button className="kt-btn" style={{
+              fontSize: 12, padding: "5px 12px",
+              background: "var(--danger-bg)", color: "var(--danger)",
+              border: "1px solid var(--accent-soft)", borderRadius: 8
+            }} onClick={() => setConfirmingBulkDelete(true)}>
+              🗑️ Xóa {selectedIds.size} KOL đã chọn
+            </button>
+          )}
+        </div>
+      )}
+
     <div className="kt-scrollbar" style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
       <table className="kt-table kt-table-sticky">
         <thead>
           <tr>
+            <th style={{ width: 36, padding: "8px 10px", textAlign: "center" }}
+              onClick={e => e.stopPropagation()}>
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={toggleAll}
+                title={allSelected ? "Bỏ chọn tất cả" : "Chọn tất cả"}
+                style={{ cursor: "pointer", width: 15, height: 15, accentColor: "var(--accent)" }}
+              />
+            </th>
             <SortTh label="ID" field="id" />
             <SortTh label="KOL" field="kol" />
             <SortTh label="Campaign" field="campaign" />
@@ -2949,8 +3041,19 @@ const TableView = ({ rows, onOpen, onSave, campaignLabels, statusMap, statusStag
           </tr>
         </thead>
         <tbody>
-          {sortedRows.map(r => (
-            <tr key={r.id} onClick={() => onOpen(r)} style={{ cursor: "pointer" }}>
+          {sortedRows.map(r => {
+            const isChecked = selectedIds.has(r.id);
+            return (
+            <tr key={r.id} onClick={() => onOpen(r)} style={{ cursor: "pointer", background: isChecked ? "#FFF1F2" : undefined }}>
+              <td style={{ textAlign: "center", padding: "8px 10px", width: 36 }} onClick={e => toggleRow(e, r.id)}>
+                <input
+                  type="checkbox"
+                  checked={isChecked}
+                  onChange={() => {}}
+                  onClick={e => toggleRow(e, r.id)}
+                  style={{ cursor: "pointer", width: 15, height: 15, accentColor: "var(--accent)", pointerEvents: "none" }}
+                />
+              </td>
               <td><span className="kt-mono" style={{ fontSize: 11, color: "var(--ink-soft)" }}>{r.id}</span></td>
               <td title={r.kol} style={{ maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 <div style={{ fontWeight: 600, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis" }}>{r.kol}</div>
@@ -3020,7 +3123,8 @@ const TableView = ({ rows, onOpen, onSave, campaignLabels, statusMap, statusStag
                 );
               })()}</td>
             </tr>
-          ))}
+          );
+          })}
         </tbody>
       </table>
       {rows.length === 0 && (
@@ -3028,6 +3132,7 @@ const TableView = ({ rows, onOpen, onSave, campaignLabels, statusMap, statusStag
           Không có KOL nào phù hợp với bộ lọc.
         </div>
       )}
+    </div>
     </div>
   );
 };
@@ -5840,8 +5945,8 @@ const [view, setView] = useState("table");
               </h1>
             </div>
             
-            {/* View Toggle (Bảng, Kanban, Lịch, Hồ sơ KOL, Dashboard) */}
-            <div style={{ display: "flex", gap: 2, background: "var(--paper)", padding: 3, borderRadius: 20 }}>
+            {/* View Toggle (Bảng, Kanban, Lịch, Hồ sơ KOL, Dashboard, Tự Động Hóa, Cảm Xúc, Giá Đối Thủ) */}
+            <div style={{ display: "flex", gap: 2, background: "var(--paper)", padding: 3, borderRadius: 20, flexWrap: "wrap" }}>
               <button className={`kt-btn ${view === "table" ? "kt-btn-primary" : "kt-btn-ghost"}`}
                 style={{ padding: "5px 12px", fontSize: 11, borderRadius: 16 }}
                 onClick={() => setView("table")}>Bảng</button>
@@ -5857,6 +5962,7 @@ const [view, setView] = useState("table");
               <button className={`kt-btn ${view === "dashboard" ? "kt-btn-primary" : "kt-btn-ghost"}`}
                 style={{ padding: "5px 12px", fontSize: 11, borderRadius: 16 }}
                 onClick={() => setView("dashboard")}>Dashboard</button>
+
             </div>
           </div>
 
@@ -5971,7 +6077,7 @@ const [view, setView] = useState("table");
           boxShadow: "0 4px 20px rgba(46, 56, 64, 0.04)"
         }}>
           <ViewErrorBoundary>
-            {view === "table" && <TableView rows={filtered} statusMap={statusMap} statusStages={statusStages} onOpen={r => setSelected(r)} onSave={(id, changes) => { setData(prev => prev.map(item => item.id === id ? { ...item, ...changes } : item)); }} campaignLabels={campaignLabels} />}
+            {view === "table" && <TableView rows={filtered} statusMap={statusMap} statusStages={statusStages} onOpen={r => setSelected(r)} onSave={(id, changes) => { setData(prev => prev.map(item => item.id === id ? { ...item, ...changes } : item)); }} onDelete={(ids) => { setData(prev => prev.filter(item => !ids.includes(item.id))); showToast(`🗑️ Đã xóa ${ids.length} KOL`); }} campaignLabels={campaignLabels} />}
             {view === "kanban" && (
               <KanbanView 
                 rows={filtered} 
@@ -6024,6 +6130,7 @@ const [view, setView] = useState("table");
                 campaignLabels={campaignLabels} 
               />
             )}
+
           </ViewErrorBoundary>
         </div>
       </div>
@@ -6179,13 +6286,28 @@ const [view, setView] = useState("table");
               newColors[c.key] = c.color;
             });
 
-            // Update campaign in data rows if a key was renamed
+            // Update campaign in data rows: if renamed, update key; if deleted, wipe campaign identifiers
             setData(prev => prev.map(row => {
-              const match = newCampaigns.find(nc => nc.originalKey === row.campaign);
-              if (match && match.key !== row.campaign) {
-                return { ...row, campaign: match.key };
+              const currentKey = resolveCampaignKey(row);
+              if (!currentKey) return row;
+
+              const match = newCampaigns.find(nc => nc.originalKey === currentKey || nc.key === currentKey);
+              if (match) {
+                if (match.key !== currentKey || row.campaign !== match.key) {
+                  return { ...row, campaign: match.key };
+                }
+                return row;
               }
-              return row;
+
+              // Campaign was deleted by user in settings modal → wipe campaign fields completely
+              const updated = { ...row };
+              delete updated.campaign;
+              delete updated.__sheet__;
+              delete updated.sheet;
+              delete updated.Sheet;
+              delete updated.Brand;
+              delete updated.brand;
+              return { ...updated, campaign: "", __sheet__: "" };
             }));
 
             setCampaignLabels(newLabels);
