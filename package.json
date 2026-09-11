@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "server": "node server.js",
+    "start:all": "node server.js & vite",
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview",
@@ -13,6 +15,8 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.3",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "xlsx": "^0.18.5"
