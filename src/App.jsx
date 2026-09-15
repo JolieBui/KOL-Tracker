@@ -3061,57 +3061,22 @@ const TableView = ({ rows, onOpen, onSave, onDelete, campaignLabels, dynamicCamp
                   onClick={e => e.stopPropagation()}
                   style={{ fontSize: 11, color: "var(--ink-soft)" }}>TikTok ↗</a>}
               </td>
+              <td><CampaignDot campaign={r.campaign} labels={campaignLabels} /></td>
               <td onClick={e => e.stopPropagation()} style={{ padding: "4px 6px" }}>
-                <div style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
-                  <span style={{
-                    width: 7, height: 7, borderRadius: "50%",
-                    background: getCampaignColor(r.campaign) || "#888",
-                    position: "absolute", left: 8, pointerEvents: "none", zIndex: 1
-                  }} />
-                  <select
-                    value={r.campaign || ""}
-                    onChange={e => onSave && onSave(r.id, { campaign: e.target.value })}
-                    onClick={e => e.stopPropagation()}
-                    title="Click để đổi Chiến dịch"
-                    style={{
-                      fontSize: 11, fontWeight: 600, border: "1px solid var(--line)",
-                      borderRadius: 16, padding: "3px 20px 3px 20px", cursor: "pointer",
-                      background: "var(--paper-bg)", color: getCampaignColor(r.campaign) || "var(--ink)",
-                      outline: "none", appearance: "none", WebkitAppearance: "none"
-                    }}
-                  >
-                    {(dynamicCampaigns || []).map(c => (
-                      <option key={c.key} value={c.key} style={{ background: "#fff", color: "#111" }}>{campaignLabels[c.key] || c.label}</option>
-                    ))}
-                  </select>
-                  <span style={{
-                    position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)",
-                    pointerEvents: "none", fontSize: 8, color: "var(--ink-soft)"
-                  }}>▼</span>
-                </div>
-              </td>
-              <td onClick={e => e.stopPropagation()} style={{ padding: "4px 6px" }}>
-                <div style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
-                  <select
-                    value={r.type || ""}
-                    onChange={e => onSave && onSave(r.id, { type: e.target.value })}
-                    onClick={e => e.stopPropagation()}
-                    title="Click để chọn Tier KOL"
-                    style={{
-                      fontSize: 11, fontWeight: 600, border: "1px solid var(--line)",
-                      borderRadius: 20, padding: "3px 18px 3px 8px", cursor: "pointer",
-                      background: "var(--paper-bg)", color: "var(--ink-soft)",
-                      outline: "none", appearance: "none", WebkitAppearance: "none"
-                    }}
-                  >
-                    <option value="">— Tier —</option>
-                    {TYPES.map(t => <option key={t} value={t} style={{ background: "#fff", color: "#111" }}>{t}</option>)}
-                  </select>
-                  <span style={{
-                    position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)",
-                    pointerEvents: "none", fontSize: 8, color: "var(--ink-soft)"
-                  }}>▼</span>
-                </div>
+                <select
+                  value={r.type || ""}
+                  onChange={e => onSave && onSave(r.id, { type: e.target.value })}
+                  onClick={e => e.stopPropagation()}
+                  style={{
+                    fontSize: 11, fontWeight: 600, border: "1px solid var(--line)",
+                    borderRadius: 20, padding: "3px 8px", cursor: "pointer",
+                    background: "var(--paper-bg)", color: "var(--ink-soft)",
+                    outline: "none"
+                  }}
+                >
+                  <option value="">—</option>
+                  {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
               </td>
               <td><span className="kt-mono" style={{ fontSize: 12 }}>{r.follower || "—"}</span></td>
               <td><span className="kt-mono" style={{ fontSize: 12, color: "var(--ink)" }}>{fmtVND(r.cost)}</span></td>
@@ -3121,41 +3086,33 @@ const TableView = ({ rows, onOpen, onSave, onDelete, campaignLabels, dynamicCamp
                   const resolvedKey = statusMap[rawKey] ? rawKey : (statusStages.find(s => s.label === rawKey || s.key === rawKey)?.key || "waiting_food");
                   const currentStatus = statusMap[resolvedKey] || { label: rawKey || "Chờ duyệt món ăn", color: "#888", soft: "#eee" };
                   return (
-                    <div style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
-                      <select
-                        value={resolvedKey}
-                        onChange={e => {
-                          const newKey = e.target.value;
-                          onSave && onSave(r.id, { statusKey: newKey });
-                        }}
-                        onClick={e => e.stopPropagation()}
-                        title="Click để đổi Trạng thái trực tiếp"
-                        style={{
-                          fontSize: 11,
-                          fontWeight: 700,
-                          border: `1.5px solid ${currentStatus.color || "var(--line)"}`,
-                          borderRadius: 20,
-                          padding: "4px 22px 4px 10px",
-                          cursor: "pointer",
-                          outline: "none",
-                          background: currentStatus.soft || "#eee",
-                          color: currentStatus.color || "#333",
-                          boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
-                          appearance: "none",
-                          WebkitAppearance: "none",
-                        }}
-                      >
-                        {statusStages.map(s => (
-                          <option key={s.key} value={s.key} style={{ background: "#fff", color: "#111", fontWeight: 600 }}>
-                            {s.label}
-                          </option>
-                        ))}
-                      </select>
-                      <span style={{
-                        position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)",
-                        pointerEvents: "none", fontSize: 8, color: currentStatus.color || "#666"
-                      }}>▼</span>
-                    </div>
+                    <select
+                      value={resolvedKey}
+                      onChange={e => {
+                        const newKey = e.target.value;
+                        onSave && onSave(r.id, { statusKey: newKey });
+                      }}
+                      onClick={e => e.stopPropagation()}
+                      title="Click để đổi Trạng thái trực tiếp"
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 700,
+                        border: "none",
+                        borderRadius: 20,
+                        padding: "4px 10px",
+                        cursor: "pointer",
+                        outline: "none",
+                        background: currentStatus.soft || "#eee",
+                        color: currentStatus.color || "#888",
+                        transition: "all 0.15s ease"
+                      }}
+                    >
+                      {statusStages.map(s => (
+                        <option key={s.key} value={s.key} style={{ background: "#fff", color: "#111", fontWeight: 600 }}>
+                          {s.label}
+                        </option>
+                      ))}
+                    </select>
                   );
                 })()}
               </td>
