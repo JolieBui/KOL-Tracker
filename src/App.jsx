@@ -5349,6 +5349,9 @@ export default function App() {
         if (!updated.phaseTags || updated.phaseTags.trim() === "") {
           updated = { ...updated, phaseTags: "Phase 1" };
         }
+        if (!updated.campaign || updated.campaign.trim() === "") {
+          updated = { ...updated, campaign: "MSG Sep26" };
+        }
         return updated;
       });
       return synced;
@@ -5360,18 +5363,14 @@ export default function App() {
   const [campaignLabels, setCampaignLabels] = useState(() => {
     try {
       const s = localStorage.getItem("kol_campaign_labels");
-      return s ? JSON.parse(s) : {
-        "Campaign A": "Campaign A",
-        "Campaign B": "Campaign B",
-        "Campaign C": "Campaign C",
-        "Campaign D": "Campaign D"
+      const parsed = s ? JSON.parse(s) : {};
+      return {
+        "MSG Sep26": "MSG Sep26",
+        ...parsed
       };
     } catch {
       return {
-        "Campaign A": "Campaign A",
-        "Campaign B": "Campaign B",
-        "Campaign C": "Campaign C",
-        "Campaign D": "Campaign D"
+        "MSG Sep26": "MSG Sep26"
       };
     }
   });
@@ -5492,6 +5491,9 @@ const [view, setView] = useState("table");
         }
         if (!updated.phaseTags || updated.phaseTags.trim() === "") {
           updated = { ...updated, phaseTags: "Phase 1" };
+        }
+        if (!updated.campaign || updated.campaign.trim() === "") {
+          updated = { ...updated, campaign: "MSG Sep26" };
         }
         return updated;
       });
