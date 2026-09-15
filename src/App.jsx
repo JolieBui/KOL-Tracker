@@ -4326,10 +4326,12 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
         if (bucket && !bucket.test(displayEng)) return;
       }
 
-      const matchedPerf = [...(DATA_MSG?.kols || []), ...(DATA_VINEGAR?.kols || [])].find(p => p.kol?.toLowerCase().trim() === k.kol?.toLowerCase().trim()) || {};
+      const hasAired = activeRows.some(r => r.statusKey === "aired" || r.status === "Đã lên sóng" || Number(r.views) > 0 || (r.airedLink && r.airedLink.toString().trim().length > 5));
+
+      const matchedPerf = hasAired ? (([...(DATA_MSG?.kols || []), ...(DATA_VINEGAR?.kols || [])].find(p => p.kol?.toLowerCase().trim() === k.kol?.toLowerCase().trim())) || {}) : {};
       
       let sec = 0;
-      if (matchedPerf.time) {
+      if (hasAired && matchedPerf.time) {
         if (matchedPerf.time.includes("m")) {
           const parts = matchedPerf.time.split("m");
           sec = (parseFloat(parts[0]) || 0) * 60 + (parseFloat(parts[1]) || 0);
@@ -4339,18 +4341,18 @@ const ProfileView = ({ rows, onOpenProfile, campaignLabels, dynamicCampaigns, st
       }
 
       const totalActualAdSpend = activeRows.reduce((s, r) => s + (Number(r.adSpend || r.spend) || 0), 0);
-      const displayMediaPaid = totalActualAdSpend > 0 
-        ? totalActualAdSpend 
-        : (matchedPerf.reupViews ? Number((matchedPerf.reupViews * 18.5).toFixed(0)) : Number((displayCost * 0.15).toFixed(0)));
+      const displayMediaPaid = hasAired 
+        ? (totalActualAdSpend > 0 ? totalActualAdSpend : (matchedPerf.reupViews ? Number((matchedPerf.reupViews * 18.5).toFixed(0)) : Number((displayCost * 0.15).toFixed(0))))
+        : 0;
 
       results.push({
         ...k,
         displayCost,
-        displayViews,
-        displayEng,
-        displayTimeStr: matchedPerf.time || "12.0s",
-        displayTimeSec: sec || 12.0,
-        displayCpv: matchedPerf.cpv || (displayCost > 0 && displayViews > 0 ? Number((displayCost / (displayViews * 0.4)).toFixed(1)) : 42.0),
+        displayViews: hasAired ? displayViews : 0,
+        displayEng: hasAired ? displayEng : 0,
+        displayTimeStr: hasAired ? (matchedPerf.time || (displayViews > 0 ? "12.0s" : "—")) : "—",
+        displayTimeSec: hasAired ? (sec || (displayViews > 0 ? 12.0 : 0)) : 0,
+        displayCpv: hasAired ? (matchedPerf.cpv || (displayCost > 0 && displayViews > 0 ? Number((displayCost / (displayViews * 0.4)).toFixed(1)) : 0)) : 0,
         displayMediaPaid,
         filteredDetails: matchingDetails,
       });
