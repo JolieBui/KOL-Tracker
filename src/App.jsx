@@ -474,6 +474,55 @@ const DEFAULT_STATUS_STAGES = [
   { key: "aired",          label: "Đã lên sóng",         color: "#3B9686", soft: "#D0E9E6" },
 ];
 
+const resolveStatusKey = (rawVal, statusStages = DEFAULT_STATUS_STAGES) => {
+  if (rawVal === null || rawVal === undefined) return "";
+  const s = rawVal.toString().toLowerCase().trim();
+  if (!s) return "";
+
+  // 1. Direct match with key or exact label
+  for (const stage of statusStages) {
+    if (s === stage.key.toLowerCase() || s === stage.label.toLowerCase()) {
+      return stage.key;
+    }
+  }
+
+  // 2. Keyword/phrase pattern matching for Vietnamese & English statuses
+  if (s.includes("lên sóng") || s.includes("đã air") || s.includes("aired") || s.includes("đã đăng") || s.includes("published")) {
+    return "aired";
+  }
+  if (s.includes("chốt demo") || s.includes("đã duyệt demo") || s.includes("demo ok") || s.includes("demo pass") || s.includes("confirmed demo") || s.includes("đã chốt")) {
+    return "confirmed_demo";
+  }
+  if (s.includes("sửa demo") || s.includes("chỉnh demo") || s.includes("revised demo") || s.includes("fixed demo") || s.includes("chỉnh sửa demo")) {
+    return "revised_demo";
+  }
+  if (s.includes("chờ demo") || s.includes("chờ duyệt demo") || s.includes("waiting demo") || s.includes("check demo") || s.includes("đang check demo") || s.includes("đang duyệt demo")) {
+    return "waiting_demo";
+  }
+  if (s.includes("đang làm demo") || s.includes("làm demo") || s.includes("doing demo") || s.includes("quay demo")) {
+    return "doing_demo";
+  }
+  if (s.includes("script") || s.includes("kịch bản")) {
+    return "waiting_script";
+  }
+  if (s.includes("đang check") || s.includes("đang duyệt") || s.includes("chờ duyệt") || s.includes("pending") || s.includes("reviewing") || s.includes("checking")) {
+    if (s.includes("demo")) return "waiting_demo";
+    if (s.includes("script")) return "waiting_script";
+    return "waiting_demo";
+  }
+  if (s.includes("món") || s.includes("food") || s.includes("sản phẩm") || s.includes("quà")) {
+    return "waiting_food";
+  }
+
+  // 3. Substring match fallback
+  for (const stage of statusStages) {
+    const l = stage.label.toLowerCase();
+    if (s.includes(l) || l.includes(s)) return stage.key;
+  }
+
+  return "";
+};
+
 const PREDEFINED_COLORS = [
   "#D97A6C", // Soft Coral / Terracotta (from #FACDD0)
   "#3B9686", // Mint Sage (from #D0E9E6)
@@ -686,12 +735,12 @@ const COL_ALIASES = {
   group:         ["group", "nhóm", "nhom", "target", "camp."],
   addonFee:      ["addonFee", "addon fee", "add-on fee", "add-on", "deliverable", "deliverables", "addonfee", "addon"],
   cost:          ["cost", "chi phí", "chi phi", "giá", "gia", "ext. cost", "ext cost", "budget"],
-  status:        ["status", "trạng thái", "trang thai", "tiến độ", "tien do", "tình trạng", "tinh trang"],
+  status:        ["status", "trạng thái", "trang thai", "tiến độ", "tien do", "tình trạng", "tinh trang", "check", "duyệt"],
   statusKey:     ["statusKey", "status key", "status_key"],
   monAn:         ["monản", "món ăn", "mon an", "food", "dish", "thực đơn", "thuc don"],
-  ngayGuiScript: ["ngay gui script", "ngày gửi script", "script link"],
-  ngayGuiDemo:   ["ngay gui demo", "ngày gửi demo", "ngày gửi 1st demo", "ngay gui 1st demo", "demo link"],
-  ngayAir:       ["ngay air", "ngày air", "air date", "ngày lên sóng", "date aired", "date air", "est. start date", "est start date"],
+  ngayGuiScript: ["ngay gui script", "ngày gửi script", "script link", "script", "hạn script", "ngày script", "kịch bản"],
+  ngayGuiDemo:   ["ngay gui demo", "ngày gửi demo", "ngày gửi 1st demo", "ngay gui 1st demo", "demo link", "demo", "hạn demo", "ngày demo", "demo 1"],
+  ngayAir:       ["ngay air", "ngày air", "air date", "ngày lên sóng", "date aired", "date air", "est. start date", "est start date", "air", "ngày đăng", "ngay dang", "lên sóng", "len song", "timeline"],
   airedLink:     ["airedLink", "aired link", "link aired", "aired tiktok", "link vdo", "link video", "video link", "link_vdo", "vdo link"],
   airedFb:       ["airedFb", "aired fb", "fb/ig", "reup", "social", "facebook", "instagram"],
   giftSent:      ["giftSent", "gift", "quà tặng", "qua tang", "gift sent", "gửi sản phẩm"],
@@ -914,9 +963,9 @@ const applyMapping = (rawRows, mapping, statusLabelToKey) => {
       if (numericFields.includes(field)) {
         out[field] = parseFloat(val.replace(/[^0-9.-]/g, "")) || 0;
       } else if (field === "status") {
-        out.statusKey = (statusLabelToKey[val.toLowerCase().trim()]) || "waiting_food";
+        out.statusKey = resolveStatusKey(val, statusStages) || "waiting_food";
       } else if (field === "statusKey") {
-        out.statusKey = (statusLabelToKey[val.toLowerCase().trim()]) || val || "waiting_food";
+        out.statusKey = resolveStatusKey(val, statusStages) || val || "waiting_food";
       } else {
         out[field] = val;
       }
@@ -1217,11 +1266,11 @@ const parseInternalWorkbook = (wb, statusLabelToKey) => {
     const iGroup = findHeaderIdx(header, "group");
     const iCost = findHeaderIdx(header, "cost");
     const iAddon = findHeaderIdx(header, "add-on fee");
-    const iStatus = findHeaderIdx(header, "status");
-    const iMonAn = findHeaderIdx(header, "món ăn", "mon an");
-    const iScript = findHeaderIdx(header, "ngày gửi script", "ngay gui script");
-    const iDemo = findHeaderIdx(header, "ngày gửi 1st demo", "ngày gửi demo", "ngay gui 1st demo");
-    const iAir = findHeaderIdx(header, "ngày air", "ngay air");
+    const iStatus = findHeaderIdx(header, "status", "trạng thái", "trang thai", "tiến độ", "tình trạng");
+    const iMonAn = findHeaderIdx(header, "món ăn", "mon an", "food");
+    const iScript = findHeaderIdx(header, "ngày gửi script", "ngay gui script", "script link", "script", "hạn script", "ngày script", "kịch bản");
+    const iDemo = findHeaderIdx(header, "ngày gửi 1st demo", "ngày gửi demo", "ngay gui 1st demo", "demo link", "demo", "hạn demo", "ngày demo", "demo 1");
+    const iAir = findHeaderIdx(header, "ngày air", "ngay air", "air date", "ngày lên sóng", "date aired", "date air", "air", "ngày đăng", "lên sóng", "timeline");
     const iAiredLink = findHeaderIdx(header, "aired link");
     const iAiredFb = findHeaderIdx(header, "aired fb");
     const iAdName = findHeaderIdx(header, "ad name", "ad_name", "adname", "tên ads");
@@ -1253,12 +1302,12 @@ const parseInternalWorkbook = (wb, statusLabelToKey) => {
       const no = (noVal !== null && noVal !== "" && !isNaN(Number(noVal))) ? Number(noVal) : (r - headerIdx);
       const intAiredLink = iAiredLink >= 0 ? getLinkOrText(ws, r, iAiredLink, row[iAiredLink]) : "";
       const intNgayAir = excelCellToStr(row[iAir]);
-      let intStatusKey = iStatus >= 0 ? (statusLabelToKey[(row[iStatus] || "").toString().toLowerCase().trim()] || "") : "";
-      // Auto-infer "aired" if there is a real air date or aired link but status not yet set
-      if (!intStatusKey || intStatusKey === "waiting_food") {
+      let intStatusKey = iStatus >= 0 ? resolveStatusKey(row[iStatus], statusStages) : "";
+      if (!intStatusKey) {
         const hasAiredLink = intAiredLink && /^https?:\/\//i.test(intAiredLink);
         const hasAiredDate = intNgayAir && intNgayAir.trim() !== "" && intNgayAir.trim() !== "—" && intNgayAir.trim().toLowerCase() !== "asap";
         if (hasAiredLink || hasAiredDate) intStatusKey = "aired";
+        else intStatusKey = "waiting_food";
       }
       map.set(kolName.toLowerCase(), {
         kol: kolName,
@@ -5395,10 +5444,21 @@ export default function App() {
 
   const statusMap = useMemo(() => Object.fromEntries(statusStages.map(s => [s.key, s])), [statusStages]);
   const statusLabelToKey = useMemo(() => {
-    return Object.fromEntries([
+    const map = Object.fromEntries([
       ...statusStages.map(s => [s.label.toLowerCase(), s.key]),
       ...statusStages.map(s => [s.key.toLowerCase(), s.key])
     ]);
+    return new Proxy(map, {
+      get(target, prop) {
+        if (typeof prop === "string" && prop in target) {
+          return target[prop];
+        }
+        if (typeof prop === "string" && prop) {
+          return resolveStatusKey(prop, statusStages);
+        }
+        return undefined;
+      }
+    });
   }, [statusStages]);
   
   const [showStatusSettings, setShowStatusSettings] = useState(false);
